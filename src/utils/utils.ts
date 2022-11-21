@@ -1,5 +1,7 @@
 import { IRecord } from '@/namespaces/interface';
 import { isEmpty, isEqual, omit } from 'lodash';
+import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
+import cls from 'classnames';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -307,3 +309,37 @@ export const checkLogin = () => {
   const href = location.pathname + location.search;
   return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
 };
+const initColDef: ColDef = { resizable: true, suppressMenu: true, flex: 1, filter: true };
+
+const onGridReady = (params: GridReadyEvent, ref: React.MutableRefObject<GridApi | undefined>) => {
+  ref.current = params.api;
+  params.api.sizeColumnsToFit();
+};
+
+export const initGridTable = ({
+  ref,
+  border = false,
+  height = 32,
+  options,
+}: {
+  ref: React.MutableRefObject<GridApi | undefined>;
+  border?: boolean;
+  height?: number;
+  options?: ColDef;
+}) => ({
+  className: cls('ag-theme-alpine', 'ag-initialize-theme'),
+  defaultColDef: {
+    ...initColDef,
+    ...{
+      cellStyle: {
+        ...(border ? { 'border-right': 'solid 0.5px #E3E6E6' } : {}),
+        'line-height': `${height}px`,
+      },
+    },
+    ...options,
+  },
+  onGridReady: (v: GridReadyEvent) => onGridReady(v, ref),
+  onGridSizeChanged: (v: GridReadyEvent) => onGridReady(v, ref),
+  rowHeight: height,
+  headerHeight: height,
+});

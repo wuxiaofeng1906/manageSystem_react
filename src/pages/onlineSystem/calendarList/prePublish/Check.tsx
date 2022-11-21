@@ -18,8 +18,8 @@ import {
   ModalFuncProps,
   Button,
 } from 'antd';
-import { checkInfo, CheckStatus } from '@/pages/onlineSystem/common/constant';
-import styles from '../../common/common.less';
+import { checkInfo, CheckStatus } from '@/pages/onlineSystem/config/constant';
+import styles from '../../config/common.less';
 import { isEmpty } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import Ellipsis from '@/components/Elipsis';
@@ -28,9 +28,9 @@ import { history } from '@@/core/history';
 
 const Check = (props: any, ref: any) => {
   const query = useLocation()?.query;
-  const [global, setGlobal] = useModel('onlineSystem', (online) => [
-    online.global,
-    online.setGlobal,
+  const [globalState, setGlobalState] = useModel('onlineSystem', (online) => [
+    online.globalState,
+    online.setGlobalState,
   ]);
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
@@ -45,7 +45,7 @@ const Check = (props: any, ref: any) => {
       onSetting: () => setVisible(true),
       onLock: onLock,
     }),
-    [selected, ref, global],
+    [selected, ref, globalState],
   );
 
   const onCheck = async () => {
@@ -57,8 +57,8 @@ const Check = (props: any, ref: any) => {
      * 1.检查是否封板，是否已确认
      * 2. 检查状态是否通过、忽略
      */
-    if (!global.finished) {
-      setGlobal({ ...global, locked: !global.locked });
+    if (!globalState.finished) {
+      setGlobalState({ ...globalState, locked: !globalState.locked });
     }
   };
 
@@ -74,13 +74,13 @@ const Check = (props: any, ref: any) => {
   }, [query.key]);
 
   useEffect(() => {
-    if (global.locked && global.step == 2) {
+    if (globalState.locked && globalState.step == 2) {
       console.log('check');
       history.replace({ pathname: history.location.pathname, query: { key: 'sheet' } });
     }
-  }, [global]);
+  }, [globalState]);
 
-  const hasEdit = useMemo(() => global.locked || global.finished, [global]);
+  const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
 
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>

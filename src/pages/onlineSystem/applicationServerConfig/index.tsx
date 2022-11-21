@@ -8,7 +8,7 @@ import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { getHeight } from '@/publicMethods/pageSet';
 import { applicationConfigColumn } from './column';
-import { TechnicalSide, WhetherOrNot } from '@/pages/onlineSystem/common/constant';
+import { TechnicalSide, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
 import { infoMessage } from '@/publicMethods/showMessages';
 
 const ApplicationServerConfig = () => {

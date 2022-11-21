@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useRef } from 'react';
 import { Tabs, Button } from 'antd';
 import { useLocation, history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import styles from '../../common/common.less';
+import styles from '../../config/common.less';
 import ProcessList from './ProcessList';
 import ZentaoDetail from './ZentaoDetail';
 import { SyncOutlined } from '@ant-design/icons';

@@ -12,20 +12,22 @@ import {
   repaireColumn,
   serverConfirmColumn,
   upgradeServicesColumn,
-} from '@/pages/onlineSystem/common/column';
+} from '@/pages/onlineSystem/config/column';
 import { groupBy, isEmpty, uniq } from 'lodash';
-import { mergeCellsTable } from '@/utils/utils';
+import { initGridTable, mergeCellsTable } from '@/utils/utils';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
-import styles from '@/pages/onlineSystem/common/common.less';
+import styles from '@/pages/onlineSystem/config/common.less';
 import { infoMessage } from '@/publicMethods/showMessages';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { history, useModel } from 'umi';
+import { history, useModel, useParams } from 'umi';
 import IPagination from '@/components/IPagination';
 
 const ProcessDetail = (props: any, ref: any) => {
-  const [global] = useModel('onlineSystem', (online) => [online.global]);
+  const query = useParams() as { branch: string; release_num: string };
+
+  const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
   const [serverData, setServerData] = useState<any[]>([]);
   const [interfaceData, setInterfaceData] = useState<any[]>([]);
   const [repaireData, setRepaireData] = useState<any[]>([]);
@@ -38,6 +40,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const confirmRef = useRef<GridApi>();
   const interfaceRef = useRef<GridApi>();
   const repaireRef = useRef<GridApi>();
+
   const [pages, setPages] = useState({
     page_size: 20,
     total: 0,
@@ -63,10 +66,10 @@ const ProcessDetail = (props: any, ref: any) => {
         });
       },
       onRefresh: () => {
-        console.log('refresh');
+        console.log('refresh', query);
       },
     }),
-    [],
+    [query],
   );
 
   useEffect(() => {
@@ -79,13 +82,6 @@ const ProcessDetail = (props: any, ref: any) => {
     setServerData(mock);
   }, []);
 
-  const onGridReady = (
-    params: GridReadyEvent,
-    ref: React.MutableRefObject<GridApi | undefined>,
-  ) => {
-    ref.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
   const onSeal = async () => {
     if (isEmpty(selectedRowKeys)) return infoMessage('请先选择需封板项目');
     const selected = serverData.flatMap((it) => (selectedRowKeys.includes(it.id) ? [it] : []));
@@ -142,7 +138,7 @@ const ProcessDetail = (props: any, ref: any) => {
     };
   }, [serverData]);
 
-  const hasEdit = useMemo(() => global.locked || global.finished, [global]);
+  const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
 
   return (
     <div className={styles.processDetail}>
@@ -270,18 +266,9 @@ const ProcessDetail = (props: any, ref: any) => {
       </div>
       <div style={{ height: 300, width: '100%' }}>
         <AgGridReact
-          className="ag-theme-alpine"
           columnDefs={upgradeServicesColumn}
           rowData={interfaceData}
-          defaultColDef={{
-            resizable: true,
-            sortable: true,
-            filter: true,
-            suppressMenu: true,
-          }}
-          rowHeight={30}
-          headerHeight={35}
-          onGridReady={(p) => onGridReady(p, interfaceRef)}
+          {...initGridTable({ ref: interfaceRef, height: 30 })}
         />
       </div>
       <div className={styles.tableHeader}>
@@ -297,18 +284,9 @@ const ProcessDetail = (props: any, ref: any) => {
       </div>
       <div style={{ height: 300, width: '100%' }}>
         <AgGridReact
-          className="ag-theme-alpine"
           columnDefs={repaireColumn}
           rowData={repaireData}
-          defaultColDef={{
-            resizable: true,
-            sortable: true,
-            filter: true,
-            suppressMenu: true,
-          }}
-          rowHeight={30}
-          headerHeight={35}
-          onGridReady={(p) => onGridReady(p, repaireRef)}
+          {...initGridTable({ ref: repaireRef, height: 30 })}
         />
       </div>
       <IPagination
@@ -322,18 +300,9 @@ const ProcessDetail = (props: any, ref: any) => {
       </div>
       <div style={{ height: 300, width: '100%' }}>
         <AgGridReact
-          className="ag-theme-alpine"
           columnDefs={serverConfirmColumn}
           rowData={confirmData}
-          defaultColDef={{
-            resizable: true,
-            sortable: true,
-            filter: true,
-            suppressMenu: true,
-          }}
-          rowHeight={30}
-          headerHeight={35}
-          onGridReady={(p) => onGridReady(p, confirmRef)}
+          {...initGridTable({ ref: confirmRef, height: 30 })}
         />
       </div>
       <DemandListModal

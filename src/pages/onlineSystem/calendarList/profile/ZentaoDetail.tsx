@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } f
 import { Form, Select, Row, Col, Spin, TreeSelect } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
-import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/common/column';
+import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/config/column';
 import IPagination from '@/components/IPagination';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { useGqlClient } from '@/hooks/index';
 import { isEmpty } from 'lodash';
-import { ZentaoPhase, ZentaoStatus, ZentaoType } from '../../common/constant';
-import styles from '../../common/common.less';
+import { ZentaoPhase, ZentaoStatus, ZentaoType } from '../../config/constant';
+import styles from '../../config/common.less';
+import { initGridTable } from '@/utils/utils';
 
 const ZentaoDetail = (props: any, ref: any) => {
   const client = useGqlClient();
@@ -18,7 +19,7 @@ const ZentaoDetail = (props: any, ref: any) => {
   const testRef = useRef<GridApi>();
   const [storyData, setStoryData] = useState<any[]>([]);
   const [testData, setTestData] = useState<any[]>([]);
-  const [tableHeight, setTableHeight] = useState((window.innerHeight - 400) / 2);
+  const [tableHeight, setTableHeight] = useState((window.innerHeight - 450) / 2);
   const [spin, setSpin] = useState(false);
   const [orgTree, setOrgTree] = useState<any[]>([]);
 
@@ -31,17 +32,8 @@ const ZentaoDetail = (props: any, ref: any) => {
     onRefresh: getTableList,
   }));
 
-  const onGridReady = (params: GridReadyEvent) => {
-    storyRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-  const onTestGridReady = (params: GridReadyEvent) => {
-    testRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
   window.onresize = function () {
-    setTableHeight((window.innerHeight - 400) / 2);
+    setTableHeight((window.innerHeight - 450) / 2);
   };
   const getSelectList = async () => {
     let source: any[] = [];
@@ -185,20 +177,11 @@ const ZentaoDetail = (props: any, ref: any) => {
             </Col>
           </Row>
         </Form>
-        <div className="ag-theme-alpine" style={{ height: tableHeight, width: '100%' }}>
+        <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
           <AgGridReact
             columnDefs={zentaoStoryColumn}
             rowData={storyData}
-            defaultColDef={{
-              resizable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-              cellStyle: { 'line-height': '28px' },
-            }}
-            rowHeight={28}
-            headerHeight={30}
-            onGridReady={onGridReady}
+            {...initGridTable({ ref: storyRef, height: 30 })}
             frameworkComponents={{
               link: (p: CellClickedEvent) => {
                 return (
@@ -257,20 +240,11 @@ const ZentaoDetail = (props: any, ref: any) => {
             </Col>
           </Row>
         </Form>
-        <div className="ag-theme-alpine" style={{ height: tableHeight, width: '100%' }}>
+        <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
           <AgGridReact
             columnDefs={zentaoTestColumn}
             rowData={testData}
-            defaultColDef={{
-              resizable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-              cellStyle: { 'line-height': '28px' },
-            }}
-            rowHeight={28}
-            headerHeight={30}
-            onGridReady={onTestGridReady}
+            {...initGridTable({ ref: testRef, height: 30 })}
             frameworkComponents={{
               testSheet: (p: CellClickedEvent) => {
                 return (

@@ -3,12 +3,10 @@ import { Tabs, Button, Space } from 'antd';
 import ProcessDetail from './ProcessDetail';
 import Check from './Check';
 import SheetInfo from './SheetInfo';
-// import Approval from './Approval';
-// import Publish from './Publish';
 import { useLocation, history, useParams, useModel } from 'umi';
 import { BarsOutlined, SyncOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import styles from '../../common/common.less';
+import styles from '../../config/common.less';
 
 const tabs = [
   { name: '项目与服务详情', comp: ProcessDetail, key: 'server' },
@@ -19,8 +17,8 @@ const tabs = [
 ];
 const Layout = () => {
   const query = useLocation()?.query;
-  const [global] = useModel('onlineSystem', (online) => [online.global]);
-  const { id } = useParams() as { id: string };
+  const { branch } = useParams() as { branch: string };
+  const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
   const ref = useRef() as React.MutableRefObject<{
     onRefresh: Function;
     onRefreshCheck: Function;
@@ -38,10 +36,13 @@ const Layout = () => {
 
   const updateKey = (key?: string) =>
     history.replace({ pathname: history.location.pathname, query: { key: key ?? 'server' } });
+
   const disableStyle = useMemo(
     () =>
-      global.locked || global.finished ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {},
-    [global],
+      globalState.locked || globalState.finished
+        ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
+        : {},
+    [globalState],
   );
 
   const renderTabContent = useMemo(() => {
@@ -50,7 +51,7 @@ const Layout = () => {
         <Space size={10}>
           <BarsOutlined
             onClick={() => {
-              if (global.locked || global.finished) return;
+              if (globalState.locked || globalState.finished) return;
               ref.current?.onShow();
             }}
             title={'需求列表'}
@@ -62,7 +63,7 @@ const Layout = () => {
           <SyncOutlined
             title={'刷新'}
             onClick={() => {
-              if (global.locked || global.finished) return;
+              if (globalState.locked || globalState.finished) return;
               ref.current?.onRefresh();
             }}
             style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
@@ -78,18 +79,22 @@ const Layout = () => {
           <Button
             size={'small'}
             onClick={() => ref.current?.onCheck()}
-            disabled={global.locked || global.finished}
+            disabled={globalState.locked || globalState.finished}
           >
             一键执行检查
           </Button>
-          <Button size={'small'} disabled={global.finished} onClick={() => ref.current?.onLock()}>
-            {global.locked || global.finished ? '取消封板锁定' : '封板锁定'}
+          <Button
+            size={'small'}
+            disabled={globalState.finished}
+            onClick={() => ref.current?.onLock()}
+          >
+            {globalState.locked || globalState.finished ? '取消封板锁定' : '封板锁定'}
           </Button>
           <SyncOutlined
             title={'刷新'}
             style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
             onClick={() => {
-              if (global.locked || global.finished) return;
+              if (globalState.locked || globalState.finished) return;
               ref.current?.onRefreshCheck();
             }}
           />
@@ -103,7 +108,7 @@ const Layout = () => {
           </Button>
         </div>
       );
-  }, [id, query.key, global]);
+  }, [branch, query.key, globalState]);
 
   return (
     <PageContainer title={'预发布工单'}>
@@ -117,7 +122,7 @@ const Layout = () => {
         >
           {tabs?.map((it, index) => {
             return (
-              <Tabs.TabPane key={it.key} tab={it.name} disabled={global.step < index}>
+              <Tabs.TabPane key={it.key} tab={it.name} disabled={globalState.step < index}>
                 <it.comp ref={ref} />
               </Tabs.TabPane>
             );

@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import styles from '../../common/common.less';
+import styles from '../../config/common.less';
 import {
   Col,
   DatePicker,
@@ -21,21 +21,24 @@ import {
   ModalFuncProps,
 } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
 import { infoMessage } from '@/publicMethods/showMessages';
 import { useModel } from '@@/plugin-model/useModel';
-import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/common/column';
-import { WhetherOrNot } from '@/pages/onlineSystem/common/constant';
+import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/config/column';
+import { WhetherOrNot } from '@/pages/onlineSystem/config/constant';
 import { history, useLocation } from 'umi';
 import { Prompt } from 'react-router-dom';
+import { initGridTable } from '@/utils/utils';
+import AnnouncementServices from '@/services/announcement';
+import PreReleaseServices from '@/services/preRelease';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 
 const SheetInfo = (props: any, ref: any) => {
   const query = useLocation()?.query;
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
-  const [global] = useModel('onlineSystem', (online) => [online.global]);
+  const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
 
   const [spinning, setSpinning] = useState(false);
   const [tableHeight, setTableHeight] = useState((window.innerHeight - 460) / 2);
@@ -45,10 +48,12 @@ const SheetInfo = (props: any, ref: any) => {
   const [visible, setVisible] = useState(false);
   const [activeItem, setActiveItem] = useState<any>();
   const [upgradeData, setUpgradeData] = useState<any[]>([]);
+  const [dutyList, setDutyList] = useState<any[]>([]);
+  const [announcementList, setAnnouncementList] = useState<any[]>([]);
   const [isSave, setIssave] = useState(false);
 
-  const gridRef = useRef<GridApi>();
-  const gridCompareRef = useRef<GridApi>();
+  const serverRef = useRef<GridApi>();
+  const upgradeRef = useRef<GridApi>();
 
   useImperativeHandle(
     ref,
@@ -60,20 +65,16 @@ const SheetInfo = (props: any, ref: any) => {
     [],
   );
 
-  const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
-    ref.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
   const onDrag = async () => {
     if (true) return infoMessage('已标记发布结果不能修改工单顺序!');
     const sortArr: any = [];
-    gridRef.current?.forEachNode(function (node) {
+    upgradeRef.current?.forEachNode(function (node) {
       sortArr.push({ ...node.data });
     });
   };
 
   useEffect(() => {
+    getBaseList();
     getDetail();
   }, []);
 
@@ -89,6 +90,26 @@ const SheetInfo = (props: any, ref: any) => {
       },
     ]);
   };
+
+  const getBaseList = async () => {
+    const announce = await AnnouncementServices.preAnnouncement();
+    const order = await PreReleaseServices.dutyOrder();
+    setDutyList(
+      order?.map((it: any) => ({
+        label: it.duty_name ?? '',
+        value: it.person_duty_num,
+        key: it.person_duty_num,
+      })),
+    );
+    setAnnouncementList(
+      announce.map((it: any) => ({
+        label: it.announcement_name,
+        value: it.announcement_num,
+        key: it.announcement_num,
+      })),
+    );
+  };
+
   const hasPermission = useMemo(() => {
     return { save: true };
   }, [user]);
@@ -147,7 +168,7 @@ const SheetInfo = (props: any, ref: any) => {
                 showSearch
                 disabled={finished}
                 optionFilterProp={'label'}
-                options={[{ key: '免', value: '免', label: '免' }].concat([])}
+                options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
                 style={{ width: '100%' }}
               />
             </Form.Item>
@@ -158,7 +179,7 @@ const SheetInfo = (props: any, ref: any) => {
                 showSearch
                 disabled={finished}
                 optionFilterProp={'label'}
-                options={[{ key: '免', value: '免', label: '免' }].concat([])}
+                options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
                 style={{ width: '100%' }}
               />
             </Form.Item>
@@ -263,48 +284,22 @@ const SheetInfo = (props: any, ref: any) => {
           </Row>
         </Form>
         <h4 style={{ margin: '16px 0' }}>二、发布服务</h4>
-        <div
-          className="ag-theme-alpine"
-          style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}
-        >
+        <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}>
           <AgGridReact
             columnDefs={PublishSeverColumn}
             rowData={[]}
-            defaultColDef={{
-              resizable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-              cellStyle: { 'line-height': '28px' },
-            }}
-            rowHeight={28}
-            headerHeight={30}
-            onGridReady={(r) => onGridReady(r, gridCompareRef)}
-            onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
+            {...initGridTable({ ref: serverRef, height: 30 })}
           />
         </div>
         <h4 style={{ margin: '16px 0' }}>三、升级接口</h4>
-        <div
-          className="ag-theme-alpine"
-          style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}
-        >
+        <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
           <AgGridReact
-            columnDefs={PublishUpgradeColumn}
-            rowData={upgradeData}
-            defaultColDef={{
-              resizable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-              cellStyle: { 'line-height': '28px' },
-            }}
-            rowHeight={28}
-            headerHeight={30}
-            onGridReady={onGridReady}
-            onGridSizeChanged={onGridReady}
             rowDragManaged={!finished}
             animateRows={true}
             onRowDragEnd={onDrag}
+            columnDefs={PublishUpgradeColumn}
+            rowData={upgradeData}
+            {...initGridTable({ ref: upgradeRef, height: 30 })}
             frameworkComponents={{
               operation: (p: CellClickedEvent) => (
                 <Space size={8}>

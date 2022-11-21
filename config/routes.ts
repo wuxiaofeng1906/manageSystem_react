@@ -220,14 +220,14 @@ export default [
       },
       {
         name: '上线日历',
-        path: 'profile/:id',
+        path: 'profile/:branch',
         component: './onlineSystem/calendarList/profile', // 禅道概况
         wrappers: ['../wrappers/auth'],
         hideInMenu: true,
       },
       {
         name: '发布过程单',
-        path: 'prePublish/:id',
+        path: 'prePublish/:branch/:release_num',
         component: './onlineSystem/calendarList/prePublish/layout',
         wrappers: ['../wrappers/auth'],
         hideInMenu: true,

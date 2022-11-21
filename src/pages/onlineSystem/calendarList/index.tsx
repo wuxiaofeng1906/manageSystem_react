@@ -4,10 +4,10 @@ import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import IPagination from '@/components/IPagination';
 import { getHeight } from '@/publicMethods/pageSet';
-import { calendarColumn } from '@/pages/onlineSystem/common/column';
+import { calendarColumn } from '@/pages/onlineSystem/config/column';
 import { history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import styles from '../common/common.less';
+import styles from '../config/common.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 
 const CalendarList = () => {
@@ -37,7 +37,6 @@ const CalendarList = () => {
     const res = await OnlineSystemServices.getProjects();
     setProjects(res?.map((it) => ({ label: it.project_name, value: it.project_id })));
   };
-
   const getTableList = async (page = 1, page_size = 20) => {
     try {
       setSpinning(true);

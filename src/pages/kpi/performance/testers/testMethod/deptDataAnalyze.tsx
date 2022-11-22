@@ -5,7 +5,7 @@ const findParent = (departDatas: any, depts: any, result: any) => {
   const idx = depts.deptName;
   departDatas.forEach((item: any) => {
     if (item['deptName'] && idx) {
-      if (idx === item['deptName']) {
+      if (depts.dept == item.dept) {
         const pidName = item['parent'].deptName;
         if (pidName !== '北京企企科技有限公司') {
           // 不显示北京企企科技有限公司

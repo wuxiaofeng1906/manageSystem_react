@@ -8,6 +8,10 @@ export const OnlineSystemServices = {
   async getEnvs() {
     return request(`${baseUrl}/release/online_environment`);
   },
+  // 上线分支
+  async getBranch() {
+    return request(`${baseUrl}/sonar/branch`);
+  },
   // 上线计划
   async getOnlineList(params: any) {
     return request(`${baseUrl}/online/release-plan`, { params });

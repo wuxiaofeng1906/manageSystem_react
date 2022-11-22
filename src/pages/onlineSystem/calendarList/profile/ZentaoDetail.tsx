@@ -214,7 +214,7 @@ const ZentaoDetail = (props: any, ref: any) => {
           showQuickJumper={getTableList}
           onShowSizeChange={(size) => getTableList(1, size)}
         />
-        <Form form={testForm} size={'small'} className={styles.resetForm}>
+        <Form form={testForm} size={'small'} className={styles.resetForm} style={{ marginTop: 16 }}>
           <Row justify={'space-between'} gutter={8}>
             <Col span={8}>
               <Form.Item label={'归属执行'} name={'execution'}>

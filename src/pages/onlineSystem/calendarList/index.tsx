@@ -18,6 +18,7 @@ const CalendarList = () => {
   const [spinning, setSpinning] = useState(false);
   const [gridHeight, setGridHeight] = useState(getHeight() - 60);
   const [projects, setProjects] = useState<any[]>([]);
+  const [branch, setBranch] = useState<any[]>([]);
 
   const [pages, setPages] = useState({
     page_size: 20,
@@ -34,8 +35,10 @@ const CalendarList = () => {
     setGridHeight(Number(getHeight()) - 60);
   };
   const getSelectList = async () => {
-    const res = await OnlineSystemServices.getProjects();
-    setProjects(res?.map((it) => ({ label: it.project_name, value: it.project_id })));
+    const projects = await OnlineSystemServices.getProjects();
+    const branchs = await OnlineSystemServices.getBranch();
+    setProjects(projects?.map((it) => ({ label: it.project_name, value: it.project_id })));
+    setBranch(branchs?.map((it) => ({ label: it.branch_name, value: it.branch_id })));
   };
   const getTableList = async (page = 1, page_size = 20) => {
     try {
@@ -75,7 +78,7 @@ const CalendarList = () => {
           <Form layout={'inline'} size={'small'} form={form} onFieldsChange={() => getTableList()}>
             <Col span={8}>
               <Form.Item name={'branch'} label={'上线分支'}>
-                <Select options={[]} optionFilterProp={'label'} mode={'multiple'} showSearch />
+                <Select options={branch} optionFilterProp={'label'} mode={'multiple'} showSearch />
               </Form.Item>
             </Col>
             <Col span={8}>

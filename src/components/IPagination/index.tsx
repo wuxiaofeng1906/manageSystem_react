@@ -11,8 +11,8 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
   const pages = useMemo(() => Math.ceil(page.total / page.page_size), [page.total, page.page_size]);
   return (
     <div style={{ background: 'white', marginTop: 2, height: 50, paddingTop: 10 }}>
-      <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 共 {page.total} 条</label>
-      <label style={{ marginLeft: 20, fontWeight: 'bold' }}>每页</label>
+      <strong> 共 {page.total} 条</strong>
+      <strong style={{ marginLeft: 20 }}>每页</strong>
       <Select
         size={'small'}
         style={{ marginLeft: 10, width: 80 }}
@@ -25,8 +25,8 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
           { value: 200, label: 200 },
         ]}
       />
-      <label style={{ marginLeft: 10, fontWeight: 'bold' }}>条</label>
-      <label style={{ marginLeft: 10, fontWeight: 'bold' }}>共 {pages} 页</label>
+      <strong style={{ marginLeft: 10 }}>条</strong>
+      <strong style={{ marginLeft: 10 }}>共 {pages} 页</strong>
       <Button
         size={'small'}
         style={{
@@ -40,19 +40,18 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
       >
         &lt;
       </Button>
-      <span
+      <strong
         style={{
           display: 'inline-block',
           marginLeft: 10,
           textAlign: 'center',
-          fontWeight: 'bold',
           backgroundColor: '#46A0FC',
           color: 'white',
           width: '40px',
         }}
       >
         {page.page || 1}
-      </span>
+      </strong>
       <Button
         size={'small'}
         style={{
@@ -66,7 +65,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
       >
         &gt;
       </Button>
-      <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 跳转到第 </label>
+      <strong style={{ marginLeft: 20 }}> 跳转到第 </strong>
       <InputNumber
         size={'small'}
         style={{ display: 'inline-block' }}
@@ -80,7 +79,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
         max={pages}
         min={1}
       />
-      <label style={{ marginLeft: 2, fontWeight: 'bold' }}> 页 </label>
+      <strong style={{ marginLeft: 2 }}> 页 </strong>
     </div>
   );
 };

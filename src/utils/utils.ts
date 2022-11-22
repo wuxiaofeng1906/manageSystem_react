@@ -1,5 +1,5 @@
 import { IRecord } from '@/namespaces/interface';
-import { isEmpty, isEqual, omit } from 'lodash';
+import { isEmpty, isEqual, omit, intersection } from 'lodash';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -121,7 +121,7 @@ const findParent = (departments: any[], dept: any, result: any) => {
   const deptName = dept.deptName;
   departments.forEach((item: any) => {
     if (item['deptName'] && deptName) {
-      if (dept.dept == item.dept) {
+      if (dept.dept == item.dept && deptName === item['deptName']) {
         const parentName = item['parent'].deptName;
         if (parentName !== '北京企企科技有限公司') {
           // 过滤 北京企企科技有限公司
@@ -183,6 +183,7 @@ interface Iparam {
   percent?: number;
   showSide?: boolean;
   isMulti?: boolean;
+  isTest?: boolean;
 }
 export const formatTreeData = ({
   origin = [],
@@ -190,6 +191,7 @@ export const formatTreeData = ({
   percent = 1,
   showSide = false,
   isMulti = true, // 默认为乘以
+  isTest = false, // 测试-指标模块
 }: Iparam) => {
   if (!origin) return null;
   const result: any = [];
@@ -242,8 +244,9 @@ export const formatTreeData = ({
             [`${startTime}_denominator`]: dept.sideKpi.denominator,
           }
         : {};
-      const groups: any = [dept.deptName];
+      let groups: string[] = [dept.deptName];
       findParent(departments, dept, groups);
+      if (checkTesterGroup(groups) && isTest) return;
       result.push({
         Group: groups,
         isDept: true,
@@ -307,3 +310,6 @@ export const checkLogin = () => {
   const href = location.pathname + location.search;
   return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
 };
+// 测试指标-不显示 管理会计研发部，供应链研发部 及子部门
+export const checkTesterGroup = (groups: string[]) =>
+  intersection(groups, ['管理会计研发部', '供应链研发部'])?.length > 0;

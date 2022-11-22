@@ -1,9 +1,11 @@
+import { intersection } from 'lodash';
+import { checkTesterGroup } from '@/utils/utils';
 // 查找父部门
 const findParent = (departDatas: any, depts: any, result: any) => {
   const idx = depts.deptName;
   departDatas.forEach((item: any) => {
     if (item['deptName'] && idx) {
-      if (depts.dept == item.dept) {
+      if (idx === item['deptName']) {
         const pidName = item['parent'].deptName;
         if (pidName !== '北京企企科技有限公司') {
           // 不显示北京企企科技有限公司
@@ -82,7 +84,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
       const groups: any = [depts.deptName];
       findParent(departDatas, depts, groups);
-
+      if (checkTesterGroup(groups)) return;
       // 新增部门
       resultArray.push({
         Group: groups,
@@ -143,7 +145,7 @@ const converseDataForAgGrid_code = (oraDatas: any) => {
 
       const groups: any = [depts.deptName];
       findParent(departDatas, depts, groups);
-
+      if (checkTesterGroup(groups)) return;
       // 新增部门
       resultArray.push({
         Group: groups,
@@ -214,7 +216,7 @@ const converseForAgGrid_Convergency = (oraDatas: any) => {
         } else {
           findParent(departDatas, depts, groups);
         }
-
+        if (checkTesterGroup(groups)) return;
         // 新增部门
         resultArray.push({
           Group: groups,
@@ -262,6 +264,7 @@ const converseForAgGrid_planDevition = (oraDatas: any) => {
     departDatas.forEach((depts: any) => {
       const groups: any = [depts.deptName];
       findParent(departDatas, depts, groups);
+      if (checkTesterGroup(groups)) return;
       // 新增部门
       resultArray.push({
         Group: groups,
@@ -292,6 +295,7 @@ const converseForAgGrid_showDepts = (oraDatas: any) => {
     departDatas.forEach((depts: any) => {
       const groups: any = [depts.deptName];
       findParent(departDatas, depts, groups);
+      if (checkTesterGroup(groups)) return;
       // 新增部门
       resultArray.push({
         Group: groups,
@@ -324,6 +328,7 @@ const converseForAgGrid_cusInputRate = (oraDatas: any) => {
     departDatas.forEach((depts: any) => {
       const groups: any = [depts.deptName];
       findParent(departDatas, depts, groups);
+      if (checkTesterGroup(groups)) return;
       // 新增部门
       resultArray.push({
         Group: groups,

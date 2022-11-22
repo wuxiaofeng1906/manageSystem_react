@@ -44,7 +44,7 @@ const AvgTimeOnline: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.onlineTime}
       unit={'天'}
-      len={5}
+      len={2}
     />
   );
 };

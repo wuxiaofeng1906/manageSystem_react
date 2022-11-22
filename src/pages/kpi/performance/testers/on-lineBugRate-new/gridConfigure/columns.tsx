@@ -1,17 +1,20 @@
 /* region 列的定义和渲染 */
 // 数据渲染
-import {customRound} from "@/publicMethods/pageSet";
+import { customRound } from '@/publicMethods/pageSet';
 import {
-  getFourQuarterTime, getMonthWeek, getTwelveMonthTime,
-  getWeeksRange, getYearsTime
-} from "@/publicMethods/timeMethods";
+  getFourQuarterTime,
+  getMonthWeek,
+  getTwelveMonthTime,
+  getWeeksRange,
+  getYearsTime,
+} from '@/publicMethods/timeMethods';
 
 // 数据渲染
 const dataRender = (params: any) => {
   const node = params.data;
   if (params.value) {
-    let result = customRound(params.value, 4);
-    if ((params.column?.colId).indexOf("_kpi") < 0) {
+    let result = customRound(params.value, 3);
+    if ((params.column?.colId).indexOf('_kpi') < 0) {
       result = params.value;
     }
 
@@ -26,7 +29,7 @@ const dataRender = (params: any) => {
   }
 
   return `<span style="color: silver"> ${0}</span>`;
-}
+};
 
 // 周
 export const columsForWeeks = () => {
@@ -39,15 +42,15 @@ export const columsForWeeks = () => {
       headerName: weekName,
       children: [
         {
-          headerName: "bug率",
+          headerName: 'bug率',
           field: `${starttime}_kpi`,
           cellRenderer: dataRender,
         },
         {
-          headerName: "代码量",
+          headerName: '代码量',
           field: `${starttime}_codes`,
           cellRenderer: dataRender,
-          columnGroupShow: 'open'
+          columnGroupShow: 'open',
         },
         // {
         //   headerName: "bug数",
@@ -61,7 +64,7 @@ export const columsForWeeks = () => {
         //   cellRenderer: dataRender,
         //   columnGroupShow: 'open'
         // }
-      ]
+      ],
     });
   }
   return component;
@@ -76,15 +79,15 @@ export const columsForMonths = () => {
       headerName: monthRanges[index].title,
       children: [
         {
-          headerName: "bug率",
+          headerName: 'bug率',
           field: `${monthRanges[index].start}_kpi`,
           cellRenderer: dataRender,
         },
         {
-          headerName: "代码量",
+          headerName: '代码量',
           field: `${monthRanges[index].start}_codes`,
           cellRenderer: dataRender,
-          columnGroupShow: 'open'
+          columnGroupShow: 'open',
         },
         // {
         //   headerName: "bug数",
@@ -98,10 +101,8 @@ export const columsForMonths = () => {
         //   cellRenderer: dataRender,
         //   columnGroupShow: 'open'
         // }
-      ]
+      ],
     });
-
-
   }
   return component;
 };
@@ -115,15 +116,15 @@ export const columsForQuarters = () => {
       headerName: quarterTime[index].title,
       children: [
         {
-          headerName: "bug率",
+          headerName: 'bug率',
           field: `${quarterTime[index].start}_kpi`,
           cellRenderer: dataRender,
         },
         {
-          headerName: "代码量",
+          headerName: '代码量',
           field: `${quarterTime[index].start}_codes`,
           cellRenderer: dataRender,
-          columnGroupShow: 'open'
+          columnGroupShow: 'open',
         },
         // {
         //   headerName: "bug数",
@@ -137,9 +138,8 @@ export const columsForQuarters = () => {
         //   cellRenderer: dataRender,
         //   columnGroupShow: 'open'
         // }
-      ]
+      ],
     });
-
   }
   return component;
 };
@@ -159,15 +159,15 @@ export const columsForYears = () => {
       headerName: yearsTime[index].title,
       children: [
         {
-          headerName: "bug率",
+          headerName: 'bug率',
           field: `${yearsTime[index].start}_kpi`,
           cellRenderer: dataRender,
         },
         {
-          headerName: "代码量",
+          headerName: '代码量',
           field: `${yearsTime[index].start}_codes`,
           cellRenderer: dataRender,
-          columnGroupShow: 'open'
+          columnGroupShow: 'open',
         },
         // {
         //   headerName: "bug数",
@@ -181,9 +181,8 @@ export const columsForYears = () => {
         //   cellRenderer: dataRender,
         //   columnGroupShow: 'open'
         // }
-      ]
+      ],
     });
-
   }
   return component;
 };

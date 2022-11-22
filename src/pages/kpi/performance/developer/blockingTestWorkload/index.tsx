@@ -43,6 +43,7 @@ const BlockingTestWorkload: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.blockingTestWorkload}
       unit={'人天'}
+      len={2}
     />
   );
 };

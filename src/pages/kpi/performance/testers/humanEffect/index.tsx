@@ -30,7 +30,7 @@ const HumanEffect: React.FC<any> = () => {
       request={StatisticServices.humanEffect}
       identity={'TESTER'}
       showDenominator={true}
-      len={5}
+      len={3}
       unit={'FP/人天'}
     />
   );

@@ -18,8 +18,11 @@ const findParent = (departDatas: any, depts: any, result: any) => {
     if (item['deptName'] && idx) {
       if (depts.dept == item.dept) {
         const pidName = item['parent'].deptName;
-        result.unshift(pidName);
-        findParent(departDatas, item['parent'], result);
+        if (pidName !== '北京企企科技有限公司') {
+          // 不显示北京企企科技有限公司
+          result.unshift(pidName);
+          findParent(departDatas, item['parent'], result);
+        }
       }
     }
   });

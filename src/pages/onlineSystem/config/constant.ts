@@ -117,7 +117,7 @@ export const checkInfo = [
     disabled: false,
   },
   {
-    check_type: '创建库对比校验是否通过',
+    check_type: '构建时间对比校验是否通过',
     side: '后端',
     status: 'version',
     start: '',

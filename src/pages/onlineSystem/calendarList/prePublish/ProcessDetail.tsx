@@ -16,21 +16,23 @@ import {
 import { groupBy, isEmpty, uniq } from 'lodash';
 import { initGridTable, mergeCellsTable } from '@/utils/utils';
 import { AgGridReact } from 'ag-grid-react';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import styles from '@/pages/onlineSystem/config/common.less';
 import { infoMessage } from '@/publicMethods/showMessages';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { history, useModel, useParams } from 'umi';
 import IPagination from '@/components/IPagination';
+import { WhetherOrNot } from '@/pages/onlineSystem/config/constant';
 
+const color = { yes: '#2BF541', no: '#faad14' };
 const ProcessDetail = (props: any, ref: any) => {
   const query = useParams() as { branch: string; release_num: string };
 
   const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
   const [serverData, setServerData] = useState<any[]>([]);
   const [interfaceData, setInterfaceData] = useState<any[]>([]);
-  const [repaireData, setRepaireData] = useState<any[]>([]);
+  const [repairData, setRepairData] = useState<any[]>([]);
   const [confirmData, setConfirmData] = useState<any[]>([]);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
@@ -80,6 +82,9 @@ const ProcessDetail = (props: any, ref: any) => {
       { project_name: 'stage-patch20220919', release_num: '202209190009', applicant: 'app' },
     ];
     setServerData(mock);
+    setConfirmData([
+      { front_user_name: '张三', qbos_hot: 'yes', front_hot: 'no', front_confirm: 'yes' },
+    ]);
   }, []);
 
   const onSeal = async () => {
@@ -270,6 +275,12 @@ const ProcessDetail = (props: any, ref: any) => {
         >
           移除
         </Button>
+        <div style={{ color: 'red' }}>
+          <WarningOutlined
+            style={{ color: 'orange', fontSize: 18, margin: '0 10px', fontWeight: 'bold' }}
+          />
+          接口数据解析异常
+        </div>
       </div>
       <div style={{ height: 300, width: '100%' }}>
         <AgGridReact
@@ -292,7 +303,7 @@ const ProcessDetail = (props: any, ref: any) => {
       <div style={{ height: 300, width: '100%' }}>
         <AgGridReact
           columnDefs={repaireColumn}
-          rowData={repaireData}
+          rowData={repairData}
           {...initGridTable({ ref: repaireRef, height: 30 })}
         />
       </div>
@@ -310,6 +321,27 @@ const ProcessDetail = (props: any, ref: any) => {
           columnDefs={serverConfirmColumn}
           rowData={confirmData}
           {...initGridTable({ ref: confirmRef, height: 30 })}
+          frameworkComponents={{
+            select: (p: CellClickedEvent) => {
+              return (
+                <Select
+                  size={'small'}
+                  value={p.value}
+                  style={{
+                    width: '100%',
+                    color: p.column?.colId?.includes('confirm') ? color[p.value] : 'initial',
+                  }}
+                  options={Object.keys(WhetherOrNot)?.map((k) => ({
+                    value: k,
+                    label: WhetherOrNot[k],
+                  }))}
+                  onChange={(v) => {
+                    console.log(v);
+                  }}
+                />
+              );
+            },
+          }}
         />
       </div>
       <DemandListModal

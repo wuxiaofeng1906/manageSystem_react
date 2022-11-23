@@ -207,6 +207,7 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
     field: 'front_hot',
     minWidth: 110,
     headerClass: 'ag-required',
+    cellRenderer: 'select',
   },
   {
     headerName: '服务确认完成',
@@ -222,6 +223,7 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
     field: 'backend_hot',
     headerClass: 'ag-required',
     minWidth: 110,
+    cellRenderer: 'select',
   },
   {
     headerName: '服务确认完成',
@@ -237,6 +239,7 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
     field: 'process_hot',
     minWidth: 110,
     headerClass: 'ag-required',
+    cellRenderer: 'select',
   },
   {
     headerName: '服务确认完成',
@@ -252,6 +255,7 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
     field: 'jsf_hot',
     minWidth: 110,
     headerClass: 'ag-required',
+    cellRenderer: 'select',
   },
   {
     headerName: '服务确认完成',
@@ -267,6 +271,7 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
     field: 'global_hot',
     minWidth: 110,
     headerClass: 'ag-required',
+    cellRenderer: 'select',
   },
   {
     headerName: '服务确认完成',
@@ -277,7 +282,13 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   },
   { headerName: '确认时间', field: 'global_time', minWidth: 130 },
   { headerName: 'openapi&qtms值班', field: 'openapi_user_name', minWidth: 120 },
-  { headerName: '是否可热更', field: 'openapi_hot', minWidth: 110, headerClass: 'ag-required' },
+  {
+    headerName: '是否可热更',
+    field: 'openapi_hot',
+    minWidth: 110,
+    headerClass: 'ag-required',
+    cellRenderer: 'select',
+  },
   {
     headerName: '服务确认完成',
     field: 'openapi_confirm',
@@ -292,6 +303,7 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
     field: 'emitter_hot',
     minWidth: 110,
     headerClass: 'ag-required',
+    cellRenderer: 'select',
   },
   {
     headerName: '服务确认完成',
@@ -302,7 +314,13 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   },
   { headerName: '确认时间', field: 'emitter_time', minWidth: 130 },
   { headerName: 'qbos&store值班', field: 'qbos_user_name', minWidth: 120 },
-  { headerName: '是否可热更', field: 'qbos_hot', minWidth: 110, headerClass: 'ag-required' },
+  {
+    headerName: '是否可热更',
+    field: 'qbos_hot',
+    minWidth: 110,
+    headerClass: 'ag-required',
+    cellRenderer: 'select',
+  },
   {
     headerName: '服务确认完成',
     field: 'qbos_confirm',

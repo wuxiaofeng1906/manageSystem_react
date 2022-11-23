@@ -9,6 +9,7 @@ import { history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from '../config/common.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
+import { PublishStatus } from '@/pages/onlineSystem/config/constant';
 
 const CalendarList = () => {
   const gridRef = useRef<GridApi>();
@@ -37,29 +38,22 @@ const CalendarList = () => {
   const getSelectList = async () => {
     const projects = await OnlineSystemServices.getProjects();
     const branchs = await OnlineSystemServices.getBranch();
-    setProjects(projects?.map((it) => ({ label: it.project_name, value: it.project_id })));
-    setBranch(branchs?.map((it) => ({ label: it.branch_name, value: it.branch_id })));
+    setProjects(projects?.map((it: any) => ({ label: it.project_name, value: it.project_id })));
+    setBranch(branchs?.map((it: any) => ({ label: it.branch_name, value: it.branch_id })));
   };
   const getTableList = async (page = 1, page_size = 20) => {
     try {
       setSpinning(true);
       const values = form.getFieldsValue();
-      // const res = await PreReleaseServices.historyList({
-      //   pro_ids: values.pro_ids?.join(',') ?? '',
-      //   branch: values.repair_order?.join(',') ?? '',
-      //   page: page,
-      //   page_size: page_size,
-      // });
-      setRowData([
-        {
-          branch: 'sprint20221110',
-          project_name: 'sprint20221110移动端改版',
-          pro_name: '郭海,杨期成',
-          appservice: 'app,web',
-          release_num: '202211030012',
-        },
-      ]);
-      // setPages({ page: res.page, total: res.total, page_size: res.page_size });
+      const res = await OnlineSystemServices.getOnlineList({
+        pro_id: values.pro_ids?.join(',') ?? '',
+        branch: values.repair_order?.join(',') ?? '',
+        release_status: values.release_status?.join(',') ?? '',
+        page: page,
+        page_size: page_size,
+      });
+      setRowData(res?.data ?? []);
+      setPages({ page: res?.page ?? 1, total: res?.count ?? 0, page_size: res.page_size });
       setSpinning(false);
     } catch (e) {
       setSpinning(false);
@@ -92,8 +86,16 @@ const CalendarList = () => {
               </Form.Item>
             </Col>
             <Col span={7}>
-              <Form.Item name={'status'} label={'状态'}>
-                <Select style={{ width: '100%' }} />
+              <Form.Item name={'release_status'} label={'状态'}>
+                <Select
+                  style={{ width: '100%' }}
+                  mode={'multiple'}
+                  showSearch
+                  options={Object.keys(PublishStatus)?.map((k) => ({
+                    value: k,
+                    label: PublishStatus[k],
+                  }))}
+                />
               </Form.Item>
             </Col>
           </Form>
@@ -127,7 +129,7 @@ const CalendarList = () => {
                         textOverflow: 'ellipsis',
                       }}
                       onClick={() => {
-                        history.push(`/onlineSystem/profile/${p.data.release_num}`);
+                        history.push(`/onlineSystem/profile/${p.data.online_branch}`);
                       }}
                     >
                       {p.value}

@@ -1,6 +1,11 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { ColumnsType } from 'antd/lib/table';
-import { ZentaoPhase, ZentaoStatus, ZentaoType } from '@/pages/onlineSystem/config/constant';
+import {
+  PublishStatus,
+  ZentaoPhase,
+  ZentaoStatus,
+  ZentaoType,
+} from '@/pages/onlineSystem/config/constant';
 import Ellipsis from '@/components/Elipsis';
 import React from 'react';
 
@@ -14,25 +19,30 @@ export const calendarColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '上线分支',
-    field: 'branch',
+    field: 'online_branch',
     minWidth: 150,
-    tooltipField: 'branch',
+    tooltipField: 'online_branch',
     cellRenderer: 'link',
   },
   {
     headerName: '项目名称',
-    field: 'project_name',
+    field: 'project',
     minWidth: 150,
-    tooltipField: 'project_name',
+    tooltipField: 'project',
   },
-  { headerName: '项目负责人', field: 'pro_name', minWidth: 140 },
+  { headerName: '项目负责人', field: 'project_manager', minWidth: 140 },
   {
     headerName: '应用服务',
-    field: 'appservice',
+    field: 'apps',
     minWidth: 130,
-    tooltipField: 'project_name',
+    tooltipField: 'apps',
   },
-  { headerName: '状态', field: 'status', minWidth: 110 },
+  {
+    headerName: '状态',
+    field: 'online_status',
+    minWidth: 110,
+    valueFormatter: (p) => PublishStatus[p.value] ?? '',
+  },
 ];
 // 发布过程列表
 export const preProcessColumn: (ColDef | ColGroupDef)[] = [

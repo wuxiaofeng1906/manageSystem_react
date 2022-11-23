@@ -37,6 +37,19 @@ export const CheckStatus = {
   wait: { text: '未开始' },
   running: { text: '执行中', color: '#1890ff' },
 };
+export const PublishStatus = { doing: '发布中', done: '发布成功', wait: '未开始' };
+export const StoryStatus = {
+  wait: '未开始',
+  planned: '已计划',
+  projected: '已立项',
+  developing: '研发中',
+  developed: '研发完毕',
+  testing: '测试中',
+  tested: '测试完毕',
+  verified: '已验收',
+  released: '已发布',
+  closed: '已关闭',
+};
 export const checkInfo = [
   {
     check_type: '前端单元测试运行是否通过',

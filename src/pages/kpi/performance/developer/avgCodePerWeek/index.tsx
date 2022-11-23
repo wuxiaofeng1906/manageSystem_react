@@ -1,22 +1,30 @@
-import React, {useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridReact} from 'ag-grid-react';
+import React, { useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GqlClient, useGqlClient } from '@/hooks';
 import {
-  getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime,
-  getYearsTime, getParamsByType
+  getWeeksRange,
+  getMonthWeek,
+  getTwelveMonthTime,
+  getFourQuarterTime,
+  getYearsTime,
+  getParamsByType,
 } from '@/publicMethods/timeMethods';
-import {customRound, getHeight} from '@/publicMethods/pageSet';
-import {Button, Drawer} from "antd";
+import { customRound, getHeight } from '@/publicMethods/pageSet';
+import { Button, Drawer } from 'antd';
 import {
-  ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone, AppstoreTwoTone
-} from "@ant-design/icons";
-import {converseFormatForAgGrid} from "../devMethod/deptDataAnalyze";
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone,
+} from '@ant-design/icons';
+import { converseFormatForAgGrid } from '../devMethod/deptDataAnalyze';
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
@@ -27,8 +35,7 @@ const quarterTime = getFourQuarterTime();
 
 // 数据渲染
 const dataRender = (params: any) => {
-
-  let result = "0";
+  let result = '0';
   if (params.value) {
     result = customRound(params.value, 2);
   }
@@ -38,9 +45,8 @@ const dataRender = (params: any) => {
     return `<span style="font-weight: bold"> ${result}</span>`;
   }
 
-  return `<span> ${result}</span>`
-
-}
+  return `<span> ${result}</span>`;
+};
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -51,9 +57,8 @@ const columsForWeeks = () => {
       headerName: weekName,
       field: starttime.toString(),
       cellRenderer: dataRender,
-      minWidth: 100
+      minWidth: 100,
     });
-
   }
   return component;
 };
@@ -65,9 +70,8 @@ const columsForMonths = () => {
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
       cellRenderer: dataRender,
-      minWidth: 110
+      minWidth: 110,
     });
-
   }
   return component;
 };
@@ -78,9 +82,8 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
-      cellRenderer: dataRender
+      cellRenderer: dataRender,
     });
-
   }
   return component;
 };
@@ -92,9 +95,8 @@ const columsForYears = () => {
     component.push({
       headerName: yearsTime[index].title,
       field: yearsTime[index].start,
-      cellRenderer: dataRender
+      cellRenderer: dataRender,
     });
-
   }
   return component;
 };
@@ -104,7 +106,6 @@ const columsForYears = () => {
 /* region 数据获取和解析 */
 
 const queryCodesCount = async (client: GqlClient<object>, params: string) => {
-
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
     return [];
@@ -112,7 +113,7 @@ const queryCodesCount = async (client: GqlClient<object>, params: string) => {
 
   // avgCodeDept(kind:"${condition.typeFlag}",ends:  ["2021-12-31"]) {
   // avgCodeDept(kind:"${condition.typeFlag}",ends:${condition.ends}) {
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
 
        avgCodeDept(kind:"${condition.typeFlag}",ends:${condition.ends}) {
@@ -161,13 +162,10 @@ const queryCodesCount = async (client: GqlClient<object>, params: string) => {
 /* endregion */
 
 const WeekCodeTableList: React.FC<any> = () => {
-
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() =>
-    queryCodesCount(gqlClient, 'quarter'),
-  );
+  const { data, loading } = useRequest(() => queryCodesCount(gqlClient, 'quarter'));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -196,7 +194,6 @@ const WeekCodeTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs(weekColums);
     const datas: any = await queryCodesCount(gqlClient, 'week');
     gridApi.current?.setRowData(datas);
-
   };
 
   // 按月统计
@@ -207,7 +204,6 @@ const WeekCodeTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs(monthColums);
     const datas: any = await queryCodesCount(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
-
   };
 
   // 按季度统计
@@ -240,29 +236,63 @@ const WeekCodeTableList: React.FC<any> = () => {
     setVisible(false);
   };
 
-  const cssIndent = {textIndent: '2em'};
+  const cssIndent = { textIndent: '2em' };
   /* endregion */
-
 
   return (
     <PageContainer>
+      <div style={{ background: 'white' }}>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ProfileTwoTone />}
+          size={'large'}
+          onClick={statisticsByWeeks}
+        >
+          按周统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<CalendarTwoTone />}
+          size={'large'}
+          onClick={statisticsByMonths}
+        >
+          按月统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ScheduleTwoTone />}
+          size={'large'}
+          onClick={statisticsByQuarters}
+        >
+          按季统计
+        </Button>
 
-      <div style={{background: 'white'}}>
-        <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
-                onClick={statisticsByWeeks}>按周统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<CalendarTwoTone/>} size={'large'}
-                onClick={statisticsByMonths}>按月统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
-                onClick={statisticsByQuarters}>按季统计</Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<AppstoreTwoTone />}
+          size={'large'}
+          onClick={statisticsByYear}
+        >
+          按年统计
+        </Button>
+        <label style={{ fontWeight: 'bold' }}>(统计单位：Loc)</label>
 
-        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
-                onClick={statisticsByYear}>按年统计</Button>
-
-        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
-                size={'large'} onClick={showRules}>计算规则</Button>
+        <Button
+          type="text"
+          style={{ color: '#1890FF', float: 'right' }}
+          icon={<QuestionCircleTwoTone />}
+          size={'large'}
+          onClick={showRules}
+        >
+          计算规则
+        </Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
@@ -271,16 +301,15 @@ const WeekCodeTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            suppressMenu: true
+            suppressMenu: true,
           }}
           autoGroupColumnDef={{
             minWidth: 280,
             headerName: '部门-人员',
-            cellRendererParams: {suppressCount: true},
+            cellRendererParams: { suppressCount: true },
             pinned: 'left',
-            suppressMenu: false
+            suppressMenu: false,
           }}
-
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
@@ -290,45 +319,71 @@ const WeekCodeTableList: React.FC<any> = () => {
           getDataPath={(source: any) => {
             return source.Group;
           }}
-        >
-        </AgGridReact>
+        ></AgGridReact>
       </div>
 
-
       <div>
-        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
-                placement="right" width={"300px"} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.统计周期</strong></p>
+        <Drawer
+          title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
+          placement="right"
+          width={'300px'}
+          closable={false}
+          onClose={onClose}
+          visible={messageVisible}
+        >
+          <p>
+            <strong>1.统计周期</strong>
+          </p>
           <p style={cssIndent}>按周统计：代码提交日期为周一00:00:00--周日23:59:59的代码量；</p>
           <p style={cssIndent}>按月统计：代码提交日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：代码提交日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p style={cssIndent}>特殊情况：当月或季度的开始日期或结束日期在周中（不为整数周）时，不计算该周周数和对应该周的代码量；</p>
+          <p style={cssIndent}>
+            按季统计：代码提交日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；
+          </p>
+          <p style={cssIndent}>
+            特殊情况：当月或季度的开始日期或结束日期在周中（不为整数周）时，不计算该周周数和对应该周的代码量；
+          </p>
 
-          <p style={{color: "#1890FF"}}><strong>2.计算公式说明</strong></p>
+          <p style={{ color: '#1890FF' }}>
+            <strong>2.计算公式说明</strong>
+          </p>
           <p> 2.1 按人统计： </p>
           <p style={cssIndent}>周报：周一至周天代码量求和；</p>
           <p style={cssIndent}>月报：当月整周数对应的代码量之和/当月整周数；</p>
           <p style={cssIndent}>季报：当季整周数对应的代码量之和/当季整周数；</p>
           <p> 2.2 按端统计： </p>
           <p style={cssIndent}>周报：该端周一至周天代码量求和/该端人数；</p>
-          <p style={cssIndent}>月报：该端所有人员当月整周数对应的代码量之和/当月整周数/该端所有人数；</p>
-          <p style={cssIndent}>季报：该端所有人员当季整周数对应的代码量之和/当季整周数/该端所有人数；</p>
+          <p style={cssIndent}>
+            月报：该端所有人员当月整周数对应的代码量之和/当月整周数/该端所有人数；
+          </p>
+          <p style={cssIndent}>
+            季报：该端所有人员当季整周数对应的代码量之和/当季整周数/该端所有人数；
+          </p>
           <p> 2.3 按组统计： </p>
           <p style={cssIndent}>周报：该组周一至周天代码量求和/该组人数；</p>
-          <p style={cssIndent}>月报：该组所有人员当月整周数对应的代码量之和/当月整周数/该组所有人数；</p>
-          <p style={cssIndent}>季报：该组所有人员当季整周数对应的代码量之和/当季整周数/该组所有人数；</p>
+          <p style={cssIndent}>
+            月报：该组所有人员当月整周数对应的代码量之和/当月整周数/该组所有人数；
+          </p>
+          <p style={cssIndent}>
+            季报：该组所有人员当季整周数对应的代码量之和/当季整周数/该组所有人数；
+          </p>
           <p> 2.4 按部门统计： </p>
           <p style={cssIndent}>周报：该部门周一至周天代码量求和/该部门所有人数；</p>
-          <p style={cssIndent}>月报：该部门所有人员当月整周数对应的代码量之和/当月整周数/该部门所有人数；</p>
-          <p style={cssIndent}>季报：该部门所有人员当季整周数对应的代码量之和/当季整周数/该部门所有人数；</p>
+          <p style={cssIndent}>
+            月报：该部门所有人员当月整周数对应的代码量之和/当月整周数/该部门所有人数；
+          </p>
+          <p style={cssIndent}>
+            季报：该部门所有人员当季整周数对应的代码量之和/当季整周数/该部门所有人数；
+          </p>
           <p> 2.4 按研发中心统计： </p>
           <p style={cssIndent}>周报：该中心所有人员周一至周天代码量求和/该中心所有人数；</p>
-          <p style={cssIndent}>月报：该中心所有人员当月整周数对应的代码量之和/当月整周数/该中心所有人数；</p>
-          <p style={cssIndent}>季报：该中心所有人员当季整周数对应的代码量之和/当季整周数/该中心所有人数；</p>
-
+          <p style={cssIndent}>
+            月报：该中心所有人员当月整周数对应的代码量之和/当月整周数/该中心所有人数；
+          </p>
+          <p style={cssIndent}>
+            季报：该中心所有人员当季整周数对应的代码量之和/当季整周数/该中心所有人数；
+          </p>
         </Drawer>
       </div>
-
     </PageContainer>
   );
 };

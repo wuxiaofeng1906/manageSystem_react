@@ -1,5 +1,5 @@
 import { IRecord } from '@/namespaces/interface';
-import { isEmpty, isEqual, omit } from 'lodash';
+import { isEmpty, isEqual, omit, intersection } from 'lodash';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import cls from 'classnames';
 
@@ -185,6 +185,7 @@ interface Iparam {
   percent?: number;
   showSide?: boolean;
   isMulti?: boolean;
+  isTest?: boolean;
 }
 export const formatTreeData = ({
   origin = [],
@@ -192,6 +193,7 @@ export const formatTreeData = ({
   percent = 1,
   showSide = false,
   isMulti = true, // 默认为乘以
+  isTest = false, // 测试-指标模块
 }: Iparam) => {
   if (!origin) return null;
   const result: any = [];
@@ -244,8 +246,9 @@ export const formatTreeData = ({
             [`${startTime}_denominator`]: dept.sideKpi.denominator,
           }
         : {};
-      const groups: any = [dept.deptName];
+      let groups: string[] = [dept.deptName];
       findParent(departments, dept, groups);
+      if (checkTesterGroup(groups) && isTest) return;
       result.push({
         Group: groups,
         isDept: true,
@@ -309,6 +312,10 @@ export const checkLogin = () => {
   const href = location.pathname + location.search;
   return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
 };
+// 测试指标-不显示 管理会计研发部，供应链研发部 及子部门
+export const checkTesterGroup = (groups: string[]) =>
+  intersection(groups, ['管理会计研发部', '供应链研发部'])?.length > 0;
+
 const initColDef: ColDef = { resizable: true, suppressMenu: true, flex: 1, filter: true };
 
 const onGridReady = (params: GridReadyEvent, ref: React.MutableRefObject<GridApi | undefined>) => {

@@ -159,7 +159,7 @@ const GrayScaleBugRate: React.FC = () => {
             onGridReady={onGridReady}
             suppressAggFuncInHeader={true}
             columnDefs={[
-              { field: 'total', headerName: 'bug率', aggFunc: (data) => aggFunc(data, 5) },
+              { field: 'total', headerName: 'bug率', aggFunc: (data) => aggFunc(data, 3) },
               { field: 'numerator', headerName: '加权数', aggFunc: aggFunc },
               { field: 'denominator', headerName: '代码量', aggFunc: aggFunc },
               { field: 'title', pivot: true, pivotComparator: () => 1 },

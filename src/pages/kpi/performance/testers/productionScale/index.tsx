@@ -26,6 +26,7 @@ const ProductionScale: React.FC<any> = () => {
       request={StatisticServices.productScale}
       identity={'TESTER'}
       unit={'FP'}
+      len={2}
     />
   );
 };

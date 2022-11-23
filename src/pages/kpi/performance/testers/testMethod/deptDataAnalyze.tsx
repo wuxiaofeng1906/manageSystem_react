@@ -1,4 +1,3 @@
-import { intersection } from 'lodash';
 import { checkTesterGroup } from '@/utils/utils';
 // 查找父部门
 const findParent = (departDatas: any, depts: any, result: any) => {

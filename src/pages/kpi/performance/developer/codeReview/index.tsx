@@ -277,6 +277,7 @@ const CodeReviewTableList: React.FC<any> = () => {
         >
           按年统计
         </Button>
+        <label style={{ fontWeight: 'bold' }}>(统计单位：次)</label>
         <Button
           type="text"
           style={{ color: '#1890FF', float: 'right' }}

@@ -6,7 +6,7 @@ import { IStaticBy } from '@/hooks/statistic';
 export interface IStatisticQuery {
   client: GqlClient<object>;
   params: IStaticBy;
-  identity?: string;
+  identity?: 'DEVELOPER' | 'TESTER';
   showDenominator?: boolean;
 }
 interface StaticOther {
@@ -42,7 +42,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
   },
   // feedback
   async feedback({ client, params, identity }: IStatisticQuery) {
@@ -72,7 +72,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
   },
 
   // 线上反馈平均上线时长
@@ -103,7 +103,10 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, percent: 86400, isMulti: false }), loading };
+    return {
+      data: formatTreeData({ origin: data.data, percent: 86400, isMulti: false, isTest: true }),
+      loading,
+    };
   },
 
   async productScale({ client, params, identity }: IStatisticQuery) {
@@ -133,7 +136,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
   },
 
   async humanEffect({ client, params, identity, showDenominator }: IStatisticQuery) {
@@ -181,7 +184,10 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, showDenominator }), loading };
+    return {
+      data: formatTreeData({ origin: data.data, showDenominator, isTest: identity == 'TESTER' }),
+      loading,
+    };
   },
 
   async shuttleDelay({ client, params, identity }: IStatisticQuery) {
@@ -211,7 +217,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
   },
 
   // 测试 - 累计千行bug率 3个 identity: TEST、OWN、REFER
@@ -249,7 +255,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
   },
 
   // 开发- 累计千行bug率 2个 identity:ALL,EXCLUDE_ONLINE
@@ -324,7 +330,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
   },
 
   // 已发布需求平均关闭时长

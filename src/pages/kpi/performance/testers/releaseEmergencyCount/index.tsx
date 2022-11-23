@@ -1,9 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useRequest } from 'ahooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { useGqlClient } from '@/hooks';
@@ -195,7 +192,9 @@ const ReleaseEmergencyCounts: React.FC<any> = () => {
           <p>1.取值范围：</p>
           <p style={cssIndent}>查需求创建时间落在该周期的（按周、按月、按季、按年）；</p>
           <p style={cssIndent}>查需求的所属计划包含emergency字样的；</p>
-          <p style={cssIndent}>且任务有关联需求；</p>
+          <p style={cssIndent}>
+            且需求的‘发布引入版本’字段值不为空或不为’非发布引入‘(introduced not in ( '','nointo'))；
+          </p>
           <p style={cssIndent}>
             且需求的'是否发布引入'字段值为'是'；当计划为空，是否发布引入为‘是’，查该需求关联的执行类型是否为’emergency’，是则算，不是则不算
           </p>

@@ -1,21 +1,30 @@
-import React, {useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridReact} from 'ag-grid-react';
+import React, { useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GqlClient, useGqlClient } from '@/hooks';
 import {
-  getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime, getParamsByType, getYearsTime
+  getWeeksRange,
+  getMonthWeek,
+  getTwelveMonthTime,
+  getFourQuarterTime,
+  getParamsByType,
+  getYearsTime,
 } from '@/publicMethods/timeMethods';
-import {Button, Drawer} from "antd";
+import { Button, Drawer } from 'antd';
 import {
-  ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone, AppstoreTwoTone
-} from "@ant-design/icons";
-import {getHeight} from "@/publicMethods/pageSet";
-import {converseFormatForAgGrid} from "../testMethod/deptDataAnalyze";
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone,
+} from '@ant-design/icons';
+import { getHeight } from '@/publicMethods/pageSet';
+import { converseFormatForAgGrid } from '../testMethod/deptDataAnalyze';
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
@@ -25,12 +34,11 @@ const quarterTime = getFourQuarterTime();
 /* region 动态定义列 */
 
 function colorRender(params: any) {
-
   const node = params.data;
 
   if (params.value) {
-    const result = (Number(params.value)).toFixed(2);
-    if (node &&node.isDept === true) {
+    const result = Number(params.value).toFixed(2);
+    if (node && node.isDept === true) {
       return `<span style="font-weight: bold"> ${result}</span>`;
     }
 
@@ -55,7 +63,6 @@ const columsForWeeks = () => {
       cellRenderer: colorRender,
       minWidth: 100,
     });
-
   }
   return component;
 };
@@ -69,7 +76,6 @@ const columsForMonths = () => {
       cellRenderer: colorRender,
       minWidth: 110,
     });
-
   }
   return component;
 };
@@ -80,9 +86,8 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
-      cellRenderer: colorRender
+      cellRenderer: colorRender,
     });
-
   }
   return component;
 };
@@ -94,9 +99,8 @@ const columsForYears = () => {
     component.push({
       headerName: yearsTime[index].title,
       field: yearsTime[index].start,
-      cellRenderer: colorRender
+      cellRenderer: colorRender,
     });
-
   }
   return component;
 };
@@ -111,7 +115,7 @@ const queryExampleCount = async (client: GqlClient<object>, params: string) => {
     return [];
   }
 
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
           caseExecuteDept(kind: "${condition.typeFlag}", ends: ${condition.ends}){
             total {
@@ -148,13 +152,10 @@ const queryExampleCount = async (client: GqlClient<object>, params: string) => {
 /* endregion */
 
 const BugReturnTableList: React.FC<any> = () => {
-
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() =>
-    queryExampleCount(gqlClient, 'quarter'),
-  );
+  const { data, loading } = useRequest(() => queryExampleCount(gqlClient, 'quarter'));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -183,7 +184,6 @@ const BugReturnTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs(weekColums);
     const datas: any = await queryExampleCount(gqlClient, 'week');
     gridApi.current?.setRowData(datas);
-
   };
 
   // 按月统计
@@ -194,7 +194,6 @@ const BugReturnTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs(monthColums);
     const datas: any = await queryExampleCount(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
-
   };
 
   // 按季度统计
@@ -227,26 +226,62 @@ const BugReturnTableList: React.FC<any> = () => {
     setVisible(false);
   };
 
-  const cssIndent = {textIndent: '2em'};
+  const cssIndent = { textIndent: '2em' };
   /* endregion */
 
   return (
     <PageContainer>
-      <div style={{background: 'white'}}>
-        <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
-                onClick={statisticsByWeeks}>按周统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<CalendarTwoTone/>} size={'large'}
-                onClick={statisticsByMonths}>按月统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
-                onClick={statisticsByQuarters}>按季统计</Button>
+      <div style={{ background: 'white' }}>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ProfileTwoTone />}
+          size={'large'}
+          onClick={statisticsByWeeks}
+        >
+          按周统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<CalendarTwoTone />}
+          size={'large'}
+          onClick={statisticsByMonths}
+        >
+          按月统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ScheduleTwoTone />}
+          size={'large'}
+          onClick={statisticsByQuarters}
+        >
+          按季统计
+        </Button>
 
-        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
-                onClick={statisticsByYear}>按年统计</Button>
-        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
-                size={'large'} onClick={showRules}>计算规则</Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<AppstoreTwoTone />}
+          size={'large'}
+          onClick={statisticsByYear}
+        >
+          按年统计
+        </Button>
+        <label style={{ fontWeight: 'bold' }}>(统计单位：个)</label>
+        <Button
+          type="text"
+          style={{ color: '#1890FF', float: 'right' }}
+          icon={<QuestionCircleTwoTone />}
+          size={'large'}
+          onClick={showRules}
+        >
+          计算规则
+        </Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
@@ -255,16 +290,15 @@ const BugReturnTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            suppressMenu: true
+            suppressMenu: true,
           }}
           autoGroupColumnDef={{
             minWidth: 240,
             headerName: '部门-人员',
-            cellRendererParams: {suppressCount: true},
+            cellRendererParams: { suppressCount: true },
             pinned: 'left',
-            suppressMenu: false
+            suppressMenu: false,
           }}
-
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
@@ -274,40 +308,60 @@ const BugReturnTableList: React.FC<any> = () => {
           getDataPath={(source: any) => {
             return source.Group;
           }}
-        >
-        </AgGridReact>
+        ></AgGridReact>
       </div>
 
       <div>
-        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
-                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.统计周期</strong></p>
+        <Drawer
+          title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
+          placement="right"
+          width={300}
+          closable={false}
+          onClose={onClose}
+          visible={messageVisible}
+        >
+          <p>
+            <strong>1.统计周期</strong>
+          </p>
 
           <p style={cssIndent}>按周统计：用例执行日期为周一00:00:00--周日23:59:59；</p>
           <p style={cssIndent}>按月统计：用例执行日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：用例执行日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+          <p style={cssIndent}>
+            按季统计：用例执行日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；
+          </p>
 
-          <p><strong>2.统计范围</strong></p>
+          <p>
+            <strong>2.统计范围</strong>
+          </p>
           <p style={cssIndent}>用例统计要求：已评审通过的用例，zt_case.reviewedBy字段值不为空；</p>
 
-          <p style={{color: "#1890FF"}}><strong>3.计算公式说明</strong></p>
-          <p><strong>3.1 按人统计</strong></p>
+          <p style={{ color: '#1890FF' }}>
+            <strong>3.计算公式说明</strong>
+          </p>
+          <p>
+            <strong>3.1 按人统计</strong>
+          </p>
           <p style={cssIndent}>周报：个人当周执行用例数/部门当周执行用例总数；</p>
           <p style={cssIndent}>月报：个人当月执行用例数/部门当月执行用例总数；</p>
           <p style={cssIndent}>季报：个人当季执行用例数/部门当季执行用例总数；</p>
           <p style={cssIndent}> 特别说明：测试经理指标数据=本人个人数据*30%+所负责组的数据*70%;</p>
 
-          <p><strong>3.2 按组统计</strong></p>
+          <p>
+            <strong>3.2 按组统计</strong>
+          </p>
           <p style={cssIndent}>周报：该组当周执行用例数/部门当周执行用例总数；</p>
           <p style={cssIndent}>月报：该组当月执行用例数/部门当月执行用例总数；</p>
           <p style={cssIndent}>季报：该组当季执行用例数/部门当季执行用例总数；</p>
-          <p><strong>3.3 按部门统计</strong></p>
+          <p>
+            <strong>3.3 按部门统计</strong>
+          </p>
           <p style={cssIndent}>周报：该部门当周执行用例数/目标值；</p>
           <p style={cssIndent}>月报：该部门当月执行用例数/目标值；</p>
           <p style={cssIndent}>季报：该部门当季执行用例数/目标值；</p>
-          <p><strong>3.4 按中心统计</strong></p>
+          <p>
+            <strong>3.4 按中心统计</strong>
+          </p>
           <p style={cssIndent}>按研发中心统计（同按部门统计）；</p>
-
         </Drawer>
       </div>
     </PageContainer>

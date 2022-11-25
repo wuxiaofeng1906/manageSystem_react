@@ -227,7 +227,7 @@ export default [
       },
       {
         name: '发布过程单',
-        path: 'prePublish/:branch/:release_num',
+        path: 'prePublish/:release_num',
         component: './onlineSystem/calendarList/prePublish/layout',
         wrappers: ['../wrappers/auth'],
         hideInMenu: true,

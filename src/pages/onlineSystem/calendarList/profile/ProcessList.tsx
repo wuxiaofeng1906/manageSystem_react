@@ -16,8 +16,10 @@ const ProcessList = () => {
   const [tableHeight, setTableHeight] = useState(window.innerHeight - 300);
 
   const onConfirm = (v: any) => {
-    console.log(v);
     setShowModal(false);
+    if (v) {
+      getTableList();
+    }
   };
 
   const getTableList = async () => {
@@ -27,6 +29,7 @@ const ProcessList = () => {
   useEffect(() => {
     getTableList();
   }, []);
+
   window.onresize = function () {
     setTableHeight(window.innerHeight - 300);
   };
@@ -53,7 +56,7 @@ const ProcessList = () => {
                     textOverflow: 'ellipsis',
                   }}
                   onClick={() => {
-                    history.push(`/onlineSystem/prePublish/${query.branch}/${p.data.release_num}`);
+                    history.push(`/onlineSystem/prePublish/${p.data.release_num}`);
                   }}
                 >
                   {p.value}

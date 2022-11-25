@@ -3,27 +3,21 @@ import { OnlineSystemServices } from '@/services/onlineSystem';
 
 export default () => {
   const [globalState, setGlobalState] = useState({ locked: false, finished: false, step: 2 });
-  const [releaseInfo, setReleaseInfo] = useState<{
-    basicInfo: any;
-    serverApp: any[];
-    upgradeInfo: any[];
-    repairInfo: { pages: any; data: any[] };
-    serverConfirm: any[];
-  }>({
-    basicInfo: [],
-    serverApp: [],
-    upgradeInfo: [],
-    repairInfo: { pages: null, data: [] },
-    serverConfirm: [],
-  });
+  const [basic, setBasic] = useState<any>();
+  const [server, setServer] = useState<any[]>([]);
+  const [api, setApi] = useState<any[]>([]);
+  const [repair, setRepair] = useState<any>({ count: 0, page: 1, page_size: 20, data: [] });
+  const [serverConfirm, setServerConfirm] = useState<any[]>([]);
 
-  const getReleaseInfo = (data: any) => {
+  const getReleaseInfo = async (data: any) => {
     if (data) {
-      getBasicInfo(data);
-      getServerApp(data);
-      getUpgradeInfo(data);
-      getRepairInfo(data);
-      getServerConfirm(data);
+      await Promise.all([
+        getBasicInfo(data),
+        getServerApp(data),
+        getUpgradeInfo(data),
+        getRepairInfo(data),
+        getServerConfirm(data),
+      ]);
     }
   };
 
@@ -33,25 +27,25 @@ export default () => {
       page,
       page_size: size,
     });
-    setReleaseInfo({ ...releaseInfo, repairInfo: res });
+    setRepair(res);
   };
-
   const getServerApp = async (data: any) => {
     const res = await OnlineSystemServices.getServerApp(data);
-    setReleaseInfo({ ...releaseInfo, serverApp: res ?? [] });
+    setServer(res);
   };
   const getBasicInfo = async (data: any) => {
     const res = await OnlineSystemServices.getBasicInfo(data);
-    setReleaseInfo({ ...releaseInfo, basicInfo: res });
+    setBasic(res);
   };
   const getUpgradeInfo = async (data: any) => {
     const res = await OnlineSystemServices.getUpgradeInfo(data);
-    setReleaseInfo({ ...releaseInfo, upgradeInfo: res });
+    setApi(res);
   };
   const getServerConfirm = async (data: any) => {
     const res = await OnlineSystemServices.getServerConfirm(data);
-    setReleaseInfo({ ...releaseInfo, serverConfirm: res });
+    setServerConfirm(res);
   };
+
   // 移除
   const removeRelease = async (data: any, type: 'server' | 'api' | 'repair', refreshData: any) => {
     let request = OnlineSystemServices.removeServerApp;
@@ -72,14 +66,28 @@ export default () => {
     await OnlineSystemServices.updateServerApp(data);
     await getServerApp(refreshData);
   };
+  const updateBasic = async (data: any, refreshData: any) => {
+    await OnlineSystemServices.updateBasicInfo(data);
+    await getBasicInfo(refreshData);
+  };
+  const updateServerConfirm = async (data: any, refreshData: any) => {
+    await OnlineSystemServices.updateServerConfirm(data);
+    await getServerConfirm(refreshData);
+  };
 
   return {
     globalState,
-    releaseInfo,
+    basic,
+    server,
+    api,
+    repair,
+    serverConfirm,
     setGlobalState,
     getReleaseInfo,
     getRepairInfo,
     removeRelease,
     updateSealing,
+    updateBasic,
+    updateServerConfirm,
   };
 };

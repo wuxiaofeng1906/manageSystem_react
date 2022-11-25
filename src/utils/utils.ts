@@ -2,6 +2,8 @@ import { IRecord } from '@/namespaces/interface';
 import { isEmpty, isEqual, omit, intersection } from 'lodash';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import cls from 'classnames';
+import { LocalstorageKeys } from '@/namespaces';
+import { useModel } from 'umi';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -307,10 +309,14 @@ export const formatTreeData = ({
   return converseArrayToOne(result);
 };
 export const checkLogin = () => {
-  const token = localStorage.getItem('accessId');
-  if (token) return { flag: true, redirect: '' };
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const href = location.pathname + location.search;
-  return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
+  const token = localStorage.getItem(LocalstorageKeys.token);
+  const userInfo = localStorage.getItem(LocalstorageKeys.user);
+  const auth = localStorage.getItem(LocalstorageKeys.authority);
+  if (isEmpty(token) || isEmpty(userInfo) || isEmpty(auth) || isEmpty(user))
+    return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
+  return { flag: true, redirect: '' };
 };
 // 测试指标-不显示 管理会计研发部，供应链研发部 及子部门
 export const checkTesterGroup = (groups: string[]) =>

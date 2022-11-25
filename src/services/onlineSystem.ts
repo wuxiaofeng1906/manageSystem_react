@@ -5,9 +5,6 @@ export const OnlineSystemServices = {
   async getProjects() {
     return request(`${baseUrl}/duty/project`);
   },
-  async getEnvs() {
-    return request(`${baseUrl}/release/online_environment`);
-  },
   // 上线分支
   async getBranch() {
     return request(`${baseUrl}/sonar/branch`);
@@ -48,25 +45,36 @@ export const OnlineSystemServices = {
     return request(`${baseUrl}/online/project-app`, { params });
   },
   async removeServerApp(data: any) {
-    return request(`${baseUrl}/online/project-app`, { data, method: 'delete' });
+    return request(`${baseUrl}/online/project-app`, { data, method: 'delete', msg: '移除成功' });
   },
   // 封板、解除封板
   async updateServerApp(data: any) {
-    return request(`${baseUrl}/online/sealing-version`, { data, method: 'post' });
+    return request(`${baseUrl}/online/sealing-version`, {
+      data,
+      method: 'post',
+      msg: `批量${data.is_seal ? '' : '解除'}封板成功`,
+    });
+  },
+  // 封版检查【测试用例是否通过】
+  async sealingCheck(params: any) {
+    return request(`${baseUrl}/online/sealing-confirm`, {
+      params,
+      warn: '当前测试用例未通过，不能进行封板！',
+    });
   },
   // 发布过程单-升级接口
   async getUpgradeInfo(params: any) {
     return request(`${baseUrl}/online/upgrade-api`, { params });
   },
   async removeUpgradeInfo(data: any) {
-    return request(`${baseUrl}/online/upgrade-api`, { data, method: 'delete' });
+    return request(`${baseUrl}/online/upgrade-api`, { data, method: 'delete', msg: '移除成功' });
   },
   // 发布过程单-数据修复
   async getRepairInfo(params: any) {
     return request(`${baseUrl}/online/data-recovery`, { params });
   },
   async removeRepaireInfo(data: any) {
-    return request(`${baseUrl}/online/data-recovery`, { data, method: 'delete' });
+    return request(`${baseUrl}/online/data-recovery`, { data, method: 'delete', msg: '移除成功' });
   },
   // 服务确认
   async getServerConfirm(params: any) {

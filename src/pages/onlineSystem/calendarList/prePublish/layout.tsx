@@ -17,7 +17,7 @@ const tabs = [
 ];
 const Layout = () => {
   const query = useLocation()?.query;
-  const { branch } = useParams() as { branch: string };
+  const { release_num } = useParams() as { release_num: string };
   const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
   const ref = useRef() as React.MutableRefObject<{
     onRefresh: Function;
@@ -108,7 +108,7 @@ const Layout = () => {
           </Button>
         </div>
       );
-  }, [branch, query.key, globalState]);
+  }, [release_num, query.key, globalState]);
 
   return (
     <PageContainer title={'预发布工单'}>

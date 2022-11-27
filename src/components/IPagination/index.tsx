@@ -9,6 +9,14 @@ interface IParam {
 
 const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IParam) => {
   const pages = useMemo(() => Math.ceil(page.total / page.page_size), [page.total, page.page_size]);
+
+  const onJump = (value) => {
+    let current = +value;
+    if (+value <= 0) current = 1;
+    else if (+value > pages) current = pages;
+    if (current == page.page) return;
+    showQuickJumper(current);
+  };
   return (
     <div style={{ background: 'white', marginTop: 2, height: 50, paddingTop: 10 }}>
       <strong> 共 {page.total} 条</strong>
@@ -68,16 +76,10 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
       <strong style={{ marginLeft: 20 }}> 跳转到第 </strong>
       <InputNumber
         size={'small'}
-        style={{ display: 'inline-block' }}
-        onBlur={(e) => {
-          let current = +e.target.value;
-          if (+e.target.value <= 0) current = 1;
-          else if (+e.target.value > pages) current = pages;
-          if (current == page.page) return;
-          showQuickJumper(current);
-        }}
         max={pages}
         min={1}
+        style={{ display: 'inline-block' }}
+        onBlur={(e) => onJump(e.target.value)}
       />
       <strong style={{ marginLeft: 2 }}> 页 </strong>
     </div>

@@ -18,9 +18,9 @@ export const OnlineSystemServices = {
     return request(`${baseUrl}/online/zt-data`, { params });
   },
   // 禅道-测试单
-  async getTestOrderList(params: any) {
-    return request(`${baseUrl}/online/test-case`, { params });
-  },
+  // async getTestOrderList(params: any) {
+  //   return request(`${baseUrl}/online/test-case`, { params });
+  // },
   // 发布过程列表
   async getReleaseList(params: any) {
     return request(`${baseUrl}/online/release-list`, { params });
@@ -76,6 +76,9 @@ export const OnlineSystemServices = {
   async removeRepaireInfo(data: any) {
     return request(`${baseUrl}/online/data-recovery`, { data, method: 'delete', msg: '移除成功' });
   },
+  async refreshProjectInfo(data: any) {
+    return request(`${baseUrl}/online/fresh-data`, { data, method: 'post' });
+  },
   // 服务确认
   async getServerConfirm(params: any) {
     return request(`${baseUrl}/online/server-confirm`, { params });
@@ -108,6 +111,92 @@ export const OnlineSystemServices = {
           }
         }
       }
+  `);
+    return data.data;
+  },
+  // 禅道测试单列表
+  async getTestOrderList(client: GqlClient<object>, params: any) {
+    const { data } = await client.query(`
+      {
+        data:supportForOnlineTesttask(branch:"${params.branch}"){
+           execution{
+            id
+            name
+            }
+            testtask{
+              id
+              name
+            }
+            status{
+              en
+              zh
+            }
+            build{
+              id
+              name
+            }
+            owner{
+              account
+              realname
+            }
+            caseNums
+            bugNums
+            }
+          }
+  `);
+    return data.data;
+  },
+
+  // 禅道任务
+  async getOnlineCalendarList(client: GqlClient<object>, params: any) {
+    const { data } = await client.query(`
+      {
+        data:supportForOnlineCalendar(branch:"${params.branch}",force:${params.force}){
+        category
+        ztNo
+        stage{
+          orig
+          show{
+            en
+            zh
+          }
+        }
+        execution{
+          id
+          name
+        }
+        title
+        appservices
+        severity
+        module{
+          id
+          name
+        }
+        openedBy{
+          account
+          realname
+          dept{
+            id
+            name
+            parent{
+              id
+            }
+          }
+        }
+        assignedTo{
+          account
+          realname
+          dept{
+            id
+            name
+            pinyin
+            parent{
+              id
+            }
+          }
+        }
+      }
+    }
   `);
     return data.data;
   },

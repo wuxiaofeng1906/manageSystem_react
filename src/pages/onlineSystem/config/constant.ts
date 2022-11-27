@@ -1,20 +1,18 @@
 export const WhetherOrNot = { yes: '是', no: '否' };
 export const TechnicalSide = { backend: '后端', front: '前端', frontBackend: '前后端' };
 export const ZentaoPhase = {
-  1: '未开始',
-  2: '开发中',
-  3: '开发完',
-  4: '已提测',
-  5: '测试中',
-  6: 'TE测试环境已验过',
-  7: 'UED测试环境已验过',
-  8: '已取消',
-  9: '开发已revert',
-  10: '测试已验证revert',
-  11: '灰度已验过',
-  12: '线上已验过',
+  未开始: 1,
+  进行中: 2,
+  开发完: 3,
+  测试中: 4,
+  测试完毕: 5,
+  已验收: 6,
+  已发布: 7,
+  已暂停: 8,
+  已取消: 9,
+  已关闭: 10,
 };
-export const ZentaoType = { bug: 'Bug', story: 'Story', B_story: 'B_Story', task: 'Task' };
+export const ZentaoType = { Bug: 'bug', Story: 'story', B_Story: 'B_story', Task: 'task' };
 export const ZentaoStatus = {
   active: '激活',
   closed: '已关闭',

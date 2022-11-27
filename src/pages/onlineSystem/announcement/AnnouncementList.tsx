@@ -211,8 +211,8 @@ const announcementList = () => {
           </div>
           <IPagination
             page={pages}
-            onChange={getList}
-            showQuickJumper={getList}
+            onChange={(p) => getList(p, pages.page_size)}
+            showQuickJumper={(p) => getList(p, pages.page_size)}
             onShowSizeChange={(size) => getList(1, size)}
           />
         </div>

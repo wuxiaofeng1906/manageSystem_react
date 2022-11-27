@@ -1,13 +1,12 @@
 import React from 'react';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { ColumnsType } from 'antd/lib/table';
+import { sum } from 'lodash';
 import {
   PublishStatus,
   ReleaseOrderStatus,
+  ServerConfirmType,
   WhetherOrNot,
-  ZentaoPhase,
-  ZentaoStatus,
-  ZentaoType,
 } from '@/pages/onlineSystem/config/constant';
 import Ellipsis from '@/components/Elipsis';
 const cpWhetherOrNot = { ...WhetherOrNot, unknown: '免' };
@@ -69,7 +68,13 @@ export const preProcessColumn: (ColDef | ColGroupDef)[] = [
     minWidth: 150,
     tooltipField: 'project',
   },
-  { headerName: '发布集群', field: 'cluster', minWidth: 140 },
+  {
+    headerName: '发布集群',
+    field: 'cluster',
+    minWidth: 140,
+    valueFormatter: (p) =>
+      p.value.includes('cn-northwest-') ? p.value.replaceAll('cn-northwest-', '集群') : p.value,
+  },
   {
     headerName: '上线分支',
     field: 'branch',
@@ -92,74 +97,112 @@ export const zentaoStoryColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     field: 'num',
-    minWidth: 90,
-    maxWidth: 90,
+    minWidth: 70,
+    maxWidth: 70,
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
+  { headerName: '类型', field: 'category', minWidth: 100 },
+  { headerName: '编号', field: 'ztNo', minWidth: 110, cellRenderer: 'link' },
+  { headerName: '阶段', field: 'stage.show.zh', minWidth: 110 },
   {
-    headerName: '类型',
-    field: 'type',
-    minWidth: 120,
-    valueFormatter: (p) => ZentaoType[p.value] ?? '',
+    headerName: '执行名称',
+    field: 'execution.name',
+    minWidth: 150,
+    tooltipField: 'execution.name',
   },
-  { headerName: '编号', field: 'num', minWidth: 110, cellRenderer: 'link' },
+  { headerName: '标题名称', field: 'title', minWidth: 150, tooltipField: 'title' },
   {
-    headerName: '阶段',
-    field: 'phase',
+    headerName: '应用服务',
+    field: 'appservices',
     minWidth: 110,
-    valueFormatter: (p) => ZentaoPhase[p.value] ?? '',
+    cellRenderer: (p) => p.value?.join(',') ?? '',
+    tooltipField: 'appservices',
   },
-  { headerName: '执行名称', field: 'execution', minWidth: 130 },
-  { headerName: '标题名称', field: 'title', minWidth: 110 },
-  { headerName: '应用服务', field: 'server', minWidth: 110 },
-  { headerName: '严重等级', field: 'level', minWidth: 110 },
-  { headerName: '所属模块', field: 'module', minWidth: 110 },
-  { headerName: '创建人', field: 'creator', minWidth: 110 },
-  { headerName: '指派人', field: 'assignedPm', minWidth: 110 },
+  { headerName: '严重等级', field: 'severity', minWidth: 110 },
+  { headerName: '所属模块', field: 'module.name', minWidth: 120, tooltipField: 'module.name' },
+  { headerName: '创建人', field: 'openedBy.realname', minWidth: 110 },
+  { headerName: '指派人', field: 'assignedTo.realname', minWidth: 110 },
 ];
 export const zentaoTestColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     field: 'num',
-    minWidth: 90,
-    maxWidth: 90,
+    minWidth: 70,
+    maxWidth: 70,
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
-  { headerName: '归属执行', field: 'execution', minWidth: 120 },
+  {
+    headerName: '归属执行',
+    field: 'execution.name',
+    minWidth: 170,
+    tooltipField: 'execution.name',
+  },
   {
     headerName: '测试单名称',
-    field: 'name',
-    minWidth: 110,
+    field: 'testtask',
+    minWidth: 170,
     cellRenderer: 'testSheet',
+    tooltipField: 'testtask.name',
   },
-  { headerName: '测试单对应版本', field: 'version', minWidth: 110 },
+  { headerName: '测试单对应版本', field: 'build.name', minWidth: 130 },
   {
     headerName: '状态',
-    field: 'status',
+    field: 'status.zh',
     minWidth: 130,
-    valueFormatter: (p) => ZentaoStatus[p.value] ?? '',
   },
-  { headerName: '负责人', field: 'pm', minWidth: 110 },
-  { headerName: '用例总数', field: 'total', minWidth: 110 },
-  { headerName: '通过用例数', field: 'passNum', minWidth: 110 },
+  { headerName: '负责人', field: 'owner.realname', minWidth: 110 },
+  // caseNums 用例数:[通过, 阻塞, 失败, 未执行]
+  {
+    headerName: '用例总数',
+    field: 'caseNums',
+    minWidth: 110,
+    valueFormatter: (p) => sum(p.value),
+  },
+  {
+    headerName: '通过用例数',
+    field: 'caseNums',
+    minWidth: 110,
+    valueFormatter: (p) => p.value?.[0],
+  },
   {
     headerName: '阻塞用例数',
-    field: 'blockNum',
+    field: 'caseNums',
     minWidth: 110,
-    cellStyle: { color: 'red' },
+    cellStyle: (p) => ({
+      color: p.value?.[1] > 0 ? 'red' : 'initial',
+      lineHeight: '30px',
+      fontWeight: p.value?.[1] > 0 ? 'bold' : 'initial',
+    }),
+    valueFormatter: (p) => p.value?.[1],
   },
   {
     headerName: '失败用例数',
-    field: 'failNum',
+    field: 'caseNums',
     minWidth: 110,
-    cellStyle: { color: 'red' },
+    cellStyle: (p) => ({
+      color: p.value?.[2] > 0 ? 'red' : 'initial',
+      lineHeight: '30px',
+      fontWeight: p.value?.[2] > 0 ? 'bold' : 'initial',
+    }),
+    valueFormatter: (p) => p.value?.[2],
   },
-  { headerName: '未执行用例数', field: 'notExecutedNum', minWidth: 110 },
-  { headerName: 'BUG总数', field: 'bug', minWidth: 110 },
-  { headerName: 'BUG-P1', field: 'p1', minWidth: 110 },
-  { headerName: 'BUG-P2', field: 'p2', minWidth: 110 },
-  { headerName: 'BUG-P3', field: 'p3', minWidth: 110 },
-  { headerName: 'BUG-P4', field: 'p4', minWidth: 110 },
+  {
+    headerName: '未执行用例数',
+    field: 'caseNums',
+    minWidth: 130,
+    cellStyle: (p) => ({
+      color: p.value?.[3] > 0 ? '#bfbfbf' : 'initial',
+      lineHeight: '30px',
+      fontWeight: p.value?.[3] > 0 ? 'bold' : 'initial',
+    }),
+    valueFormatter: (p) => p.value?.[3],
+  },
+  // bugNums bug数:[P0, P1, P2, P3]
+  { headerName: 'BUG总数', field: 'bugNums', minWidth: 110, valueFormatter: (p) => sum(p.value) },
+  { headerName: 'BUG-P0', field: 'bugNums', minWidth: 110, valueFormatter: (p) => p.value?.[0] },
+  { headerName: 'BUG-P1', field: 'bugNums', minWidth: 110, valueFormatter: (p) => p.value?.[1] },
+  { headerName: 'BUG-P2', field: 'bugNums', minWidth: 110, valueFormatter: (p) => p.value?.[2] },
+  { headerName: 'BUG-P3', field: 'bugNums', minWidth: 110, valueFormatter: (p) => p.value?.[3] },
 ];
 
 export const preServerColumn: ColumnsType<any> = [
@@ -255,11 +298,32 @@ export const repairColumn: (ColDef | ColGroupDef)[] = [
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
   { headerName: '数据修复内容', field: 'title', minWidth: 120 },
-  { headerName: '涉及租户', field: 'tenant', minWidth: 110 },
-  { headerName: '类型', field: 'recovery_type', minWidth: 110 },
-  { headerName: '修复提交人', field: 'author', minWidth: 130 },
-  { headerName: '分支', field: 'branch', minWidth: 110 },
-  { headerName: 'sql详情', field: 'sql_detail', width: 100, cellRenderer: 'log' },
+  { headerName: '涉及租户', field: 'tenant', minWidth: 100 },
+  { headerName: '类型', field: 'recovery_type', minWidth: 100 },
+  { headerName: '修复提交人', field: 'author', minWidth: 100 },
+  { headerName: '分支', field: 'branch', minWidth: 120 },
+  { headerName: 'sql详情', field: 'sql_detail', width: 90, cellRenderer: 'log' },
+];
+export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
+  {
+    headerName: '技术侧',
+    field: 'confirm_type',
+    valueFormatter: (p) => ServerConfirmType[p.value],
+  },
+  { headerName: '值班人', field: 'server_confirm_user' },
+  {
+    headerName: '是否可热更',
+    field: 'is_hot_update',
+    headerClass: 'ag-required',
+    cellRenderer: 'select',
+  },
+  {
+    headerName: '服务确认完成',
+    field: 'confirm_result',
+    cellRenderer: 'select',
+    headerClass: 'ag-required',
+  },
+  { headerName: '确认时间', field: `confirm_time` },
 ];
 export const PublishSeverColumn: (ColDef | ColGroupDef)[] = [
   { headerName: '环境', field: 'env', minWidth: 110, cellRenderer: 'env' },

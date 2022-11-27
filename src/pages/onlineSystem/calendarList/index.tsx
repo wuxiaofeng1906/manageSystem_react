@@ -141,8 +141,8 @@ const CalendarList = () => {
           </div>
           <IPagination
             page={pages}
-            onChange={getTableList}
-            showQuickJumper={getTableList}
+            onChange={(p) => getTableList(p, pages.page_size)}
+            showQuickJumper={(p) => getTableList(p, pages.page_size)}
             onShowSizeChange={(size) => getTableList(1, size)}
           />
         </div>

@@ -9,7 +9,10 @@ export default () => {
   const [repair, setRepair] = useState<any>({ count: 0, page: 1, page_size: 20, data: [] });
   const [serverConfirm, setServerConfirm] = useState<any[]>([]);
 
-  const getReleaseInfo = async (data: any) => {
+  const getReleaseInfo = async (data: any, refreshData: any = null) => {
+    if (refreshData) {
+      await OnlineSystemServices.refreshProjectInfo(refreshData);
+    }
     if (data) {
       await Promise.all([
         getBasicInfo(data),

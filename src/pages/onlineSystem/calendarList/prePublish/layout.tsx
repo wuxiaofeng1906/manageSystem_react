@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Tabs, Button, Space } from 'antd';
 import ProcessDetail from './ProcessDetail';
 import Check from './Check';
@@ -19,6 +19,7 @@ const Layout = () => {
   const query = useLocation()?.query;
   const { release_num } = useParams() as { release_num: string };
   const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
+  const [touched, setTouched] = useState(false);
   const ref = useRef() as React.MutableRefObject<{
     onRefresh: Function;
     onRefreshCheck: Function;
@@ -41,8 +42,8 @@ const Layout = () => {
     () =>
       globalState.locked || globalState.finished
         ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
-        : {},
-    [globalState],
+        : { cursor: touched ? 'not-allowed' : 'initial' },
+    [globalState, touched],
   );
 
   const renderTabContent = useMemo(() => {
@@ -51,20 +52,23 @@ const Layout = () => {
         <Space size={10}>
           <BarsOutlined
             onClick={() => {
-              if (globalState.locked || globalState.finished) return;
+              if (globalState.locked || globalState.finished || touched) return;
               ref.current?.onShow();
             }}
             title={'需求列表'}
             style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
           />
-          <Button size={'small'} onClick={() => ref.current?.onCancelPublish()}>
+          <Button size={'small'} disabled={touched} onClick={() => ref.current?.onCancelPublish()}>
             取消发布
           </Button>
           <SyncOutlined
             title={'刷新'}
-            onClick={() => {
-              if (globalState.locked || globalState.finished) return;
-              ref.current?.onRefresh();
+            spin={touched}
+            onClick={async () => {
+              setTouched(true);
+              if (globalState.locked || globalState.finished || touched) return;
+              await ref.current?.onRefresh();
+              setTouched(false);
             }}
             style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
           />
@@ -108,7 +112,7 @@ const Layout = () => {
           </Button>
         </div>
       );
-  }, [release_num, query.key, globalState]);
+  }, [release_num, query.key, globalState, touched]);
 
   return (
     <PageContainer title={'预发布工单'}>
@@ -122,7 +126,11 @@ const Layout = () => {
         >
           {tabs?.map((it, index) => {
             return (
-              <Tabs.TabPane key={it.key} tab={it.name} disabled={globalState.step < index}>
+              <Tabs.TabPane
+                key={it.key}
+                tab={it.name}
+                disabled={globalState.step < index || touched}
+              >
                 <it.comp ref={ref} />
               </Tabs.TabPane>
             );

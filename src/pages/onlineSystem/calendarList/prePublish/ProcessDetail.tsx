@@ -18,11 +18,11 @@ import {
   Button,
   Modal,
   Spin,
-  Popconfirm,
 } from 'antd';
 import {
   preServerColumn,
   repairColumn,
+  serverConfirmColumn,
   upgradeServicesColumn,
 } from '@/pages/onlineSystem/config/column';
 import { groupBy, isEmpty, uniq } from 'lodash';
@@ -41,6 +41,7 @@ import PreReleaseServices from '@/services/preRelease';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 
 const color = { yes: '#2BF541', no: '#faad14' };
+
 const ProcessDetail = (props: any, ref: any) => {
   const { release_num } = useParams() as { release_num: string };
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -62,6 +63,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const [checked, setChecked] = useState(false); // 服务项
   const [loading, setLoading] = useState(false);
+  const [confirmDisabled, setConfirmDisabled] = useState(false);
   const [checkBoxOpt, setCheckBoxOpt] = useState<string[]>([]);
   const [storyModal, setStoryModal] = useState<{ visible: boolean; data: any }>({
     visible: false,
@@ -91,25 +93,45 @@ const ProcessDetail = (props: any, ref: any) => {
           okText: '确认',
           cancelText: '取消',
           centered: true,
-          title: '取消发布提示',
-          content: '请确认是否取消发布？',
-          closable: false,
+          title: '取消发布提醒',
+          content: '取消发布将删除发布工单，请确认是否取消发布?',
+          icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+          okButtonProps: { disabled: confirmDisabled },
           onOk: async () => {
-            console.log('取消');
-            history.replace('/onlineSystem/calendarList');
+            setConfirmDisabled(true);
+            try {
+              await PreReleaseServices.cancelPublish({
+                user_id: user?.userid ?? '',
+                user_name: user?.name ?? '',
+                ready_release_num: release_num,
+              });
+              await PreReleaseServices.removeRelease(
+                {
+                  user_id: user?.userid ?? '',
+                  release_num: release_num,
+                },
+                false,
+              );
+              history.replace(`/onlineSystem/profile/${basic.branch}?key='process`);
+            } catch (e) {
+              setConfirmDisabled(false);
+            }
           },
         });
       },
-      onRefresh: init,
+      onRefresh: () => init(true),
     }),
     [release_num, basic],
   );
 
-  const init = async () => {
+  const init = async (refresh = false) => {
     try {
       setLoading(true);
       reset();
-      await getReleaseInfo({ release_num });
+      await getReleaseInfo(
+        { release_num },
+        refresh ? { release_num, user_id: user?.userid ?? '' } : null,
+      );
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -157,6 +179,7 @@ const ProcessDetail = (props: any, ref: any) => {
       title: `${flag ? '' : '解除'}封板提示`,
       content: `请确认是否将该项目${flag ? '' : '解除'}封板?`,
       onOk: async () => {
+        setLoading(true);
         reset();
         // 1.校验用例是否通过
         if (flag == 'yes') {
@@ -173,6 +196,7 @@ const ProcessDetail = (props: any, ref: any) => {
           },
           { release_num },
         );
+        setLoading(false);
       },
     });
   };
@@ -192,6 +216,7 @@ const ProcessDetail = (props: any, ref: any) => {
       icon: <InfoCircleOutlined style={{ color: 'red' }} />,
       content: `请确认是否要移除该项目?`,
       onOk: async () => {
+        setLoading(true);
         reset();
         await removeRelease(
           {
@@ -201,6 +226,7 @@ const ProcessDetail = (props: any, ref: any) => {
           type,
           { release_num },
         );
+        setLoading(false);
       },
     });
   };
@@ -215,14 +241,6 @@ const ProcessDetail = (props: any, ref: any) => {
     setCheckBoxOpt([]);
     setSelectedRowKeys([]);
   };
-
-  const memoGroup = useMemo(() => {
-    const table = mergeCellsTable(server ?? [], 'apps');
-    return {
-      opts: uniq(server?.map((it) => it.apps)),
-      table,
-    };
-  }, [server]);
 
   const onSave = async () => {
     const values = await form.validateFields();
@@ -246,13 +264,15 @@ const ProcessDetail = (props: any, ref: any) => {
   };
   const changeServerConfirm = async (v: string, param: CellClickedEvent) => {
     Modal.confirm({
+      width: 500,
       maskClosable: false,
       centered: true,
-      title: `【${ServerConfirmType[param.data.confirm_type]}值班】修改服务确认提醒：`,
-      content: `请确认是否将『${
+      title: '修改服务确认提醒',
+      content: `请确认是否将『${ServerConfirmType[param.data.confirm_type]} - ${
         param.column.colId.includes('is_hot_update') ? '是否可热更' : '服务确认完成'
-      }』状态调整为 ${WhetherOrNot[v]}`,
+      }』状态调整为: ${WhetherOrNot[v]}`,
       onOk: async () => {
+        setLoading(true);
         await updateServerConfirm(
           {
             user_id: user?.userid ?? '',
@@ -263,54 +283,33 @@ const ProcessDetail = (props: any, ref: any) => {
           },
           { release_num },
         );
+        setLoading(false);
       },
     });
   };
 
-  const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
+  const onLog = (v: string) => {
+    if (isEmpty(v)) return infoMessage('暂无sql日志！');
+    Modal.info({
+      width: 700,
+      okText: '取消',
+      title: 'sql详情',
+      content: (
+        <div style={{ maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap' }}>
+          {v}
+        </div>
+      ),
+    });
+  };
 
-  const memoServerConfirmColumn = useMemo(() => {
-    let column: any[] = [];
-    let rowData: any = {};
-    if (!isEmpty(serverConfirm)) {
-      serverConfirm.forEach((it) => {
-        const side = it.confirm_type;
-        column.push(
-          {
-            headerName: `${ServerConfirmType[side]}值班`,
-            field: `${side}_user`,
-            minWidth: 130,
-          },
-          {
-            headerName: '是否可热更',
-            field: `${side}_is_hot_update`,
-            minWidth: 150,
-            headerClass: 'ag-required',
-            cellRenderer: 'select',
-          },
-          {
-            headerName: '服务确认完成',
-            field: `${side}_confirm_result`,
-            minWidth: 150,
-            cellRenderer: 'select',
-            headerClass: 'ag-required',
-          },
-          { headerName: '确认时间', field: `${side}_confirm_time`, minWidth: 190 },
-        );
-        rowData = {
-          ...rowData,
-          [`${side}_server_confirm`]: it.server_confirm, // userid
-          [`${side}_user`]: it.server_confirm_user,
-          [`${side}_confirm_type`]: it.confirm_type,
-          [`${side}_confirm_time`]: it.confirm_time,
-          [`${side}_confirm_result`]: it.confirm_result,
-          [`${side}_is_hot_update`]: it.is_hot_update,
-          [`${side}_id`]: it._id,
-        };
-      });
-    }
-    return { column, rowData: [rowData] };
-  }, [serverConfirm]);
+  const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
+  const memoGroup = useMemo(() => {
+    const table = mergeCellsTable(server ?? [], 'apps');
+    return {
+      opts: uniq(server?.map((it) => it.apps)),
+      table,
+    };
+  }, [server]);
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
@@ -498,9 +497,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 <img
                   style={{ width: 16, height: 16, cursor: 'pointer' }}
                   src={require('../../../../../public/logs.png')}
-                  onClick={() => {
-                    console.log(p.value);
-                  }}
+                  onClick={() => onLog(p.value)}
                 />
               ),
             }}
@@ -508,8 +505,8 @@ const ProcessDetail = (props: any, ref: any) => {
         </div>
         <IPagination
           page={pages}
-          onChange={getTableList}
-          showQuickJumper={getTableList}
+          onChange={(p) => getTableList(p, pages.page_size)}
+          showQuickJumper={(p) => getTableList(p, pages.page_size)}
           onShowSizeChange={(size) => getTableList(1, size)}
         />
         <div>
@@ -517,38 +514,12 @@ const ProcessDetail = (props: any, ref: any) => {
         </div>
         <div style={{ height: 300, width: '100%' }}>
           <AgGridReact
-            // columnDefs={memoServerConfirmColumn?.column}
-            // rowData={memoServerConfirmColumn.rowData ?? []}
-            columnDefs={[
-              {
-                headerName: '技术侧',
-                field: 'confirm_type',
-                minWidth: 130,
-                valueFormatter: (p) => ServerConfirmType[p.value],
-              },
-              {
-                headerName: '值班人',
-                field: 'server_confirm_user',
-                minWidth: 130,
-              },
-              {
-                headerName: '是否可热更',
-                field: 'is_hot_update',
-                minWidth: 150,
-                headerClass: 'ag-required',
-                cellRenderer: 'select',
-              },
-              {
-                headerName: '服务确认完成',
-                field: 'confirm_result',
-                minWidth: 150,
-                cellRenderer: 'select',
-                headerClass: 'ag-required',
-              },
-              { headerName: '确认时间', field: `confirm_time`, minWidth: 190 },
-            ]}
+            columnDefs={serverConfirmColumn}
             rowData={serverConfirm}
-            {...initGridTable({ ref: confirmRef, height: 30 })}
+            {...initGridTable({
+              ref: confirmRef,
+              height: 30,
+            })}
             frameworkComponents={{
               select: (p: CellClickedEvent) => {
                 return (

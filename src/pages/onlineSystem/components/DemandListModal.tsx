@@ -11,8 +11,6 @@ import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 import PreReleaseServices from '@/services/preRelease';
 
-const cpWhetherOrNot = { ...WhetherOrNot, unknown: '免' };
-
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [form] = Form.useForm();
   const query = useParams() as { branch: string };
@@ -119,6 +117,16 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     });
     setList(list.map((it) => ({ ...it, disabled: it.type !== v })));
   };
+  const updateStatus = (data: any, status: string, index: number) => {
+    Modal.confirm({
+      title: '修改是否可热更提醒',
+      content: `请确认是否将『需求编号：${data.story_num}』的是否可热更 状态调整为 ${WhetherOrNot[status]}`,
+      onOk: () => {
+        list[index].is_update = status;
+        setList([...list]);
+      },
+    });
+  };
 
   const memoColumn = useMemo(() => {
     return [
@@ -166,18 +174,18 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       {
         title: '是否涉及数据update',
         dataIndex: 'db_update',
-        render: (v: string) => cpWhetherOrNot[v] ?? (v || ''),
+        render: (v: string) => WhetherOrNot[v] ?? (v || ''),
       },
       {
         title: '是否涉及数据Recovery',
         dataIndex: 'is_recovery',
-        render: (v: string) => cpWhetherOrNot[v] ?? (v || ''),
+        render: (v: string) => WhetherOrNot[v] ?? (v || ''),
       },
       {
         title: '是否可热更',
         dataIndex: 'is_update',
         width: 90,
-        render: (v: string) =>
+        render: (v: string, row: any, i: number) =>
           v == '-' ? (
             v
           ) : (
@@ -185,13 +193,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               disabled={!permission}
               value={v}
               style={{ width: '100%' }}
-              options={Object.keys(cpWhetherOrNot)?.map((k) => ({
+              options={Object.keys(WhetherOrNot)?.map((k) => ({
                 value: k,
-                label: cpWhetherOrNot[k],
+                label: WhetherOrNot[k],
               }))}
-              onChange={(e) => {
-                console.log(e);
-              }}
+              onChange={(e) => updateStatus(row, e, i)}
             />
           ),
       },

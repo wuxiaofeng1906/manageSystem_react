@@ -6,12 +6,12 @@ import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/config
 import IPagination from '@/components/IPagination';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { useGqlClient } from '@/hooks/index';
-import { isEmpty, pick, isEqual } from 'lodash';
-import { ZentaoPhase, ZentaoStatus, ZentaoType } from '../../config/constant';
+import { isEmpty } from 'lodash';
+import { ZentaoPhase, ZentaoType } from '../../config/constant';
 import styles from '../../config/common.less';
 import { initGridTable } from '@/utils/utils';
 import { useLocation, useParams } from 'umi';
-import { push } from 'echarts/types/src/component/dataZoom/history';
+const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'key', allowClear: true };
 
 const ZentaoDetail = (props: any, ref: any) => {
   const client = useGqlClient();
@@ -23,6 +23,7 @@ const ZentaoDetail = (props: any, ref: any) => {
   const testRef = useRef<GridApi>();
   const [storyData, setStoryData] = useState<any[]>([]);
   const [originStoryData, setOriginStoryData] = useState<any[]>([]);
+  const [originTestData, setOriginTestData] = useState<any[]>([]);
   const [testData, setTestData] = useState<any[]>([]);
   const [tableHeight, setTableHeight] = useState((window.innerHeight - 450) / 2);
   const [spin, setSpin] = useState(false);
@@ -34,6 +35,11 @@ const ZentaoDetail = (props: any, ref: any) => {
     assignTo: any;
     execution: any;
     org: any;
+  }>();
+  const [testCount, setTestCount] = useState<{
+    status: any;
+    testTask: any;
+    execution: any;
   }>();
 
   const [pages, setPages] = useState({
@@ -80,27 +86,57 @@ const ZentaoDetail = (props: any, ref: any) => {
   }, [branch, query.key]);
 
   const getTestOrder = async () => {
+    let status: Record<string, any> = {};
+    let testTask: Record<string, any> = {};
+    let execution: Record<string, any> = {}; // 归属执行
     const res = await OnlineSystemServices.getTestOrderList(client, { branch: 'sprint20221124' });
+    res?.forEach((it: any) => {
+      status = {
+        ...status,
+        [it.status.en]: { count: (status[it.status.en]?.count ?? 0) + 1, name: it.status.zh },
+      };
+      testTask = {
+        ...testTask,
+        [it.testtask.id]: {
+          count: (testTask[it.testtask.id]?.count ?? 0) + 1,
+          name: it.testtask.name,
+        },
+      };
+      execution = {
+        ...execution,
+        [it.execution.id]: {
+          count: (execution[it.execution.id]?.count ?? 0) + 1,
+          name: it.execution.name,
+        },
+      };
+    });
+    setTestCount({ execution, status, testTask });
     setTestData(res);
+    setOriginTestData(res);
   };
 
   const onPageChange = (page = 1, page_size = 20) => {
     setPages({ ...pages, page, page_size });
   };
-  const conditionChange = () => {
-    let result = originStoryData;
-    const values = storyForm.getFieldsValue();
+
+  const conditionChange = (type: 'story' | 'test') => {
+    const flag = type == 'story';
+    let result = flag ? originStoryData : originTestData;
+    const values = flag ? storyForm.getFieldsValue() : testForm.getFieldsValue();
     let compareKey: any = {};
     Object.entries(values).forEach(([k, v]) => {
       if (!isEmpty(v)) compareKey = { ...compareKey, [k]: v };
     });
-    if (isEmpty(compareKey)) result = originStoryData;
-    else
+    if (isEmpty(compareKey)) result = flag ? originStoryData : originTestData;
+    else {
       Object.entries(compareKey).forEach(([key, v]) => {
         result = fn(result, v, key);
       });
-    setStoryData(result);
-    setPages({ page: 1, page_size: 20, total: result?.length });
+    }
+    if (flag) {
+      setStoryData(result);
+      setPages({ page: 1, page_size: 20, total: result?.length });
+    } else setTestData(result);
   };
 
   const fn = (filterData: any[], formValue: any, key: string) => {
@@ -108,7 +144,8 @@ const ZentaoDetail = (props: any, ref: any) => {
       let originV = it[key];
       if (key == 'ztNo') originV = +originV;
       if (key == 'stage') originV = originV.show.zh;
-      if (key == 'execution') originV = originV.id;
+      if (key == 'status') originV = originV.en;
+      if (['execution', 'testtask'].includes(key)) originV = originV.id;
       if (['openedBy', 'assignedTo'].includes(key)) originV = originV.account;
       return formValue.includes(originV);
     });
@@ -177,7 +214,7 @@ const ZentaoDetail = (props: any, ref: any) => {
           size={'small'}
           className={styles.resetForm}
           labelCol={{ span: 4 }}
-          onBlur={conditionChange}
+          onBlur={() => conditionChange('story')}
         >
           <Row justify={'space-between'} gutter={8}>
             <Col span={8}>
@@ -199,15 +236,14 @@ const ZentaoDetail = (props: any, ref: any) => {
             <Col span={8}>
               <Form.Item label={'归属执行'} name={'execution'}>
                 <Select
-                  mode={'multiple'}
-                  showSearch
-                  onDeselect={conditionChange}
+                  {...opts}
+                  onDeselect={() => conditionChange('story')}
                   options={Object.keys(recordCount?.execution ?? {}).map((it, i) => ({
                     label: `${recordCount?.execution[it]?.name}(${
                       recordCount?.execution[it]?.count ?? 0
                     })`,
-                    value: +it,
                     key: recordCount?.execution[it]?.name + i,
+                    value: +it,
                   }))}
                 />
               </Form.Item>
@@ -215,10 +251,8 @@ const ZentaoDetail = (props: any, ref: any) => {
             <Col span={8}>
               <Form.Item label={'类型'} name={'category'}>
                 <Select
-                  mode={'multiple'}
-                  showSearch
-                  allowClear
-                  onDeselect={conditionChange}
+                  {...opts}
+                  onDeselect={() => conditionChange('story')}
                   options={Object.keys(ZentaoType).map((key) => ({
                     label: `${ZentaoType[key]}(${recordCount?.category[key] ?? 0})`,
                     value: key,
@@ -232,41 +266,37 @@ const ZentaoDetail = (props: any, ref: any) => {
             <Col span={8}>
               <Form.Item label={'阶段'} name={'stage'}>
                 <Select
-                  mode={'multiple'}
-                  showSearch
+                  {...opts}
                   options={Object.keys(ZentaoPhase).map((it) => ({
                     label: `${it}(${recordCount?.stage[it] ?? 0})`,
                     value: it,
                     key: it,
                   }))}
-                  onDeselect={conditionChange}
+                  onDeselect={() => conditionChange('story')}
                 />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item label={'编号'} name={'ztNo'}>
                 <Select
-                  showSearch
-                  mode={'multiple'}
-                  allowClear
+                  {...opts}
                   options={recordCount?.ztNo}
-                  onDeselect={conditionChange}
+                  onDeselect={() => conditionChange('story')}
                 />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item label={'指派给'} name={'assignedTo'}>
                 <Select
-                  mode={'multiple'}
-                  showSearch
+                  {...opts}
                   options={Object.keys(recordCount?.assignTo ?? {}).map((it, i) => ({
                     label: `${recordCount?.assignTo[it]?.name}(${
                       recordCount?.assignTo[it]?.count ?? 0
                     })`,
-                    value: it,
                     key: recordCount?.assignTo[it]?.name + i,
+                    value: it,
                   }))}
-                  onDeselect={conditionChange}
+                  onDeselect={() => conditionChange('story')}
                 />
               </Form.Item>
             </Col>
@@ -313,27 +343,54 @@ const ZentaoDetail = (props: any, ref: any) => {
           showQuickJumper={(p) => onPageChange(p, pages.page_size)}
           onShowSizeChange={(size) => onPageChange(1, size)}
         />
-        <Form form={testForm} size={'small'} className={styles.resetForm} style={{ marginTop: 16 }}>
+        <Form
+          form={testForm}
+          size={'small'}
+          className={styles.resetForm}
+          style={{ marginTop: 16 }}
+          onBlur={() => conditionChange('test')}
+        >
           <Row justify={'space-between'} gutter={8}>
             <Col span={8}>
               <Form.Item label={'归属执行'} name={'execution'}>
-                <Select options={[]} mode={'multiple'} showSearch />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item label={'测试单名称'} name={'name'}>
-                <Select options={[]} mode={'multiple'} showSearch />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item label={'状态'} name={'phase'}>
                 <Select
-                  options={Object.keys(ZentaoStatus).map((it) => ({
-                    label: ZentaoStatus[it],
+                  {...opts}
+                  onDeselect={() => conditionChange('test')}
+                  options={Object.keys(testCount?.execution ?? {}).map((it) => ({
+                    label: `${testCount?.execution[it]?.name}(${
+                      testCount?.execution[it]?.count ?? 0
+                    })`,
+                    key: testCount?.execution[it]?.name,
+                    value: +it,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label={'测试单名称'} name={'testtask'}>
+                <Select
+                  {...opts}
+                  onDeselect={() => conditionChange('test')}
+                  options={Object.keys(testCount?.testTask ?? {}).map((it) => ({
+                    label: `${testCount?.testTask[it]?.name}(${
+                      testCount?.testTask[it]?.count ?? 0
+                    })`,
+                    key: testCount?.testTask[it]?.name,
+                    value: +it,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label={'状态'} name={'status'}>
+                <Select
+                  {...opts}
+                  onDeselect={() => conditionChange('test')}
+                  options={Object.keys(testCount?.status ?? {}).map((it) => ({
+                    label: `${testCount?.status[it]?.name}(${testCount?.status[it]?.count ?? 0})`,
+                    key: testCount?.status[it]?.name,
                     value: it,
                   }))}
-                  mode={'multiple'}
-                  showSearch
                 />
               </Form.Item>
             </Col>

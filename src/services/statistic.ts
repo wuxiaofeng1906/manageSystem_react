@@ -2,6 +2,7 @@ import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
 import { formatTreeData } from '@/utils/utils';
 import { IStaticBy } from '@/hooks/statistic';
+import ConvergenceBugRate from '@/pages/kpi/performance/testers/convergenceBugRate';
 
 export interface IStatisticQuery {
   client: GqlClient<object>;
@@ -574,6 +575,39 @@ const StatisticServices = {
       }
   `);
     return { data: formatTreeData({ origin: data.data }), loading };
+  },
+  async convergenceBugRate({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:bugConvUpToPeriodTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+              total {
+                dept
+                deptName
+                kpi
+              }
+              range {
+                start
+                end
+              }
+              datas {
+                dept
+                deptName
+                kpi
+                sideKpi {
+                  testKpi
+                  devkpi
+                }
+                parent {
+                  dept
+                  deptName
+                }
+              }
+            }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
   },
 
   // 产品上线后引入emergency

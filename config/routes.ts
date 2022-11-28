@@ -447,6 +447,14 @@ export default [
                 component: './kpi/performance/developer/cumulativeLineBugRateExcludeOnline',
                 wrappers: ['../wrappers/auth'],
               },
+              {
+                name: '上线后emergency占比',
+                icon: 'table',
+                path: 'productOnlineEmergencyRate',
+                component: './kpi/performance/service/productOnlineEmergencyRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
+              },
             ],
           },
           {
@@ -646,6 +654,21 @@ export default [
                 component: './kpi/performance/testers/cumulativeLineBugRateTests',
                 wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '累计千行bug率收敛',
+                icon: 'table',
+                path: 'convergenceBugRate',
+                component: './kpi/performance/testers/convergenceBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '上线后emergency占比',
+                icon: 'table',
+                path: 'productOnlineEmergencyRate',
+                component: './kpi/performance/service/productOnlineEmergencyRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
             ],
           },

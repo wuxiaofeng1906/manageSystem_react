@@ -313,3 +313,54 @@ export const checkLogin = () => {
 // 测试指标-不显示 管理会计研发部，供应链研发部 及子部门
 export const checkTesterGroup = (groups: string[]) =>
   intersection(groups, ['管理会计研发部', '供应链研发部'])?.length > 0;
+
+export const formatD = (origin: any[]) => {
+  let result: any[] = [];
+  let columns: any[] = [];
+  origin?.forEach((it) => {
+    const data = it.datas;
+
+    data?.forEach((obj: any) => {
+      const startTime = obj.range.start;
+      const departments = obj.datas;
+
+      result.push({
+        Group: ['研发中心'],
+        isDept: true,
+        [startTime]: obj.total.kpi,
+      });
+      departments?.forEach((dept: any) => {
+        let groups: string[] = [dept.deptName];
+        findParent(departments, dept, groups);
+        if (checkTesterGroup(groups)) return;
+        console.log(startTime, it.range);
+        result.push({
+          Group: groups,
+          isDept: true,
+          [startTime]: dept.kpi,
+          title: it.range.start,
+          subTitle: startTime,
+        });
+        columns.push(
+          {
+            field: 'total',
+            headerName: 'emergency占比',
+            aggFunc: (data: any) => {
+              let sum = 0;
+              data?.forEach(function (value: any) {
+                if (value) {
+                  sum = sum + parseFloat(value);
+                }
+              });
+              if (!sum) return 0;
+              return sum.toFixed(2);
+            },
+          },
+          { field: 'title', pivot: true, pivotComparator: () => 1 },
+          { field: 'subTitle', pivot: true },
+        );
+      });
+    });
+  });
+  return { data: converseArrayToOne(result), columns };
+};

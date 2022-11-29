@@ -9,8 +9,9 @@ import { Button, Spin } from 'antd';
 import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { IDrawer } from '@/components/IStaticPerformance';
-import { isEmpty } from 'lodash';
+import IStaticPerformance, { IDrawer } from '@/components/IStaticPerformance';
+import { formatD } from '@/utils/utils';
+import { omit } from 'lodash';
 
 const ruleData: IRuleData[] = [
   {
@@ -57,6 +58,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
+  const [row, setRow] = useState<any[]>([]);
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
@@ -69,35 +71,17 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const getTableSource = async () => {
     setLoading(true);
     try {
-      const ends = getDate();
-      const { data } = await StatisticServices.onlineEmergency({
+      const data = await StatisticServices.onlineTestOnlineEmergency({
         client,
-        params: {
-          kind: catagory == 'month' ? 2 : 3,
-          ends,
-        },
+        params: catagory,
+        identity: 'TESTER',
       });
-      setData(
-        data
-          ?.map((it: any) => {
-            const title =
-              catagory == 'quarter'
-                ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
-                : moment(it.range.start).format('MM月YYYY年');
-
-            if (isEmpty(it.datas)) return { title: title, total: 0 };
-
-            return it.datas.map((child: any) => ({
-              subTitle: moment(child.date).format('YYYYMMDD'),
-              title: title,
-              // total: +((child.count / child.recordNum) * 2 * 100),
-              total: child.kpi * 100,
-            }));
-          })
-          .flat(),
-      );
+      const format = formatD(data);
+      setData(format.data);
+      setRow(format.columns);
       setLoading(false);
     } catch (e) {
+      console.log(e);
       setLoading(false);
     }
   };
@@ -107,76 +91,14 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   }, [catagory]);
 
   return (
-    <PageContainer>
-      <Spin spinning={loading} tip={'数据加载中...'}>
-        <div style={{ background: 'white' }}>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<CalendarTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('month')}
-          >
-            按月统计
-          </Button>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<ScheduleTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('quarter')}
-          >
-            按季统计
-          </Button>
-          <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
-          <Button
-            type="text"
-            style={{ color: '#1890FF', float: 'right' }}
-            icon={<QuestionCircleTwoTone />}
-            size={'large'}
-            onClick={() => setVisible(true)}
-          >
-            计算规则
-          </Button>
-        </div>
-        <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
-          <AgGridReact
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
-            pivotMode={true}
-            rowData={data}
-            suppressAggFuncInHeader={true}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
-              flex: 1,
-              minWidth: 80,
-            }}
-            columnDefs={[
-              {
-                field: 'total',
-                headerName: 'emergency占比',
-                aggFunc: (data: any) => {
-                  let sum = 0;
-                  data?.forEach(function (value: any) {
-                    if (value) {
-                      sum = sum + parseFloat(value);
-                    }
-                  });
-                  if (!sum) return 0;
-                  return sum.toFixed(2);
-                },
-              },
-              { field: 'title', pivot: true, pivotComparator: () => 1 },
-              { field: 'subTitle', pivot: true },
-            ]}
-          />
-        </div>
-        <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
-      </Spin>
-    </PageContainer>
+    <IStaticPerformance
+      ruleData={ruleData}
+      columnDefs={row}
+      request={StatisticServices.onlineTestOnlineEmergency}
+      identity={'TESTER'}
+      unit={'%'}
+      len={2}
+    />
   );
 };
 

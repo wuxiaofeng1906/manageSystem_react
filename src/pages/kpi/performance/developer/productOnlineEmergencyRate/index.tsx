@@ -70,12 +70,13 @@ const ProductOnlineEmergencyRate: React.FC = () => {
     setLoading(true);
     try {
       const ends = getDate();
-      const { data } = await StatisticServices.onlineEmergency({
+      const { data } = await StatisticServices.onlineTestOnlineEmergency({
         client,
         params: {
           kind: catagory == 'month' ? 2 : 3,
           ends,
         },
+        identity: 'DEVELOPER',
       });
       setData(
         data

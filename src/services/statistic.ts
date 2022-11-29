@@ -1,6 +1,6 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import { formatTreeData } from '@/utils/utils';
+import { formatD, formatTreeData } from '@/utils/utils';
 import { IStaticBy } from '@/hooks/statistic';
 import ConvergenceBugRate from '@/pages/kpi/performance/testers/convergenceBugRate';
 
@@ -13,6 +13,7 @@ export interface IStatisticQuery {
 interface StaticOther {
   client: GqlClient<object>;
   params: { kind: number; ends: string };
+  identity?: 'DEVELOPER' | 'TESTER';
 }
 const StatisticServices = {
   // patch
@@ -630,6 +631,42 @@ const StatisticServices = {
       }
   `);
     return { data: data.data };
+  },
+
+  async onlineTestOnlineEmergency({ client, params, identity }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data } = await client.query(`
+      {
+         data:devTestOnlineEmerPropOwner(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
+            range{
+              start
+              end
+            }
+            datas{
+              total{
+                dept
+                kpi
+              }
+              range{
+                start
+                end
+              }
+              datas{
+                dept
+                deptName
+                kpi
+                parent{
+                  dept
+                  deptName
+                }
+              }
+            }
+          }
+      }
+  `);
+    // return { data: formatD(data.data) };
+    return data.data;
   },
   //灰度千行bug率
   async grayThousBugRate({ client, params }: StaticOther) {

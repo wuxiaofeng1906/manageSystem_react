@@ -164,7 +164,6 @@ const IStaticPerformance: React.FC<IStatic> = ({
             animateRows={true}
             groupDefaultExpanded={-1}
             getDataPath={(source: any) => {
-              console.log(source.Group);
               return source.Group;
             }}
           />

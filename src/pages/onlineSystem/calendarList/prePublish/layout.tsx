@@ -42,7 +42,7 @@ const Layout = () => {
     () =>
       globalState.locked || globalState.finished
         ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
-        : { cursor: touched ? 'not-allowed' : 'initial' },
+        : { cursor: touched ? 'not-allowed' : 'pointer' },
     [globalState, touched],
   );
 

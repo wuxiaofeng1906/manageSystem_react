@@ -68,6 +68,7 @@ export default () => {
   const updateSealing = async (data: any, refreshData: any) => {
     await OnlineSystemServices.updateServerApp(data);
     await getServerApp(refreshData);
+    await getServerConfirm(refreshData);
   };
   const updateBasic = async (data: any, refreshData: any) => {
     await OnlineSystemServices.updateBasicInfo(data);

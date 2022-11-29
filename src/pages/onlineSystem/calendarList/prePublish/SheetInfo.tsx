@@ -72,7 +72,7 @@ const SheetInfo = (props: any, ref: any) => {
 
   const onSave = async () => {
     const res = await OnlineSystemServices.updateOrderDetail({
-      release_num,
+      ready_release_num: release_num,
       user_id: user?.userid,
     });
     getDetail();
@@ -86,9 +86,11 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    getBaseList();
-    getDetail();
-  }, []);
+    if (query.key == 'sheet') {
+      getBaseList();
+      getDetail();
+    }
+  }, [query, release_num]);
 
   const getDetail = async () => {
     const res = await OnlineSystemServices.getOrderDetail({ release_num });
@@ -97,6 +99,8 @@ const SheetInfo = (props: any, ref: any) => {
       plan_release_time: res?.basic_data?.plan_release_time
         ? moment(res?.basic_data?.plan_release_time)
         : null,
+      release_result:
+        res?.basic_data?.release_result == 'unknown' ? undefined : res?.basic_data?.release_result,
     });
     baseForm.setFieldsValue({ ...res?.basic_data });
     setUpgradeData(res);
@@ -285,8 +289,8 @@ const SheetInfo = (props: any, ref: any) => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name={'result'} label={'升级后自动化结果'}>
-                <Input />
+              <Form.Item name={'auto_env'} label={'跑升级后自动化环境'}>
+                <Select />
               </Form.Item>
             </Col>
           </Row>

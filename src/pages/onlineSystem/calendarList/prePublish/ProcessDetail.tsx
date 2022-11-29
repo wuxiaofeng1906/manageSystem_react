@@ -69,7 +69,7 @@ const ProcessDetail = (props: any, ref: any) => {
     visible: false,
     data: null,
   }); // 需求列表
-  const [envs, setEnvs] = useState<any[]>([]);
+  const [branchEnv, setBranchEnv] = useState<any[]>([]);
 
   const confirmRef = useRef<GridApi>();
   const interfaceRef = useRef<GridApi>();
@@ -137,28 +137,28 @@ const ProcessDetail = (props: any, ref: any) => {
       setLoading(false);
     }
   };
-  const getSelectList = async () => {
-    const res = await PreReleaseServices.environment();
-    setEnvs(
-      res?.map((it: any) => ({
-        label: it.online_environment_name ?? '',
-        value: it.online_environment_id,
-        key: it.online_environment_id,
-      })),
-    );
-  };
+
   useEffect(() => {
     if (!release_num) return;
     Modal.destroyAll?.();
-    getSelectList();
     init();
   }, [release_num]);
+
+  useEffect(() => {
+    if (!basic?.branch) return;
+    OnlineSystemServices.branchEnv({ branch: basic?.branch }).then((res) =>
+      setBranchEnv(res?.map((it: string) => ({ label: it, value: it }))),
+    );
+  }, [basic.branch]);
 
   useEffect(() => {
     if (!isEmpty(basic)) {
       form.setFieldsValue({
         ...basic,
         plan_release_time: basic?.plan_release_time ? moment(basic?.plan_release_time) : null,
+        cluster: basic?.cluster?.includes('cn-northwest-')
+          ? basic?.cluster?.replaceAll('cn-northwest-', '集群')
+          : basic?.cluster,
       });
     }
     if (!isEmpty(repair)) {
@@ -357,7 +357,7 @@ const ProcessDetail = (props: any, ref: any) => {
             </Col>
             <Col span={4}>
               <Form.Item label={'发布集群'} name={'cluster'}>
-                <Select disabled placeholder={'发布集群'} options={envs} />
+                <Input disabled placeholder={'发布集群'} />
               </Form.Item>
             </Col>
             <Col span={5}>
@@ -366,7 +366,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 name={'release_env'}
                 rules={[{ required: true, message: '请填写镜像环境绑定' }]}
               >
-                <Select placeholder={'镜像环境绑定'} disabled={hasEdit} />
+                <Select placeholder={'镜像环境绑定'} disabled={hasEdit} options={branchEnv} />
               </Form.Item>
             </Col>
             <Col span={5}>
@@ -526,6 +526,7 @@ const ProcessDetail = (props: any, ref: any) => {
                   <Select
                     size={'small'}
                     value={p.value}
+                    disabled={p.data.is_sealing == 'yes'}
                     style={{
                       width: '100%',
                       color: p.column?.colId?.includes('confirm_result')

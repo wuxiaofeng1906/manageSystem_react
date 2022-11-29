@@ -11,22 +11,28 @@ import {
   ModalFuncProps,
   Button,
 } from 'antd';
-import { AutoCheckType, checkInfo, CheckStatus } from '@/pages/onlineSystem/config/constant';
+import {
+  AutoCheckType,
+  checkInfo,
+  CheckStatus,
+  CheckTechnicalSide,
+} from '@/pages/onlineSystem/config/constant';
 import styles from '../../config/common.less';
-import { isEmpty } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import Ellipsis from '@/components/Elipsis';
 import moment from 'moment';
-import { useLocation, useModel, useParams, history } from 'umi';
-import { OnlineSystemServices } from '@/services/onlineSystem';
+import { useLocation, useModel, history, useParams } from 'umi';
+import { ICheckType, OnlineSystemServices } from '@/services/onlineSystem';
 
 const Check = (props: any, ref: any) => {
   const query = useLocation()?.query;
-  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const { release_num } = useParams() as { release_num: string };
-  const [globalState, setGlobalState] = useModel('onlineSystem', (online) => [
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+  const [globalState, setGlobalState, basic] = useModel('onlineSystem', (online) => [
     online.globalState,
     online.setGlobalState,
+    online.basic,
   ]);
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
@@ -44,11 +50,30 @@ const Check = (props: any, ref: any) => {
       onSetting: () => setShow({ visible: true, data: null }),
       onLock: onLock,
     }),
-    [selected, ref, globalState],
+    [selected, ref, globalState, basic],
   );
 
   const onCheck = async () => {
     if (isEmpty(selected)) return infoMessage('请先选择检查项！');
+    const checkList = list.flatMap((it) =>
+      selected.includes(it.rowKey) && it.api_url
+        ? [
+            {
+              user_id: user?.userid ?? '',
+              release_num,
+              is_ignore: !it.open,
+              side: it.side,
+              api_url: it.api_url as ICheckType,
+            },
+          ]
+        : [],
+    );
+    await Promise.all(
+      checkList.map((data) =>
+        OnlineSystemServices.checkOpts(omit(data, ['api_url']), data.api_url),
+      ),
+    );
+    console.log(checkList);
   };
 
   const onLock = async () => {
@@ -56,6 +81,11 @@ const Check = (props: any, ref: any) => {
      * 1.检查是否封板，是否已确认
      * 2. 检查状态是否通过、忽略
      */
+    await OnlineSystemServices.checkSealingLock({
+      user_id: user?.userid ?? '',
+      release_num,
+      release_sealing: globalState.locked ? 'no' : 'yes',
+    });
     if (!globalState.finished) {
       setGlobalState({ ...globalState, locked: !globalState.locked });
     }
@@ -63,9 +93,47 @@ const Check = (props: any, ref: any) => {
 
   const getDetail = async () => {
     setSelected([]);
-    const res = await OnlineSystemServices.getCheckInfo({ release_num });
-    console.log(res);
-    setList(list.map((it) => ({ ...it, disabled: !it.open })));
+    try {
+      const res = await OnlineSystemServices.getCheckInfo({ release_num });
+      setList(
+        checkInfo.map((it) => {
+          const currentKey = res[it.rowKey];
+          return {
+            ...it,
+            disabled: currentKey?.[it.status] !== 'skip',
+            status: currentKey?.[it.status] ?? '',
+            start: currentKey?.[it.start] || '',
+            end: currentKey?.[it.end] || '',
+            open: currentKey?.[it.status] == 'skip',
+            open_pm: currentKey?.[it.open_pm] || '',
+            open_time: currentKey?.[it.open_time] || '',
+            log: currentKey?.[it.log] || '',
+          };
+        }),
+      );
+    } catch (e) {
+      setList(
+        checkInfo.map((it) => ({
+          ...it,
+          disabled: !it.open,
+          status: '',
+          start: '',
+          end: '',
+          open_pm: '',
+          open_time: '',
+          log: '',
+        })),
+      );
+    }
+  };
+
+  const updateStatus = async (data: any) => {
+    const res = await OnlineSystemServices.updateCheckStatus({
+      user_id: user?.userid,
+      release_num,
+      is_ignore: data.status,
+      side: data.side,
+    });
   };
 
   useEffect(() => {
@@ -112,6 +180,7 @@ const Check = (props: any, ref: any) => {
               width: 90,
               align: 'center',
               onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
+              render: (v) => CheckTechnicalSide[v],
             },
             {
               title: '检查状态',
@@ -120,13 +189,13 @@ const Check = (props: any, ref: any) => {
               align: 'center',
               render: (p) => (
                 <span style={{ color: CheckStatus[p]?.color ?? '#000000d9', fontWeight: 500 }}>
-                  {CheckStatus[p]?.text ?? ''}
+                  {CheckStatus[p]?.text ?? p}
                 </span>
               ),
             },
             {
               title: '检查开始时间',
-              dataIndex: 'start_time',
+              dataIndex: 'start',
               width: '12%',
               render: (v) => (
                 <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
@@ -134,7 +203,7 @@ const Check = (props: any, ref: any) => {
             },
             {
               title: '检查结束时间',
-              dataIndex: 'end_time',
+              dataIndex: 'end',
               width: '12%',
               render: (v) => (
                 <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
@@ -150,6 +219,7 @@ const Check = (props: any, ref: any) => {
                   checkedChildren={'开启'}
                   unCheckedChildren={'忽略'}
                   disabled={hasEdit}
+                  checked={v}
                   onChange={(e) => {
                     list[index].open = e;
                     list[index].disabled = !e;
@@ -208,11 +278,13 @@ const Check = (props: any, ref: any) => {
         <CheckSettingModal
           init={show}
           onOk={async (values) => {
-            await OnlineSystemServices.checkSetting({
-              user_id: user?.userid,
-              release_num,
-              ...values,
-            });
+            if (values) {
+              await OnlineSystemServices.checkSetting({
+                user_id: user?.userid,
+                release_num,
+                ...values,
+              });
+            }
             setShow({ visible: false, data: null });
           }}
         />
@@ -225,10 +297,17 @@ export default forwardRef(Check);
 const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
   const [form] = Form.useForm();
   const [disabled, setDisabled] = useState(false);
+  const [compareBranch, setCompareBranch] = useState<any[]>([]);
+
+  const getBranch = async () => {
+    const res = await OnlineSystemServices.getBranch();
+    setCompareBranch(res?.map((it) => ({ label: it.branch_name, value: it.branch_id })));
+  };
 
   useEffect(() => {
     if (!props.init.visible) return form.resetFields();
-    if (props.init.data) form.setFieldsValue(props.init.data);
+    getBranch();
+    if (props.init.data) form.setFieldsValue({ ...props.init.data });
   }, [props.init.visible]);
 
   const onConfirm = async () => {
@@ -236,7 +315,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
     setDisabled(true);
     await props.onOk?.({
       main_branch: values?.main_branch?.join(',') ?? '',
-      main_since: moment(values.main_since).format('YYYY-MM-DD HH:mm:ss'),
+      main_since: moment(values.main_since).startOf('d').format('YYYY-MM-DD HH:mm:ss'),
       auto_data: Object.keys(AutoCheckType)?.map((v: string) => ({
         check_type: v,
         check_result: values.auto_data?.includes(v),
@@ -253,12 +332,15 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
       maskClosable={false}
       title={'检查参数设置'}
       onCancel={() => props?.onOk?.()}
+      visible={props.init?.visible}
       footer={[
-        <img
-          style={{ width: 18, height: 18, marginRight: 10 }}
-          src={require('../../../../../public/logs.png')}
-          title={'日志'}
-        />,
+        <Button
+          onClick={() => {
+            console.log(props.init?.data);
+          }}
+        >
+          查看日志
+        </Button>,
         <Button onClick={() => props.onOk?.()}>取消</Button>,
         <Button type={'primary'} disabled={disabled} onClick={onConfirm}>
           确定
@@ -272,7 +354,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
           name={'main_branch'}
           rules={[{ message: '请选择对比分支', required: true }]}
         >
-          <Select options={[]} allowClear showSearch mode={'multiple'} />
+          <Select options={compareBranch} allowClear showSearch mode={'multiple'} />
         </Form.Item>
         <Form.Item
           label={'对比起始时间'}

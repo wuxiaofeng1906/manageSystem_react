@@ -1,6 +1,17 @@
 import request from './request';
 import { GqlClient } from '@/hooks';
 const baseUrl = '/api/verify';
+export type ICheckType =
+  | 'test-unit' // 单元测试
+  | 'icon-check' // 图标一致性
+  | 'version-check' // 版本检查
+  | 'hot-update-check' // 热更检查
+  | 'create-libray' // 创建库比较
+  | 'env-check' // 环境一致性
+  | 'zt-check-list' //特性、班车项目
+  | 'preview-sql' //  previewsql
+  | 'web-h5-automation'; // 自动化检查
+
 export const OnlineSystemServices = {
   async getProjects() {
     return request(`${baseUrl}/duty/project`);
@@ -94,6 +105,23 @@ export const OnlineSystemServices = {
   async checkSetting(data: any) {
     return request(`${baseUrl}/online/check-param`, { data, method: 'post' });
   },
+  // 检查-状态修改
+  async updateCheckStatus(data: any) {
+    return request(`${baseUrl}/online/sealing-version-check`, { data, method: 'post' });
+  },
+  // 检查-各项
+  async checkOpts(data: any, type: ICheckType) {
+    return request(`${baseUrl}/online/${type}`, { data, method: 'post' });
+  },
+  // 检查-封板锁定
+  async checkSealingLock(data: any) {
+    return request(`${baseUrl}/online/sealing-lock`, { data, method: 'post' });
+  },
+  // 镜像环境
+  async branchEnv(params: any) {
+    return request(`${baseUrl}/online/branch-env`, { params });
+  },
+
   // 工单
   async getOrderDetail(params: any) {
     return request(`${baseUrl}/online/rd-repair-order`, { params });

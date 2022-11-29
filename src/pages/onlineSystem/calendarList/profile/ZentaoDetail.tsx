@@ -48,7 +48,10 @@ const ZentaoDetail = (props: any, ref: any) => {
     page: 1,
   });
   useImperativeHandle(ref, () => ({
-    onRefresh: () => getTableList(true),
+    onRefresh: () => {
+      getTestOrder();
+      getTableList(true);
+    },
   }));
 
   window.onresize = function () {
@@ -89,7 +92,7 @@ const ZentaoDetail = (props: any, ref: any) => {
     let status: Record<string, any> = {};
     let testTask: Record<string, any> = {};
     let execution: Record<string, any> = {}; // 归属执行
-    const res = await OnlineSystemServices.getTestOrderList(client, { branch: 'sprint20221124' });
+    const res = await OnlineSystemServices.getTestOrderList(client, { branch });
     res?.forEach((it: any) => {
       status = {
         ...status,
@@ -146,18 +149,15 @@ const ZentaoDetail = (props: any, ref: any) => {
       if (key == 'stage') originV = originV.show.zh;
       if (key == 'status') originV = originV.en;
       if (['execution', 'testtask'].includes(key)) originV = originV.id;
-      if (['openedBy', 'assignedTo'].includes(key)) originV = originV.account;
-      return formValue.includes(originV);
+      if (['openedBy', 'assignedTo'].includes(key)) originV = originV.realname;
+      return formValue?.join(',') == 'NA' ? isEmpty(originV) : formValue.includes(originV);
     });
   };
 
-  const getTableList = async (refresh = false) => {
+  const getTableList = async (force = false) => {
     try {
       setSpin(true);
-      const res = await OnlineSystemServices.getOnlineCalendarList(client, {
-        branch: 'sprint20221124',
-        force: refresh,
-      });
+      const res = await OnlineSystemServices.getOnlineCalendarList(client, { branch, force });
 
       let category: Record<string, number> = {}; // 类型
       let stage: Record<string, number> = {}; // 阶段
@@ -175,7 +175,7 @@ const ZentaoDetail = (props: any, ref: any) => {
           ...execution,
           [executionItem?.name ? executionItem.id : 'NA']: {
             count: (execution[executionItem?.name ? executionItem.id : 'NA']?.count ?? 0) + 1,
-            name: executionItem?.name || 'NA',
+            name: executionItem?.name || '空',
           },
         };
         assignTo = {
@@ -183,7 +183,7 @@ const ZentaoDetail = (props: any, ref: any) => {
           [assignToItem?.realname ? assignToItem.account : 'NA']: {
             count:
               (assignTo[assignToItem?.realname ? assignToItem?.account : 'NA']?.count ?? 0) + 1,
-            name: assignToItem?.realname || 'NA',
+            name: assignToItem?.realname || '空',
           },
         };
         org = {
@@ -204,7 +204,6 @@ const ZentaoDetail = (props: any, ref: any) => {
       setSpin(false);
     }
   };
-
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
       <div className={styles.zentaoDetail}>
@@ -213,7 +212,7 @@ const ZentaoDetail = (props: any, ref: any) => {
           form={storyForm}
           size={'small'}
           className={styles.resetForm}
-          labelCol={{ span: 4 }}
+          labelCol={{ span: 5 }}
           onBlur={() => conditionChange('story')}
         >
           <Row justify={'space-between'} gutter={8}>
@@ -239,9 +238,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                   {...opts}
                   onDeselect={() => conditionChange('story')}
                   options={Object.keys(recordCount?.execution ?? {}).map((it, i) => ({
-                    label: `${recordCount?.execution[it]?.name}(${
-                      recordCount?.execution[it]?.count ?? 0
-                    })`,
+                    label: recordCount?.execution[it]?.name,
                     key: recordCount?.execution[it]?.name + i,
                     value: +it,
                   }))}
@@ -254,7 +251,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                   {...opts}
                   onDeselect={() => conditionChange('story')}
                   options={Object.keys(ZentaoType).map((key) => ({
-                    label: `${ZentaoType[key]}(${recordCount?.category[key] ?? 0})`,
+                    label: ZentaoType[key],
                     value: key,
                     key: key,
                   }))}
@@ -268,7 +265,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                 <Select
                   {...opts}
                   options={Object.keys(ZentaoPhase).map((it) => ({
-                    label: `${it}(${recordCount?.stage[it] ?? 0})`,
+                    label: it,
                     value: it,
                     key: it,
                   }))}
@@ -290,9 +287,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                 <Select
                   {...opts}
                   options={Object.keys(recordCount?.assignTo ?? {}).map((it, i) => ({
-                    label: `${recordCount?.assignTo[it]?.name}(${
-                      recordCount?.assignTo[it]?.count ?? 0
-                    })`,
+                    label: recordCount?.assignTo[it]?.name,
                     key: recordCount?.assignTo[it]?.name + i,
                     value: it,
                   }))}
@@ -357,9 +352,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                   {...opts}
                   onDeselect={() => conditionChange('test')}
                   options={Object.keys(testCount?.execution ?? {}).map((it) => ({
-                    label: `${testCount?.execution[it]?.name}(${
-                      testCount?.execution[it]?.count ?? 0
-                    })`,
+                    label: testCount?.execution[it]?.name,
                     key: testCount?.execution[it]?.name,
                     value: +it,
                   }))}
@@ -372,9 +365,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                   {...opts}
                   onDeselect={() => conditionChange('test')}
                   options={Object.keys(testCount?.testTask ?? {}).map((it) => ({
-                    label: `${testCount?.testTask[it]?.name}(${
-                      testCount?.testTask[it]?.count ?? 0
-                    })`,
+                    label: testCount?.testTask[it]?.name,
                     key: testCount?.testTask[it]?.name,
                     value: +it,
                   }))}
@@ -387,7 +378,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                   {...opts}
                   onDeselect={() => conditionChange('test')}
                   options={Object.keys(testCount?.status ?? {}).map((it) => ({
-                    label: `${testCount?.status[it]?.name}(${testCount?.status[it]?.count ?? 0})`,
+                    label: testCount?.status[it]?.name,
                     key: testCount?.status[it]?.name,
                     value: it,
                   }))}

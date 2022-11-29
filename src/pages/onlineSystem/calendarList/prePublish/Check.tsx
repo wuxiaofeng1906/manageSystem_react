@@ -1,11 +1,4 @@
-import React, {
-  useImperativeHandle,
-  useState,
-  forwardRef,
-  useEffect,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useImperativeHandle, useState, forwardRef, useEffect, useMemo } from 'react';
 import {
   Table,
   Switch,
@@ -18,16 +11,19 @@ import {
   ModalFuncProps,
   Button,
 } from 'antd';
-import { checkInfo, CheckStatus } from '@/pages/onlineSystem/config/constant';
+import { AutoCheckType, checkInfo, CheckStatus } from '@/pages/onlineSystem/config/constant';
 import styles from '../../config/common.less';
 import { isEmpty } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import Ellipsis from '@/components/Elipsis';
-import { useLocation, useModel } from 'umi';
-import { history } from '@@/core/history';
+import moment from 'moment';
+import { useLocation, useModel, useParams, history } from 'umi';
+import { OnlineSystemServices } from '@/services/onlineSystem';
 
 const Check = (props: any, ref: any) => {
   const query = useLocation()?.query;
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+  const { release_num } = useParams() as { release_num: string };
   const [globalState, setGlobalState] = useModel('onlineSystem', (online) => [
     online.globalState,
     online.setGlobalState,
@@ -35,14 +31,17 @@ const Check = (props: any, ref: any) => {
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [list, setList] = useState(checkInfo);
-  const [visible, setVisible] = useState(false);
+  const [show, setShow] = useState<{ visible: boolean; data: any }>({
+    visible: false,
+    data: null,
+  });
 
   useImperativeHandle(
     ref,
     () => ({
       onRefreshCheck: getDetail,
       onCheck: onCheck,
-      onSetting: () => setVisible(true),
+      onSetting: () => setShow({ visible: true, data: null }),
       onLock: onLock,
     }),
     [selected, ref, globalState],
@@ -64,6 +63,8 @@ const Check = (props: any, ref: any) => {
 
   const getDetail = async () => {
     setSelected([]);
+    const res = await OnlineSystemServices.getCheckInfo({ release_num });
+    console.log(res);
     setList(list.map((it) => ({ ...it, disabled: !it.open })));
   };
 
@@ -205,9 +206,14 @@ const Check = (props: any, ref: any) => {
           }}
         />
         <CheckSettingModal
-          visible={visible}
-          onOk={(e) => {
-            setVisible(false);
+          init={show}
+          onOk={async (values) => {
+            await OnlineSystemServices.checkSetting({
+              user_id: user?.userid,
+              release_num,
+              ...values,
+            });
+            setShow({ visible: false, data: null });
           }}
         />
       </div>
@@ -216,17 +222,27 @@ const Check = (props: any, ref: any) => {
 };
 export default forwardRef(Check);
 
-const CheckSettingModal = (props: ModalFuncProps) => {
+const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
   const [form] = Form.useForm();
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
-    if (!props.visible) return form.resetFields();
-  }, [props.visible]);
+    if (!props.init.visible) return form.resetFields();
+    if (props.init.data) form.setFieldsValue(props.init.data);
+  }, [props.init.visible]);
 
   const onConfirm = async () => {
     const values = await form.validateFields();
-    props.onOk?.(true);
+    setDisabled(true);
+    await props.onOk?.({
+      main_branch: values?.main_branch?.join(',') ?? '',
+      main_since: moment(values.main_since).format('YYYY-MM-DD HH:mm:ss'),
+      auto_data: Object.keys(AutoCheckType)?.map((v: string) => ({
+        check_type: v,
+        check_result: values.auto_data?.includes(v),
+      })),
+    });
+    setDisabled(false);
   };
 
   return (
@@ -253,26 +269,26 @@ const CheckSettingModal = (props: ModalFuncProps) => {
         <h4>一、检查上线分支是否包含对比分支的提交</h4>
         <Form.Item
           label={'被对比的主分支'}
-          name={'branch'}
+          name={'main_branch'}
           rules={[{ message: '请选择对比分支', required: true }]}
         >
           <Select options={[]} allowClear showSearch mode={'multiple'} />
         </Form.Item>
         <Form.Item
           label={'对比起始时间'}
-          name={'time'}
+          name={'main_since'}
           rules={[{ message: '请选择对比起始时间', required: true }]}
         >
-          <DatePicker style={{ width: '100%' }} />
+          <DatePicker style={{ width: '100%' }} format={'YYYY-MM-DD'} />
         </Form.Item>
         <h4>二、升级前自动化检查是否通过</h4>
-        <Form.Item>
+        <Form.Item name={'auto_data'}>
           <Checkbox.Group
-            options={[
-              { label: 'ui执行通过', value: 'ui' },
-              { label: '小程序执行通过', value: 'applet' },
-              { label: '接口执行通过', value: 'api' },
-            ]}
+            options={Object.keys(AutoCheckType).map((v) => ({
+              label: AutoCheckType[v],
+              value: v,
+              key: v,
+            }))}
           />
         </Form.Item>
       </Form>

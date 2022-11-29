@@ -26,17 +26,20 @@ import DragIcon from '@/components/DragIcon';
 import { infoMessage } from '@/publicMethods/showMessages';
 import { useModel } from '@@/plugin-model/useModel';
 import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/config/column';
-import { WhetherOrNot } from '@/pages/onlineSystem/config/constant';
-import { history, useLocation } from 'umi';
+import { ClusterType, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
+import { history, useLocation, useParams } from 'umi';
 import { Prompt } from 'react-router-dom';
 import { initGridTable } from '@/utils/utils';
 import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
+import { OnlineSystemServices } from '@/services/onlineSystem';
+import moment from 'moment';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 
 const SheetInfo = (props: any, ref: any) => {
   const query = useLocation()?.query;
+  const { release_num } = useParams() as { release_num: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
 
@@ -47,7 +50,11 @@ const SheetInfo = (props: any, ref: any) => {
   const [finished, setFinished] = useState(false);
   const [visible, setVisible] = useState(false);
   const [activeItem, setActiveItem] = useState<any>();
-  const [upgradeData, setUpgradeData] = useState<any[]>([]);
+  const [upgradeData, setUpgradeData] = useState<{
+    upgrade_api: any[];
+    release_app: any;
+    basic_data: any;
+  } | null>();
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [announcementList, setAnnouncementList] = useState<any[]>([]);
   const [isSave, setIssave] = useState(false);
@@ -58,13 +65,18 @@ const SheetInfo = (props: any, ref: any) => {
   useImperativeHandle(
     ref,
     () => ({
-      onSave: () => {
-        console.log('save');
-      },
+      onSave: onSave,
     }),
-    [],
+    [release_num],
   );
 
+  const onSave = async () => {
+    const res = await OnlineSystemServices.updateOrderDetail({
+      release_num,
+      user_id: user?.userid,
+    });
+    getDetail();
+  };
   const onDrag = async () => {
     if (true) return infoMessage('已标记发布结果不能修改工单顺序!');
     const sortArr: any = [];
@@ -79,16 +91,15 @@ const SheetInfo = (props: any, ref: any) => {
   }, []);
 
   const getDetail = async () => {
-    setUpgradeData([
-      {
-        release_num: '111111',
-        server: 'basebi',
-        method: 'post',
-        url: '/basebi/',
-        tendent: '全量租户',
-        count: 20,
-      },
-    ]);
+    const res = await OnlineSystemServices.getOrderDetail({ release_num });
+    orderForm.setFieldsValue({
+      ...res?.basic_data,
+      plan_release_time: res?.basic_data?.plan_release_time
+        ? moment(res?.basic_data?.plan_release_time)
+        : null,
+    });
+    baseForm.setFieldsValue({ ...res?.basic_data });
+    setUpgradeData(res);
   };
 
   const getBaseList = async () => {
@@ -136,120 +147,129 @@ const SheetInfo = (props: any, ref: any) => {
         message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
       />
       <div>
-        <Form layout={'inline'} size={'small'} form={orderForm} className={styles.bgForm}>
-          <Col span={4}>
-            <Form.Item name={'release_way'} label={'发布方式'}>
-              <Select
-                disabled
-                style={{ width: '100%' }}
-                options={[
-                  { label: '停服', value: 'stop_server' },
-                  { label: '不停服', value: 'keep_server' },
-                ]}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={5}>
-            <Form.Item name={'plan_release_time'} label={'发布时间'}>
-              <DatePicker
-                style={{ width: '100%' }}
-                showTime
-                format={'YYYY-MM-DD HH:mm'}
-                disabled={finished}
-                onChange={(e) => {
-                  setIssave(true);
+        <Form
+          size={'small'}
+          form={orderForm}
+          className={styles.bgForm + ' ' + styles.resetForm + ' no-wrap-form'}
+        >
+          <Row gutter={3}>
+            <Col span={4}>
+              <Form.Item name={'release_way'} label={'发布方式'}>
+                <Select
+                  disabled
+                  style={{ width: '100%' }}
+                  options={[
+                    { label: '停服', value: 'stop_server' },
+                    { label: '不停服', value: 'keep_server' },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={5}>
+              <Form.Item name={'plan_release_time'} label={'发布时间'}>
+                <DatePicker
+                  style={{ width: '100%' }}
+                  format={'YYYY-MM-DD HH:mm'}
+                  allowClear={false}
+                  showTime
+                  disabled={finished}
+                  onChange={(e) => {
+                    setIssave(true);
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item name={'announcement_num'} label={'关联公告'} required>
+                <Select
+                  showSearch
+                  disabled={finished}
+                  optionFilterProp={'label'}
+                  options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item name={'person_duty_num'} label={'值班名单'}>
+                <Select
+                  showSearch
+                  disabled={finished}
+                  optionFilterProp={'label'}
+                  options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={3}>
+              <Form.Item
+                noStyle
+                shouldUpdate={(old, current) => old.release_result != current.release_result}
+              >
+                {({ getFieldValue }) => {
+                  const result = getFieldValue('release_result');
+                  const color = { success: '#2BF541', failure: 'red' };
+                  return (
+                    <Form.Item name={'release_result'}>
+                      <Select
+                        allowClear
+                        // disabled={!hasPermission?.saveResult || finished}
+                        className={styles.selectColor}
+                        // onChange={() => onSaveBeforeCheck(true)}
+                        options={[
+                          { label: '发布成功', value: 'success', key: 'success' },
+                          { label: '发布失败', value: 'failure', key: 'failure' },
+                          { label: '取消发布', value: 'cancel', key: 'cancel' },
+                          { label: ' ', value: 'unknown', key: 'unknown' },
+                        ]}
+                        style={{
+                          width: '100%',
+                          fontWeight: 'bold',
+                          color: color[result] ?? 'initial',
+                        }}
+                        placeholder={
+                          <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
+                            标记发布结果
+                          </span>
+                        }
+                      />
+                    </Form.Item>
+                  );
                 }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item name={'announcement_num'} label={'关联公告'} required>
-              <Select
-                showSearch
-                disabled={finished}
-                optionFilterProp={'label'}
-                options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item name={'person_duty_num'} label={'值班名单'}>
-              <Select
-                showSearch
-                disabled={finished}
-                optionFilterProp={'label'}
-                options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={3}>
-            <Form.Item
-              noStyle
-              shouldUpdate={(old, current) => old.release_result != current.release_result}
-            >
-              {({ getFieldValue }) => {
-                const result = getFieldValue('release_result');
-                const color = { success: '#2BF541', failure: 'red' };
-                return (
-                  <Form.Item name={'release_result'}>
-                    <Select
-                      allowClear
-                      // disabled={!hasPermission?.saveResult || finished}
-                      className={styles.selectColor}
-                      // onChange={() => onSaveBeforeCheck(true)}
-                      options={[
-                        { label: '发布成功', value: 'success', key: 'success' },
-                        { label: '发布失败', value: 'failure', key: 'failure' },
-                        { label: '取消发布', value: 'cancel', key: 'cancel' },
-                        { label: ' ', value: 'unknown', key: 'unknown' },
-                      ]}
-                      style={{
-                        width: '100%',
-                        fontWeight: 'bold',
-                        color: color[result] ?? 'initial',
-                      }}
-                      placeholder={
-                        <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
-                          标记发布结果
-                        </span>
-                      }
-                    />
-                  </Form.Item>
-                );
-              }}
-            </Form.Item>
-          </Col>
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
         <h4 style={{ margin: '16px 0' }}>一、工单-基础设置</h4>
         <Form size={'small'} form={baseForm} className={styles.resetForm}>
           <Row gutter={8}>
             <Col span={6}>
-              <Form.Item name={'release_type'} label={'预发布分支'}>
+              <Form.Item name={'branch'} label={'预发布分支'}>
                 <Select options={[]} style={{ width: '100%' }} disabled />
               </Form.Item>
             </Col>
             <Col span={18}>
-              <Form.Item name={'release_name'} label={'预发布项目'}>
+              <Form.Item name={'project'} label={'预发布项目'}>
                 <Select style={{ width: '100%' }} disabled />
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={8}>
             <Col span={6}>
-              <Form.Item name={'order'} label={'工单类型选择'} required>
+              <Form.Item name={'release_type'} label={'工单类型选择'} required>
                 <Select
                   showSearch
                   disabled
-                  options={[]}
+                  options={Object.keys(ClusterType).map((k) => ({
+                    label: ClusterType[k],
+                    value: k,
+                  }))}
                   style={{ width: '100%' }}
-                  mode={'multiple'}
                 />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name={'name'} label={'工单名称'} required>
+              <Form.Item name={'ready_release_name'} label={'工单名称'} required>
                 <Input style={{ width: '100%' }} />
               </Form.Item>
             </Col>
@@ -287,7 +307,7 @@ const SheetInfo = (props: any, ref: any) => {
         <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}>
           <AgGridReact
             columnDefs={PublishSeverColumn}
-            rowData={[]}
+            rowData={[upgradeData?.release_app]}
             {...initGridTable({ ref: serverRef, height: 30 })}
           />
         </div>
@@ -298,7 +318,7 @@ const SheetInfo = (props: any, ref: any) => {
             animateRows={true}
             onRowDragEnd={onDrag}
             columnDefs={PublishUpgradeColumn}
-            rowData={upgradeData}
+            rowData={upgradeData?.upgrade_api ?? []}
             {...initGridTable({ ref: upgradeRef, height: 30 })}
             frameworkComponents={{
               operation: (p: CellClickedEvent) => (
@@ -370,10 +390,10 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
       destroyOnClose
     >
       <Form form={form} labelCol={{ span: 6 }}>
-        <Form.Item label={'接口服务'} name={'server'}>
+        <Form.Item label={'接口服务'} name={'api_server'}>
           <Input disabled />
         </Form.Item>
-        <Form.Item label={'接口Method'} name={'method'}>
+        <Form.Item label={'接口URL'} name={'api_url'}>
           <Input disabled />
         </Form.Item>
         <Form.Item

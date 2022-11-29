@@ -5,7 +5,7 @@ import styles from './DemandListModal.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { ClusterType, StoryStatus, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
 import { isEmpty, difference, isEqual } from 'lodash';
-import { infoMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage } from '@/publicMethods/showMessages';
 import dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
@@ -105,9 +105,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       release_name: `${release_num}${name}`,
       plan_release_time: time,
     };
-    await OnlineSystemServices.addRelease(data);
-    setSpin(false);
-    props.onOk?.(true);
+    try {
+      await OnlineSystemServices.addRelease(data);
+      setSpin(false);
+      props.onOk?.(true);
+    } catch (e) {
+      errorMessage('接口异常');
+      setSpin(false);
+    }
   };
 
   const onChange = (v: string) => {

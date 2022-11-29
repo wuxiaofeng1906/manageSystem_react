@@ -11,6 +11,9 @@ import {
 import Ellipsis from '@/components/Elipsis';
 const cpWhetherOrNot = { ...WhetherOrNot, unknown: '免' };
 
+const formatCluster = (p) =>
+  p?.value?.includes('cn-northwest-') ? p?.value?.replaceAll('cn-northwest-', '集群') : p.value;
+
 export const calendarColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
@@ -72,8 +75,7 @@ export const preProcessColumn: (ColDef | ColGroupDef)[] = [
     headerName: '发布集群',
     field: 'cluster',
     minWidth: 140,
-    valueFormatter: (p) =>
-      p.value.includes('cn-northwest-') ? p.value.replaceAll('cn-northwest-', '集群') : p.value,
+    valueFormatter: formatCluster,
   },
   {
     headerName: '上线分支',
@@ -326,25 +328,29 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   { headerName: '确认时间', field: `confirm_time` },
 ];
 export const PublishSeverColumn: (ColDef | ColGroupDef)[] = [
-  { headerName: '环境', field: 'env', minWidth: 110, cellRenderer: 'env' },
-  { headerName: '应用', field: 'applicant', minWidth: 110 },
-  { headerName: '镜像源环境', field: 'origin_env', minWidth: 110 },
+  {
+    headerName: '环境',
+    field: 'cluster',
+    minWidth: 110,
+  },
+  { headerName: '应用', field: 'apps', minWidth: 110 },
+  { headerName: '镜像源环境', field: 'release_env', minWidth: 110 },
   { headerName: 'batch版本', field: 'batch', minWidth: 110 },
-  { headerName: '数据库版本', field: 'access', minWidth: 110 },
-  { headerName: '数据Recovery', field: 'recovery', minWidth: 110 },
-  { headerName: '数据update', field: 'update', minWidth: 110 },
-  { headerName: '是否清理redis缓存', field: 'redis', minWidth: 110 },
-  { headerName: '是否清理应用缓存', field: 'app', minWidth: 110 },
+  { headerName: '数据库版本', field: 'database_version', minWidth: 110 },
+  { headerName: '数据Recovery', field: 'is_recovery', minWidth: 110 },
+  { headerName: '数据update', field: 'is_update', minWidth: 110 },
+  { headerName: '是否清理redis缓存', field: 'clear_redis', minWidth: 110 },
+  { headerName: '是否清理应用缓存', field: 'clear_cache', minWidth: 110 },
   { headerName: 'SQL工单', field: 'sql', minWidth: 110 },
 ];
 export const PublishUpgradeColumn: (ColDef | ColGroupDef)[] = [
   { headerName: '序号', minWidth: 110, cellRenderer: (params: any) => String(+params.node.id + 1) },
-  { headerName: '接口服务', field: 'server', minWidth: 110 },
-  { headerName: '接口Method', field: 'method', minWidth: 110 },
-  { headerName: '接口URL', field: 'url', minWidth: 110 },
-  { headerName: 'Data', field: 'data', minWidth: 110 },
-  { headerName: 'Header', field: 'header', minWidth: 110 },
-  { headerName: '涉及租户', field: 'tendent', minWidth: 110 },
+  { headerName: '接口服务', field: 'api_server', minWidth: 110 },
+  { headerName: '接口Method', field: 'api_method', minWidth: 110 },
+  { headerName: '接口URL', field: 'api_url', minWidth: 110 },
+  { headerName: 'Data', field: 'api_data', minWidth: 110 },
+  { headerName: 'Header', field: 'api_header', minWidth: 110 },
+  { headerName: '涉及租户', field: 'tenant', minWidth: 110 },
   { headerName: '并发数', field: 'count', minWidth: 110, headerClass: 'ag-required' },
   { headerName: '操作', minWidth: 110, cellRenderer: 'operation' },
 ];

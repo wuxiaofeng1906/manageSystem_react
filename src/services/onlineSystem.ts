@@ -98,6 +98,9 @@ export const OnlineSystemServices = {
   async getOrderDetail(params: any) {
     return request(`${baseUrl}/online/rd-repair-order`, { params });
   },
+  async updateOrderDetail(data: any) {
+    return request(`${baseUrl}/online/rd-repair-order`, { data, method: 'post' });
+  },
 
   async getOrgList(client: GqlClient<object>) {
     const { data } = await client.query(`

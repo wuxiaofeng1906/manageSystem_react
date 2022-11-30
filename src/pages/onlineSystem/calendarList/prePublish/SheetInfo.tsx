@@ -58,6 +58,7 @@ const SheetInfo = (props: any, ref: any) => {
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [announcementList, setAnnouncementList] = useState<any[]>([]);
   const [isSave, setIssave] = useState(false);
+  const [basicInfo, setBasicInfo] = useState<any>();
 
   const serverRef = useRef<GridApi>();
   const upgradeRef = useRef<GridApi>();
@@ -74,6 +75,30 @@ const SheetInfo = (props: any, ref: any) => {
     const res = await OnlineSystemServices.updateOrderDetail({
       ready_release_num: release_num,
       user_id: user?.userid,
+      deployment: [{ deployment_id: '', app: '', deployment_time: '' }],
+      basic_data: {
+        ready_release_name: 'string',
+        plan_release_time: 'string',
+        release_way: 'string',
+        branch: 'string',
+        release_type: 'string',
+        project: 'string',
+        announcement_num: 'string',
+        person_duty_num: 'string',
+        release_result: 'string',
+      },
+      release_app: {
+        cluster: 'string',
+        apps: 'string',
+        release_env: 'string',
+        batch: 'string',
+        database_version: 'string',
+        is_recovery: 'string',
+        is_update: 'string',
+        clear_redis: 'string',
+        clear_cache: 'string',
+      },
+      upgrade_api: upgradeRef.current,
     });
     getDetail();
   };
@@ -103,6 +128,7 @@ const SheetInfo = (props: any, ref: any) => {
         res?.basic_data?.release_result == 'unknown' ? undefined : res?.basic_data?.release_result,
     });
     baseForm.setFieldsValue({ ...res?.basic_data });
+    setBasicInfo(res?.basic_data);
     setUpgradeData(res);
   };
 
@@ -138,11 +164,15 @@ const SheetInfo = (props: any, ref: any) => {
       ev.preventDefault();
       ev.returnValue = '离开提示';
     };
-    window.addEventListener('beforeunload', listener);
+    if (isSave) {
+      window.addEventListener('beforeunload', listener);
+    }
     return () => {
       window.removeEventListener('beforeunload', listener);
     };
   }, [isSave]);
+
+  const computedServer = useMemo(() => PublishSeverColumn(basicInfo), [basicInfo]);
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
@@ -310,9 +340,25 @@ const SheetInfo = (props: any, ref: any) => {
         <h4 style={{ margin: '16px 0' }}>二、发布服务</h4>
         <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}>
           <AgGridReact
-            columnDefs={PublishSeverColumn}
+            columnDefs={computedServer}
             rowData={[upgradeData?.release_app]}
             {...initGridTable({ ref: serverRef, height: 30 })}
+            frameworkComponents={{
+              select: (p: CellClickedEvent) => {
+                return (
+                  <Select
+                    size={'small'}
+                    value={p.value}
+                    style={{ width: '100%' }}
+                    options={Object.keys(WhetherOrNot)?.map((k) => ({
+                      value: k,
+                      label: WhetherOrNot[k],
+                    }))}
+                    onChange={(v) => {}}
+                  />
+                );
+              },
+            }}
           />
         </div>
         <h4 style={{ margin: '16px 0' }}>三、升级接口</h4>
@@ -372,7 +418,7 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
 
   const onConfirm = async () => {
     const values = await form.validateFields();
-    props.onOk?.(true);
+    props.onOk?.(values);
   };
 
   useEffect(() => {
@@ -402,7 +448,7 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
         </Form.Item>
         <Form.Item
           label={'并发数'}
-          name={'count'}
+          name={'concurrent'}
           rules={[{ message: '请填写并发数', required: true }]}
         >
           <InputNumber style={{ width: '100%' }} min={0} max={99999999} />

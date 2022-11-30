@@ -1,3 +1,8 @@
+import { isEmpty } from 'lodash';
+import { infoMessage } from '@/publicMethods/showMessages';
+import { Modal, ModalFuncProps } from 'antd';
+import React from 'react';
+
 export const WhetherOrNot = { yes: '是', no: '否' };
 export const TechnicalSide = { backend: '后端', front: '前端', frontBackend: '前后端' };
 export const CheckTechnicalSide = { backend: '后端', front: '前端', public: '公共', test: '测试' };
@@ -14,19 +19,6 @@ export const ZentaoPhase = {
   已关闭: 10,
 };
 export const ZentaoType = { Bug: 'bug', Story: 'story', B_Story: 'B_story', Task: 'task' };
-export const ZentaoStatus = {
-  active: '激活',
-  closed: '已关闭',
-  verified: '已验证',
-  resolved: '已解决',
-  wait: '未开始',
-  doing: '进行中',
-  done: '已完成',
-  pause: '已暂停',
-  cancel: '已取消',
-  changed: '已更改',
-  draft: '已草拟',
-};
 export const CheckStatus = {
   skip: { text: '忽略', color: '#bfbfbf' },
   yes: { text: '通过', color: '#52c41a' },
@@ -35,6 +27,7 @@ export const CheckStatus = {
   noHot: { text: '不可热更', color: '#d46b08' },
   version: { text: '未封板', color: '#faad14' },
   wait: { text: '未开始' },
+  unknown: { text: '未知' },
   running: { text: '执行中', color: '#1890ff' },
 };
 export const PublishStatus = { doing: '发布中', done: '发布成功', wait: '未开始' };
@@ -62,7 +55,7 @@ export const StoryStatus = {
   released: '已发布',
   closed: '已关闭',
 };
-export const AutoCheckType = { ui: 'ui执行通过', applet: '小程序执行通过', api: '接口执行通过' };
+export const AutoCheckType = { ui: 'ui执行通过', api: '接口执行通过' };
 export const checkInfo = [
   {
     check_type: '前端单元测试运行是否通过',
@@ -74,36 +67,37 @@ export const checkInfo = [
     open_pm: 'action_user',
     open_time: 'action_time',
     log: 'check_log',
-    rowKey: 'front_test_unit',
     disabled: false,
-    api_url: 'test-unit',
+    rowKey: 'front_test_unit', // 接口参数取值
+    api_url: 'test-unit', // 批量检查接口地址
   },
   {
     check_type: '前端图标一致性检查是否通过',
     side: 'front',
-    status: '',
-    start: '',
-    end: '',
+    status: 'check_result',
+    start: 'check_start_time',
+    end: 'check_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
-    rowKey: 'icon_check',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_log',
     disabled: false,
+    rowKey: 'icon_check',
     api_url: 'icon-check',
   },
   {
     check_type: '前端代码遗漏检查是否通过',
     side: 'front',
-    status: '',
-    start: '',
-    end: '',
+    status: 'check_result',
+    start: 'check_start_time',
+    end: 'check_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
-    rowKey: 'front_version_data',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_log', // 链接
     disabled: false,
+    rowKey: 'front_version_data',
+    api_url: 'version-check',
   },
   {
     check_type: '前端服务git分支是否封板',
@@ -117,17 +111,18 @@ export const checkInfo = [
     log: 'check_log',
     rowKey: 'front_seal_data',
     disabled: false,
+    api_url: 'sealing-version-check',
   },
   {
     check_type: '后端单元测试运行是否通过',
     side: 'backend',
-    status: '',
-    start: '',
-    end: '',
+    status: 'test_case_status',
+    start: 'test_case_start_time',
+    end: 'test_case_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_log',
     rowKey: 'backend_test_unit',
     disabled: false,
     api_url: 'test-unit',
@@ -135,28 +130,30 @@ export const checkInfo = [
   {
     check_type: '后端代码遗漏检查是否通过',
     side: 'backend',
-    status: '',
-    start: '',
-    end: '',
+    status: 'check_result',
+    start: 'check_start_time',
+    end: 'check_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
-    rowKey: 'backend_version_data',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_log', // 链接
     disabled: false,
+    rowKey: 'backend_version_data',
+    api_url: 'version-check',
   },
   {
     check_type: '构建时间对比校验是否通过',
     side: 'backend',
-    status: '',
-    start: '',
-    end: '',
+    status: 'check_result',
+    start: 'check_start_time',
+    end: 'check_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
-    rowKey: 'access',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_log', // 特殊处理日志
     disabled: false,
+    rowKey: 'libray_data',
+    api_url: 'create-libray',
   },
   // {
   //   check_type: '数据库升级验证是否通过',
@@ -174,13 +171,13 @@ export const checkInfo = [
   {
     check_type: '后端环境一致性检查是否通过',
     side: 'backend',
-    status: '',
-    start: '',
-    end: '',
+    status: 'check_result',
+    start: 'check_start_time',
+    end: 'check_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_address', // 链接
     rowKey: 'env_data',
     disabled: false,
     api_url: 'env-check',
@@ -202,26 +199,27 @@ export const checkInfo = [
   {
     check_type: '后端服务git分支是否封板',
     side: 'backend',
-    status: '',
-    start: '',
-    end: '',
+    status: 'sealing_version',
+    start: 'version_check_start_time',
+    end: 'version_check_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_log',
     rowKey: 'backend_seal_data',
     disabled: false,
+    api_url: 'sealing-version-check',
   },
   {
     check_type: '上线前检查checklist是否检查完成',
     side: 'public',
-    status: '',
-    start: '',
-    end: '',
+    status: 'check_result',
+    start: 'check_start_time',
+    end: 'check_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_log',
     rowKey: 'check_list_data',
     disabled: false,
     api_url: 'zt-check-list',
@@ -255,15 +253,15 @@ export const checkInfo = [
   {
     check_type: 'web/h5部署时是否勾选自动化测试参数',
     side: 'public',
-    status: '',
-    start: '',
-    end: '',
+    status: 'automation_check',
+    start: 'check_start_time',
+    end: 'check_end_time',
     open: false,
     open_pm: '',
     open_time: '',
+    disabled: false,
     log: '',
     rowKey: 'auto_h5_web_data',
-    disabled: false,
     api_url: 'web-h5-automation',
   },
   {
@@ -276,7 +274,21 @@ export const checkInfo = [
     open_pm: '',
     open_time: '',
     log: '',
-    rowKey: 'auto_obj_data',
     disabled: false,
+    rowKey: 'auto_obj_data', // 数组结构
   },
 ];
+// 日志弹窗
+export const onLog = (props: ModalFuncProps & { log: string; noData: string }) => {
+  if (isEmpty(props.log)) return infoMessage(props.noData || '暂无日志！');
+  Modal.info({
+    width: props.width || 700,
+    okText: props.okText || '取消',
+    title: props.title,
+    content: props.content ?? (
+      <div style={{ maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap' }}>
+        {props.log}
+      </div>
+    ),
+  });
+};

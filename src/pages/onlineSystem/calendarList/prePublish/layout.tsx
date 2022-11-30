@@ -38,13 +38,26 @@ const Layout = () => {
   const updateKey = (key?: string) =>
     history.replace({ pathname: history.location.pathname, query: { key: key ?? 'server' } });
 
-  const disableStyle = useMemo(
-    () =>
-      globalState.locked || globalState.finished
+  const onExtra = async (fn: Function) => {
+    if (checkStatus.flag || touched) return;
+    setTouched(true);
+    try {
+      await fn();
+      setTouched(false);
+    } catch (e) {
+      setTouched(false);
+    }
+  };
+
+  const checkStatus = useMemo(() => {
+    const flag = globalState.locked || globalState.finished;
+    return {
+      disableStyle: flag
         ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
         : { cursor: touched ? 'not-allowed' : 'pointer' },
-    [globalState, touched],
-  );
+      flag,
+    };
+  }, [globalState, touched]);
 
   const renderTabContent = useMemo(() => {
     if (query.key == 'server')
@@ -52,11 +65,11 @@ const Layout = () => {
         <Space size={10}>
           <BarsOutlined
             onClick={() => {
-              if (globalState.locked || globalState.finished || touched) return;
+              if (checkStatus.flag || touched) return;
               ref.current?.onShow();
             }}
             title={'需求列表'}
-            style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
+            style={{ color: '#0079ff', fontSize: 16, ...checkStatus.disableStyle }}
           />
           <Button size={'small'} disabled={touched} onClick={() => ref.current?.onCancelPublish()}>
             取消发布
@@ -64,43 +77,35 @@ const Layout = () => {
           <SyncOutlined
             title={'刷新'}
             spin={touched}
-            onClick={async () => {
-              setTouched(true);
-              if (globalState.locked || globalState.finished || touched) return;
-              await ref.current?.onRefresh();
-              setTouched(false);
-            }}
-            style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
+            onClick={() => onExtra(ref.current?.onRefresh)}
+            style={{ color: '#0079ff', fontSize: 16, ...checkStatus.disableStyle }}
           />
         </Space>
       );
     else if (query.key == 'check')
       return (
         <Space size={10}>
-          <Button size={'small'} onClick={() => ref.current?.onSetting()}>
+          <Button size={'small'} disabled={touched} onClick={() => onExtra(ref.current?.onSetting)}>
             检查参数设置
           </Button>
           <Button
             size={'small'}
-            onClick={() => ref.current?.onCheck()}
-            disabled={globalState.locked || globalState.finished}
+            onClick={() => onExtra(ref.current?.onCheck)}
+            disabled={checkStatus.flag || touched}
           >
             一键执行检查
           </Button>
           <Button
             size={'small'}
-            disabled={globalState.finished}
-            onClick={() => ref.current?.onLock()}
+            disabled={globalState.finished || touched}
+            onClick={() => onExtra(ref.current?.onLock)}
           >
-            {globalState.locked || globalState.finished ? '取消封板锁定' : '封板锁定'}
+            {checkStatus.flag ? '取消封板锁定' : '封板锁定'}
           </Button>
           <SyncOutlined
             title={'刷新'}
-            style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
-            onClick={() => {
-              if (globalState.locked || globalState.finished) return;
-              ref.current?.onRefreshCheck();
-            }}
+            style={{ color: '#0079ff', fontSize: 16, ...checkStatus.disableStyle }}
+            onClick={() => onExtra(ref.current?.onRefreshCheck)}
           />
         </Space>
       );

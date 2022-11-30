@@ -4,13 +4,14 @@ const baseUrl = '/api/verify';
 export type ICheckType =
   | 'test-unit' // 单元测试
   | 'icon-check' // 图标一致性
-  | 'version-check' // 版本检查
+  | 'version-check' // 代码遗漏检查
   | 'hot-update-check' // 热更检查
-  | 'create-libray' // 创建库比较
+  | 'create-libray' // 构建时间比较
   | 'env-check' // 环境一致性
   | 'zt-check-list' //特性、班车项目
   | 'preview-sql' //  previewsql
-  | 'web-h5-automation'; // 自动化检查
+  | 'web-h5-automation' // 自动化检查
+  | 'sealing-version-check'; // 分支封板
 
 export const OnlineSystemServices = {
   async getProjects() {
@@ -105,9 +106,13 @@ export const OnlineSystemServices = {
   async checkSetting(data: any) {
     return request(`${baseUrl}/online/check-param`, { data, method: 'post' });
   },
-  // 检查-状态修改
+  // 参数设置-详情
+  async getCheckSettingDetail(params: any) {
+    return request(`${baseUrl}/online/check-param`, { params });
+  },
+  // 检查-分支封板检查，分支封板状态修改
   async updateCheckStatus(data: any) {
-    return request(`${baseUrl}/online/sealing-version-check`, { data, method: 'post' });
+    return request(`${baseUrl}/online/sealing-version-check`, { data, method: 'post', msg: true });
   },
   // 检查-各项
   async checkOpts(data: any, type: ICheckType) {
@@ -116,6 +121,10 @@ export const OnlineSystemServices = {
   // 检查-封板锁定
   async checkSealingLock(data: any) {
     return request(`${baseUrl}/online/sealing-lock`, { data, method: 'post' });
+  },
+  // 检查-封版锁定检查是否确认和服务封版
+  async checkProcess(params: any) {
+    return request(`${baseUrl}/online/sealing-lock`, { params });
   },
   // 镜像环境
   async branchEnv(params: any) {
@@ -128,6 +137,10 @@ export const OnlineSystemServices = {
   },
   async updateOrderDetail(data: any) {
     return request(`${baseUrl}/online/rd-repair-order`, { data, method: 'post' });
+  },
+  // 更新一键部署id
+  async updateDeployId(data: any) {
+    return request(`${baseUrl}/online/one-deployment`, { data, method: 'post' });
   },
 
   async getOrgList(client: GqlClient<object>) {

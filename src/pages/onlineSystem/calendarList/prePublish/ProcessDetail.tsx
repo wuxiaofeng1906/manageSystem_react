@@ -35,7 +35,12 @@ import { infoMessage } from '@/publicMethods/showMessages';
 import { InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { history, useModel, useParams } from 'umi';
 import IPagination from '@/components/IPagination';
-import { ClusterType, ServerConfirmType, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
+import {
+  ClusterType,
+  onLog,
+  ServerConfirmType,
+  WhetherOrNot,
+} from '@/pages/onlineSystem/config/constant';
 import moment from 'moment';
 import PreReleaseServices from '@/services/preRelease';
 import { OnlineSystemServices } from '@/services/onlineSystem';
@@ -149,7 +154,7 @@ const ProcessDetail = (props: any, ref: any) => {
     OnlineSystemServices.branchEnv({ branch: basic?.branch }).then((res) =>
       setBranchEnv(res?.map((it: string) => ({ label: it, value: it }))),
     );
-  }, [basic.branch]);
+  }, [basic?.branch]);
 
   useEffect(() => {
     if (!isEmpty(basic)) {
@@ -288,19 +293,19 @@ const ProcessDetail = (props: any, ref: any) => {
     });
   };
 
-  const onLog = (v: string) => {
-    if (isEmpty(v)) return infoMessage('暂无sql日志！');
-    Modal.info({
-      width: 700,
-      okText: '取消',
-      title: 'sql详情',
-      content: (
-        <div style={{ maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap' }}>
-          {v}
-        </div>
-      ),
-    });
-  };
+  // const onLog = (v: string) => {
+  //   if (isEmpty(v)) return infoMessage('暂无sql日志！');
+  //   Modal.info({
+  //     width: 700,
+  //     okText: '取消',
+  //     title: 'sql详情',
+  //     content: (
+  //       <div style={{ maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap' }}>
+  //         {v}
+  //       </div>
+  //     ),
+  //   });
+  // };
 
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
   const memoGroup = useMemo(() => {
@@ -493,11 +498,11 @@ const ProcessDetail = (props: any, ref: any) => {
             rowData={repair?.data}
             {...initGridTable({ ref: repairRef, height: 30 })}
             frameworkComponents={{
-              log: (p) => (
+              log: (p: CellClickedEvent) => (
                 <img
                   style={{ width: 16, height: 16, cursor: 'pointer' }}
                   src={require('../../../../../public/logs.png')}
-                  onClick={() => onLog(p.value)}
+                  onClick={() => onLog({ title: 'sql详情', log: p.value, noData: '暂无sql日志！' })}
                 />
               ),
             }}

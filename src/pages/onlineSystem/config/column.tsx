@@ -327,22 +327,55 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   },
   { headerName: '确认时间', field: `confirm_time` },
 ];
-export const PublishSeverColumn: (ColDef | ColGroupDef)[] = [
-  {
-    headerName: '环境',
-    field: 'cluster',
-    minWidth: 110,
-  },
-  { headerName: '应用', field: 'apps', minWidth: 110 },
-  { headerName: '镜像源环境', field: 'release_env', minWidth: 110 },
-  { headerName: 'batch版本', field: 'batch', minWidth: 110 },
-  { headerName: '数据库版本', field: 'database_version', minWidth: 110 },
-  { headerName: '数据Recovery', field: 'is_recovery', minWidth: 110 },
-  { headerName: '数据update', field: 'is_update', minWidth: 110 },
-  { headerName: '是否清理redis缓存', field: 'clear_redis', minWidth: 110 },
-  { headerName: '是否清理应用缓存', field: 'clear_cache', minWidth: 110 },
-  { headerName: 'SQL工单', field: 'sql', minWidth: 110 },
-];
+export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
+  return [
+    {
+      headerName: '环境',
+      field: 'cluster',
+      minWidth: 110,
+    },
+    { headerName: '应用', field: 'apps', minWidth: 110 },
+    { headerName: '镜像源环境', field: 'release_env', minWidth: 110 },
+    {
+      headerName: 'batch版本',
+      field: 'batch',
+      minWidth: 110,
+      hide: data?.release_type == 'global',
+    },
+    {
+      headerName: '数据库版本',
+      field: 'database_version',
+      minWidth: 110,
+    },
+    {
+      headerName: '数据Recovery',
+      field: 'is_recovery',
+      minWidth: 130,
+      cellRenderer: 'select',
+      hide: data?.release_way == 'keep_server',
+    },
+    {
+      headerName: '数据update',
+      field: 'is_update',
+      minWidth: 130,
+      cellRenderer: 'select',
+      hide: data?.release_way == 'keep_server',
+    },
+    {
+      headerName: '是否清理redis缓存',
+      field: 'clear_redis',
+      minWidth: 150,
+      cellRenderer: 'select',
+    },
+    { headerName: '是否清理应用缓存', field: 'clear_cache', minWidth: 150, cellRenderer: 'select' },
+    {
+      headerName: 'SQL工单',
+      field: 'sql',
+      minWidth: 130,
+      hide: data?.release_way == 'keep_server',
+    },
+  ];
+};
 export const PublishUpgradeColumn: (ColDef | ColGroupDef)[] = [
   { headerName: '序号', minWidth: 110, cellRenderer: (params: any) => String(+params.node.id + 1) },
   { headerName: '接口服务', field: 'api_server', minWidth: 110 },
@@ -351,6 +384,6 @@ export const PublishUpgradeColumn: (ColDef | ColGroupDef)[] = [
   { headerName: 'Data', field: 'api_data', minWidth: 110 },
   { headerName: 'Header', field: 'api_header', minWidth: 110 },
   { headerName: '涉及租户', field: 'tenant', minWidth: 110 },
-  { headerName: '并发数', field: 'count', minWidth: 110, headerClass: 'ag-required' },
+  { headerName: '并发数', field: 'concurrent', minWidth: 110, headerClass: 'ag-required' },
   { headerName: '操作', minWidth: 110, cellRenderer: 'operation' },
 ];

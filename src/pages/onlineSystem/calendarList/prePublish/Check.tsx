@@ -10,17 +10,18 @@ import {
   DatePicker,
   ModalFuncProps,
   Button,
+  Tooltip,
 } from 'antd';
 import {
   AutoCheckType,
   checkInfo,
   CheckStatus,
   CheckTechnicalSide,
+  onLog,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../../config/common.less';
 import { isEmpty, omit } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
-import Ellipsis from '@/components/Elipsis';
 import moment from 'moment';
 import { useLocation, useModel, history, useParams } from 'umi';
 import { ICheckType, OnlineSystemServices } from '@/services/onlineSystem';
@@ -36,7 +37,18 @@ const Check = (props: any, ref: any) => {
   ]);
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
-  const [list, setList] = useState(checkInfo);
+  const [list, setList] = useState(() =>
+    checkInfo.map((it) => ({
+      ...it,
+      disabled: !it.open,
+      status: '',
+      start: '',
+      end: '',
+      open_pm: '',
+      open_time: '',
+      log: '',
+    })),
+  );
   const [show, setShow] = useState<{ visible: boolean; data: any }>({
     visible: false,
     data: null,
@@ -47,7 +59,7 @@ const Check = (props: any, ref: any) => {
     () => ({
       onRefreshCheck: getDetail,
       onCheck: onCheck,
-      onSetting: () => setShow({ visible: true, data: null }),
+      onSetting: () => setShow({ visible: true, data: release_num }),
       onLock: onLock,
     }),
     [selected, ref, globalState, basic],
@@ -73,7 +85,7 @@ const Check = (props: any, ref: any) => {
         OnlineSystemServices.checkOpts(omit(data, ['api_url']), data.api_url),
       ),
     );
-    console.log(checkList);
+    infoMessage('任务正在进行中，请稍后刷新');
   };
 
   const onLock = async () => {
@@ -81,6 +93,13 @@ const Check = (props: any, ref: any) => {
      * 1.检查是否封板，是否已确认
      * 2. 检查状态是否通过、忽略
      */
+
+    if (!globalState.locked) {
+      const res = await OnlineSystemServices.checkProcess({ release_num });
+      const flag = list.every((it) => ['yes', 'skip'].includes(it.status) || !it.open);
+      if (!flag) return infoMessage('各项检查状态未达到『 通过、忽略 』，不能进行封板锁定');
+    }
+
     await OnlineSystemServices.checkSealingLock({
       user_id: user?.userid ?? '',
       release_num,
@@ -93,6 +112,7 @@ const Check = (props: any, ref: any) => {
 
   const getDetail = async () => {
     setSelected([]);
+    setSpin(true);
     try {
       const res = await OnlineSystemServices.getCheckInfo({ release_num });
       setList(
@@ -100,38 +120,28 @@ const Check = (props: any, ref: any) => {
           const currentKey = res[it.rowKey];
           return {
             ...it,
-            disabled: currentKey?.[it.status] !== 'skip',
+            disabled: false,
             status: currentKey?.[it.status] ?? '',
             start: currentKey?.[it.start] || '',
             end: currentKey?.[it.end] || '',
-            open: currentKey?.[it.status] == 'skip',
+            open: currentKey?.[it.status] !== 'skip',
             open_pm: currentKey?.[it.open_pm] || '',
             open_time: currentKey?.[it.open_time] || '',
             log: currentKey?.[it.log] || '',
           };
         }),
       );
+      setSpin(false);
     } catch (e) {
-      setList(
-        checkInfo.map((it) => ({
-          ...it,
-          disabled: !it.open,
-          status: '',
-          start: '',
-          end: '',
-          open_pm: '',
-          open_time: '',
-          log: '',
-        })),
-      );
+      setSpin(false);
     }
   };
 
   const updateStatus = async (data: any) => {
-    const res = await OnlineSystemServices.updateCheckStatus({
+    await OnlineSystemServices.updateCheckStatus({
       user_id: user?.userid,
       release_num,
-      is_ignore: data.status,
+      is_ignore: !data.open,
       side: data.side,
     });
   };
@@ -169,9 +179,12 @@ const Check = (props: any, ref: any) => {
             {
               title: '检查类别',
               dataIndex: 'check_type',
-              width: '24%',
+              width: 300,
+              fixed: 'left',
               render: (v) => (
-                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+                <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
+                  {v}
+                </Tooltip>
               ),
             },
             {
@@ -196,17 +209,21 @@ const Check = (props: any, ref: any) => {
             {
               title: '检查开始时间',
               dataIndex: 'start',
-              width: '12%',
+              width: 180,
               render: (v) => (
-                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+                <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
+                  {v}
+                </Tooltip>
               ),
             },
             {
               title: '检查结束时间',
               dataIndex: 'end',
-              width: '12%',
+              width: 180,
               render: (v) => (
-                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+                <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
+                  {v}
+                </Tooltip>
               ),
             },
             {
@@ -218,15 +235,15 @@ const Check = (props: any, ref: any) => {
                 <Switch
                   checkedChildren={'开启'}
                   unCheckedChildren={'忽略'}
-                  disabled={hasEdit}
+                  disabled={hasEdit || record.disabled}
                   checked={v}
                   onChange={(e) => {
-                    list[index].open = e;
-                    list[index].disabled = !e;
+                    list[index].disabled = true;
                     setList([...list]);
                     if (!e) {
                       setSelected(selected.filter((it) => it != record.rowKey));
                     }
+                    updateStatus({ ...record, open: e });
                   }}
                 />
               ),
@@ -235,9 +252,11 @@ const Check = (props: any, ref: any) => {
             {
               title: '启用/忽略时间',
               dataIndex: 'open_time',
-              width: '12%',
+              width: 180,
               render: (v) => (
-                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+                <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
+                  {v}
+                </Tooltip>
               ),
             },
             {
@@ -246,18 +265,22 @@ const Check = (props: any, ref: any) => {
               width: 90,
               fixed: 'right',
               align: 'center',
-              render: (p) => (
+              render: (v, record) => (
                 <img
                   style={{
                     width: 18,
                     height: 18,
                     marginRight: 10,
-                    ...(hasEdit ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}),
+                    ...(hasEdit || !record.open
+                      ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
+                      : {}),
                   }}
                   src={require('../../../../../public/logs.png')}
                   title={'日志'}
                   onClick={() => {
-                    if (hasEdit) return;
+                    if (hasEdit || !record.open) return;
+
+                    onLog({ title: '检查日志', log: v, noData: '暂无检查日志' });
                   }}
                 />
               ),
@@ -265,14 +288,16 @@ const Check = (props: any, ref: any) => {
           ]}
           dataSource={list}
           pagination={false}
-          scroll={{ x: 1200 }}
+          scroll={{ x: 'min-content' }}
           rowKey={(p) => p.rowKey}
           rowSelection={{
             selectedRowKeys: selected,
             onChange: (p) => {
               setSelected(p as string[]);
             },
-            getCheckboxProps: (record) => ({ disabled: hasEdit || record.disabled }),
+            getCheckboxProps: (record) => ({
+              disabled: hasEdit || record.disabled || !record.open,
+            }),
           }}
         />
         <CheckSettingModal
@@ -297,17 +322,39 @@ export default forwardRef(Check);
 const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
   const [form] = Form.useForm();
   const [disabled, setDisabled] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [compareBranch, setCompareBranch] = useState<any[]>([]);
 
   const getBranch = async () => {
     const res = await OnlineSystemServices.getBranch();
-    setCompareBranch(res?.map((it) => ({ label: it.branch_name, value: it.branch_id })));
+    setCompareBranch(
+      res?.map((it: any) => ({ label: it.branch_name, key: it.branch_id, value: it.branch_name })),
+    );
+  };
+  const getDetail = async () => {
+    setLoading(true);
+    try {
+      const res = await OnlineSystemServices.getCheckSettingDetail({
+        release_num: props.init.data,
+      });
+      const data = res?.branch_check_data;
+      form.setFieldsValue({
+        main_branch: data?.main_branch ? data?.main_branch?.split(',') : [],
+        main_since: data?.main_since ? moment(data?.main_since).subtract(5, 'days') : undefined,
+        auto_data: res?.auto_data?.flatMap((it: any) =>
+          it.check_result == 'yes' ? [it.check_type] : [],
+        ),
+      });
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     if (!props.init.visible) return form.resetFields();
     getBranch();
-    if (props.init.data) form.setFieldsValue({ ...props.init.data });
+    getDetail();
   }, [props.init.visible]);
 
   const onConfirm = async () => {
@@ -315,65 +362,70 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
     setDisabled(true);
     await props.onOk?.({
       main_branch: values?.main_branch?.join(',') ?? '',
-      main_since: moment(values.main_since).startOf('d').format('YYYY-MM-DD HH:mm:ss'),
+      main_since: moment(values.main_since)
+        .add(5, 'day')
+        .startOf('d')
+        .format('YYYY-MM-DD HH:mm:ss'),
       auto_data: Object.keys(AutoCheckType)?.map((v: string) => ({
         check_type: v,
-        check_result: values.auto_data?.includes(v),
+        check_result: values.auto_data?.includes(v) ? 'yes' : 'no',
       })),
     });
     setDisabled(false);
   };
 
   return (
-    <Modal
-      {...props}
-      centered
-      destroyOnClose
-      maskClosable={false}
-      title={'检查参数设置'}
-      onCancel={() => props?.onOk?.()}
-      visible={props.init?.visible}
-      footer={[
-        <Button
-          onClick={() => {
-            console.log(props.init?.data);
-          }}
-        >
-          查看日志
-        </Button>,
-        <Button onClick={() => props.onOk?.()}>取消</Button>,
-        <Button type={'primary'} disabled={disabled} onClick={onConfirm}>
-          确定
-        </Button>,
-      ]}
-    >
-      <Form form={form} labelCol={{ span: 6 }}>
-        <h4>一、检查上线分支是否包含对比分支的提交</h4>
-        <Form.Item
-          label={'被对比的主分支'}
-          name={'main_branch'}
-          rules={[{ message: '请选择对比分支', required: true }]}
-        >
-          <Select options={compareBranch} allowClear showSearch mode={'multiple'} />
-        </Form.Item>
-        <Form.Item
-          label={'对比起始时间'}
-          name={'main_since'}
-          rules={[{ message: '请选择对比起始时间', required: true }]}
-        >
-          <DatePicker style={{ width: '100%' }} format={'YYYY-MM-DD'} />
-        </Form.Item>
-        <h4>二、升级前自动化检查是否通过</h4>
-        <Form.Item name={'auto_data'}>
-          <Checkbox.Group
-            options={Object.keys(AutoCheckType).map((v) => ({
-              label: AutoCheckType[v],
-              value: v,
-              key: v,
-            }))}
-          />
-        </Form.Item>
-      </Form>
-    </Modal>
+    <Spin spinning={loading} tip={'数据加载中...'}>
+      <Modal
+        {...props}
+        centered
+        destroyOnClose
+        maskClosable={false}
+        title={'检查参数设置'}
+        onCancel={() => props?.onOk?.()}
+        visible={props.init?.visible}
+        footer={[
+          <Button
+            onClick={() => {
+              console.log(props.init?.data);
+            }}
+          >
+            查看日志
+          </Button>,
+          <Button onClick={() => props.onOk?.()}>取消</Button>,
+          <Button type={'primary'} disabled={disabled} onClick={onConfirm}>
+            确定
+          </Button>,
+        ]}
+      >
+        <Form form={form} labelCol={{ span: 6 }}>
+          <h4>一、检查上线分支是否包含对比分支的提交</h4>
+          <Form.Item
+            label={'被对比的主分支'}
+            name={'main_branch'}
+            rules={[{ message: '请选择对比分支', required: true }]}
+          >
+            <Select options={compareBranch} allowClear showSearch mode={'multiple'} />
+          </Form.Item>
+          <Form.Item
+            label={'对比起始时间'}
+            name={'main_since'}
+            rules={[{ message: '请选择对比起始时间', required: true }]}
+          >
+            <DatePicker style={{ width: '100%' }} format={'YYYY-MM-DD'} />
+          </Form.Item>
+          <h4>二、升级前自动化检查是否通过</h4>
+          <Form.Item name={'auto_data'}>
+            <Checkbox.Group
+              options={Object.keys(AutoCheckType).map((v) => ({
+                label: AutoCheckType[v],
+                value: v,
+                key: v,
+              }))}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </Spin>
   );
 };

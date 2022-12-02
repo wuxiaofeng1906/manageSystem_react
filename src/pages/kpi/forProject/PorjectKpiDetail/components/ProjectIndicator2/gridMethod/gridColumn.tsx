@@ -283,7 +283,7 @@ export const reviewDefectColums: any = [
     //   }
     //   return true;
     // },
-    // agSelectCellEditor: 'agSelectCellEditor',
+    // cellEditor: 'cellEditor',
     // cellEditorParams: {values: ['是', '否']},
     // cellRenderer: (params: any) => {
     //   if (params.data?.kind === '合计') {
@@ -583,7 +583,7 @@ export const processQualityColums: any = [
     //   }
     //   return true;
     // },
-    // agSelectCellEditor: 'agSelectCellEditor',
+    // cellEditor: 'cellEditor',
     // cellEditorParams: {values: ['是', '否']},
     // cellRenderer: (params: any) => {
     //   if (

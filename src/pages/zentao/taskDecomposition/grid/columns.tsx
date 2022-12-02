@@ -24,7 +24,7 @@ const gridColumns: any = [
     width: 90,
     pinned: 'left',
     cellEditorPopup: true,
-    agSelectCellEditor: 'agLargeTextCellEditor',
+    cellEditor: 'agLargeTextCellEditor',
     cellEditorParams: {
       rows: 2,
     },

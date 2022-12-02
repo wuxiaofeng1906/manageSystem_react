@@ -39,14 +39,14 @@ const Layout = () => {
     if (!release_num) return;
     let step = 0;
     OnlineSystemServices.getReleaseStatus({ release_num }).then((res) => {
-      step = res?.release_result == 'yes' ? 2 : 2;
+      step = res?.release_result == 'success' ? 2 : 0;
       setGlobalState({
         locked: res?.release_sealing == 'yes',
-        finished: res?.release_result == 'yes',
+        finished: res?.release_result == 'success',
         step,
       });
+      updateKey(Step[step]);
     });
-    updateKey(Step[step]);
   }, [release_num]);
 
   const updateKey = (key?: string) =>
@@ -106,7 +106,11 @@ const Layout = () => {
     else if (query.key == 'check')
       return (
         <Space size={10}>
-          <Button size={'small'} disabled={touched} onClick={() => onExtra(ref.current?.onSetting)}>
+          <Button
+            size={'small'}
+            disabled={checkStatus.flag || touched}
+            onClick={() => onExtra(ref.current?.onSetting)}
+          >
             检查参数设置
           </Button>
           <Button

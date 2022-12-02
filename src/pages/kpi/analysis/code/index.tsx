@@ -221,7 +221,7 @@ const getSourceColums = () => {
       field: 'attendance',
       minWidth: 80,
       editable: true,
-      agSelectCellEditor: 'agSelectCellEditor',
+      cellEditor: 'cellEditor',
       cellEditorParams: { values: attStageRender() },
       filterParams: {
         valueFormatter: (params: any) => {
@@ -237,7 +237,7 @@ const getSourceColums = () => {
       field: 'stage',
       minWidth: 110,
 
-      agSelectCellEditor: 'agSelectCellEditor',
+      cellEditor: 'cellEditor',
       cellEditorParams: { values: prjStageRender() },
       filterParams: {
         valueFormatter: (params: any) => {

@@ -479,7 +479,7 @@ const getReviewDefectColumns = () => {
         }
         return true;
       },
-      agSelectCellEditor: 'agSelectCellEditor',
+      cellEditor: 'cellEditor',
       cellEditorParams: { values: ['是', '否'] },
       cellRenderer: (params: any) => {
         if (params.data?.kind === '合计') {
@@ -784,7 +784,7 @@ const getProcessQualityColumns = () => {
         }
         return true;
       },
-      agSelectCellEditor: 'agSelectCellEditor',
+      cellEditor: 'cellEditor',
       cellEditorParams: { values: ['是', '否'] },
       cellRenderer: (params: any) => {
         if (

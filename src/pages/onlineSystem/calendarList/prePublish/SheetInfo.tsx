@@ -78,7 +78,6 @@ const SheetInfo = (props: any, ref: any) => {
   useImperativeHandle(
     ref,
     () => {
-      console.log(release_num);
       if (!release_num) return;
       return { onSave };
     },

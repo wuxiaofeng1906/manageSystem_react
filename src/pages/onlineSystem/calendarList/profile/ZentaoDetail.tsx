@@ -47,12 +47,16 @@ const ZentaoDetail = (props: any, ref: any) => {
     total: 0,
     page: 1,
   });
-  useImperativeHandle(ref, () => ({
-    onRefresh: () => {
-      getTestOrder();
-      getTableList(true);
-    },
-  }));
+  useImperativeHandle(
+    ref,
+    () => ({
+      onRefresh: () => {
+        getTestOrder();
+        getTableList(true);
+      },
+    }),
+    [query.key],
+  );
 
   window.onresize = function () {
     setTableHeight((window.innerHeight - 450) / 2);

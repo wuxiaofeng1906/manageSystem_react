@@ -219,7 +219,7 @@ const getReleaseServiceComfirmColumns = () => {
       field: 'front_confirm_status',
       minWidth: 115,
       // editable: true,
-      // agSelectCellEditor: "agSelectCellEditor",
+      // cellEditor: "cellEditor",
       // cellEditorParams: {values: confirmRender()},
       // filterParams: {
       //   valueFormatter: (params: any) => {
@@ -244,7 +244,7 @@ const getReleaseServiceComfirmColumns = () => {
       field: 'back_end_confirm_status',
       minWidth: 115,
       // editable: true,
-      // agSelectCellEditor: "agSelectCellEditor",
+      // cellEditor: "cellEditor",
       // cellEditorParams: {values: confirmRender()},
       // filterParams: {
       //   valueFormatter: (params: any) => {
@@ -270,7 +270,7 @@ const getReleaseServiceComfirmColumns = () => {
       field: 'process_confirm_status',
       minWidth: 115,
       // editable: true,
-      // agSelectCellEditor: "agSelectCellEditor",
+      // cellEditor: "cellEditor",
       // cellEditorParams: {values: confirmRender()},
       // filterParams: {
       //   valueFormatter: (params: any) => {
@@ -296,7 +296,7 @@ const getReleaseServiceComfirmColumns = () => {
       field: 'test_confirm_status',
       minWidth: 115,
       // editable: true,
-      // agSelectCellEditor: "agSelectCellEditor",
+      // cellEditor: "cellEditor",
       // cellEditorParams: {values: confirmRender()},
       // filterParams: {
       //   valueFormatter: (params: any) => {

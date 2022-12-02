@@ -155,7 +155,7 @@ export const prjQualityColumn: any = [
     field: 'description',
     editable: true,
     minWidth: CELL_LENGTH.DESC_LENGTH,
-    agSelectCellEditor: 'agLargeTextCellEditor',
+    cellEditor: 'agLargeTextCellEditor',
     headerClass: 'title_left',
     cellEditorParams: {
       rows: 2,
@@ -285,7 +285,7 @@ export const testDataColumn: any = [
     editable: true,
     headerClass: 'title_left',
     minWidth: CELL_LENGTH.DESC_LENGTH,
-    agSelectCellEditor: 'agLargeTextCellEditor',
+    cellEditor: 'agLargeTextCellEditor',
     cellEditorParams: {
       rows: 2,
     },
@@ -411,7 +411,7 @@ export const devUserColumn: any = [
     editable: true,
     minWidth: 300,
     maxWidth: 1000,
-    agSelectCellEditor: 'agLargeTextCellEditor',
+    cellEditor: 'agLargeTextCellEditor',
     cellEditorParams: {
       rows: 2,
     },
@@ -534,7 +534,7 @@ export const testUserColumn: any = [
     editable: true,
     minWidth: 300,
     maxWidth: 1000,
-    agSelectCellEditor: 'agLargeTextCellEditor',
+    cellEditor: 'agLargeTextCellEditor',
     cellEditorParams: {
       rows: 2,
     },

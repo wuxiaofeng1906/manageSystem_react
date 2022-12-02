@@ -96,7 +96,11 @@ export default () => {
     setSqlList(sqlOrder.map((it: any) => ({ label: it.label, value: it.id })));
   };
   useEffect(() => {
-    if (location.pathname.includes('onlineSystem/prePublish') && isEmpty(envs)) {
+    if (
+      (location.pathname.includes('onlineSystem/prePublish') ||
+        location.pathname.includes('onlineSystem/profile')) &&
+      isEmpty(envs)
+    ) {
       getSelectList();
     }
   }, [location.pathname]);

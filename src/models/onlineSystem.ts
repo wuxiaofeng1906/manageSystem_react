@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OnlineSystemServices } from '@/services/onlineSystem';
+import PreReleaseServices from '@/services/preRelease';
+import { isEmpty } from 'lodash';
 
 export default () => {
-  const [globalState, setGlobalState] = useState({ locked: false, finished: false, step: 2 });
+  const [globalState, setGlobalState] = useState({ locked: false, finished: false, step: 1 });
   const [basic, setBasic] = useState<any>();
   const [server, setServer] = useState<any[]>([]);
   const [api, setApi] = useState<any[]>([]);
   const [repair, setRepair] = useState<any>({ count: 0, page: 1, page_size: 20, data: [] });
   const [serverConfirm, setServerConfirm] = useState<any[]>([]);
+  const [envs, setEnvs] = useState<any[]>([]);
+  const [sqlList, setSqlList] = useState<any[]>([]);
 
   const getReleaseInfo = async (data: any, refreshData: any = null) => {
     if (refreshData) {
@@ -79,8 +83,28 @@ export default () => {
     await getServerConfirm(refreshData);
   };
 
+  const getSelectList = async () => {
+    const res = await PreReleaseServices.environment();
+    const sqlOrder = await OnlineSystemServices.sqlOrder();
+    setEnvs(
+      res?.map((it: any) => ({
+        label: it.online_environment_name ?? '',
+        value: it.online_environment_id,
+        key: it.online_environment_id,
+      })),
+    );
+    setSqlList(sqlOrder.map((it: any) => ({ label: it.label, value: it.id })));
+  };
+  useEffect(() => {
+    if (location.pathname.includes('onlineSystem/prePublish') && isEmpty(envs)) {
+      getSelectList();
+    }
+  }, [location.pathname]);
+
   return {
     globalState,
+    envs,
+    sqlList,
     basic,
     server,
     api,

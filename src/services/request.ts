@@ -3,6 +3,7 @@ import { extend } from 'umi-request';
 import { message } from 'antd';
 import axios, { AxiosRequestConfig } from 'axios';
 import { errorMessage } from '@/publicMethods/showMessages';
+import { isString } from 'lodash';
 
 const errorHandler = (error: { response: Response; message: any }): Response => {
   // notification.destroy();
@@ -94,8 +95,8 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
         }
         return Promise.reject(res);
       }
-      if (msg && res.msg !== 'success') {
-        message.info(msg === true ? res.msg : msg);
+      if (msg && res?.msg !== 'success' && isString(res?.msg)) {
+        message.info(msg === true ? res?.msg : msg);
       }
       return res?.data;
     })

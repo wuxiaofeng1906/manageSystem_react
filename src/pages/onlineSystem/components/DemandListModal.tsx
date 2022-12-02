@@ -15,11 +15,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [form] = Form.useForm();
   const query = useParams() as { branch: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
-  const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
+  const [globalState, envs] = useModel('onlineSystem', (online) => [
+    online.globalState,
+    online.envs,
+  ]);
   const [list, setList] = useState<any[]>([]);
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<any[]>([]);
-  const [envs, setEnvs] = useState<any[]>([]);
+  const [relatedStory, setRelatedStory] = useState<any[]>([]);
 
   useEffect(() => {
     if (!props.visible) {
@@ -34,21 +37,16 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         release_env: props.data.release_env,
       });
     }
-    getSelectList();
+    getRelatedStory();
     getTableList();
   }, [props.visible, props.data]);
 
-  const getSelectList = async () => {
-    const res = await PreReleaseServices.environment();
-    setEnvs(
-      res?.map((it: any) => ({
-        label: it.online_environment_name ?? '',
-        value: it.online_environment_id,
-        key: it.online_environment_id,
-      })),
-    );
+  const getRelatedStory = async () => {
+    const res = await OnlineSystemServices.getRelatedStory({
+      branch: props.data?.branch || query.branch,
+    });
+    setRelatedStory(res);
   };
-
   const getTableList = async () => {
     setSpin(true);
     try {
@@ -122,6 +120,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     });
     setList(list.map((it) => ({ ...it, disabled: it.type !== v })));
   };
+
   const updateStatus = (data: any, status: string, index: number) => {
     Modal.confirm({
       title: '修改是否可热更提醒',

@@ -7,6 +7,8 @@ import { useLocation, history, useParams, useModel } from 'umi';
 import { BarsOutlined, SyncOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from '../../config/common.less';
+import { OnlineSystemServices } from '@/services/onlineSystem';
+import { Step } from '@/pages/onlineSystem/config/constant';
 
 const tabs = [
   { name: '项目与服务详情', comp: ProcessDetail, key: 'server' },
@@ -18,7 +20,10 @@ const tabs = [
 const Layout = () => {
   const query = useLocation()?.query;
   const { release_num } = useParams() as { release_num: string };
-  const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
+  const [globalState, setGlobalState] = useModel('onlineSystem', (online) => [
+    online.globalState,
+    online.setGlobalState,
+  ]);
   const [touched, setTouched] = useState(false);
   const ref = useRef() as React.MutableRefObject<{
     onRefresh: Function;
@@ -31,12 +36,24 @@ const Layout = () => {
     onSave: Function;
   }>;
   useEffect(() => {
-    let init = query.key;
-    updateKey(init);
-  }, []);
+    if (!release_num) return;
+    let step = 0;
+    OnlineSystemServices.getReleaseStatus({ release_num }).then((res) => {
+      step = res?.release_result == 'yes' ? 2 : 2;
+      setGlobalState({
+        locked: res?.release_sealing == 'yes',
+        finished: res?.release_result == 'yes',
+        step,
+      });
+    });
+    updateKey(Step[step]);
+  }, [release_num]);
 
   const updateKey = (key?: string) =>
-    history.replace({ pathname: history.location.pathname, query: { key: key ?? 'server' } });
+    history.replace({
+      pathname: history.location.pathname,
+      query: { key: key ?? 'server' },
+    });
 
   const onExtra = async (fn: Function) => {
     if (checkStatus.flag || touched) return;
@@ -66,12 +83,16 @@ const Layout = () => {
           <BarsOutlined
             onClick={() => {
               if (checkStatus.flag || touched) return;
-              ref.current?.onShow();
+              ref.current?.onShow?.();
             }}
             title={'需求列表'}
             style={{ color: '#0079ff', fontSize: 16, ...checkStatus.disableStyle }}
           />
-          <Button size={'small'} disabled={touched} onClick={() => ref.current?.onCancelPublish()}>
+          <Button
+            size={'small'}
+            disabled={touched || globalState.finished}
+            onClick={() => ref.current?.onCancelPublish()}
+          >
             取消发布
           </Button>
           <SyncOutlined
@@ -112,7 +133,11 @@ const Layout = () => {
     else
       return (
         <div>
-          <Button size={'small'} onClick={() => ref.current?.onSave()}>
+          <Button
+            size={'small'}
+            onClick={() => ref.current?.onSave()}
+            disabled={globalState.finished}
+          >
             保存
           </Button>
         </div>
@@ -134,7 +159,7 @@ const Layout = () => {
               <Tabs.TabPane
                 key={it.key}
                 tab={it.name}
-                disabled={globalState.step < index || touched}
+                disabled={(globalState.step || 1) < index || touched}
               >
                 <it.comp ref={ref} />
               </Tabs.TabPane>

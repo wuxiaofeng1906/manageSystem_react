@@ -143,6 +143,8 @@ const ZentaoDetail = (props: any, ref: any) => {
   };
 
   const fn = (filterData: any[], formValue: any, key: string) => {
+    const Na = formValue?.includes('NA');
+
     return filterData.filter((it: any) => {
       let originV = it[key];
       if (key == 'ztNo') originV = +originV;
@@ -150,7 +152,7 @@ const ZentaoDetail = (props: any, ref: any) => {
       if (key == 'status') originV = originV.en;
       if (['execution', 'testtask'].includes(key)) originV = originV.id;
       if (['openedBy', 'assignedTo'].includes(key)) originV = originV.realname;
-      return formValue?.join(',') == 'NA' ? isEmpty(originV) : formValue.includes(originV);
+      return Na ? isEmpty(originV) || formValue.includes(originV) : formValue.includes(originV);
     });
   };
 
@@ -180,9 +182,9 @@ const ZentaoDetail = (props: any, ref: any) => {
         };
         assignTo = {
           ...assignTo,
-          [assignToItem?.realname ? assignToItem.account : 'NA']: {
+          [assignToItem?.realname ? assignToItem.realname : 'NA']: {
             count:
-              (assignTo[assignToItem?.realname ? assignToItem?.account : 'NA']?.count ?? 0) + 1,
+              (assignTo[assignToItem?.realname ? assignToItem?.realname : 'NA']?.count ?? 0) + 1,
             name: assignToItem?.realname || '空',
           },
         };
@@ -195,6 +197,7 @@ const ZentaoDetail = (props: any, ref: any) => {
         };
         ztNo.push({ key: it.ztNo, value: it.ztNo, label: it.ztNo });
       });
+
       setRecordCount({ category, stage, ztNo, assignTo, execution, org });
       setStoryData(res);
       setOriginStoryData(res);
@@ -204,6 +207,7 @@ const ZentaoDetail = (props: any, ref: any) => {
       setSpin(false);
     }
   };
+
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
       <div className={styles.zentaoDetail}>

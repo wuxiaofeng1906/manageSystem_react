@@ -3,9 +3,17 @@ import { infoMessage } from '@/publicMethods/showMessages';
 import { Modal, ModalFuncProps } from 'antd';
 import React from 'react';
 
+export const Step = { 0: 'server', 1: 'check', 2: 'sheet' };
 export const WhetherOrNot = { yes: '是', no: '否' };
-export const TechnicalSide = { backend: '后端', front: '前端', frontBackend: '前后端' };
+export const TechnicalSide = { backend: '后端', front: '前端', backendFront: '前后端' };
 export const CheckTechnicalSide = { backend: '后端', front: '前端', public: '公共', test: '测试' };
+// 应用服务配置 - 所属应用类型
+export const appServerSide = {
+  businessFront: '前端业务应用',
+  businessBackend: '后端业务应用',
+  platformBackend: '后端平台应用',
+  process: '流程应用',
+};
 export const ZentaoPhase = {
   未开始: 1,
   进行中: 2,
@@ -43,6 +51,7 @@ export const ServerConfirmType = {
   emitter: 'emitter',
 };
 export const ClusterType = { global: 'global集群', tenant: '租户集群发布' };
+export const PublishWay = { stop_server: '停服', keep_server: '不停服' };
 export const StoryStatus = {
   wait: '未开始',
   planned: '已计划',
@@ -227,14 +236,15 @@ export const checkInfo = [
   {
     check_type: '需求阶段是否满足条件（需要测试需达到测试完毕/无需测试需要开发完毕）',
     side: 'public',
-    status: '',
-    start: '',
-    end: '',
+    status: 'check_result',
+    start: 'check_start_time',
+    end: 'check_end_time',
     open: false,
-    open_pm: '',
-    open_time: '',
-    log: '',
+    open_pm: 'action_user',
+    open_time: 'action_time',
+    log: 'check_log',
     rowKey: 'story_data',
+    api_url: 'story-status',
   },
   {
     check_type: 'previewsql是否已执行',
@@ -274,7 +284,7 @@ export const checkInfo = [
     open_pm: '',
     open_time: '',
     log: '',
-    disabled: false,
+    disabled: true,
     rowKey: 'auto_obj_data', // 数组结构
   },
 ];
@@ -285,9 +295,9 @@ export const onLog = (props: ModalFuncProps & { log: string; noData: string }) =
     width: props.width || 700,
     okText: props.okText || '取消',
     title: props.title,
-    content: props.content ?? (
+    content: (
       <div style={{ maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap' }}>
-        {props.log}
+        {props.content ?? props.log}
       </div>
     ),
   });

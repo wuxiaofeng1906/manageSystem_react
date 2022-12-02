@@ -11,7 +11,8 @@ export type ICheckType =
   | 'zt-check-list' //特性、班车项目
   | 'preview-sql' //  previewsql
   | 'web-h5-automation' // 自动化检查
-  | 'sealing-version-check'; // 分支封板
+  | 'sealing-version-check' // 分支封板
+  | 'story-status'; // 需求阶段
 
 export const OnlineSystemServices = {
   async getProjects() {
@@ -25,14 +26,7 @@ export const OnlineSystemServices = {
   async getOnlineList(params: any) {
     return request(`${baseUrl}/online/release-plan`, { params });
   },
-  // 禅道-需求任务bug
-  async getZentaoList(params: any) {
-    return request(`${baseUrl}/online/zt-data`, { params });
-  },
-  // 禅道-测试单
-  // async getTestOrderList(params: any) {
-  //   return request(`${baseUrl}/online/test-case`, { params });
-  // },
+
   // 发布过程列表
   async getReleaseList(params: any) {
     return request(`${baseUrl}/online/release-list`, { params });
@@ -44,6 +38,10 @@ export const OnlineSystemServices = {
   // 发布过程单-需求列表
   async getStoryList(params: any) {
     return request(`${baseUrl}/online/release-project-story`, { params });
+  },
+  // 已关联需求项
+  async getRelatedStory(params: any) {
+    return request(`${baseUrl}/online/story`, { params });
   },
   // 发布过程单-基础信息
   async getBasicInfo(params: any) {
@@ -110,11 +108,8 @@ export const OnlineSystemServices = {
   async getCheckSettingDetail(params: any) {
     return request(`${baseUrl}/online/check-param`, { params });
   },
-  // 检查-分支封板检查，分支封板状态修改
-  async updateCheckStatus(data: any) {
-    return request(`${baseUrl}/online/sealing-version-check`, { data, method: 'post', msg: true });
-  },
-  // 检查-各项
+
+  // 一键执行检查/修改启用状态
   async checkOpts(data: any, type: ICheckType) {
     return request(`${baseUrl}/online/${type}`, { data, method: 'post' });
   },
@@ -128,7 +123,7 @@ export const OnlineSystemServices = {
   },
   // 镜像环境
   async branchEnv(params: any) {
-    return request(`${baseUrl}/online/branch-env`, { params });
+    return request(`${baseUrl}/online/branch-env`, { params, warn: false });
   },
 
   // 工单
@@ -141,6 +136,32 @@ export const OnlineSystemServices = {
   // 更新一键部署id
   async updateDeployId(data: any) {
     return request(`${baseUrl}/online/one-deployment`, { data, method: 'post' });
+  },
+  // sql工单
+  async sqlOrder() {
+    return request(`${baseUrl}/online/sql-order`);
+  },
+  async deployments(params: any) {
+    return request(`${baseUrl}/online/one-deployment-id`, { params });
+  },
+  // 数据修复读取异常提示
+  async abnormalApi(params: any) {
+    return request(`${baseUrl}/online/abnormal-api`, { params, warn: false });
+  },
+  // 获取工单状态
+  async getReleaseStatus(params: any) {
+    return request(`${baseUrl}/online/release-status`, { params });
+  },
+
+  // 应用服务
+  async appConfig() {
+    return request(`${baseUrl}/online/app-config`);
+  },
+  async updateAppConfig(data: any) {
+    return request(`${baseUrl}/online/app-config`, { data, method: 'post', msg: '更新成功' });
+  },
+  async removeAppConfig(data: any) {
+    return request(`${baseUrl}/online/app-config`, { data, method: 'delete', msg: '删除成功' });
   },
 
   async getOrgList(client: GqlClient<object>) {

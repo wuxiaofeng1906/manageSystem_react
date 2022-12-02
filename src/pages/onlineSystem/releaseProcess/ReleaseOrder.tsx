@@ -128,7 +128,7 @@ const ReleaseOrder = () => {
       setSpinning(false);
     } catch (e: any) {
       if (e?.code == 4001) initForm();
-      else infoMessage(e.msg);
+      else infoMessage(e?.msg ?? e?.statusText);
       setSpinning(false);
     }
   };
@@ -396,6 +396,7 @@ const ReleaseOrder = () => {
       history.replace('/onDutyAndRelease/releaseProcess?key=pre');
     }
   };
+
   const onRemove = (data: any) => {
     const cluster = baseForm.getFieldValue('cluster');
     if (agFinished || !hasPermission.delete) {
@@ -684,7 +685,7 @@ const ReleaseOrder = () => {
 };
 export default ReleaseOrder;
 
-const ModalSuccessCheck = ({
+export const ModalSuccessCheck = ({
   visible,
   onOk,
   disabled,

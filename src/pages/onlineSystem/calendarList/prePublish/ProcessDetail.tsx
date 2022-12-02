@@ -33,7 +33,7 @@ import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import styles from '@/pages/onlineSystem/config/common.less';
 import { infoMessage } from '@/publicMethods/showMessages';
 import { InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
-import { history, useModel, useParams } from 'umi';
+import { history, useLocation, useModel, useParams } from 'umi';
 import IPagination from '@/components/IPagination';
 import {
   ClusterType,
@@ -49,6 +49,8 @@ const color = { yes: '#2BF541', no: '#faad14' };
 
 const ProcessDetail = (props: any, ref: any) => {
   const { release_num } = useParams() as { release_num: string };
+  const query = useLocation()?.query;
+
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const {
     globalState,
@@ -64,10 +66,10 @@ const ProcessDetail = (props: any, ref: any) => {
     updateSealing,
     updateServerConfirm,
   } = useModel('onlineSystem');
-
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const [checked, setChecked] = useState(false); // 服务项
   const [loading, setLoading] = useState(false);
+  const [errorTips, setErrorTips] = useState('');
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   const [checkBoxOpt, setCheckBoxOpt] = useState<string[]>([]);
   const [storyModal, setStoryModal] = useState<{ visible: boolean; data: any }>({
@@ -89,44 +91,47 @@ const ProcessDetail = (props: any, ref: any) => {
 
   useImperativeHandle(
     ref,
-    () => ({
-      onShow: () => {
-        setStoryModal({ visible: true, data: basic });
-      },
-      onCancelPublish: () => {
-        Modal.confirm({
-          okText: '确认',
-          cancelText: '取消',
-          centered: true,
-          title: '取消发布提醒',
-          content: '取消发布将删除发布工单，请确认是否取消发布?',
-          icon: <InfoCircleOutlined style={{ color: 'red' }} />,
-          okButtonProps: { disabled: confirmDisabled },
-          onOk: async () => {
-            setConfirmDisabled(true);
-            try {
-              await PreReleaseServices.cancelPublish({
-                user_id: user?.userid ?? '',
-                user_name: user?.name ?? '',
-                ready_release_num: release_num,
-              });
-              await PreReleaseServices.removeRelease(
-                {
+    () => {
+      if (!release_num && query?.key !== 'server' && !basic) return;
+      return {
+        onShow: () => {
+          setStoryModal({ visible: true, data: basic });
+        },
+        onCancelPublish: () => {
+          Modal.confirm({
+            okText: '确认',
+            cancelText: '取消',
+            centered: true,
+            title: '取消发布提醒',
+            content: '取消发布将删除发布工单，请确认是否取消发布?',
+            icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+            okButtonProps: { disabled: confirmDisabled },
+            onOk: async () => {
+              setConfirmDisabled(true);
+              try {
+                await PreReleaseServices.cancelPublish({
                   user_id: user?.userid ?? '',
-                  release_num: release_num,
-                },
-                false,
-              );
-              history.replace(`/onlineSystem/profile/${basic.branch}?key='process`);
-            } catch (e) {
-              setConfirmDisabled(false);
-            }
-          },
-        });
-      },
-      onRefresh: () => init(true),
-    }),
-    [release_num, basic],
+                  user_name: user?.name ?? '',
+                  ready_release_num: release_num,
+                });
+                await PreReleaseServices.removeRelease(
+                  {
+                    user_id: user?.userid ?? '',
+                    release_num: release_num,
+                  },
+                  false,
+                );
+                history.replace(`/onlineSystem/profile/${basic.branch}?key='process`);
+              } catch (e) {
+                setConfirmDisabled(false);
+              }
+            },
+          });
+        },
+        onRefresh: () => init(true),
+      };
+    },
+    [release_num, basic, query.key],
   );
 
   const init = async (refresh = false) => {
@@ -137,24 +142,28 @@ const ProcessDetail = (props: any, ref: any) => {
         { release_num },
         refresh ? { release_num, user_id: user?.userid ?? '' } : null,
       );
+      await OnlineSystemServices.abnormalApi({ release_num });
       setLoading(false);
     } catch (e) {
+      setErrorTips(e?.msg);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!release_num) return;
-    Modal.destroyAll?.();
-    init();
-  }, [release_num]);
+    if (release_num && query?.key == 'server') {
+      Modal.destroyAll?.();
+      init();
+    }
+  }, [release_num, query]);
 
   useEffect(() => {
-    if (!basic?.branch) return;
+    if (isEmpty(basic?.branch) || query.key !== 'server') return;
+
     OnlineSystemServices.branchEnv({ branch: basic?.branch }).then((res) =>
       setBranchEnv(res?.map((it: string) => ({ label: it, value: it }))),
     );
-  }, [basic?.branch]);
+  }, [basic?.branch, query]);
 
   useEffect(() => {
     if (!isEmpty(basic)) {
@@ -176,31 +185,49 @@ const ProcessDetail = (props: any, ref: any) => {
   }, [basic, repair]);
 
   const onSeal = async (flag = 'yes') => {
-    let tips = '请选择未封板项目进行封板';
-    if (!flag) tips = '请选择已封板项目进行解除封板';
-    if (isEmpty(selectedRowKeys)) return infoMessage(`请先选择需${flag ? '' : '解除'}封板项目`);
+    let tips = '请选择未封板服务进行封板';
+    if (!flag) tips = '请选择已封板服务进行解除封板';
+    if (isEmpty(selectedRowKeys)) return infoMessage(`请先选择需${flag ? '' : '解除'}封板服务`);
+
+    const confirmSide = serverConfirm.flatMap((it) =>
+      it.confirm_result == 'yes' ? [it.confirm_type] : [],
+    );
+    let noConfirmSide: string[] = [];
+    selectedRowKeys.forEach((it) => {
+      if (!confirmSide.includes(it.side)) noConfirmSide.push(ServerConfirmType[it.side]);
+    });
     if (selectedRowKeys?.some((it) => it.is_sealing == flag)) return infoMessage(tips);
+    // 判断对应侧是否确认
+    if (!isEmpty(noConfirmSide))
+      return infoMessage(`『${noConfirmSide?.join()}』对应侧,未确认完成请先确认后再封板`);
     Modal.confirm({
       title: `${flag ? '' : '解除'}封板提示`,
-      content: `请确认是否将该项目${flag ? '' : '解除'}封板?`,
+      content: `请确认是否将该服务${flag ? '' : '解除'}封板?`,
       onOk: async () => {
-        setLoading(true);
-        reset();
-        // 1.校验用例是否通过
-        if (flag == 'yes') {
-          await OnlineSystemServices.sealingCheck({
-            apps: selectedRowKeys?.map((it) => it.apps)?.join(',') ?? '',
-            release_num,
-          });
+        try {
+          setLoading(true);
+          reset();
+          // 1.校验测试用例是否通过
+          if (flag == 'yes') {
+            await OnlineSystemServices.sealingCheck({
+              apps: selectedRowKeys?.map((it) => it.apps)?.join(',') ?? '',
+              release_num,
+            });
+          }
+          await updateSealing(
+            {
+              user_id: user?.userid ?? '',
+              app_id: selectedRowKeys?.map((it) => it._id)?.join(',') ?? '',
+              is_seal: flag == 'yes',
+            },
+            { release_num },
+          );
+          setLoading(false);
+        } catch (e) {
+          setLoading(false);
         }
-        await updateSealing(
-          {
-            user_id: user?.userid ?? '',
-            app_id: selectedRowKeys?.map((it) => it._id)?.join(',') ?? '',
-            is_seal: flag == 'yes',
-          },
-          { release_num },
-        );
+      },
+      onCancel: () => {
         setLoading(false);
       },
     });
@@ -213,13 +240,16 @@ const ProcessDetail = (props: any, ref: any) => {
         : type == 'repair'
         ? repairRef?.current?.getSelectedRows()
         : selectedRowKeys;
-    if (isEmpty(gridSelected)) return infoMessage('请先选择需移除的项目！');
+    if (isEmpty(gridSelected)) return infoMessage('请先选择需移除的服务！');
     if (type == 'server' && gridSelected?.some((it) => it.is_sealing == 'yes'))
-      return infoMessage('已封板项目不能移除！');
+      return infoMessage('已封板服务不能移除！');
     Modal.confirm({
+      centered: true,
       title: '移除提示',
       icon: <InfoCircleOutlined style={{ color: 'red' }} />,
-      content: `请确认是否要移除该项目?`,
+      content: `请确认是否要移除 ${
+        type == 'server' ? gridSelected?.map((it) => it.apps)?.join(',') + '服务' : ''
+      }?`,
       onOk: async () => {
         setLoading(true);
         reset();
@@ -293,20 +323,6 @@ const ProcessDetail = (props: any, ref: any) => {
     });
   };
 
-  // const onLog = (v: string) => {
-  //   if (isEmpty(v)) return infoMessage('暂无sql日志！');
-  //   Modal.info({
-  //     width: 700,
-  //     okText: '取消',
-  //     title: 'sql详情',
-  //     content: (
-  //       <div style={{ maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap' }}>
-  //         {v}
-  //       </div>
-  //     ),
-  //   });
-  // };
-
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
   const memoGroup = useMemo(() => {
     const table = mergeCellsTable(server ?? [], 'apps');
@@ -315,6 +331,7 @@ const ProcessDetail = (props: any, ref: any) => {
       table,
     };
   }, [server]);
+  const serverColumn = useMemo(() => preServerColumn(server), [server]);
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
@@ -435,9 +452,9 @@ const ProcessDetail = (props: any, ref: any) => {
             size={'small'}
             rowKey={(record) => +record._id}
             dataSource={memoGroup.table}
-            columns={preServerColumn}
+            columns={serverColumn}
             pagination={false}
-            scroll={{ y: 400, x: 1200 }}
+            scroll={{ y: 400, x: 'min-content' }}
             rowSelection={{
               selectedRowKeys: selectedRowKeys?.map((it) => +it._id),
               onChange: (v, arr) => {
@@ -465,12 +482,14 @@ const ProcessDetail = (props: any, ref: any) => {
           >
             移除
           </Button>
-          <div style={{ color: 'red' }}>
-            <WarningOutlined
-              style={{ color: 'orange', fontSize: 18, margin: '0 10px', fontWeight: 'bold' }}
-            />
-            接口数据解析异常
-          </div>
+          {!isEmpty(errorTips) && (
+            <div style={{ color: 'red' }}>
+              <WarningOutlined
+                style={{ color: 'orange', fontSize: 18, margin: '0 10px', fontWeight: 'bold' }}
+              />
+              {errorTips}
+            </div>
+          )}
         </div>
         <div style={{ height: 300, width: '100%' }}>
           <AgGridReact

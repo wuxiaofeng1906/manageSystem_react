@@ -207,58 +207,69 @@ export const zentaoTestColumn: (ColDef | ColGroupDef)[] = [
   { headerName: 'BUG-P3', field: 'bugNums', minWidth: 110, valueFormatter: (p) => p.value?.[3] },
 ];
 
-export const preServerColumn: ColumnsType<any> = [
-  {
-    title: '应用',
-    dataIndex: 'apps',
-    onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
-    width: 100,
-  },
-  {
-    title: '项目名称',
-    dataIndex: 'project',
-    width: 200,
-    ellipsis: { showTitle: false },
-    render: (v) => <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />,
-  },
-  {
-    title: '是否封板',
-    dataIndex: 'is_sealing',
-    width: 120,
-    render: (v) => (
-      <span style={{ color: v == 'yes' ? 'green' : 'initial' }}>{cpWhetherOrNot[v] ?? v}</span>
-    ),
-  },
-  { title: '封板/封板人', dataIndex: 'sealing_user', width: 120 },
-  { title: '封板/封板时间', dataIndex: 'sealing_time', width: 120 },
-  { title: '需求编号', dataIndex: 'story_num', width: 120 },
-  {
-    title: '需求标题',
-    dataIndex: 'title',
-    width: 200,
-    render: (v) => <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />,
-  },
-  {
-    title: '是否涉及数据update',
-    dataIndex: 'data_upgrade',
-    width: 150,
-    render: (v) => cpWhetherOrNot[v] ?? v,
-  },
-  {
-    title: '是否涉及数据Recovery',
-    dataIndex: 'is_recovery',
-    width: 160,
-    render: (v) => cpWhetherOrNot[v] ?? v,
-  },
-  {
-    title: '是否可热更',
-    dataIndex: 'is_hot_update',
-    width: 120,
-    render: (v) => cpWhetherOrNot[v] ?? v,
-  },
-  { title: '需求创建人', dataIndex: 'create_user_name', width: 120 },
-  { title: '需求指派人', dataIndex: 'assigned_to_name', width: 120 },
-];
+export const preServerColumn = (data: any[]): ColumnsType<any> => {
+  const flag = data.some(
+    (it: any) => it.project.includes('stage-patch') || it.project.includes('emergency'),
+  );
+  let arr = [
+    {
+      title: '应用',
+      dataIndex: 'apps',
+      onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
+      width: 100,
+    },
+    {
+      title: '项目名称',
+      dataIndex: 'project',
+      width: 200,
+      ellipsis: { showTitle: false },
+      render: (v) => <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />,
+    },
+    {
+      title: '是否封板',
+      dataIndex: 'is_sealing',
+      width: 120,
+      render: (v) => (
+        <span style={{ color: v == 'yes' ? 'green' : 'initial' }}>{cpWhetherOrNot[v] ?? v}</span>
+      ),
+    },
+    { title: '封板/封板人', dataIndex: 'sealing_user', width: 120 },
+    { title: '封板/封板时间', dataIndex: 'sealing_time', width: 120 },
+  ];
+  if (flag)
+    arr.push(
+      { title: '需求编号', dataIndex: 'story_num', width: 120 },
+      {
+        title: '需求标题',
+        dataIndex: 'title',
+        width: 200,
+        render: (v) => (
+          <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />
+        ),
+      },
+      {
+        title: '是否涉及数据update',
+        dataIndex: 'data_upgrade',
+        width: 150,
+        render: (v) => cpWhetherOrNot[v] ?? v,
+      },
+      {
+        title: '是否涉及数据Recovery',
+        dataIndex: 'is_recovery',
+        width: 160,
+        render: (v) => cpWhetherOrNot[v] ?? v,
+      },
+      {
+        title: '是否可热更',
+        dataIndex: 'is_hot_update',
+        width: 120,
+        render: (v) => cpWhetherOrNot[v] ?? v,
+      },
+      { title: '需求创建人', dataIndex: 'create_user_name', width: 120 },
+      { title: '需求指派人', dataIndex: 'assigned_to_name', width: 120 },
+    );
+  return arr;
+};
 // 升级接口
 export const upgradeServicesColumn: (ColDef | ColGroupDef)[] = [
   {
@@ -325,14 +336,19 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
     cellRenderer: 'select',
     headerClass: 'ag-required',
   },
-  { headerName: '确认时间', field: `confirm_time` },
+  {
+    headerName: '确认时间',
+    field: `confirm_time`,
+    valueFormatter: (p) => (p.data.confirm_result == 'no' ? '' : p.value),
+  },
 ];
 export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
   return [
     {
       headerName: '环境',
       field: 'cluster',
-      minWidth: 110,
+      minWidth: 220,
+      cellRenderer: 'select',
     },
     { headerName: '应用', field: 'apps', minWidth: 110 },
     { headerName: '镜像源环境', field: 'release_env', minWidth: 110 },
@@ -370,8 +386,9 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
     { headerName: '是否清理应用缓存', field: 'clear_cache', minWidth: 150, cellRenderer: 'select' },
     {
       headerName: 'SQL工单',
-      field: 'sql',
+      field: 'sql_order',
       minWidth: 130,
+      cellRenderer: 'select',
       hide: data?.release_way == 'keep_server',
     },
   ];
@@ -384,6 +401,12 @@ export const PublishUpgradeColumn: (ColDef | ColGroupDef)[] = [
   { headerName: 'Data', field: 'api_data', minWidth: 110 },
   { headerName: 'Header', field: 'api_header', minWidth: 110 },
   { headerName: '涉及租户', field: 'tenant', minWidth: 110 },
-  { headerName: '并发数', field: 'concurrent', minWidth: 110, headerClass: 'ag-required' },
+  {
+    headerName: '并发数',
+    field: 'concurrent',
+    minWidth: 110,
+    headerClass: 'ag-required',
+    valueFormatter: (p) => p.value ?? 20,
+  },
   { headerName: '操作', minWidth: 110, cellRenderer: 'operation' },
 ];

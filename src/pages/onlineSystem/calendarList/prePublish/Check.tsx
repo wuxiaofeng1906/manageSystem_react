@@ -20,7 +20,7 @@ import {
   onLog,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../../config/common.less';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit, delay } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 import { useLocation, useModel, history, useParams } from 'umi';
@@ -57,12 +57,12 @@ const Check = (props: any, ref: any) => {
   useImperativeHandle(
     ref,
     () => ({
+      onCheck,
+      onLock,
       onRefreshCheck: getDetail,
-      onCheck: onCheck,
       onSetting: () => setShow({ visible: true, data: release_num }),
-      onLock: onLock,
     }),
-    [selected, ref, globalState, basic],
+    [selected, ref, globalState, basic, list],
   );
 
   const onCheck = async () => {
@@ -73,7 +73,7 @@ const Check = (props: any, ref: any) => {
             {
               user_id: user?.userid ?? '',
               release_num,
-              is_ignore: !it.open,
+              is_ignore: it.open ? 'no' : 'yes',
               side: it.side,
               api_url: it.api_url as ICheckType,
             },
@@ -95,9 +95,9 @@ const Check = (props: any, ref: any) => {
      */
 
     if (!globalState.locked) {
-      const res = await OnlineSystemServices.checkProcess({ release_num });
-      const flag = list.every((it) => ['yes', 'skip'].includes(it.status) || !it.open);
-      if (!flag) return infoMessage('各项检查状态未达到『 通过、忽略 』，不能进行封板锁定');
+      await OnlineSystemServices.checkProcess({ release_num });
+      const flag = list.some((it) => !['yes', 'skip'].includes(it.status));
+      if (flag) return infoMessage('各项检查状态未达到『 通过、忽略 』，不能进行封板锁定');
     }
 
     await OnlineSystemServices.checkSealingLock({
@@ -118,13 +118,22 @@ const Check = (props: any, ref: any) => {
       setList(
         checkInfo.map((it) => {
           const currentKey = res[it.rowKey];
+          const flag = it.rowKey == 'auto_obj_data';
+          let status = 'skip';
+          if (flag) {
+            status = isEmpty(currentKey)
+              ? ''
+              : currentKey?.some((it: any) => it?.check_result == 'no')
+              ? 'no'
+              : 'yes';
+          }
           return {
             ...it,
             disabled: false,
-            status: currentKey?.[it.status] ?? '',
-            start: currentKey?.[it.start] || '',
-            end: currentKey?.[it.end] || '',
-            open: currentKey?.[it.status] !== 'skip',
+            status: flag ? status : currentKey?.[it.status] ?? '',
+            start: flag ? (status == '' ? status : '-') : currentKey?.[it.start] || '',
+            end: flag ? (status == '' ? status : '-') : currentKey?.[it.end] || '',
+            open: flag ? status !== 'skip' : currentKey?.[it.status] !== 'skip',
             open_pm: currentKey?.[it.open_pm] || '',
             open_time: currentKey?.[it.open_time] || '',
             log: currentKey?.[it.log] || '',
@@ -133,28 +142,33 @@ const Check = (props: any, ref: any) => {
       );
       setSpin(false);
     } catch (e) {
+      console.log(e);
       setSpin(false);
     }
   };
 
   const updateStatus = async (data: any) => {
-    await OnlineSystemServices.updateCheckStatus({
-      user_id: user?.userid,
-      release_num,
-      is_ignore: !data.open,
-      side: data.side,
-    });
+    await OnlineSystemServices.checkOpts(
+      {
+        user_id: user?.userid ?? '',
+        release_num,
+        is_ignore: data.open ? 'no' : 'yes',
+        side: data.side,
+      },
+      data.api_url,
+    );
+    delay(getDetail, 2000);
   };
 
   useEffect(() => {
     if (query.key == 'check') {
+      Modal?.destroyAll?.();
       getDetail();
     }
   }, [query.key]);
 
   useEffect(() => {
     if (globalState.locked && globalState.step == 2) {
-      console.log('check');
       history.replace({ pathname: history.location.pathname, query: { key: 'sheet' } });
     }
   }, [globalState]);
@@ -207,6 +221,7 @@ const Check = (props: any, ref: any) => {
               ),
             },
             {
+              align: 'center',
               title: '检查开始时间',
               dataIndex: 'start',
               width: 180,
@@ -217,6 +232,7 @@ const Check = (props: any, ref: any) => {
               ),
             },
             {
+              align: 'center',
               title: '检查结束时间',
               dataIndex: 'end',
               width: 180,
@@ -271,16 +287,37 @@ const Check = (props: any, ref: any) => {
                     width: 18,
                     height: 18,
                     marginRight: 10,
-                    ...(hasEdit || !record.open
+                    ...(hasEdit || !record.open || v == ''
                       ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
-                      : {}),
+                      : { cursor: 'pointer' }),
                   }}
                   src={require('../../../../../public/logs.png')}
                   title={'日志'}
                   onClick={() => {
-                    if (hasEdit || !record.open) return;
-
-                    onLog({ title: '检查日志', log: v, noData: '暂无检查日志' });
+                    if (hasEdit || !record.open || v == '') return;
+                    let type = record.rowKey;
+                    let content = v;
+                    if (type == 'env_data' || record.api_url == 'version-check')
+                      return window.open(v);
+                    if (type == 'libray_data')
+                      content = (
+                        <div>
+                          <div>
+                            线上：
+                            <pre style={{ whiteSpace: 'pre-line' }}>{v?.before}</pre>
+                          </div>
+                          <div>
+                            线下：
+                            <pre style={{ whiteSpace: 'pre-line' }}>{v?.after}</pre>
+                          </div>
+                        </div>
+                      );
+                    return onLog({
+                      title: '检查日志',
+                      log: v,
+                      noData: '暂无检查日志',
+                      content,
+                    });
                   }}
                 />
               ),
@@ -296,7 +333,7 @@ const Check = (props: any, ref: any) => {
               setSelected(p as string[]);
             },
             getCheckboxProps: (record) => ({
-              disabled: hasEdit || record.disabled || !record.open,
+              disabled: hasEdit || record.disabled || !record.open || record.status == 'running',
             }),
           }}
         />

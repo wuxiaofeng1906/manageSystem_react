@@ -5,55 +5,62 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import { isEmpty } from 'lodash';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { getHeight } from '@/publicMethods/pageSet';
 import { applicationConfigColumn } from './column';
-import { TechnicalSide, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
+import {
+  appServerSide,
+  ClusterType,
+  TechnicalSide,
+  WhetherOrNot,
+} from '@/pages/onlineSystem/config/constant';
 import { infoMessage } from '@/publicMethods/showMessages';
+import { OnlineSystemServices } from '@/services/onlineSystem';
+import { useModel } from 'umi';
+import { initGridTable } from '@/utils/utils';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 const ApplicationServerConfig = () => {
-  const [gridHeight, setGridHeight] = useState(getHeight() - 60);
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+  const [gridHeight, setGridHeight] = useState((getHeight() ?? 0) - 60);
   const [list, setList] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [activeItem, setActiveItem] = useState<any>();
   const gridRef = useRef<GridApi>();
 
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
   const onRemove = async () => {
     const selected = gridRef.current?.getSelectedRows();
     if (isEmpty(selected)) return infoMessage('请先选择删除项！');
-    console.log(selected);
+    Modal.confirm({
+      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+      title: '应用服务配置删除提示',
+      content: '请确认是否删除该服务?',
+      onOk: async () => {
+        await OnlineSystemServices.removeAppConfig({
+          app_id: selected?.map((it) => it.app_id)?.join(','),
+        });
+        await getConfigList();
+      },
+    });
   };
   window.onresize = function () {
     setGridHeight(Number(getHeight()) - 60);
     gridRef.current?.sizeColumnsToFit();
   };
+  const getConfigList = async () => {
+    setSpinning(true);
+    try {
+      const res = await OnlineSystemServices.appConfig();
+      setList(res);
+      setSpinning(false);
+    } catch (e) {
+      setSpinning(false);
+    }
+  };
 
   useEffect(() => {
-    setList([
-      {
-        name: 'web',
-        side: '前端',
-        type: '前端业务应用',
-        env: '租户集群',
-        apk: 'yes',
-        unit_check: 'yes',
-        env_check: 'no',
-        hot: 'no',
-        upgrade: 'no',
-        gitlab: 'front/front-goserver',
-        mark: '测试一下',
-        creator: '张值',
-        create_time: '2022-10-10 12:23:21',
-        editor: '邓刚',
-        editor_time: '2022-10-10 18:20:20',
-      },
-    ]);
+    getConfigList();
   }, []);
 
   return (
@@ -70,19 +77,8 @@ const ApplicationServerConfig = () => {
           </div>
           <div style={{ height: gridHeight }}>
             <AgGridReact
-              className="ag-theme-alpine"
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true,
-                suppressMenu: true,
-                cellStyle: { 'line-height': '30px' },
-              }}
-              rowHeight={30}
-              headerHeight={35}
-              suppressRowTransform={true}
-              onGridReady={onGridReady}
-              onGridSizeChanged={onGridReady}
+              rowSelection={'multiple'}
+              {...initGridTable({ ref: gridRef, height: 30 })}
               columnDefs={applicationConfigColumn}
               rowData={list}
               onRowDoubleClicked={(p) => {
@@ -92,7 +88,18 @@ const ApplicationServerConfig = () => {
             />
           </div>
           <EditModal
-            onCancel={() => {
+            onCancel={async (v) => {
+              if (!isEmpty(v)) {
+                await OnlineSystemServices.updateAppConfig({
+                  ...v,
+                  app_id: activeItem?.app_id,
+                  remark: v.remark || '',
+                  side: v?.side?.join(','),
+                  release_env: v?.release_env?.join(','),
+                  user_id: user?.userid ?? '',
+                });
+                getConfigList();
+              }
               setActiveItem(undefined);
               setEditModal(false);
             }}
@@ -108,6 +115,7 @@ export default ApplicationServerConfig;
 
 const EditModal = (props: ModalFuncProps & { data: any }) => {
   const [loading, setLoading] = useState(false);
+  const [touched, setTouched] = useState(false);
   const [form] = Form.useForm();
   const memoWhetherOrNot = useMemo(
     () => Object.entries(WhetherOrNot).map(([k, v]) => ({ label: v, value: k })),
@@ -115,14 +123,28 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
   );
   const onConfirm = async () => {
     const values = await form.validateFields();
-    props.onCancel?.(values);
+    try {
+      setTouched(true);
+      await props.onCancel?.(values);
+      setTouched(false);
+    } catch (e) {
+      setTouched(false);
+    }
   };
   useEffect(() => {
     if (!props?.visible) {
       form.resetFields();
       return;
     }
-    form.setFieldsValue(props.data);
+    setLoading(true);
+    if (props.data) {
+      form.setFieldsValue({
+        ...props.data,
+        side: props.data?.side?.split(','),
+        release_env: props.data?.release_env?.split(','),
+      });
+    }
+    setLoading(false);
   }, [props?.visible]);
 
   return (
@@ -130,137 +152,168 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
       {...props}
       centered
       maskClosable={false}
-      title={`${isEmpty(props.data) ? '新增' : '编辑'}新增应用服务配置`}
+      title={`${isEmpty(props.data) ? '新增' : '编辑'}应用服务配置`}
       onCancel={() => props?.onCancel?.()}
       onOk={onConfirm}
       destroyOnClose={true}
-      okButtonProps={{ disabled: loading }}
-      width={800}
+      okButtonProps={{ disabled: loading || touched }}
+      width={950}
     >
-      <Form form={form}>
-        <Row gutter={6}>
-          <Col span={12}>
-            <Form.Item
-              name={'applicant'}
-              label={'应用名称'}
-              rules={[{ message: '请选择应用名称', required: true }]}
-            >
-              <Select placeholder={'请选择应用名称'} options={[]} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name={'side'}
-              label={'技术侧'}
-              rules={[{ message: '请选择应用名称', required: true }]}
-            >
-              <Select
-                placeholder={'请选择技术侧'}
-                mode={'multiple'}
-                options={Object.entries(TechnicalSide).map(([k, v]) => ({ label: v, value: k }))}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={6}>
-          <Col span={12}>
-            <Form.Item
-              name={'type'}
-              label={'所属应用类型'}
-              rules={[{ message: '请选择所属应用类型', required: true }]}
-            >
-              <Select
-                placeholder={'请选择所属应用类型'}
-                options={[
-                  { label: '前端业务应用', value: 'front' },
-                  { label: '后端业务应用', value: 'backend' },
-                  { label: '后端平台应用', value: 'platform' },
-                  { label: '流程应用', value: 'tech' },
+      <Spin spinning={loading || touched} tip={`数据${touched ? '保存' : '加载'}中...`}>
+        <Form form={form} autoComplete={'off'}>
+          <Row gutter={6}>
+            <Col span={12}>
+              <Form.Item
+                name={'app_name'}
+                label={'应用名称'}
+                rules={[
+                  {
+                    required: true,
+                    validator: (rule, v, cb) => {
+                      if (isEmpty(v?.trim())) return cb('请填写应用名称');
+                      else if (!v?.match(/^[A-Za-z0-9]+$/g)) {
+                        return cb('请输入英文字符');
+                      }
+                      return cb();
+                    },
+                  },
                 ]}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name={'env'}
-              label={'可上线环境'}
-              rules={[{ message: '请选择可上线环境', required: true }]}
-            >
-              <Select placeholder={'请选择可上线环境'} options={[]} mode={'multiple'} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={6}>
-          <Col span={12}>
-            <Form.Item
-              name={'apk'}
-              label={'是否是应用包'}
-              rules={[{ message: '请选择是否是应用包', required: true }]}
-            >
-              <Select placeholder={'应用包'} options={memoWhetherOrNot} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name={'hot'}
-              label={'是否执行"可热更"辅助检查'}
-              rules={[{ message: '请选择是否执行"可热更"辅助检查', required: true }]}
-            >
-              <Select placeholder={'是否执行"可热更"辅助检查'} options={memoWhetherOrNot} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={6}>
-          <Col span={12}>
-            <Form.Item
-              name={'unit_check'}
-              label={'是否需要检查单元测试'}
-              rules={[{ message: '请选择是否需要检查单元测试', required: true }]}
-            >
-              <Select placeholder={'检查单元测试'} options={memoWhetherOrNot} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name={'env_check'}
-              label={'是否需要执行环境一致性检查'}
-              rules={[{ message: '请选择是否需要执行环境一致性检查', required: true }]}
-            >
-              <Select placeholder={'是否需要执行环境一致性检查'} options={memoWhetherOrNot} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={6}>
-          <Col span={12}>
-            <Form.Item
-              name={'upgrade'}
-              label={'是否涉及数据修复/升级'}
-              rules={[{ message: '请选择是否涉及数据修复/升级', required: true }]}
-            >
-              <Select
-                placeholder={'是否涉及数据修复/升级(backend/apps/build)'}
-                options={memoWhetherOrNot}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name={'gitlab'}
-              label={'对应gitlab工程地址'}
-              rules={[{ message: '请填写对应gitlab工程地址', required: true }]}
-            >
-              <Input placeholder={'对应gitlab工程地址'} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={24}>
-            <Form.Item name={'mark'} label={'备注'}>
-              <Input.TextArea placeholder={'备注'} />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+              >
+                <Input placeholder={'应用名称'} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={'side'}
+                label={'技术侧'}
+                rules={[{ required: true, message: '请选择技术侧' }]}
+              >
+                <Select
+                  placeholder={'技术侧'}
+                  mode={'multiple'}
+                  options={Object.entries(TechnicalSide).map(([k, v]) => ({ label: v, value: k }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={6}>
+            <Col span={12}>
+              <Form.Item
+                name={'technical_side'}
+                label={'所属应用类型'}
+                rules={[{ message: '请选择所属应用类型', required: true }]}
+              >
+                <Select
+                  placeholder={'所属应用类型'}
+                  options={Object.keys(appServerSide).map((key) => ({
+                    label: appServerSide[key],
+                    value: key,
+                    key,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={'release_env'}
+                label={'可上线环境'}
+                rules={[{ message: '请选择可上线环境', required: true }]}
+              >
+                <Select
+                  mode={'multiple'}
+                  placeholder={'可上线环境'}
+                  options={Object.keys(ClusterType).map((key) => ({
+                    label: ClusterType[key],
+                    value: key,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={6}>
+            <Col span={12}>
+              <Form.Item
+                name={'is_package'}
+                label={'是否是应用包'}
+                rules={[{ message: '请选择是否是应用包', required: true }]}
+              >
+                <Select placeholder={'应用包'} options={memoWhetherOrNot} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={'is_check_hot_update'}
+                label={'是否执行"可热更"辅助检查'}
+                rules={[{ message: '请选择是否执行"可热更"辅助检查', required: true }]}
+              >
+                <Select placeholder={'是否执行"可热更"辅助检查'} options={memoWhetherOrNot} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={6}>
+            <Col span={12}>
+              <Form.Item
+                name={'is_need_test_unit'}
+                label={'是否需要检查单元测试'}
+                rules={[{ message: '请选择是否需要检查单元测试', required: true }]}
+              >
+                <Select placeholder={'检查单元测试'} options={memoWhetherOrNot} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={'is_check_env'}
+                label={'是否需要执行环境一致性检查'}
+                rules={[{ message: '请选择是否需要执行环境一致性检查', required: true }]}
+              >
+                <Select placeholder={'是否需要执行环境一致性检查'} options={memoWhetherOrNot} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={6}>
+            <Col span={12}>
+              <Form.Item
+                name={'is_have_data_recovery'}
+                label={'是否涉及数据修复/升级'}
+                rules={[{ message: '请选择是否涉及数据修复/升级', required: true }]}
+              >
+                <Select
+                  placeholder={'是否涉及数据修复/升级(backend/apps/build)'}
+                  options={memoWhetherOrNot}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={'server_path'}
+                label={'对应gitlab工程地址'}
+                rules={[
+                  {
+                    required: true,
+                    validator: (r, v, cb) => {
+                      if (!v?.trim()) return cb('请填写gitlab工程地址');
+                      else if (!v?.match(/^[A-Za-z_/,-]+$/g)) {
+                        return cb('请输入英文字符或 / - ,');
+                      }
+                      return cb();
+                    },
+                  },
+                ]}
+              >
+                <Input placeholder={'对应gitlab工程地址 多个以英文逗号隔开'} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <Form.Item name={'remark'} label={'备注'}>
+                <Input.TextArea placeholder={'备注'} />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+        <span>说明：是否是应用包，对应gitlab上是subgroup还是project</span>
+      </Spin>
     </Modal>
   );
 };

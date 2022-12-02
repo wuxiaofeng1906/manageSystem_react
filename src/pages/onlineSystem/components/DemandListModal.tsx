@@ -23,6 +23,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<any[]>([]);
   const [relatedStory, setRelatedStory] = useState<any[]>([]);
+  const [branchEnv, setBranchEnv] = useState<any[]>([]);
 
   useEffect(() => {
     if (!props.visible) {
@@ -45,6 +46,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const res = await OnlineSystemServices.getRelatedStory({
       branch: props.data?.branch || query.branch,
     });
+    const branchEnv = await OnlineSystemServices.branchEnv({
+      branch: props.data?.branch || query.branch,
+    });
+    setBranchEnv(branchEnv?.map((it: string) => ({ label: it, value: it })));
     setRelatedStory(res);
   };
   const getTableList = async () => {
@@ -115,8 +120,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
   const onChange = (v: string) => {
     setSelected([]);
+    /*
+      1.stage-patch、emergency 默认勾选未关联项，和集群
+      2. 班车、特性 默认集群0
+      3.global 默认global
+    */
+
     form.setFieldsValue({
-      cluster: v == 'global' ? ['global'] : ['cn-northwest-0'],
+      cluster: v == 'global' ? ['global'] : isSprint ? ['cn-northwest-0'] : [],
     });
     setList(list.map((it) => ({ ...it, disabled: it.type !== v })));
   };
@@ -284,7 +295,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                 >
                   <Select
                     showSearch
-                    options={[{ value: 'nx-hotfix-k8s', label: '测试' }]}
+                    options={branchEnv}
                     placeholder={'镜像环境绑定'}
                     disabled={memoEdit}
                   />
@@ -295,7 +306,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           <div className={styles.onlineTable}>
             <Table
               size={'small'}
-              scroll={{ y: 400 }}
+              scroll={{ y: 400, x: 'min-content' }}
               pagination={false}
               columns={memoColumn}
               rowKey={(p) => p.story}

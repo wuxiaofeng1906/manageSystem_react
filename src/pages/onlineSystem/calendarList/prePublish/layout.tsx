@@ -42,7 +42,7 @@ const Layout = () => {
       step = res?.release_result == 'success' ? 2 : 0;
       setGlobalState({
         locked: res?.release_sealing == 'yes',
-        finished: res?.release_result == 'success',
+        finished: ['success', 'failure'].includes(res?.release_result),
         step,
       });
       updateKey(Step[step]);

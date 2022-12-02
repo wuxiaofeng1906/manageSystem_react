@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+} from 'react';
 import { Form, Select, Row, Col, Spin, TreeSelect } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi } from 'ag-grid-community';
@@ -6,11 +13,12 @@ import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/config
 import IPagination from '@/components/IPagination';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { useGqlClient } from '@/hooks/index';
-import { isEmpty } from 'lodash';
+import { isEmpty, sumBy } from 'lodash';
 import { ZentaoPhase, ZentaoType } from '../../config/constant';
 import styles from '../../config/common.less';
 import { initGridTable } from '@/utils/utils';
 import { useLocation, useParams } from 'umi';
+
 const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'key', allowClear: true };
 
 const ZentaoDetail = (props: any, ref: any) => {
@@ -47,51 +55,66 @@ const ZentaoDetail = (props: any, ref: any) => {
     total: 0,
     page: 1,
   });
-  useImperativeHandle(
-    ref,
-    () => ({
-      onRefresh: () => {
-        getTestOrder();
-        getTableList(true);
-      },
-    }),
-    [query.key],
-  );
-
-  window.onresize = function () {
-    setTableHeight((window.innerHeight - 450) / 2);
-  };
 
   const getSelectList = async () => {
-    let source: any[] = [];
-    const fn = (arr: any[], origin: any[]) => {
-      if (!isEmpty(arr)) {
-        arr.forEach((it) => {
-          const children = origin
-            .filter((o: any) => it.value == o.parent)
-            ?.map((o) => ({ title: o.name, value: o.id, key: o.id, parent: o.parent }));
-          it.children = children;
-          fn(children, origin);
-        });
-      }
-    };
     const org = await OnlineSystemServices.getOrgList(client);
-    if (!isEmpty(org.organization)) {
-      const node = org.organization.find((it: any) => it.id == 59);
-      source.push({ title: node.name, value: node.id, key: node.id, parent: node.parent });
-      fn(source, org.organization);
-    }
-    setOrgTree(source);
+    setOrgTree(org?.organization || []);
   };
 
-  useEffect(() => {
-    if (branch && query.key == 'profile') {
-      getSelectList();
-      getTableList();
-      getTestOrder();
+  const translator = (arr: any[], origin: any[]) => {
+    if (!isEmpty(arr)) {
+      arr.forEach((it) => {
+        const children = origin
+          .filter((o: any) => it.value == o.parent)
+          ?.map((o) => ({
+            title: o.name,
+            name: o.name,
+            value: o.id,
+            key: o.id,
+            parent: o.parent,
+            count: o.count,
+          }));
+        it.children = children;
+        translator(children, origin);
+      });
     }
-  }, [branch, query.key]);
+  };
+  const computedCount = (arr: any) => {
+    arr.forEach((it) => {
+      if (!isEmpty(it.children)) {
+        computedCount(it.children);
+      } else {
+        it.count = it.count + sumBy(it.children, 'count');
+        it.title = `${it.name}(${it.count})`;
+      }
+    });
+    return arr;
+  };
 
+  const formatTree = (org: any[]) => {
+    let source: any[] = [];
+    const result = org?.map((dept: any) => {
+      const count = storyData.filter((it) =>
+        isEmpty(it.assignedTo?.dept)
+          ? [dept.id, dept.parent].includes(it.openedBy?.dept?.id)
+          : [dept.id, dept.parent].includes(it.assignedTo?.dept?.id),
+      );
+      return { ...dept, count: count?.length || 0 };
+    });
+    if (!isEmpty(result)) {
+      const node = result.find((it: any) => it.id == 59);
+      source.push({
+        title: node.name,
+        name: node.name,
+        value: node.id,
+        key: node.id,
+        parent: node.parent,
+        count: 0,
+      });
+      translator(source, result);
+    }
+    return source;
+  };
   const getTestOrder = async () => {
     let status: Record<string, any> = {};
     let testTask: Record<string, any> = {};
@@ -156,6 +179,11 @@ const ZentaoDetail = (props: any, ref: any) => {
       if (key == 'status') originV = originV.en;
       if (['execution', 'testtask'].includes(key)) originV = originV.id;
       if (['openedBy', 'assignedTo'].includes(key)) originV = originV.realname;
+      if (key == 'orgs') {
+        return isEmpty(it.assignedTo?.dept)
+          ? formValue.includes(it.openedBy?.dept?.id)
+          : formValue.includes(it.assignedTo?.dept?.id);
+      }
       return Na ? isEmpty(originV) || formValue.includes(originV) : formValue.includes(originV);
     });
   };
@@ -212,6 +240,30 @@ const ZentaoDetail = (props: any, ref: any) => {
     }
   };
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      onRefresh: () => {
+        getTestOrder();
+        getTableList(true);
+      },
+    }),
+    [query.key],
+  );
+
+  window.onresize = function () {
+    setTableHeight((window.innerHeight - 450) / 2);
+  };
+  const orgTr = useMemo(() => formatTree(orgTree), [storyData, orgTree]);
+
+  useEffect(() => {
+    if (branch && query.key == 'profile') {
+      getSelectList();
+      getTableList();
+      getTestOrder();
+    }
+  }, [branch, query.key]);
+
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
       <div className={styles.zentaoDetail}>
@@ -228,11 +280,13 @@ const ZentaoDetail = (props: any, ref: any) => {
               <Form.Item label={'部门/组'} name={'orgs'}>
                 <TreeSelect
                   treeDefaultExpandedKeys={[59]}
-                  treeData={orgTree}
                   showSearch
                   treeCheckable
                   multiple
+                  treeData={orgTr}
+                  onDeselect={() => conditionChange('story')}
                   showCheckedStrategy={'SHOW_ALL'}
+                  maxTagCount={'responsive'}
                   style={{ width: '100%' }}
                   filterTreeNode={(inputValue: string, treeNode: any) =>
                     !!treeNode.title.includes(inputValue)

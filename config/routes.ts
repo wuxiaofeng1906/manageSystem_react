@@ -233,7 +233,7 @@ export default [
         hideInMenu: true,
       },
       {
-        name: '应用服务配置',
+        name: '应用服务',
         path: 'applicationServerConfig',
         component: './onlineSystem/applicationServerConfig',
         wrappers: ['../wrappers/auth'],

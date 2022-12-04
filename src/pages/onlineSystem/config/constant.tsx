@@ -64,7 +64,7 @@ export const StoryStatus = {
   released: '已发布',
   closed: '已关闭',
 };
-export const AutoCheckType = { ui: 'ui执行通过', api: '接口执行通过' };
+export const AutoCheckType = { ui: 'ui执行通过', api: '接口执行通过', applet: '小程序执行通过' };
 export const checkInfo = [
   {
     check_type: '前端单元测试运行是否通过',

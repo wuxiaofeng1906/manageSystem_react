@@ -9,6 +9,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import styles from '../../config/common.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { Step } from '@/pages/onlineSystem/config/constant';
+import { getkeyFromvalue } from '@/utils/utils';
 
 const tabs = [
   { name: '项目与服务详情', comp: ProcessDetail, key: 'server' },
@@ -37,13 +38,14 @@ const Layout = () => {
   }>;
   useEffect(() => {
     if (!release_num) return;
+    const checkStatus = ['success', 'failure'];
     let step = 0;
     OnlineSystemServices.getReleaseStatus({ release_num }).then((res) => {
-      step = res?.release_result == 'success' ? 2 : 0;
+      step = checkStatus.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;
       setGlobalState({
-        locked: res?.release_sealing == 'yes',
-        finished: ['success', 'failure'].includes(res?.release_result),
         step,
+        locked: res?.release_sealing == 'yes',
+        finished: checkStatus.includes(res?.release_result),
       });
       updateKey(Step[step]);
     });
@@ -123,7 +125,15 @@ const Layout = () => {
           <Button
             size={'small'}
             disabled={globalState.finished || touched}
-            onClick={() => onExtra(ref.current?.onLock)}
+            onClick={async () => {
+              setTouched(true);
+              try {
+                await ref.current?.onLock();
+                setTouched(false);
+              } catch (e) {
+                setTouched(false);
+              }
+            }}
           >
             {checkStatus.flag ? '取消封板锁定' : '封板锁定'}
           </Button>

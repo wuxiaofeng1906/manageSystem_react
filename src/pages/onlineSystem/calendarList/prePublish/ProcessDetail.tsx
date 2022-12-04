@@ -65,6 +65,7 @@ const ProcessDetail = (props: any, ref: any) => {
     updateBasic,
     updateSealing,
     updateServerConfirm,
+    getServerConfirm,
   } = useModel('onlineSystem');
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const [checked, setChecked] = useState(false); // 服务项
@@ -261,6 +262,7 @@ const ProcessDetail = (props: any, ref: any) => {
           type,
           { release_num },
         );
+        await getServerConfirm({ release_num });
         setLoading(false);
       },
     });
@@ -411,10 +413,10 @@ const ProcessDetail = (props: any, ref: any) => {
         <div className={styles.tableHeader}>
           <h4>二、应用服务</h4>
           <Button size={'small'} onClick={() => onSeal('yes')} disabled={hasEdit}>
-            封板
+            锁定分支
           </Button>
           <Button size={'small'} onClick={() => onSeal('no')} disabled={hasEdit}>
-            解除封板
+            解除锁定分支
           </Button>
           <Button
             size={'small'}

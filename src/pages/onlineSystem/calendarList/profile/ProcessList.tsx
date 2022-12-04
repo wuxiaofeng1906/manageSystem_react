@@ -1,17 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button } from 'antd';
+import { Button, Spin } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { preProcessColumn } from '@/pages/onlineSystem/config/column';
 import { CellClickedEvent, GridApi } from 'ag-grid-community';
-import { history, useParams } from 'umi';
+import { history, useLocation, useParams } from 'umi';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import { initGridTable } from '@/utils/utils';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 
 const ProcessList = () => {
-  const query = useParams() as { branch: string };
+  const { branch } = useParams() as { branch: string };
+  const query = useLocation()?.query;
   const gridRef = useRef<GridApi>();
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [tableData, setTableData] = useState<any[]>([]);
   const [tableHeight, setTableHeight] = useState(window.innerHeight - 300);
 
@@ -23,19 +25,25 @@ const ProcessList = () => {
   };
 
   const getTableList = async () => {
-    const res = await OnlineSystemServices.getReleaseList({ branch: query.branch });
-    setTableData(res);
+    try {
+      setLoading(true);
+      const res = await OnlineSystemServices.getReleaseList({ branch });
+      setTableData(res);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
   };
   useEffect(() => {
-    getTableList();
-  }, []);
+    if (query.key == 'process') getTableList();
+  }, [query.key]);
 
   window.onresize = function () {
     setTableHeight(window.innerHeight - 300);
   };
 
   return (
-    <div>
+    <Spin spinning={loading} tip={'数据加载中...'}>
       <Button size={'small'} onClick={(e) => setShowModal(true)}>
         新增发布过程
       </Button>
@@ -67,7 +75,7 @@ const ProcessList = () => {
         />
       </div>
       <DemandListModal visible={showModal} onOk={onConfirm} />
-    </div>
+    </Spin>
   );
 };
 export default ProcessList;

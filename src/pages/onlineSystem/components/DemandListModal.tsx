@@ -226,7 +226,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     () => list.some((it) => !['stagepatch', 'emergency'].includes(it.sprinttype)),
     [list],
   );
-  const memoEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
+  const memoEdit = useMemo(
+    () => (isEmpty(props.data) ? false : globalState.locked || globalState.finished),
+    [globalState, props.data],
+  );
 
   return (
     <Modal
@@ -236,7 +239,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       maskClosable={false}
       destroyOnClose={true}
       width={1400}
-      title={'新增发布批次：选择该批次发布的项目与需求'}
+      title={`${memoEdit ? '修改' : '新增'}发布批次：选择该批次发布的项目与需求`}
       wrapClassName={styles.DemandListModal}
       onCancel={() => props.onOk?.()}
       onOk={onConfirm}
@@ -254,7 +257,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                 >
                   <Select
                     placeholder={'发布环境类型'}
-                    disabled={!isEmpty(props.data) || memoEdit}
+                    disabled={memoEdit}
                     options={Object.keys(ClusterType).map((k) => ({
                       label: ClusterType[k],
                       value: k,
@@ -295,7 +298,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                 >
                   <Select
                     showSearch
-                    options={branchEnv}
+                    options={[{ label: '测试', value: 'nx-hotfix-k8s' }]}
                     placeholder={'镜像环境绑定'}
                     disabled={memoEdit}
                   />

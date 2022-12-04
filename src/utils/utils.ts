@@ -356,3 +356,11 @@ export const initGridTable = ({
   rowHeight: height,
   headerHeight: height,
 });
+
+export const getkeyFromvalue = (object: Record<any, any>, value: any): any => {
+  for (let ob in object) {
+    if (object.hasOwnProperty(ob)) {
+      if (object[ob] === value) return ob;
+    }
+  }
+};

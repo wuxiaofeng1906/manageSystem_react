@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useRef } from 'react';
-import { Tabs, Button } from 'antd';
+import { Tabs } from 'antd';
 import { useLocation, history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from '../../config/common.less';
@@ -17,7 +17,7 @@ const Profile = () => {
   }, []);
 
   const updateKey = (key?: string) =>
-    history.replace({ pathname: history.location.pathname, query: { key: key ?? 'profile' } });
+    history.replace({ pathname: history.location.pathname, query: { key: key ?? 'process' } });
 
   return (
     <PageContainer title={query.key == 'profile' ? '禅道概况' : '发布过程单'}>
@@ -39,11 +39,11 @@ const Profile = () => {
             )
           }
         >
-          <Tabs.TabPane key={'profile'} tab={'禅道概况'}>
-            <ZentaoDetail ref={refreshRef} />
-          </Tabs.TabPane>
           <Tabs.TabPane key={'process'} tab={'发布过程单'}>
             <ProcessList />
+          </Tabs.TabPane>
+          <Tabs.TabPane key={'profile'} tab={'禅道概况'}>
+            <ZentaoDetail ref={refreshRef} />
           </Tabs.TabPane>
         </Tabs>
       </div>

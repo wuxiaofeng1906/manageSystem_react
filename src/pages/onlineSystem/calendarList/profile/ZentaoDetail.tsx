@@ -13,7 +13,7 @@ import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/config
 import IPagination from '@/components/IPagination';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { useGqlClient } from '@/hooks/index';
-import { isEmpty, sumBy } from 'lodash';
+import { isEmpty, sumBy, groupBy } from 'lodash';
 import { ZentaoPhase, ZentaoType } from '../../config/constant';
 import styles from '../../config/common.less';
 import { initGridTable } from '@/utils/utils';
@@ -61,60 +61,28 @@ const ZentaoDetail = (props: any, ref: any) => {
     setOrgTree(org?.organization || []);
   };
 
-  const translator = (arr: any[], origin: any[]) => {
-    if (!isEmpty(arr)) {
-      arr.forEach((it) => {
-        const children = origin
-          .filter((o: any) => it.value == o.parent)
-          ?.map((o) => ({
-            title: o.name,
-            name: o.name,
-            value: o.id,
-            key: o.id,
-            parent: o.parent,
-            count: o.count,
-          }));
-        it.children = children;
-        translator(children, origin);
-      });
-    }
-  };
-  const computedCount = (arr: any) => {
-    arr.forEach((it) => {
-      if (!isEmpty(it.children)) {
-        computedCount(it.children);
-      } else {
-        it.count = it.count + sumBy(it.children, 'count');
-        it.title = `${it.name}(${it.count})`;
-      }
-    });
-    return arr;
-  };
-
   const formatTree = (org: any[]) => {
     let source: any[] = [];
-    const result = org?.map((dept: any) => {
+
+    let result = org?.map((dept: any) => {
       const count = storyData.filter((it) =>
         isEmpty(it.assignedTo?.dept)
           ? [dept.id, dept.parent].includes(it.openedBy?.dept?.id)
           : [dept.id, dept.parent].includes(it.assignedTo?.dept?.id),
       );
-      return { ...dept, count: count?.length || 0 };
+      dept = { ...dept, count: count?.length || 0, value: dept.id, title: dept.name };
+      return dept;
     });
+
     if (!isEmpty(result)) {
-      const node = result.find((it: any) => it.id == 59);
-      source.push({
-        title: node.name,
-        name: node.name,
-        value: node.id,
-        key: node.id,
-        parent: node.parent,
-        count: 0,
+      result.forEach((it) => {
+        it.children = result.filter((child) => child.parent == it.id);
+        if (it.id == 59) source.push(it);
       });
-      translator(source, result);
     }
     return source;
   };
+
   const getTestOrder = async () => {
     let status: Record<string, any> = {};
     let testTask: Record<string, any> = {};

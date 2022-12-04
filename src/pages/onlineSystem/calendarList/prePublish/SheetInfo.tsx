@@ -364,7 +364,7 @@ const SheetInfo = (props: any, ref: any) => {
     return (
       <Select
         size={'small'}
-        value={p.value ? (field == 'sql_order' ? [p.value] : p.value) : undefined}
+        value={p.value ? (field == 'cluster' ? p.value?.split(',') : p.value) : undefined}
         style={{ width: '100%' }}
         disabled={agFinished}
         mode={field == 'cluster' ? 'multiple' : undefined}

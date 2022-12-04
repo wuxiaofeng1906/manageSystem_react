@@ -105,9 +105,11 @@ const Check = (props: any, ref: any) => {
       release_num,
       release_sealing: globalState.locked ? 'no' : 'yes',
     });
-    if (!globalState.finished) {
-      setGlobalState({ ...globalState, locked: !globalState.locked });
+    // 封板自动跳转工单页
+    if (!globalState.locked) {
+      history.replace({ pathname: history.location.pathname, query: { key: 'sheet' } });
     }
+    setGlobalState({ ...globalState, locked: !globalState.locked, step: 2 });
   };
 
   const getDetail = async () => {
@@ -161,17 +163,11 @@ const Check = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    if (query.key == 'check') {
+    if (query.key == 'check' && release_num) {
       Modal?.destroyAll?.();
       getDetail();
     }
-  }, [query.key]);
-
-  useEffect(() => {
-    if (globalState.locked && globalState.step == 2) {
-      history.replace({ pathname: history.location.pathname, query: { key: 'sheet' } });
-    }
-  }, [globalState]);
+  }, [query.key, release_num]);
 
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
 
@@ -225,22 +221,28 @@ const Check = (props: any, ref: any) => {
               title: '检查开始时间',
               dataIndex: 'start',
               width: 180,
-              render: (v) => (
-                <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
-                  {v}
-                </Tooltip>
-              ),
+              render: (v, record) =>
+                !record.open ? (
+                  ''
+                ) : (
+                  <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
+                    {v}
+                  </Tooltip>
+                ),
             },
             {
               align: 'center',
               title: '检查结束时间',
               dataIndex: 'end',
               width: 180,
-              render: (v) => (
-                <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
-                  {v}
-                </Tooltip>
-              ),
+              render: (v, record) =>
+                !record.open ? (
+                  ''
+                ) : (
+                  <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
+                    {v}
+                  </Tooltip>
+                ),
             },
             {
               title: '是否启用',

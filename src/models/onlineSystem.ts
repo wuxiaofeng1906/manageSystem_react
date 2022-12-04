@@ -117,6 +117,7 @@ export default () => {
     setGlobalState,
     getReleaseInfo,
     getRepairInfo,
+    getServerConfirm,
     removeRelease,
     updateSealing,
     updateBasic,

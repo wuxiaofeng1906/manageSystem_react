@@ -1,5 +1,17 @@
 import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import { Form, Select, DatePicker, Button, Input, Col, Spin, Divider, Modal, Checkbox } from 'antd';
+import {
+  Form,
+  Select,
+  DatePicker,
+  Button,
+  Input,
+  Col,
+  Spin,
+  Divider,
+  Modal,
+  Checkbox,
+  Row,
+} from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import {
@@ -461,93 +473,90 @@ const ReleaseOrder = () => {
               保存
             </Button>
           </div>
-          <Form
-            layout={'inline'}
-            size={'small'}
-            form={orderForm}
-            className={cns(styles.baseInfo, styles.bgForm)}
-          >
-            <Col span={4}>
-              <Form.Item name={'release_way'} label={'发布方式'}>
-                <Select
-                  disabled
-                  style={{ width: '100%' }}
-                  options={[
-                    { label: '停服', value: 'stop_server' },
-                    { label: '不停服', value: 'keep_server' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={5}>
-              <Form.Item name={'plan_release_time'} label={'发布时间'}>
-                <DatePicker
-                  style={{ width: '100%' }}
-                  showTime
-                  format={'YYYY-MM-DD HH:mm'}
-                  disabled={finished}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name={'announcement_num'} label={'关联公告'} required>
-                <Select
-                  showSearch
-                  disabled={finished}
-                  optionFilterProp={'label'}
-                  options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
-                  style={{ width: '100%' }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name={'person_duty_num'} label={'值班名单'}>
-                <Select
-                  showSearch
-                  disabled={finished}
-                  optionFilterProp={'label'}
-                  options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
-                  style={{ width: '100%' }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={3}>
-              <Form.Item
-                noStyle
-                shouldUpdate={(old, current) => old.release_result != current.release_result}
-              >
-                {({ getFieldValue }) => {
-                  const result = getFieldValue('release_result');
-                  const color = { success: '#2BF541', failure: 'red' };
-                  return (
-                    <Form.Item name={'release_result'}>
-                      <Select
-                        allowClear
-                        disabled={!hasPermission?.saveResult || finished}
-                        className={styles.selectColor}
-                        onChange={() => onSaveBeforeCheck(true)}
-                        options={[
-                          { label: '发布成功', value: 'success', key: 'success' },
-                          { label: '发布失败', value: 'failure', key: 'failure' },
-                          { label: '取消发布', value: 'cancel', key: 'cancel' },
-                          { label: ' ', value: 'unknown', key: 'unknown' },
-                        ]}
-                        style={{
-                          width: '100%',
-                          fontWeight: 'bold',
-                          color: color[result] ?? 'initial',
-                        }}
-                        placeholder={
-                          <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
-                            标记发布结果
-                          </span>
-                        }
-                      />
-                    </Form.Item>
-                  );
-                }}
-              </Form.Item>
-            </Col>
+          <Form size={'small'} form={orderForm} className={cns(styles.baseInfo, styles.bgForm)}>
+            <Row gutter={3}>
+              <Col span={4}>
+                <Form.Item name={'release_way'} label={'发布方式'}>
+                  <Select
+                    disabled
+                    style={{ width: '100%' }}
+                    options={[
+                      { label: '停服', value: 'stop_server' },
+                      { label: '不停服', value: 'keep_server' },
+                    ]}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={5}>
+                <Form.Item name={'plan_release_time'} label={'发布时间'}>
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    showTime
+                    format={'YYYY-MM-DD HH:mm'}
+                    disabled={finished}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item name={'announcement_num'} label={'关联公告'} required>
+                  <Select
+                    showSearch
+                    disabled={finished}
+                    optionFilterProp={'label'}
+                    options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item name={'person_duty_num'} label={'值班名单'}>
+                  <Select
+                    showSearch
+                    disabled={finished}
+                    optionFilterProp={'label'}
+                    options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={3}>
+                <Form.Item
+                  noStyle
+                  shouldUpdate={(old, current) => old.release_result != current.release_result}
+                >
+                  {({ getFieldValue }) => {
+                    const result = getFieldValue('release_result');
+                    const color = { success: '#2BF541', failure: 'red' };
+                    return (
+                      <Form.Item name={'release_result'}>
+                        <Select
+                          allowClear
+                          disabled={!hasPermission?.saveResult || finished}
+                          className={styles.selectColor}
+                          onChange={() => onSaveBeforeCheck(true)}
+                          options={[
+                            { label: '发布成功', value: 'success', key: 'success' },
+                            { label: '发布失败', value: 'failure', key: 'failure' },
+                            { label: '取消发布', value: 'cancel', key: 'cancel' },
+                            { label: ' ', value: 'unknown', key: 'unknown' },
+                          ]}
+                          style={{
+                            width: '100%',
+                            fontWeight: 'bold',
+                            color: color[result] ?? 'initial',
+                          }}
+                          placeholder={
+                            <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
+                              标记发布结果
+                            </span>
+                          }
+                        />
+                      </Form.Item>
+                    );
+                  }}
+                </Form.Item>
+              </Col>
+            </Row>
           </Form>
 
           <FieldSet data={{ title: '工单-基础设置' }}>

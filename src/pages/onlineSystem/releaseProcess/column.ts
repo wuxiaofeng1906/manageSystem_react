@@ -77,7 +77,9 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   {
     headerName: '计划发布时间',
     field: 'plan_release_time',
-    minWidth: 150,
+    minWidth: 190,
+    tooltipField: 'plan_release_time',
+    cellStyle: (p) => ({ color: p.data?.tip ? 'red' : 'initial', lineHeight: '28px' }),
   },
   {
     headerName: '操作',

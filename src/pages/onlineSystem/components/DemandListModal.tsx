@@ -136,7 +136,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     try {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
-      props.onOk?.(true);
+      props.onOk?.({ ...baseData, release_num, branch: values.branch });
     } catch (e) {
       errorMessage('接口异常');
       setSpin(false);
@@ -286,7 +286,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       maskClosable={false}
       destroyOnClose={true}
       width={1400}
-      title={`${memoEdit ? '修改' : '新增'}发布批次：选择该批次发布的项目与需求`}
+      title={`${memoEdit.disabled ? '修改' : '新增'}发布批次：选择该批次发布的项目与需求`}
       wrapClassName={styles.DemandListModal}
       onCancel={() => props.onOk?.()}
       footer={[

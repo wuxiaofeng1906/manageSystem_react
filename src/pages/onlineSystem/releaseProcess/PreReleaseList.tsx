@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Modal, Form, Select, Spin, Row, Col } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Spin } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
@@ -7,10 +7,10 @@ import { releaseListColumn } from '@/pages/onlineSystem/releaseProcess/column';
 import { getHeight } from '@/publicMethods/pageSet';
 import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
-import DutyListServices from '@/services/dutyList';
-import { isEmpty } from 'lodash';
+import { isEmpty, orderBy } from 'lodash';
 import { history, useLocation } from 'umi';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
+import { WarningOutlined } from '@ant-design/icons';
 
 const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
   const gridRef = useRef<GridApi>();
@@ -19,6 +19,7 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
   const [visible, setVisible] = useState(false);
   const [gridHeight, setGridHeight] = useState(getHeight() - 80);
   const [spinning, setSpinning] = useState(false);
+  const [warnTip, setWarnTip] = useState(false);
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
@@ -42,13 +43,11 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
 
   const onFinish = async (data: any) => {
     if (!isEmpty(data)) {
-      let href = '/onlineSystem/releaseOrder';
-      let param = data?.release_num;
+      let href = `/onlineSystem/releaseOrder/${data?.release_num}`;
       if (data.type == '1') {
-        href = '/onlineSystem/prePublish';
-        param = data?.branch;
+        href = `/onlineSystem/prePublish/${data?.release_num}/${data?.branch}`;
       }
-      history.push(`${href}/${param}`);
+      history.push(href);
     }
     setVisible(false);
   };
@@ -57,13 +56,22 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
     setSpinning(true);
     try {
       const res = await PreReleaseServices.releaseList();
-      setRowData(
-        res.map((it: any) => ({
-          ...it,
-          project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
-        })),
-      );
+      let formatData: any[] = [];
+      const sortData = orderBy(res, 'plan_release_time', 'asc');
+      sortData.forEach((it, i) => {
+        let data = res[i];
+        formatData.push({
+          ...data,
+          tip: res[i].release_num != it.release_num,
+          project: data.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
+        });
+      });
+      setRowData(formatData);
       setSpinning(false);
+      setWarnTip(
+        sortData?.map((it: any) => it.release_num)?.toString() !==
+          formatData?.map((it) => it.release_num)?.toString(),
+      );
     } catch (e) {
       setSpinning(false);
     }
@@ -76,15 +84,24 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <div className={styles.preReleaseList}>
-        <Button
-          type={'primary'}
-          size={'small'}
-          disabled={disabled}
-          onClick={() => setVisible(true)}
-          className={'btn'}
-        >
-          新增发布
-        </Button>
+        <div className={styles.box}>
+          <Button
+            type={'primary'}
+            size={'small'}
+            disabled={disabled}
+            onClick={() => setVisible(true)}
+            className={'btn'}
+          >
+            新增发布
+          </Button>
+          {warnTip && (
+            <div className={styles.warnWrap}>
+              <WarningOutlined style={{ fontSize: 18, marginRight: 8 }} />
+              提示：当前预发布列表，红色标记<span style={{ margin: '0 5px' }}>“计划发布时间”</span>
+              顺序有误，请确认后及时调整
+            </div>
+          )}
+        </div>
         <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
           <AgGridReact
             columnDefs={releaseListColumn('pre')}

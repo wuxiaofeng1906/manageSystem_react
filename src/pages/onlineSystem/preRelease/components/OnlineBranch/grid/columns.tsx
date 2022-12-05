@@ -809,9 +809,6 @@ const getOnlineBranchColumns = () => {
         }
         return `
         <div style="margin-top: -5px">
-            <Button  style="border: none; background-color: transparent; cursor: pointer" onclick='showOnlineBranchForm("add",${paramData})'>
-              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
-            </Button>
              <Button  style="border: none; background-color: transparent;cursor: pointer;  margin-left: -10px; " onclick='showOnlineBranchForm("modify",${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>

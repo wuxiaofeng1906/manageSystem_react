@@ -91,7 +91,7 @@ const Layout = () => {
           <Button
             size={'small'}
             disabled={touched || globalState.finished}
-            onClick={() => ref.current?.onCancelPublish()}
+            onClick={() => ref.current?.onCancelPublish?.()}
           >
             取消发布
           </Button>
@@ -149,7 +149,7 @@ const Layout = () => {
             size={'small'}
             onClick={() => ref.current?.onSave()}
             disabled={globalState.finished}
-            style={{ width: 150 }}
+            style={{ width: 100, background: '#46a0fc', color: 'white' }}
           >
             保存
           </Button>

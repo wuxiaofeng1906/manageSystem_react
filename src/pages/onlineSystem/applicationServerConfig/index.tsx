@@ -171,8 +171,8 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
                     required: true,
                     validator: (rule, v, cb) => {
                       if (isEmpty(v?.trim())) return cb('请填写应用名称');
-                      else if (!v?.match(/^[A-Za-z0-9]+$/g)) {
-                        return cb('请输入英文字符');
+                      else if (!v?.match(/^[A-Za-z0-9_-]+$/g)) {
+                        return cb('请输入英文、数字 或特殊符号 _ -');
                       }
                       return cb();
                     },
@@ -293,7 +293,7 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
                     validator: (r, v, cb) => {
                       if (!v?.trim()) return cb('请填写gitlab工程地址');
                       else if (!v?.match(/^[A-Za-z_/,-]+$/g)) {
-                        return cb('请输入英文字符或 / - ,');
+                        return cb('请输入英文字符或特殊符号 / - ,');
                       }
                       return cb();
                     },

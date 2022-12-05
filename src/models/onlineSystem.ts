@@ -103,7 +103,7 @@ export default () => {
         key: it.online_environment_id,
       })),
     );
-    setSqlList(sqlOrder.map((it: any) => ({ label: it.label, value: it.id })));
+    setSqlList(sqlOrder.map((it: any) => ({ label: it.label, value: it.label })));
   };
   useEffect(() => {
     if (

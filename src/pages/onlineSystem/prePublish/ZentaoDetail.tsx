@@ -310,11 +310,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                 <Select
                   {...opts}
                   onDeselect={() => conditionChange('story')}
-                  options={Object.keys(ZentaoType).map((key) => ({
-                    label: ZentaoType[key],
-                    value: key,
-                    key: key,
-                  }))}
+                  options={Object.keys(ZentaoType).map((key) => ({ label: key, value: key }))}
                 />
               </Form.Item>
             </Col>
@@ -324,11 +320,7 @@ const ZentaoDetail = (props: any, ref: any) => {
               <Form.Item label={'阶段'} name={'stage'}>
                 <Select
                   {...opts}
-                  options={Object.keys(ZentaoPhase).map((it) => ({
-                    label: it,
-                    value: it,
-                    key: it,
-                  }))}
+                  options={Object.keys(ZentaoPhase).map((it) => ({ label: it, value: it }))}
                   onDeselect={() => conditionChange('story')}
                 />
               </Form.Item>

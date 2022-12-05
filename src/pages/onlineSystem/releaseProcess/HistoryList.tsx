@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Form, Select, DatePicker, Spin, Col } from 'antd';
+import { Form, Select, DatePicker, Spin, Col, Row } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { releaseListColumn } from '@/pages/onlineSystem/releaseProcess/column';
@@ -86,34 +86,36 @@ const HistoryList = () => {
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <Form layout={'inline'} size={'small'} form={form} onFieldsChange={() => getTableList()}>
-        <Col span={8}>
-          <Form.Item name={'pro_ids'} label={'发布项目'}>
-            <Select
-              options={projects}
-              optionFilterProp={'label'}
-              style={{ width: '100%' }}
-              mode={'multiple'}
-              showSearch
-            />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item name={'repair_order'} label={'工单编号'}>
-            <Select
-              options={orders ?? []}
-              optionFilterProp={'label'}
-              style={{ width: '100%' }}
-              mode={'multiple'}
-              showSearch
-            />
-          </Form.Item>
-        </Col>
-        <Col span={7}>
-          <Form.Item name={'time'} label={'发布日期'}>
-            <DatePicker.RangePicker style={{ width: '100%' }} />
-          </Form.Item>
-        </Col>
+      <Form size={'small'} form={form} onFieldsChange={() => getTableList()}>
+        <Row gutter={4}>
+          <Col span={8}>
+            <Form.Item name={'pro_ids'} label={'发布项目'}>
+              <Select
+                options={projects}
+                optionFilterProp={'label'}
+                style={{ width: '100%' }}
+                mode={'multiple'}
+                showSearch
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name={'repair_order'} label={'工单编号'}>
+              <Select
+                options={orders ?? []}
+                optionFilterProp={'label'}
+                style={{ width: '100%' }}
+                mode={'multiple'}
+                showSearch
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name={'time'} label={'发布日期'}>
+              <DatePicker.RangePicker style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+        </Row>
       </Form>
       <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%', marginTop: 8 }}>
         <AgGridReact

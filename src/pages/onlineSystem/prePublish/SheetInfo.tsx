@@ -40,7 +40,8 @@ import { useRequest } from 'ahooks';
 import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
-// let agSql: any[] = [];
+let agSql: any[] = [];
+let agEnvs: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const query = useLocation()?.query;
@@ -75,14 +76,7 @@ const SheetInfo = (props: any, ref: any) => {
   const serverRef = useRef<GridApi>();
   const upgradeRef = useRef<GridApi>();
 
-  useImperativeHandle(
-    ref,
-    () => {
-      if (!release_num) return;
-      return { onSave };
-    },
-    [release_num, upgradeData, deployments],
-  );
+  useImperativeHandle(ref, () => ({ onSave }), [release_num, upgradeData, deployments]);
 
   const onSave = async (flag = false) => {
     const upgrade_api = upgradeRef.current
@@ -148,6 +142,15 @@ const SheetInfo = (props: any, ref: any) => {
       getDetail();
     }
   }, [query, release_num]);
+
+  useEffect(() => {
+    if (!isEmpty(envs)) {
+      agEnvs = envs;
+    }
+    if (!isEmpty(sqlList)) {
+      agSql = sqlList;
+    }
+  }, [envs, sqlList]);
 
   const getDetail = async () => {
     setSpinning(true);
@@ -245,7 +248,7 @@ const SheetInfo = (props: any, ref: any) => {
       return infoMessage(errTip.ready_release_name);
     }
     // 发布结果为空，直接保存
-    if (isEmpty(result) || result == 'unknown') {
+    if (isEmpty(result?.trim()) || result == 'unknown') {
       onSave();
     } else {
       // 二次确认标记发布结果
@@ -280,7 +283,7 @@ const SheetInfo = (props: any, ref: any) => {
             } catch (e) {
               setConfirmDisabled(false);
             }
-            history.replace(`/onlineSystem/prePublish/${release_num}`);
+            history.replace(`/onlineSystem/releaseProcess`);
           },
           onCancel: () => {
             orderForm.setFieldsValue({ release_result: null });
@@ -373,9 +376,9 @@ const SheetInfo = (props: any, ref: any) => {
         mode={field == 'cluster' ? 'multiple' : undefined}
         options={
           field == 'sql_order'
-            ? sqlList
+            ? agSql
             : field == 'cluster'
-            ? envs
+            ? agEnvs
             : Object.keys(WhetherOrNot)?.map((k) => ({
                 value: k,
                 label: WhetherOrNot[k],

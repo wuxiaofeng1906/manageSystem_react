@@ -46,7 +46,7 @@ import PreReleaseServices from '@/services/preRelease';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 
 const color = { yes: '#2BF541', no: '#faad14' };
-
+let agEdit = '';
 const ProcessDetail = (props: any, ref: any) => {
   const { release_num } = useParams() as { release_num: string };
   const query = useLocation()?.query;
@@ -122,7 +122,7 @@ const ProcessDetail = (props: any, ref: any) => {
                   },
                   false,
                 );
-                history.replace(`/onlineSystem/profile/${basic.branch}?key='process`);
+                history.replace(`/onlineSystem/releaseProcess`);
               } catch (e) {
                 setConfirmDisabled(false);
               }
@@ -132,7 +132,7 @@ const ProcessDetail = (props: any, ref: any) => {
         onRefresh: () => init(true),
       };
     },
-    [release_num, basic, query.key],
+    [release_num, basic, query.subTab],
   );
 
   const init = async (refresh = false) => {
@@ -146,20 +146,22 @@ const ProcessDetail = (props: any, ref: any) => {
       await OnlineSystemServices.abnormalApi({ release_num });
       setLoading(false);
     } catch (e) {
-      setErrorTips(e?.msg);
+      agEdit = e?.msg;
+      setErrorTips(agEdit);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (release_num && query?.key == 'server') {
+    if (release_num && query?.subTab == 'server') {
       Modal.destroyAll?.();
+      setErrorTips('');
       init();
     }
   }, [release_num, query]);
 
   useEffect(() => {
-    if (isEmpty(basic?.branch) || query.key !== 'server') return;
+    if (isEmpty(basic?.branch) || query.subTab !== 'server') return;
 
     OnlineSystemServices.branchEnv({ branch: basic?.branch }).then((res) =>
       setBranchEnv(res?.map((it: string) => ({ label: it, value: it }))),
@@ -186,9 +188,9 @@ const ProcessDetail = (props: any, ref: any) => {
   }, [basic, repair]);
 
   const onSeal = async (flag = 'yes') => {
-    let tips = '请选择未封板服务进行封板';
-    if (!flag) tips = '请选择已封板服务进行解除封板';
-    if (isEmpty(selectedRowKeys)) return infoMessage(`请先选择需${flag ? '' : '解除'}封板服务`);
+    let tips = '请选择未封版服务进行封版';
+    if (!flag) tips = '请选择已封版服务进行解除封版';
+    if (isEmpty(selectedRowKeys)) return infoMessage(`请先选择需${flag ? '' : '解除'}封版服务`);
 
     const confirmSide = serverConfirm.flatMap((it) =>
       it.confirm_result == 'yes' ? [it.confirm_type] : [],
@@ -200,20 +202,37 @@ const ProcessDetail = (props: any, ref: any) => {
     if (selectedRowKeys?.some((it) => it.is_sealing == flag)) return infoMessage(tips);
     // 判断对应侧是否确认
     if (!isEmpty(noConfirmSide))
-      return infoMessage(`『${noConfirmSide?.join()}』对应侧,未确认完成请先确认后再封板`);
+      return infoMessage(`『${noConfirmSide?.join()}』对应侧,未确认完成请先确认后再封版`);
     Modal.confirm({
-      title: `${flag ? '' : '解除'}封板提示`,
-      content: `请确认是否将该服务${flag ? '' : '解除'}封板?`,
+      title: `${flag ? '' : '解除'}封版提示`,
+      content: `请确认是否将该服务${flag ? '' : '解除'}封版?`,
       onOk: async () => {
         try {
           setLoading(true);
           reset();
           // 1.校验测试用例是否通过
           if (flag == 'yes') {
-            await OnlineSystemServices.sealingCheck({
-              apps: selectedRowKeys?.map((it) => it.apps)?.join(',') ?? '',
-              release_num,
-            });
+            try {
+              await OnlineSystemServices.sealingCheck({
+                apps: selectedRowKeys?.map((it) => it.apps)?.join(',') ?? '',
+                release_num,
+              });
+            } catch (e) {
+              if (e?.code == 4001 && e?.msg) {
+                setLoading(false);
+                Modal.confirm({
+                  title: '测试用例未通过',
+                  content: '该服务测试用例未通过,是否前往检查页，设置忽略检查测试用例？',
+                  okText: '确定',
+                  onOk: (p) =>
+                    history.replace({
+                      pathname: history.location.pathname,
+                      query: { key: 'check' },
+                    }),
+                });
+                return;
+              }
+            }
           }
           await updateSealing(
             {
@@ -243,7 +262,7 @@ const ProcessDetail = (props: any, ref: any) => {
         : selectedRowKeys;
     if (isEmpty(gridSelected)) return infoMessage('请先选择需移除的服务！');
     if (type == 'server' && gridSelected?.some((it) => it.is_sealing == 'yes'))
-      return infoMessage('已封板服务不能移除！');
+      return infoMessage('已封版服务不能移除！');
     Modal.confirm({
       centered: true,
       title: '移除提示',
@@ -299,6 +318,20 @@ const ProcessDetail = (props: any, ref: any) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!isEmpty(errorTips)) {
+      confirmRef.current?.forEachNode((node) => {
+        if (node.data.confirm_type == 'backend') {
+          node.setData({
+            ...node.data,
+            is_sealing: !isEmpty(errorTips) ? 'yes' : node.data.is_sealing,
+          });
+        }
+      });
+    }
+  }, [errorTips]);
+
   const changeServerConfirm = async (v: string, param: CellClickedEvent) => {
     Modal.confirm({
       width: 500,
@@ -309,6 +342,7 @@ const ProcessDetail = (props: any, ref: any) => {
         param.column.colId.includes('is_hot_update') ? '是否可热更' : '服务确认完成'
       }』状态调整为: ${WhetherOrNot[v]}`,
       onOk: async () => {
+        reset();
         setLoading(true);
         await updateServerConfirm(
           {
@@ -333,6 +367,7 @@ const ProcessDetail = (props: any, ref: any) => {
       table,
     };
   }, [server]);
+
   const serverColumn = useMemo(() => preServerColumn(server), [server]);
 
   return (
@@ -522,7 +557,7 @@ const ProcessDetail = (props: any, ref: any) => {
               log: (p: CellClickedEvent) => (
                 <img
                   style={{ width: 16, height: 16, cursor: 'pointer' }}
-                  src={require('../../../../../public/logs.png')}
+                  src={require('../../../../public/logs.png')}
                   onClick={() => onLog({ title: 'sql详情', log: p.value, noData: '暂无sql日志！' })}
                 />
               ),
@@ -548,6 +583,7 @@ const ProcessDetail = (props: any, ref: any) => {
             })}
             frameworkComponents={{
               select: (p: CellClickedEvent) => {
+                const isConfirm = p.column.colId == 'confirm_result';
                 return (
                   <Select
                     size={'small'}
@@ -555,9 +591,7 @@ const ProcessDetail = (props: any, ref: any) => {
                     disabled={p.data.is_sealing == 'yes'}
                     style={{
                       width: '100%',
-                      color: p.column?.colId?.includes('confirm_result')
-                        ? color[p.value]
-                        : 'initial',
+                      color: isConfirm ? color[p.value] : 'initial',
                     }}
                     options={Object.keys(WhetherOrNot)?.map((k) => ({
                       value: k,

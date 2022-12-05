@@ -19,7 +19,7 @@ import {
   CheckTechnicalSide,
   onLog,
 } from '@/pages/onlineSystem/config/constant';
-import styles from '../../config/common.less';
+import styles from '../config/common.less';
 import { isEmpty, omit, delay } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
@@ -90,14 +90,14 @@ const Check = (props: any, ref: any) => {
 
   const onLock = async () => {
     /*
-     * 1.检查是否封板，是否已确认
+     * 1.检查是否封版，是否已确认
      * 2. 检查状态是否通过、忽略
      */
 
     if (!globalState.locked) {
       await OnlineSystemServices.checkProcess({ release_num });
       const flag = list.some((it) => !['yes', 'skip'].includes(it.status));
-      if (flag) return infoMessage('各项检查状态未达到『 通过、忽略 』，不能进行封板锁定');
+      if (flag) return infoMessage('各项检查状态未达到『 通过、忽略 』，不能进行封版锁定');
     }
 
     await OnlineSystemServices.checkSealingLock({
@@ -105,7 +105,7 @@ const Check = (props: any, ref: any) => {
       release_num,
       release_sealing: globalState.locked ? 'no' : 'yes',
     });
-    // 封板自动跳转工单页
+    // 封版自动跳转工单页
     if (!globalState.locked) {
       history.replace({ pathname: history.location.pathname, query: { key: 'sheet' } });
     }
@@ -163,11 +163,11 @@ const Check = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    if (query.key == 'check' && release_num) {
+    if (query.subTab == 'check' && release_num) {
       Modal?.destroyAll?.();
       getDetail();
     }
-  }, [query.key, release_num]);
+  }, [query.subTab, release_num]);
 
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
 
@@ -293,7 +293,7 @@ const Check = (props: any, ref: any) => {
                       ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
                       : { cursor: 'pointer' }),
                   }}
-                  src={require('../../../../../public/logs.png')}
+                  src={require('../../../../public/logs.png')}
                   title={'日志'}
                   onClick={() => {
                     if (hasEdit || !record.open || v == '') return;
@@ -360,16 +360,13 @@ export default forwardRef(Check);
 
 const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
   const [form] = Form.useForm();
+  const [compareBranch, getLogInfo] = useModel('onlineSystem', (online) => [
+    online.branchs,
+    online.getLogInfo,
+  ]);
   const [disabled, setDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [compareBranch, setCompareBranch] = useState<any[]>([]);
 
-  const getBranch = async () => {
-    const res = await OnlineSystemServices.getBranch();
-    setCompareBranch(
-      res?.map((it: any) => ({ label: it.branch_name, key: it.branch_id, value: it.branch_name })),
-    );
-  };
   const getDetail = async () => {
     setLoading(true);
     try {
@@ -380,21 +377,29 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
       form.setFieldsValue({
         main_branch: data?.main_branch ? data?.main_branch?.split(',') : [],
         main_since: data?.main_since ? moment(data?.main_since).subtract(5, 'days') : undefined,
-        auto_data: res?.auto_data?.flatMap((it: any) =>
-          it.check_result == 'yes' ? [it.check_type] : [],
-        ),
+        auto_data: isEmpty(res?.auto_data)
+          ? []
+          : res?.auto_data?.flatMap((it: any) => (it.check_result == 'yes' ? [it.check_type] : [])),
       });
       setLoading(false);
     } catch (e) {
+      console.log(e);
       setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!props.init.visible) return form.resetFields();
-    getBranch();
     getDetail();
   }, [props.init.visible]);
+
+  const showLog = async () => {
+    const log = await getLogInfo({
+      release_num: props.init.data,
+      options_model: 'online_system_manage_check_detail',
+    });
+    console.log(log);
+  };
 
   const onConfirm = async () => {
     const values = await form.validateFields();
@@ -424,13 +429,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
         onCancel={() => props?.onOk?.()}
         visible={props.init?.visible}
         footer={[
-          <Button
-            onClick={() => {
-              console.log(props.init?.data);
-            }}
-          >
-            查看日志
-          </Button>,
+          <Button onClick={showLog}>查看日志</Button>,
           <Button onClick={() => props.onOk?.()}>取消</Button>,
           <Button type={'primary'} disabled={disabled} onClick={onConfirm}>
             确定

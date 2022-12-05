@@ -5,11 +5,9 @@ import Check from './Check';
 import SheetInfo from './SheetInfo';
 import { useLocation, history, useParams, useModel } from 'umi';
 import { BarsOutlined, SyncOutlined } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-layout';
-import styles from '../../config/common.less';
+import styles from '../config/common.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { Step } from '@/pages/onlineSystem/config/constant';
-import { getkeyFromvalue } from '@/utils/utils';
 
 const tabs = [
   { name: '项目与服务详情', comp: ProcessDetail, key: 'server' },
@@ -47,14 +45,14 @@ const Layout = () => {
         locked: res?.release_sealing == 'yes',
         finished: checkStatus.includes(res?.release_result),
       });
-      updateKey(Step[step]);
+      updateHref(Step[step]);
     });
   }, [release_num]);
 
-  const updateKey = (key?: string) =>
+  const updateHref = (key?: string) =>
     history.replace({
       pathname: history.location.pathname,
-      query: { key: key ?? 'server' },
+      query: { subTab: key ?? 'server', tab: query.tab ?? 'process' },
     });
 
   const onExtra = async (fn: Function) => {
@@ -79,7 +77,7 @@ const Layout = () => {
   }, [globalState, touched]);
 
   const renderTabContent = useMemo(() => {
-    if (query.key == 'server')
+    if (query.subTab == 'server')
       return (
         <Space size={10}>
           <BarsOutlined
@@ -105,7 +103,7 @@ const Layout = () => {
           />
         </Space>
       );
-    else if (query.key == 'check')
+    else if (query.subTab == 'check')
       return (
         <Space size={10}>
           <Button
@@ -135,7 +133,7 @@ const Layout = () => {
               }
             }}
           >
-            {checkStatus.flag ? '取消封板锁定' : '封板锁定'}
+            {checkStatus.flag ? '取消封版锁定' : '封版锁定'}
           </Button>
           <SyncOutlined
             title={'刷新'}
@@ -151,37 +149,36 @@ const Layout = () => {
             size={'small'}
             onClick={() => ref.current?.onSave()}
             disabled={globalState.finished}
+            style={{ width: 150 }}
           >
             保存
           </Button>
         </div>
       );
-  }, [release_num, query.key, globalState, touched]);
+  }, [release_num, query.subTab, globalState, touched]);
 
   return (
-    <PageContainer title={'预发布工单'}>
-      <div className={styles.prePublish}>
-        <Tabs
-          activeKey={query.key}
-          onChange={updateKey}
-          animated={false}
-          className={styles.onlineTab}
-          tabBarExtraContent={renderTabContent}
-        >
-          {tabs?.map((it, index) => {
-            return (
-              <Tabs.TabPane
-                key={it.key}
-                tab={it.name}
-                disabled={(globalState.step || 1) < index || touched}
-              >
-                <it.comp ref={ref} />
-              </Tabs.TabPane>
-            );
-          })}
-        </Tabs>
-      </div>
-    </PageContainer>
+    <div className={styles.prePublish}>
+      <Tabs
+        activeKey={query.subTab}
+        onChange={updateHref}
+        animated={false}
+        className={styles.onlineTab}
+        tabBarExtraContent={renderTabContent}
+      >
+        {tabs?.map((it, index) => {
+          return (
+            <Tabs.TabPane
+              key={it.key}
+              tab={it.name}
+              disabled={(globalState.step || 1) < index || touched}
+            >
+              <it.comp ref={ref} />
+            </Tabs.TabPane>
+          );
+        })}
+      </Tabs>
+    </div>
   );
 };
 export default Layout;

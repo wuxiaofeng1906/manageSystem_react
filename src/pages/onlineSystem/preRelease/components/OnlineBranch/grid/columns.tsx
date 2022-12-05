@@ -529,7 +529,7 @@ const autoCheckRenderer = (params: any) => {
       <div style="margin-top: -20px;font-size: 10px">小程序:<label style="color: ${applet_color}"> ${applet_result}</label></div>
   </div>`;
 };
-// 封板状态
+// 封版状态
 const sealStatusRenderer = (params: any) => {
   // console.log(params.data.ready_release_num);
   if (isEmpty(params.value)) {

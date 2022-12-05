@@ -33,7 +33,26 @@ const usePermission = () => {
       saveResult: roles?.includes(158),
     };
   }, [authority]);
+  const onlineSystemPermission = useCallback(() => {
+    const roles = authority?.flatMap((it: any) => (it?.parentId == 114 ? [+it.id] : [])) ?? [];
+    return {
+      delete: roles?.includes(152), // 移除
+      refresh: roles?.includes(152), // 刷新
+      branchLock: roles?.includes(153), // 锁定分支
+      branchUnlock: roles?.includes(154), // 取消锁定分支
+      storyList: roles?.includes(155), // 需求列表
+      serverConfirm: roles?.includes(156), // 服务确认
+      hotUpdate: roles?.includes(157), // 是否可热更
+      baseInfo: roles?.includes(158), // 修改基础信息
+      checkStatus: roles?.includes(158), // 检查状态
+      paramSetting: roles?.includes(158), // 检查参数设置
+      mutiCheck: roles?.includes(158), // 批量检查
+      preLock: roles?.includes(158), // 封板
+      orderSave: roles?.includes(158), // 工单保存
+      orderPublish: roles?.includes(158), // 工单发布
+    };
+  }, [authority]);
 
-  return { announcePermission, prePermission };
+  return { announcePermission, prePermission, onlineSystemPermission };
 };
 export default usePermission;

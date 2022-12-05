@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import styles from '../../config/common.less';
+import styles from '../config/common.less';
 import {
   Col,
   DatePicker,
@@ -143,7 +143,7 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    if (query.key == 'sheet' && release_num) {
+    if (query.subTab == 'sheet' && release_num) {
       getBaseList();
       getDetail();
     }
@@ -160,7 +160,9 @@ const SheetInfo = (props: any, ref: any) => {
           ? moment(basicInfo?.plan_release_time)
           : null,
         release_result:
-          basicInfo?.release_result == 'unknown' ? undefined : basicInfo?.release_result,
+          basicInfo?.release_result == 'unknown'
+            ? undefined
+            : basicInfo?.release_result?.trim() || undefined,
         announcement_num: basicInfo?.announcement_num || undefined,
         person_duty_num: basicInfo?.person_duty_num || undefined,
       });
@@ -175,7 +177,8 @@ const SheetInfo = (props: any, ref: any) => {
         auto_env: basicInfo?.auto_env ? basicInfo?.auto_env?.split(',') : [],
         need_auto: basicInfo?.need_auto || undefined,
       });
-      agFinished = !isEmpty(basicInfo?.release_result) && basicInfo?.release_result !== 'unknown';
+      agFinished =
+        !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
       setFinished(agFinished);
       setUpgradeData(res);
       setSpinning(false);
@@ -316,7 +319,7 @@ const SheetInfo = (props: any, ref: any) => {
           announcement_time: 'after',
         });
       }
-      history.replace(`/onlineSystem/prePublish/${release_num}`);
+      history.replace('/onlineSystem/releaseProcess');
     }
   };
 
@@ -339,7 +342,7 @@ const SheetInfo = (props: any, ref: any) => {
       ev.preventDefault();
       ev.returnValue = '离开提示';
     };
-    if (leaveShow && query.key == 'sheet') {
+    if (leaveShow && query.subTab == 'sheet') {
       window.addEventListener('beforeunload', listener);
     }
     return () => {
@@ -390,7 +393,7 @@ const SheetInfo = (props: any, ref: any) => {
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <Prompt
-        when={leaveShow && query.key == 'sheet'}
+        when={leaveShow && query.subTab == 'sheet'}
         message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
       />
       <div>
@@ -467,7 +470,7 @@ const SheetInfo = (props: any, ref: any) => {
                           { label: '发布成功', value: 'success', key: 'success' },
                           { label: '发布失败', value: 'failure', key: 'failure' },
                           { label: '取消发布', value: 'cancel', key: 'cancel' },
-                          { label: '', value: 'unknown', key: 'unknown' },
+                          { label: ' ', value: 'unknown', key: 'unknown' },
                         ]}
                         style={{
                           width: '100%',
@@ -579,7 +582,7 @@ const SheetInfo = (props: any, ref: any) => {
               operation: (p: CellClickedEvent) => (
                 <Space size={8}>
                   <img
-                    src={require('../../../../../public/edit.png')}
+                    src={require('../../../../public/edit.png')}
                     style={{
                       width: 18,
                       height: 18,
@@ -592,7 +595,7 @@ const SheetInfo = (props: any, ref: any) => {
                   />
                   {DragIcon(p)}
                   <img
-                    src={require('../../../../../public/logs.png')}
+                    src={require('../../../../public/logs.png')}
                     style={{
                       width: 18,
                       height: 18,

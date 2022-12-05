@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Modal, Form, Select, Spin } from 'antd';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Modal, Form, Select, Spin, Row, Col } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
@@ -10,6 +10,7 @@ import PreReleaseServices from '@/services/preRelease';
 import DutyListServices from '@/services/dutyList';
 import { isEmpty } from 'lodash';
 import { history, useLocation } from 'umi';
+import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 
 const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
   const gridRef = useRef<GridApi>();
@@ -39,19 +40,19 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
     await getTableList();
   };
 
-  const onFinish = async (v: any) => {
-    if (v) {
-      const res = await DutyListServices.getDutyNum();
-      if (!isEmpty(res)) {
-        let href = `/onlineSystem/preRelease?releasedNum=${res.ready_release_num}`;
-        if (v == '2') {
-          href = `/onlineSystem/releaseOrder/${res.ready_release_num}`;
-        }
-        history.push(href);
+  const onFinish = async (data: any) => {
+    if (!isEmpty(data)) {
+      let href = '/onlineSystem/releaseOrder';
+      let param = data?.release_num;
+      if (data.type == '1') {
+        href = '/onlineSystem/prePublish';
+        param = data?.branch;
       }
+      history.push(`${href}/${param}`);
     }
     setVisible(false);
   };
+
   const getTableList = async () => {
     setSpinning(true);
     try {
@@ -115,9 +116,9 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
                     }}
                     className={styles.links}
                     onClick={() => {
-                      let href = `/onlineSystem/preRelease?releasedNum=${p.data.release_num}`;
+                      let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}`;
                       if (p.data.release_type == 'backlog_release') {
-                        href = `/onlineSystem/releaseOrder/${p.data.release_num}`;
+                        href = `/onlineSystem/releaseOrder${p.data.release_num}`;
                       }
                       history.push(href);
                     }}
@@ -129,54 +130,9 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
             }}
           />
         </div>
-        <AddModal visible={visible} onConfirm={onFinish} />
+        <DemandListModal visible={visible} onOk={onFinish} />
       </div>
     </Spin>
   );
 };
 export default PreReleaseList;
-
-const AddModal = ({
-  visible,
-  onConfirm,
-}: {
-  visible: boolean;
-  onConfirm: (v?: string) => void;
-}) => {
-  const [form] = Form.useForm();
-
-  const onOk = async () => {
-    const value = await form.validateFields();
-    onConfirm(value.type);
-  };
-  useEffect(() => {
-    !visible && form.resetFields();
-  }, [visible]);
-
-  return (
-    <Modal
-      title={'新增发布'}
-      visible={visible}
-      maskClosable={false}
-      centered={true}
-      okText={'确定'}
-      onOk={onOk}
-      onCancel={() => onConfirm()}
-    >
-      <Form form={form}>
-        <Form.Item
-          label={'类型选择'}
-          name={'type'}
-          rules={[{ required: true, message: '请选择发布类型！' }]}
-        >
-          <Select
-            options={[
-              { label: '非积压发布', value: '1' },
-              { label: '灰度推线上', value: '2' },
-            ]}
-          />
-        </Form.Item>
-      </Form>
-    </Modal>
-  );
-};

@@ -2,33 +2,36 @@ import React, { Fragment, useEffect, useRef } from 'react';
 import { Tabs } from 'antd';
 import { useLocation, history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import styles from '../../config/common.less';
-import ProcessList from './ProcessList';
+import styles from '../config/common.less';
 import ZentaoDetail from './ZentaoDetail';
 import { SyncOutlined } from '@ant-design/icons';
+import ProcessLayout from './layout';
 
-const Profile = () => {
+const PrePublish = () => {
   const refreshRef = useRef() as React.MutableRefObject<{ onRefresh: Function }>;
   const query = useLocation()?.query;
 
   useEffect(() => {
-    let init = query.key;
-    updateKey(init);
+    let init = query.tab;
+    updateHref(init);
   }, []);
 
-  const updateKey = (key?: string) =>
-    history.replace({ pathname: history.location.pathname, query: { key: key ?? 'process' } });
+  const updateHref = (key?: string) =>
+    history.replace({
+      pathname: history.location.pathname,
+      query: { tab: key ?? 'process', subTab: query?.subTab ?? 'server' },
+    });
 
   return (
-    <PageContainer title={query.key == 'profile' ? '禅道概况' : '发布过程单'}>
+    <PageContainer title={query.tab == 'profile' ? '禅道概况' : '发布过程单'}>
       <div className={styles.profileAndProcess}>
         <Tabs
-          activeKey={query.key}
-          onChange={updateKey}
+          activeKey={query.tab}
+          onChange={updateHref}
           animated={false}
           className={styles.onlineTab}
           tabBarExtraContent={
-            query.key == 'profile' ? (
+            query.tab == 'profile' ? (
               <SyncOutlined
                 onClick={() => refreshRef.current?.onRefresh()}
                 title={'刷新'}
@@ -40,7 +43,7 @@ const Profile = () => {
           }
         >
           <Tabs.TabPane key={'process'} tab={'发布过程单'}>
-            <ProcessList />
+            <ProcessLayout />
           </Tabs.TabPane>
           <Tabs.TabPane key={'profile'} tab={'禅道概况'}>
             <ZentaoDetail ref={refreshRef} />
@@ -50,4 +53,4 @@ const Profile = () => {
     </PageContainer>
   );
 };
-export default Profile;
+export default PrePublish;

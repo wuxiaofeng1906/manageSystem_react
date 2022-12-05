@@ -33,7 +33,7 @@ export const CheckStatus = {
   no: { text: '不通过', color: '#ff4d4f' },
   error: { text: '不通过', color: '#ff4d4f' },
   noHot: { text: '不可热更', color: '#d46b08' },
-  version: { text: '未封板', color: '#faad14' },
+  version: { text: '未封版', color: '#faad14' },
   wait: { text: '未开始' },
   unknown: { text: '未知' },
   running: { text: '执行中', color: '#1890ff' },
@@ -109,7 +109,7 @@ export const checkInfo = [
     api_url: 'version-check',
   },
   {
-    check_type: '前端服务git分支是否封板',
+    check_type: '前端服务git分支是否封版',
     side: 'front',
     status: 'sealing_version',
     start: 'version_check_start_time',
@@ -206,7 +206,7 @@ export const checkInfo = [
     api_url: 'hot-update-check',
   },
   {
-    check_type: '后端服务git分支是否封板',
+    check_type: '后端服务git分支是否封版',
     side: 'backend',
     status: 'sealing_version',
     start: 'version_check_start_time',

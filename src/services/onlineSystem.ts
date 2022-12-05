@@ -11,7 +11,7 @@ export type ICheckType =
   | 'zt-check-list' //特性、班车项目
   | 'preview-sql' //  previewsql
   | 'web-h5-automation' // 自动化检查
-  | 'sealing-version-check' // 分支封板
+  | 'sealing-version-check' // 分支封版
   | 'story-status'; // 需求阶段
 
 export const OnlineSystemServices = {
@@ -57,19 +57,19 @@ export const OnlineSystemServices = {
   async removeServerApp(data: any) {
     return request(`${baseUrl}/online/project-app`, { data, method: 'delete', msg: '移除成功' });
   },
-  // 封板、解除封板
+  // 封版、解除封版
   async updateServerApp(data: any) {
     return request(`${baseUrl}/online/sealing-version`, {
       data,
       method: 'post',
-      msg: `批量${data.is_seal ? '' : '解除'}封板成功`,
+      msg: `批量${data.is_seal ? '' : '解除'}封版成功`,
     });
   },
   // 封版检查【测试用例是否通过】
   async sealingCheck(params: any) {
     return request(`${baseUrl}/online/sealing-confirm`, {
       params,
-      warn: '当前测试用例未通过，不能进行封板！',
+      warn: false,
     });
   },
   // 发布过程单-升级接口
@@ -113,7 +113,7 @@ export const OnlineSystemServices = {
   async checkOpts(data: any, type: ICheckType) {
     return request(`${baseUrl}/online/${type}`, { data, method: 'post' });
   },
-  // 检查-封板锁定
+  // 检查-封版锁定
   async checkSealingLock(data: any) {
     return request(`${baseUrl}/online/sealing-lock`, { data, method: 'post' });
   },
@@ -151,6 +151,9 @@ export const OnlineSystemServices = {
   // 获取工单状态
   async getReleaseStatus(params: any) {
     return request(`${baseUrl}/online/release-status`, { params });
+  },
+  async getLog(params: any) {
+    return request(`${baseUrl}/online/options-log`, { params });
   },
 
   // 应用服务

@@ -168,7 +168,7 @@ export default [
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
     routes: [
       {
-        name: '发布过程',
+        name: '发布过程', // 旧版本
         path: 'preRelease',
         component: './onlineSystem/preRelease',
         hideInMenu: true,
@@ -212,23 +212,17 @@ export default [
         hideInMenu: true,
         wrappers: ['../wrappers/auth'],
       },
-      {
-        name: '上线日历',
-        path: 'calendarList',
-        component: './onlineSystem/calendarList',
-        wrappers: ['../wrappers/auth'],
-      },
-      {
-        name: '上线日历',
-        path: 'profile/:branch',
-        component: './onlineSystem/calendarList/profile', // 禅道概况
-        wrappers: ['../wrappers/auth'],
-        hideInMenu: true,
-      },
+      // {
+      //   name: '上线日历',
+      //   path: 'profile/:branch',
+      //   component: './onlineSystem/prePublish/profile', // 禅道概况
+      //   wrappers: ['../wrappers/auth'],
+      //   hideInMenu: true,
+      // },
       {
         name: '发布过程单',
-        path: 'prePublish/:release_num',
-        component: './onlineSystem/calendarList/prePublish/layout',
+        path: 'prePublish/:release_num/:branch',
+        component: './onlineSystem/prePublish',
         wrappers: ['../wrappers/auth'],
         hideInMenu: true,
       },

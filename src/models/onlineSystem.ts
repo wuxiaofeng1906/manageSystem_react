@@ -3,6 +3,13 @@ import { OnlineSystemServices } from '@/services/onlineSystem';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty } from 'lodash';
 
+export type LogType =
+  | 'online_system_manage_release_basic' // 上线系统发布过程单基础信息
+  | 'online_system_manage_release_project_app' // 上线系统应用服务
+  | 'online_system_manage_release_api' // 上线系统升级接口
+  | 'online_system_manage_release_data' // 上线系统数据修复
+  | 'online_system_manage_check_detail'; // 检查详情
+
 export default () => {
   const [globalState, setGlobalState] = useState({ locked: false, finished: false, step: 1 });
   const [basic, setBasic] = useState<any>();
@@ -11,6 +18,7 @@ export default () => {
   const [repair, setRepair] = useState<any>({ count: 0, page: 1, page_size: 20, data: [] });
   const [serverConfirm, setServerConfirm] = useState<any[]>([]);
   const [envs, setEnvs] = useState<any[]>([]);
+  const [branchs, setBranchs] = useState<any[]>([]);
   const [sqlList, setSqlList] = useState<any[]>([]);
 
   const getReleaseInfo = async (data: any, refreshData: any = null) => {
@@ -86,6 +94,8 @@ export default () => {
   const getSelectList = async () => {
     const res = await PreReleaseServices.environment();
     const sqlOrder = await OnlineSystemServices.sqlOrder();
+    const branch = await OnlineSystemServices.getBranch();
+    setBranchs(branch?.map((it: any) => ({ label: it.branch_name, value: it.branch_name })));
     setEnvs(
       res?.map((it: any) => ({
         label: it.online_environment_name ?? '',
@@ -98,16 +108,20 @@ export default () => {
   useEffect(() => {
     if (
       (location.pathname.includes('onlineSystem/prePublish') ||
-        location.pathname.includes('onlineSystem/profile')) &&
+        location.pathname.includes('onlineSystem/releaseProcess')) &&
       isEmpty(envs)
     ) {
       getSelectList();
     }
   }, [location.pathname]);
 
+  const getLogInfo = (data: { release_num: string; options_model: LogType }) =>
+    OnlineSystemServices.getLog(data);
+
   return {
     globalState,
     envs,
+    branchs,
     sqlList,
     basic,
     server,
@@ -118,6 +132,7 @@ export default () => {
     getReleaseInfo,
     getRepairInfo,
     getServerConfirm,
+    getLogInfo,
     removeRelease,
     updateSealing,
     updateBasic,

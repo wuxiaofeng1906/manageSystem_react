@@ -12,10 +12,10 @@ import { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/config/column';
 import IPagination from '@/components/IPagination';
 import { OnlineSystemServices } from '@/services/onlineSystem';
-import { useGqlClient } from '@/hooks/index';
-import { isEmpty, sumBy, groupBy } from 'lodash';
-import { ZentaoPhase, ZentaoType } from '../../config/constant';
-import styles from '../../config/common.less';
+import { useGqlClient } from '@/hooks';
+import { isEmpty, sumBy } from 'lodash';
+import { ZentaoPhase, ZentaoType } from '../config/constant';
+import styles from '../config/common.less';
 import { initGridTable } from '@/utils/utils';
 import { useLocation, useParams } from 'umi';
 
@@ -63,14 +63,19 @@ const ZentaoDetail = (props: any, ref: any) => {
 
   const formatTree = (org: any[]) => {
     let source: any[] = [];
-
     let result = org?.map((dept: any) => {
       const count = storyData.filter((it) =>
         isEmpty(it.assignedTo?.dept)
-          ? [dept.id, dept.parent].includes(it.openedBy?.dept?.id)
-          : [dept.id, dept.parent].includes(it.assignedTo?.dept?.id),
+          ? dept.id == it.openedBy?.dept?.id
+          : dept.id == it.assignedTo?.dept?.id,
       );
-      dept = { ...dept, count: count?.length || 0, value: dept.id, title: dept.name };
+      dept = {
+        ...dept,
+        count: count?.length || 0,
+        value: dept.id,
+        title: `${dept.name}(${count?.length ?? 0})`,
+        name: dept.name,
+      };
       return dept;
     });
 
@@ -80,8 +85,31 @@ const ZentaoDetail = (props: any, ref: any) => {
         if (it.id == 59) source.push(it);
       });
     }
-    return source;
+
+    return test(source);
   };
+  function test(source: any[]) {
+    if (isEmpty(source)) return;
+    source?.forEach((item) => {
+      if (!isEmpty(item.children)) {
+        const data = flatTree(item.children, []);
+        item.count = sumBy(data, 'count');
+        item.title = `${item.name}(${item.count})`;
+        test(item.children);
+      }
+    });
+    return source;
+  }
+
+  function flatTree(data: any[], result: any[]) {
+    data.forEach((item: any) => {
+      result.push({ title: item.title, value: item.id, count: item.count });
+      if (item.children?.length) {
+        result = flatTree(item.children, result);
+      }
+    });
+    return result;
+  }
 
   const getTestOrder = async () => {
     let status: Record<string, any> = {};
@@ -216,21 +244,23 @@ const ZentaoDetail = (props: any, ref: any) => {
         getTableList(true);
       },
     }),
-    [query.key],
+    [query.tab],
   );
 
   window.onresize = function () {
     setTableHeight((window.innerHeight - 450) / 2);
   };
-  const orgTr = useMemo(() => formatTree(orgTree), [storyData, orgTree]);
+  const orgTr = useMemo(() => {
+    return formatTree(orgTree);
+  }, [storyData, orgTree]);
 
   useEffect(() => {
-    if (branch && query.key == 'profile') {
+    if (branch && query.tab == 'profile') {
       getSelectList();
       getTableList();
       getTestOrder();
     }
-  }, [branch, query.key]);
+  }, [branch, query.tab]);
 
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>

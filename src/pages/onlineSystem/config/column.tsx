@@ -120,7 +120,13 @@ export const zentaoStoryColumn: (ColDef | ColGroupDef)[] = [
     cellRenderer: (p) => p.value?.join(',') ?? '',
     tooltipField: 'appservices',
   },
-  { headerName: '严重等级', field: 'severity', minWidth: 110 },
+  {
+    headerName: '严重等级',
+    field: 'severity',
+    minWidth: 110,
+    valueFormatter: (p) =>
+      p.value && !String(p.value)?.includes('级') ? `${p.value}级` : p.value || '',
+  },
   { headerName: '所属模块', field: 'module.name', minWidth: 120, tooltipField: 'module.name' },
   { headerName: '创建人', field: 'openedBy.realname', minWidth: 110 },
   { headerName: '指派人', field: 'assignedTo.realname', minWidth: 110 },
@@ -226,15 +232,15 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
       render: (v) => <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />,
     },
     {
-      title: '是否封板',
+      title: '是否封版',
       dataIndex: 'is_sealing',
       width: 120,
       render: (v) => (
         <span style={{ color: v == 'yes' ? 'green' : 'initial' }}>{cpWhetherOrNot[v] ?? v}</span>
       ),
     },
-    { title: '封板/封板人', dataIndex: 'sealing_user', width: 120 },
-    { title: '封板/封板时间', dataIndex: 'sealing_time', width: 120 },
+    { title: '封版/封版人', dataIndex: 'sealing_user', width: 120 },
+    { title: '封版/封版时间', dataIndex: 'sealing_time', width: 120 },
   ];
   if (flag)
     arr.push(
@@ -289,9 +295,9 @@ export const upgradeServicesColumn: (ColDef | ColGroupDef)[] = [
   },
   { headerName: '接口服务', field: 'api_server', minWidth: 120 },
   { headerName: '接口Method', field: 'api_method', minWidth: 110 },
-  { headerName: '接口URL', field: 'api_url', minWidth: 110 },
-  { headerName: 'Data', field: 'api_data', minWidth: 130 },
-  { headerName: 'Header', field: 'api_header', minWidth: 110 },
+  { headerName: '接口URL', field: 'api_url', minWidth: 110, tooltipField: 'api_url' },
+  { headerName: 'Data', field: 'api_data', minWidth: 130, tooltipField: 'api_data' },
+  { headerName: 'Header', field: 'api_header', minWidth: 110, tooltipField: 'api_header' },
   { headerName: '租户ID', field: 'tenant', minWidth: 110 },
 ];
 export const repairColumn: (ColDef | ColGroupDef)[] = [

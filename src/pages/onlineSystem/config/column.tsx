@@ -240,7 +240,7 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
       ),
     },
     { title: '封版/封版人', dataIndex: 'sealing_user', width: 120 },
-    { title: '封版/封版时间', dataIndex: 'sealing_time', width: 120 },
+    { title: '封版/封版时间', dataIndex: 'sealing_time', width: 180 },
   ];
   if (flag)
     arr.push(
@@ -316,7 +316,7 @@ export const repairColumn: (ColDef | ColGroupDef)[] = [
     pinned: 'left',
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
-  { headerName: '数据修复内容', field: 'title', minWidth: 120 },
+  { headerName: '数据修复内容', field: 'title', tooltipField: 'title', minWidth: 120 },
   { headerName: '涉及租户', field: 'tenant', minWidth: 100 },
   { headerName: '类型', field: 'recovery_type', minWidth: 100 },
   { headerName: '修复提交人', field: 'author', minWidth: 100 },

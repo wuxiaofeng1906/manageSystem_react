@@ -227,7 +227,7 @@ const ProcessDetail = (props: any, ref: any) => {
                   onOk: (p) =>
                     history.replace({
                       pathname: history.location.pathname,
-                      query: { key: 'check' },
+                      query: { subTab: 'check', tab: query.tab },
                     }),
                 });
                 return;

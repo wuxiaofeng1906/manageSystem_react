@@ -67,6 +67,12 @@ const Check = (props: any, ref: any) => {
 
   const onCheck = async () => {
     if (isEmpty(selected)) return infoMessage('请先选择检查项！');
+    // [前端、后端代码遗漏]检查 判断是否设置检查参数
+    if (selected.some((key) => key.includes('version_data'))) {
+      const param = OnlineSystemServices.getCheckSettingDetail({ release_num });
+      console.log(isEmpty(param), param);
+      if (isEmpty(param)) return infoMessage('请先设置检查参数');
+    }
     const checkList = list.flatMap((it) =>
       selected.includes(it.rowKey) && it.api_url
         ? [
@@ -86,6 +92,7 @@ const Check = (props: any, ref: any) => {
       ),
     );
     infoMessage('任务正在进行中，请稍后刷新');
+    delay(getDetail, 2000);
   };
 
   const onLock = async () => {
@@ -107,7 +114,10 @@ const Check = (props: any, ref: any) => {
     });
     // 封版自动跳转工单页
     if (!globalState.locked) {
-      history.replace({ pathname: history.location.pathname, query: { key: 'sheet' } });
+      history.replace({
+        pathname: history.location.pathname,
+        query: { subTab: 'sheet', tab: query.tab },
+      });
     }
     setGlobalState({ ...globalState, locked: !globalState.locked, step: 2 });
   };
@@ -314,12 +324,7 @@ const Check = (props: any, ref: any) => {
                           </div>
                         </div>
                       );
-                    return onLog({
-                      title: '检查日志',
-                      log: v,
-                      noData: '暂无检查日志',
-                      content,
-                    });
+                    return onLog({ title: '检查日志', log: v, noData: '暂无检查日志', content });
                   }}
                 />
               ),
@@ -398,7 +403,18 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
       release_num: props.init.data,
       options_model: 'online_system_manage_check_detail',
     });
-    console.log(log);
+    onLog({
+      title: '参数设置日志',
+      log: JSON.stringify(log),
+      content: (
+        <>
+          {log?.map((it: any) => (
+            <div>{it.operation_content}</div>
+          ))}
+        </>
+      ),
+      noData: '暂无参数设置日志！',
+    });
   };
 
   const onConfirm = async () => {

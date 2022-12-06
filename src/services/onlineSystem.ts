@@ -12,7 +12,8 @@ export type ICheckType =
   | 'preview-sql' //  previewsql
   | 'web-h5-automation' // 自动化检查
   | 'sealing-version-check' // 分支封版
-  | 'story-status'; // 需求阶段
+  | 'story-status' // 需求阶段
+  | 'auto-check'; // 升级自动化检查
 
 export const OnlineSystemServices = {
   async getProjects() {

@@ -7,8 +7,7 @@ import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, cloneDeep, isArray, intersection } from 'lodash';
 import dayjs from 'dayjs';
 import { valueMap } from '@/utils/utils';
-import { history } from '@@/core/history';
-import { useModel } from '@@/plugin-model/useModel';
+import { history, useModel } from 'umi';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];

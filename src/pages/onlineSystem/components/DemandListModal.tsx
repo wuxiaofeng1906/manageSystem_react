@@ -29,12 +29,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [list, setList] = useState<any[]>([]);
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<any[]>([]);
-  const [relatedStory, setRelatedStory] = useState<any[]>([]);
+  const [relatedStory, setRelatedStory] = useState<any>();
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
 
   useEffect(() => {
     if (!props.visible) {
       form.resetFields();
+      baseForm.resetFields();
+      setComputed(null);
       setSelected([]);
       return;
     }
@@ -55,6 +57,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
   useEffect(() => {
     if (computed?.branch) {
+      form.resetFields();
       getRelatedStory();
       getTableList();
     }
@@ -141,7 +144,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     try {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
-      props.onOk?.({ ...baseData, release_num, branch: values.branch });
+      props.onOk?.({ ...baseData, release_num });
     } catch (e) {
       errorMessage('接口异常');
       setSpin(false);
@@ -160,10 +163,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       cluster: v == 'global' ? ['global'] : memoColumn.isSprint ? ['cn-northwest-0'] : [],
     });
     if (!memoColumn.isSprint) {
-      const noRelate = list.filter((it) => !relatedStory.includes(it.story));
+      const noRelate = list.filter((it) => !relatedStory?.story?.includes(it.story));
       setSelected(noRelate);
       form.setFieldsValue({
-        cluster: noRelate?.map((it) => it.cluster && it.cluster),
+        cluster: noRelate?.flatMap((it) => (it.cluster ? [it.cluster] : [])),
       });
     }
     setList(list.map((it) => ({ ...it, disabled: it.type !== v })));
@@ -191,7 +194,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     });
     onLog({
       title: '项目与需求日志',
-      log: JSON.stringify(log),
+      log: isEmpty(log) ? '' : '参数',
       content: (
         <>
           {log?.map((it: any) => (

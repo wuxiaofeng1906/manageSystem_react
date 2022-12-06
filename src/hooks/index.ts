@@ -10,6 +10,7 @@ import { ApolloClient, gql, ApolloQueryResult } from '@apollo/client/core';
 // @ts-ignore
 import { useModel } from '@@/plugin-model/useModel';
 import { useRequest } from 'ahooks';
+import { useEffect, useRef } from 'react';
 
 export class GqlClient<T> {
   // eslint-disable-next-line @typescript-eslint/no-parameter-properties

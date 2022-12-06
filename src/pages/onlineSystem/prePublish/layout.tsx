@@ -52,7 +52,7 @@ const Layout = () => {
   const updateHref = (key?: string) =>
     history.replace({
       pathname: history.location.pathname,
-      query: { subTab: key ?? 'server', tab: query.tab ?? 'process' },
+      query: { tab: query.tab ?? 'process', subTab: key ?? 'server' },
     });
 
   const onExtra = async (fn: Function) => {

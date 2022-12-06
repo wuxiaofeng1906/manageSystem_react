@@ -44,7 +44,7 @@ let agSql: any[] = [];
 let agEnvs: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
-  const query = useLocation()?.query;
+  const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [globalState, envs, sqlList, setGlobalState] = useModel('onlineSystem', (online) => [
@@ -137,11 +137,11 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    if (query.subTab == 'sheet' && release_num) {
+    if (subTab == 'sheet' && tab == 'process' && release_num) {
       getBaseList();
       getDetail();
     }
-  }, [query, release_num]);
+  }, [subTab, tab, release_num]);
 
   useEffect(() => {
     if (!isEmpty(envs)) {
@@ -345,13 +345,13 @@ const SheetInfo = (props: any, ref: any) => {
       ev.preventDefault();
       ev.returnValue = '离开提示';
     };
-    if (leaveShow && query.subTab == 'sheet' && query.tab == 'process') {
+    if (leaveShow && subTab == 'sheet' && tab == 'process') {
       window.addEventListener('beforeunload', listener);
     }
     return () => {
       window.removeEventListener('beforeunload', listener);
     };
-  }, [leaveShow, query]);
+  }, [leaveShow, tab, subTab]);
 
   const computedServer = useMemo(() => PublishSeverColumn(upgradeData?.basic_data), [
     upgradeData?.basic_data,
@@ -396,7 +396,7 @@ const SheetInfo = (props: any, ref: any) => {
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <Prompt
-        when={leaveShow && query.subTab == 'sheet'}
+        when={leaveShow && subTab == 'sheet'}
         message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
       />
       <div>

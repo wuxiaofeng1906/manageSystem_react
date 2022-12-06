@@ -37,9 +37,9 @@ import { history, useLocation, useModel, useParams } from 'umi';
 import IPagination from '@/components/IPagination';
 import {
   ClusterType,
-  onLog,
   ServerConfirmType,
   WhetherOrNot,
+  onLog,
 } from '@/pages/onlineSystem/config/constant';
 import moment from 'moment';
 import PreReleaseServices from '@/services/preRelease';
@@ -49,7 +49,7 @@ const color = { yes: '#2BF541', no: '#faad14' };
 let agEdit = '';
 const ProcessDetail = (props: any, ref: any) => {
   const { release_num } = useParams() as { release_num: string };
-  const query = useLocation()?.query;
+  const { subTab, tab } = useLocation()?.query as { tab: string; subTab: string };
 
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const {
@@ -92,47 +92,14 @@ const ProcessDetail = (props: any, ref: any) => {
 
   useImperativeHandle(
     ref,
-    () => {
-      if (!release_num && query?.key !== 'server' && !basic) return;
-      return {
-        onShow: () => {
-          if (basic.branch) setStoryModal({ visible: true, data: basic });
-        },
-        onCancelPublish: () => {
-          Modal.confirm({
-            okText: '确认',
-            cancelText: '取消',
-            centered: true,
-            title: '取消发布提醒',
-            content: '取消发布将删除发布工单，请确认是否取消发布?',
-            icon: <InfoCircleOutlined style={{ color: 'red' }} />,
-            okButtonProps: { disabled: confirmDisabled },
-            onOk: async () => {
-              setConfirmDisabled(true);
-              try {
-                await PreReleaseServices.cancelPublish({
-                  user_id: user?.userid ?? '',
-                  user_name: user?.name ?? '',
-                  ready_release_num: release_num,
-                });
-                await PreReleaseServices.removeRelease(
-                  {
-                    user_id: user?.userid ?? '',
-                    release_num: release_num,
-                  },
-                  false,
-                );
-                history.replace(`/onlineSystem/releaseProcess`);
-              } catch (e) {
-                setConfirmDisabled(false);
-              }
-            },
-          });
-        },
-        onRefresh: () => init(true),
-      };
-    },
-    [release_num, basic, query.subTab],
+    () => ({
+      onShow: () => {
+        if (basic.branch) setStoryModal({ visible: true, data: basic });
+      },
+      onCancelPublish,
+      onRefresh: () => init(true),
+    }),
+    [release_num, basic, subTab, tab],
   );
 
   const init = async (refresh = false) => {
@@ -153,20 +120,20 @@ const ProcessDetail = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    if (release_num && query?.subTab == 'server' && query.tab == 'process') {
+    if (release_num && subTab == 'server' && tab == 'process') {
       Modal.destroyAll?.();
       setErrorTips('');
       init();
     }
-  }, [release_num, query]);
+  }, [release_num, subTab, tab]);
 
   useEffect(() => {
-    if (isEmpty(basic?.branch) || query.subTab !== 'server') return;
+    if (isEmpty(basic?.branch) || subTab !== 'server') return;
 
     OnlineSystemServices.branchEnv({ branch: basic?.branch }).then((res) =>
       setBranchEnv(res?.map((it: string) => ({ label: it, value: it }))),
     );
-  }, [basic?.branch, query]);
+  }, [basic?.branch, subTab]);
 
   useEffect(() => {
     if (!isEmpty(basic)) {
@@ -202,7 +169,7 @@ const ProcessDetail = (props: any, ref: any) => {
     if (selectedRowKeys?.some((it) => it.is_sealing == flag)) return infoMessage(tips);
     // 判断对应侧是否确认
     if (!isEmpty(noConfirmSide))
-      return infoMessage(`『${noConfirmSide?.join()}』对应侧,未确认完成请先确认后再封版`);
+      return infoMessage(`『${uniq(noConfirmSide)?.join()}』对应侧服务未确认，请先确认后再锁定`);
     Modal.confirm({
       title: `${flag ? '' : '解除'}封版提示`,
       content: `请确认是否将该服务${flag ? '' : '解除'}封版?`,
@@ -227,7 +194,7 @@ const ProcessDetail = (props: any, ref: any) => {
                   onOk: (p) =>
                     history.replace({
                       pathname: history.location.pathname,
-                      query: { subTab: 'check', tab: query.tab },
+                      query: { tab, subTab: 'check' },
                     }),
                 });
                 return;
@@ -290,6 +257,38 @@ const ProcessDetail = (props: any, ref: any) => {
   const getTableList = async (page = 1, page_size = 20) => {
     reset();
     await getRepairInfo({ release_num }, page, page_size);
+  };
+
+  const onCancelPublish = async () => {
+    Modal.confirm({
+      okText: '确认',
+      cancelText: '取消',
+      centered: true,
+      title: '取消发布提醒',
+      content: '取消发布将删除发布工单，请确认是否取消发布?',
+      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+      okButtonProps: { disabled: confirmDisabled },
+      onOk: async () => {
+        setConfirmDisabled(true);
+        try {
+          await PreReleaseServices.cancelPublish({
+            user_id: user?.userid ?? '',
+            user_name: user?.name ?? '',
+            ready_release_num: release_num,
+          });
+          await PreReleaseServices.removeRelease(
+            {
+              user_id: user?.userid ?? '',
+              release_num: release_num,
+            },
+            false,
+          );
+          history.replace('/onlineSystem/releaseProcess');
+        } catch (e) {
+          setConfirmDisabled(false);
+        }
+      },
+    });
   };
 
   const reset = () => {

@@ -27,7 +27,7 @@ import { useLocation, useModel, history, useParams } from 'umi';
 import { ICheckType, OnlineSystemServices } from '@/services/onlineSystem';
 
 const Check = (props: any, ref: any) => {
-  const query = useLocation()?.query;
+  const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [globalState, setGlobalState, basic] = useModel('onlineSystem', (online) => [
@@ -115,7 +115,7 @@ const Check = (props: any, ref: any) => {
     if (!globalState.locked) {
       history.replace({
         pathname: history.location.pathname,
-        query: { subTab: 'sheet', tab: query.tab },
+        query: { tab, subTab: 'sheet' },
       });
     }
     setGlobalState({ ...globalState, locked: !globalState.locked, step: 2 });
@@ -171,11 +171,11 @@ const Check = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    if (query.subTab == 'check' && release_num && query.tab == 'process') {
+    if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
       getDetail();
     }
-  }, [query, release_num]);
+  }, [subTab, tab, release_num]);
 
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
 
@@ -408,7 +408,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
     });
     onLog({
       title: '参数设置日志',
-      log: JSON.stringify(log),
+      log: isEmpty(log) ? '' : '参数',
       content: (
         <>
           {log?.map((it: any) => (

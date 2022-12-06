@@ -286,6 +286,7 @@ export const checkInfo = [
     log: '',
     disabled: true,
     rowKey: 'auto_obj_data', // 数组结构
+    api_url: 'auto-check',
   },
 ];
 // 日志弹窗

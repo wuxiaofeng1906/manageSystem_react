@@ -20,11 +20,12 @@ import {
   onLog,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
-import { isEmpty, omit, delay } from 'lodash';
+import { isEmpty, omit, delay, isString } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 import { useLocation, useModel, history, useParams } from 'umi';
 import { ICheckType, OnlineSystemServices } from '@/services/onlineSystem';
+import dayjs from 'dayjs';
 
 const Check = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
@@ -59,7 +60,7 @@ const Check = (props: any, ref: any) => {
     () => ({
       onCheck,
       onLock,
-      onRefreshCheck: getDetail,
+      onRefreshCheck: () => getDetail(true),
       onSetting: () => setShow({ visible: true, data: release_num }),
     }),
     [selected, ref, globalState, basic, list],
@@ -121,10 +122,20 @@ const Check = (props: any, ref: any) => {
     setGlobalState({ ...globalState, locked: !globalState.locked, step: 2 });
   };
 
-  const getDetail = async () => {
+  const getDetail = async (isRefresh = false) => {
     setSelected([]);
     setSpin(true);
     try {
+      if (isRefresh) {
+        await Promise.all(
+          ['zt-check-list', 'test-unit'].map((type) =>
+            OnlineSystemServices.checkOpts(
+              { release_num, user_id: user?.userid, api_url: type },
+              type,
+            ),
+          ),
+        );
+      }
       const res = await OnlineSystemServices.getCheckInfo({ release_num });
       setList(
         checkInfo.map((it) => {
@@ -168,6 +179,80 @@ const Check = (props: any, ref: any) => {
       data.api_url,
     );
     delay(getDetail, 2000);
+  };
+
+  const showLog = (v: any, data: any) => {
+    if (hasEdit || !data.open || v == '') return;
+    let type = data.rowKey;
+    let width = 700;
+    let content = v;
+    // 链接
+    if (type == 'env_data' || data.api_url == 'version-check') return window.open(v);
+    // 特殊处理
+    if (type == 'libray_data')
+      content = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div>
+            <strong>线上：</strong>
+            {Object.entries(v?.before ?? {})?.map(([k, v]) => (
+              <div>{`${k}: ${v}`}</div>
+            ))}
+          </div>
+          <div>
+            <strong>线下：</strong>
+            {Object.entries(v?.after ?? {})?.map(([k, v]) => (
+              <div>{`${k}: ${v}`}</div>
+            ))}
+          </div>
+        </div>
+      );
+    if (type == 'hot_data') {
+      width = 1000;
+      content = (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div>
+            <strong>收集数据当前环境数据:</strong>
+            <div>{v?.present_env}</div>
+          </div>
+          <div>
+            <strong>收集数据线上环境数据:</strong>
+            <div>{v?.online_env}</div>
+          </div>
+          <div>
+            <strong>集群服务状态版本检查:</strong>
+            <div>{v?.servers_check}</div>
+          </div>
+        </div>
+      );
+    }
+    if (type.includes('seal_data') && !isString(v)) {
+      content = (
+        <div>
+          {v?.map((it: any) => (
+            <div key={it.name_path}>
+              <span>{`【${it.name_path}】`}</span>【
+              <span style={{ color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14' }}>
+                {it.sealing_version == 'yes' ? '已封版' : '未封版'}
+              </span>
+              】
+              <span>{`封版时间：${
+                it.sealing_version_time
+                  ? dayjs(it.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
+                  : ''
+              }`}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return onLog({
+      title: '检查日志',
+      log: String(v),
+      noData: '暂无检查日志',
+      content,
+      width,
+    });
   };
 
   useEffect(() => {
@@ -218,11 +303,27 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'status',
               width: 100,
               align: 'center',
-              render: (p) => (
-                <span style={{ color: CheckStatus[p]?.color ?? '#000000d9', fontWeight: 500 }}>
-                  {CheckStatus[p]?.text ?? p}
-                </span>
-              ),
+              render: (p, record) => {
+                let status = p;
+                const special = {
+                  'sealing-version-check': { yes: 'version', no: 'noVersion' },
+                  'hot-update-check': { yes: 'hot', no: 'noHot' },
+                };
+                // 特殊处理 封板，热更 状态
+                if (
+                  ['sealing-version-check', 'hot-update-check'].includes(record.api_url) &&
+                  ['yes', 'no'].includes(p)
+                ) {
+                  status = special[record.api_url][p];
+                }
+                return (
+                  <span
+                    style={{ color: CheckStatus[status]?.color ?? '#000000d9', fontWeight: 500 }}
+                  >
+                    {CheckStatus[status]?.text ?? status}
+                  </span>
+                );
+              },
             },
             {
               align: 'center',
@@ -303,27 +404,7 @@ const Check = (props: any, ref: any) => {
                   }}
                   src={require('../../../../public/logs.png')}
                   title={'日志'}
-                  onClick={() => {
-                    if (hasEdit || !record.open || v == '') return;
-                    let type = record.rowKey;
-                    let content = v;
-                    if (type == 'env_data' || record.api_url == 'version-check')
-                      return window.open(v);
-                    if (type == 'libray_data')
-                      content = (
-                        <div>
-                          <div>
-                            线上：
-                            <pre style={{ whiteSpace: 'pre-line' }}>{v?.before}</pre>
-                          </div>
-                          <div>
-                            线下：
-                            <pre style={{ whiteSpace: 'pre-line' }}>{v?.after}</pre>
-                          </div>
-                        </div>
-                      );
-                    return onLog({ title: '检查日志', log: v, noData: '暂无检查日志', content });
-                  }}
+                  onClick={() => showLog(v, record)}
                 />
               ),
             },

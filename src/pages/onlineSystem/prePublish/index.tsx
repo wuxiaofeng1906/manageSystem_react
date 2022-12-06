@@ -19,7 +19,7 @@ const PrePublish = () => {
   const updateHref = (key?: string) =>
     history.replace({
       pathname: history.location.pathname,
-      query: { tab: key ?? 'process', subTab: query?.subTab ?? 'server' },
+      query: { tab: key ?? 'process', subTab: query?.subTab },
     });
 
   return (

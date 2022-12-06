@@ -182,6 +182,7 @@ const SheetInfo = (props: any, ref: any) => {
       });
       agFinished =
         !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
+      setGlobalState({ ...globalState, draft: res?.status !== 'save' });
       setFinished(agFinished);
       setUpgradeData(res);
       setSpinning(false);
@@ -359,6 +360,7 @@ const SheetInfo = (props: any, ref: any) => {
 
   useEffect(() => {
     setGlobalState({
+      ...globalState,
       locked: finished ? true : globalState?.locked,
       finished,
       step: finished ? 2 : globalState.step,
@@ -466,7 +468,7 @@ const SheetInfo = (props: any, ref: any) => {
                     <Form.Item name={'release_result'}>
                       <Select
                         allowClear
-                        disabled={finished}
+                        disabled={globalState.draft || finished}
                         className={styles.selectColor}
                         onChange={() => onSaveBeforeCheck(true)}
                         options={[

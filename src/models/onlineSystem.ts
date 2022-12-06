@@ -12,7 +12,12 @@ export type LogType =
   | 'online_system_manage_check_detail'; // 检查详情
 
 export default () => {
-  const [globalState, setGlobalState] = useState({ locked: false, finished: false, step: 1 });
+  const [globalState, setGlobalState] = useState({
+    locked: false,
+    finished: false,
+    step: 1,
+    draft: true,
+  });
   const [basic, setBasic] = useState<any>();
   const [server, setServer] = useState<any[]>([]);
   const [api, setApi] = useState<any[]>([]);

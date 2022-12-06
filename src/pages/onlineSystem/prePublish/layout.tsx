@@ -41,6 +41,7 @@ const Layout = () => {
     OnlineSystemServices.getReleaseStatus({ release_num }).then((res) => {
       step = checkStatus.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;
       setGlobalState({
+        ...globalState,
         step,
         locked: res?.release_sealing == 'yes',
         finished: checkStatus.includes(res?.release_result),
@@ -145,6 +146,9 @@ const Layout = () => {
     else
       return (
         <div>
+          {globalState.draft && (
+            <strong style={{ color: '#fe7b00cf', marginRight: 16 }}>状态：草稿态</strong>
+          )}
           <Button
             size={'small'}
             onClick={() => ref.current?.onSave()}

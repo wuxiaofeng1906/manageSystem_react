@@ -69,9 +69,8 @@ const Check = (props: any, ref: any) => {
     if (isEmpty(selected)) return infoMessage('请先选择检查项！');
     // [前端、后端代码遗漏]检查 判断是否设置检查参数
     if (selected.some((key) => key.includes('version_data'))) {
-      const param = OnlineSystemServices.getCheckSettingDetail({ release_num });
-      console.log(isEmpty(param), param);
-      if (isEmpty(param)) return infoMessage('请先设置检查参数');
+      const param = await OnlineSystemServices.getCheckSettingDetail({ release_num });
+      if (param?.default == 'yes') return infoMessage('请先设置检查参数');
     }
     const checkList = list.flatMap((it) =>
       selected.includes(it.rowKey) && it.api_url
@@ -154,7 +153,6 @@ const Check = (props: any, ref: any) => {
       );
       setSpin(false);
     } catch (e) {
-      console.log(e);
       setSpin(false);
     }
   };
@@ -173,11 +171,11 @@ const Check = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    if (query.subTab == 'check' && release_num) {
+    if (query.subTab == 'check' && release_num && query.tab == 'process') {
       Modal?.destroyAll?.();
       getDetail();
     }
-  }, [query.subTab, release_num]);
+  }, [query, release_num]);
 
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
 
@@ -340,7 +338,12 @@ const Check = (props: any, ref: any) => {
               setSelected(p as string[]);
             },
             getCheckboxProps: (record) => ({
-              disabled: hasEdit || record.disabled || !record.open || record.status == 'running',
+              disabled:
+                hasEdit ||
+                record.disabled ||
+                !record.open ||
+                record.status == 'running' ||
+                record.rowKey == 'auto_obj_data', // 升级前自动化检查
             }),
           }}
         />

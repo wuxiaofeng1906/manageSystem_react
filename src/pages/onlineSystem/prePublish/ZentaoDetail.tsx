@@ -35,7 +35,7 @@ const ZentaoDetail = (props: any, ref: any) => {
   const [testData, setTestData] = useState<any[]>([]);
   const [tableHeight, setTableHeight] = useState((window.innerHeight - 450) / 2);
   const [spin, setSpin] = useState(false);
-  const [orgTree, setOrgTree] = useState<any[]>([]);
+  const [org, setOrg] = useState<any[]>([]);
   const [recordCount, setRecordCount] = useState<{
     category: any;
     stage: any;
@@ -58,13 +58,13 @@ const ZentaoDetail = (props: any, ref: any) => {
 
   const getSelectList = async () => {
     const org = await OnlineSystemServices.getOrgList(client);
-    setOrgTree(org?.organization || []);
+    setOrg(org?.organization || []);
   };
 
-  const formatTree = (org: any[]) => {
+  const formatTree = () => {
     let source: any[] = [];
     let result = org?.map((dept: any) => {
-      const count = storyData.filter((it) =>
+      const count = storyData?.filter((it) =>
         isEmpty(it.assignedTo?.dept)
           ? dept.id == it.openedBy?.dept?.id
           : dept.id == it.assignedTo?.dept?.id,
@@ -85,23 +85,23 @@ const ZentaoDetail = (props: any, ref: any) => {
         if (it.id == 59) source.push(it);
       });
     }
-
-    return test(source);
+    return findLeaf(source);
   };
-  function test(source: any[]) {
+
+  const findLeaf = (source: any[]) => {
     if (isEmpty(source)) return;
     source?.forEach((item) => {
       if (!isEmpty(item.children)) {
         const data = flatTree(item.children, []);
         item.count = sumBy(data, 'count');
         item.title = `${item.name}(${item.count})`;
-        test(item.children);
+        findLeaf(item.children);
       }
     });
     return source;
-  }
+  };
 
-  function flatTree(data: any[], result: any[]) {
+  const flatTree = (data: any[], result: any[]) => {
     data.forEach((item: any) => {
       result.push({ title: item.title, value: item.id, count: item.count });
       if (item.children?.length) {
@@ -109,7 +109,7 @@ const ZentaoDetail = (props: any, ref: any) => {
       }
     });
     return result;
-  }
+  };
 
   const getTestOrder = async () => {
     let status: Record<string, any> = {};
@@ -156,17 +156,18 @@ const ZentaoDetail = (props: any, ref: any) => {
     if (isEmpty(compareKey)) result = flag ? originStoryData : originTestData;
     else {
       Object.entries(compareKey).forEach(([key, v]) => {
-        result = fn(result, v, key);
+        result = findCondition(result, v, key);
       });
     }
+    console.log(result);
     if (flag) {
       setStoryData(result);
       setPages({ page: 1, page_size: 20, total: result?.length });
     } else setTestData(result);
   };
 
-  const fn = (filterData: any[], formValue: any, key: string) => {
-    const Na = formValue?.includes('NA');
+  const findCondition = (filterData: any[], formValue: any, key: string) => {
+    const Na = formValue?.join(',').includes('NA');
 
     return filterData.filter((it: any) => {
       let originV = it[key];
@@ -180,7 +181,9 @@ const ZentaoDetail = (props: any, ref: any) => {
           ? formValue.includes(it.openedBy?.dept?.id)
           : formValue.includes(it.assignedTo?.dept?.id);
       }
-      return Na ? isEmpty(originV) || formValue.includes(originV) : formValue.includes(originV);
+      return Na
+        ? isEmpty(it.assignedTo?.realname || it.openedBy?.realname)
+        : formValue.includes(originV);
     });
   };
 
@@ -250,9 +253,7 @@ const ZentaoDetail = (props: any, ref: any) => {
   window.onresize = function () {
     setTableHeight((window.innerHeight - 450) / 2);
   };
-  const orgTr = useMemo(() => {
-    return formatTree(orgTree);
-  }, [storyData, orgTree]);
+  const orgTree = useMemo(() => formatTree(), [storyData, org]);
 
   useEffect(() => {
     if (branch && query.tab == 'profile') {
@@ -281,7 +282,7 @@ const ZentaoDetail = (props: any, ref: any) => {
                   showSearch
                   treeCheckable
                   multiple
-                  treeData={orgTr}
+                  treeData={orgTree}
                   onDeselect={() => conditionChange('story')}
                   showCheckedStrategy={'SHOW_ALL'}
                   maxTagCount={'responsive'}

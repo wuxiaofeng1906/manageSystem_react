@@ -3,7 +3,12 @@ import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button } fr
 import { useModel } from 'umi';
 import styles from './DemandListModal.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
-import { ClusterType, StoryStatus, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
+import {
+  ClusterType,
+  onLog,
+  StoryStatus,
+  WhetherOrNot,
+} from '@/pages/onlineSystem/config/constant';
 import { isEmpty, difference, isEqual } from 'lodash';
 import { errorMessage, infoMessage } from '@/publicMethods/showMessages';
 import dayjs from 'dayjs';
@@ -182,9 +187,20 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const showLog = async () => {
     const log = await getLogInfo({
       release_num: props.data?.release_num,
-      options_model: 'online_system_manage_check_detail',
+      options_model: 'online_system_manage_release',
     });
-    console.log(log);
+    onLog({
+      title: '项目与需求日志',
+      log: JSON.stringify(log),
+      content: (
+        <>
+          {log?.map((it: any) => (
+            <div>{it.operation_content}</div>
+          ))}
+        </>
+      ),
+      noData: '暂无项目与需求日志！',
+    });
   };
 
   const memoColumn = useMemo(() => {
@@ -290,7 +306,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       wrapClassName={styles.DemandListModal}
       onCancel={() => props.onOk?.()}
       footer={[
-        <Button onClick={showLog} hidden={memoEdit.disabled}>
+        <Button onClick={showLog} hidden={!memoEdit.disabled}>
           查看日志
         </Button>,
         <Button onClick={() => props.onOk?.()}>取消</Button>,

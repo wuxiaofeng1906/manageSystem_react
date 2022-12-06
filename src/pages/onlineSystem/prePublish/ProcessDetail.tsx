@@ -96,7 +96,7 @@ const ProcessDetail = (props: any, ref: any) => {
       if (!release_num && query?.key !== 'server' && !basic) return;
       return {
         onShow: () => {
-          setStoryModal({ visible: true, data: basic });
+          if (basic.branch) setStoryModal({ visible: true, data: basic });
         },
         onCancelPublish: () => {
           Modal.confirm({
@@ -153,7 +153,7 @@ const ProcessDetail = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    if (release_num && query?.subTab == 'server') {
+    if (release_num && query?.subTab == 'server' && query.tab == 'process') {
       Modal.destroyAll?.();
       setErrorTips('');
       init();
@@ -260,7 +260,7 @@ const ProcessDetail = (props: any, ref: any) => {
         : type == 'repair'
         ? repairRef?.current?.getSelectedRows()
         : selectedRowKeys;
-    if (isEmpty(gridSelected)) return infoMessage('请先选择需移除的服务！');
+    if (isEmpty(gridSelected)) return infoMessage('请先勾选移除项！');
     if (type == 'server' && gridSelected?.some((it) => it.is_sealing == 'yes'))
       return infoMessage('已封版服务不能移除！');
     Modal.confirm({

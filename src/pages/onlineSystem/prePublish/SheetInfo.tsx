@@ -345,7 +345,7 @@ const SheetInfo = (props: any, ref: any) => {
       ev.preventDefault();
       ev.returnValue = '离开提示';
     };
-    if (leaveShow && query.subTab == 'sheet') {
+    if (leaveShow && query.subTab == 'sheet' && query.tab == 'process') {
       window.addEventListener('beforeunload', listener);
     }
     return () => {

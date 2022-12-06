@@ -425,10 +425,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
     setDisabled(true);
     await props.onOk?.({
       main_branch: values?.main_branch?.join(',') ?? '',
-      main_since: moment(values.main_since)
-        .add(5, 'day')
-        .startOf('d')
-        .format('YYYY-MM-DD HH:mm:ss'),
+      main_since: moment(values.main_since).add(5, 'day').startOf('d').format('YYYY-MM-DD'),
       auto_data: Object.keys(AutoCheckType)?.map((v: string) => ({
         check_type: v,
         check_result: values.auto_data?.includes(v) ? 'yes' : 'no',
@@ -477,7 +474,6 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
               options={Object.keys(AutoCheckType).map((v) => ({
                 label: AutoCheckType[v],
                 value: v,
-                key: v,
               }))}
             />
           </Form.Item>

@@ -585,6 +585,7 @@ const SheetInfo = (props: any, ref: any) => {
               operation: (p: CellClickedEvent) => (
                 <Space size={8}>
                   <img
+                    title={'编辑'}
                     src={require('../../../../public/edit.png')}
                     style={{
                       width: 18,
@@ -598,6 +599,7 @@ const SheetInfo = (props: any, ref: any) => {
                   />
                   {DragIcon(p)}
                   <img
+                    title={'日志'}
                     src={require('../../../../public/logs.png')}
                     style={{
                       width: 18,
@@ -636,6 +638,7 @@ export default forwardRef(SheetInfo);
 
 const EditModal = (props: ModalFuncProps & { data: any }) => {
   const [form] = Form.useForm();
+  const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
 
   const onConfirm = async () => {
     const values = await form.validateFields();
@@ -659,6 +662,7 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
       onOk={onConfirm}
       maskClosable={false}
       destroyOnClose
+      okButtonProps={{ disabled: globalState.finished }}
     >
       <Form form={form} labelCol={{ span: 6 }}>
         <Form.Item label={'接口服务'} name={'api_server'}>
@@ -672,7 +676,12 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
           name={'concurrent'}
           rules={[{ message: '请填写并发数', required: true }]}
         >
-          <InputNumber style={{ width: '100%' }} min={0} max={99999999} />
+          <InputNumber
+            style={{ width: '100%' }}
+            min={0}
+            max={99999999}
+            disabled={globalState.finished}
+          />
         </Form.Item>
       </Form>
     </Modal>

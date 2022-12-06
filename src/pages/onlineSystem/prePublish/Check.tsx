@@ -465,7 +465,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
       const data = res?.branch_check_data;
       form.setFieldsValue({
         main_branch: data?.main_branch ? data?.main_branch?.split(',') : [],
-        main_since: data?.main_since ? moment(data?.main_since).subtract(5, 'days') : undefined,
+        main_since: data?.main_since ? moment(data?.main_since) : undefined,
         auto_data: isEmpty(res?.auto_data)
           ? []
           : res?.auto_data?.flatMap((it: any) => (it.check_result == 'yes' ? [it.check_type] : [])),
@@ -506,7 +506,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
     setDisabled(true);
     await props.onOk?.({
       main_branch: values?.main_branch?.join(',') ?? '',
-      main_since: moment(values.main_since).add(5, 'day').startOf('d').format('YYYY-MM-DD'),
+      main_since: moment(values.main_since).format('YYYY-MM-DD'),
       auto_data: Object.keys(AutoCheckType)?.map((v: string) => ({
         check_type: v,
         check_result: values.auto_data?.includes(v) ? 'yes' : 'no',

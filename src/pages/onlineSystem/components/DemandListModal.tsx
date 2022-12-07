@@ -129,14 +129,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       release_env: values.release_env,
       release_env_type: values.release_env_type,
       branch: computed.branch,
-      pro_data: list
-        .filter((it) => selected.includes(it.story))
-        ?.map((o) => ({
-          pro_id: o.pro_id,
-          story_num: o.story,
-          is_hot_update: o.is_update,
-          apps: o.apps,
-        })),
+      pro_data: selected.map((o) => ({
+        pro_id: o.pro_id,
+        story_num: o.story,
+        is_hot_update: o.is_update,
+        apps: o.apps,
+      })),
       release_num: release_num ?? '',
       release_name: `${release_num}${name}`,
       plan_release_time: time,

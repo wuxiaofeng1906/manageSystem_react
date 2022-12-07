@@ -17,7 +17,7 @@ const tabs = [
   // { name: '发布', comp: Publish, key: 'publish' },
 ];
 const Layout = () => {
-  const query = useLocation()?.query;
+  const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
   const [globalState, setGlobalState] = useModel('onlineSystem', (online) => [
     online.globalState,
@@ -53,7 +53,7 @@ const Layout = () => {
   const updateHref = (key?: string) =>
     history.replace({
       pathname: history.location.pathname,
-      query: { tab: query.tab ?? 'process', subTab: key ?? 'server' },
+      query: { tab: tab ?? 'process', subTab: key ?? 'server' },
     });
 
   const onExtra = async (fn: Function) => {
@@ -68,6 +68,7 @@ const Layout = () => {
   };
 
   const checkStatus = useMemo(() => {
+    if (tab !== 'process') return {};
     const flag = globalState.locked || globalState.finished;
     return {
       disableStyle: flag
@@ -75,10 +76,10 @@ const Layout = () => {
         : { cursor: touched ? 'not-allowed' : 'pointer' },
       flag,
     };
-  }, [globalState, touched]);
+  }, [globalState, touched, tab, subTab]);
 
   const renderTabContent = useMemo(() => {
-    if (query.subTab == 'server')
+    if (subTab == 'server')
       return (
         <Space size={10}>
           <BarsOutlined
@@ -87,7 +88,7 @@ const Layout = () => {
               ref.current?.onShow?.();
             }}
             title={'需求列表'}
-            style={{ color: '#0079ff', fontSize: 16, ...checkStatus.disableStyle }}
+            style={{ color: '#0079ff', fontSize: 16, ...checkStatus?.disableStyle }}
           />
           <Button
             size={'small'}
@@ -100,16 +101,16 @@ const Layout = () => {
             title={'刷新'}
             spin={touched}
             onClick={() => onExtra(ref.current?.onRefresh)}
-            style={{ color: '#0079ff', fontSize: 16, ...checkStatus.disableStyle }}
+            style={{ color: '#0079ff', fontSize: 16, ...checkStatus?.disableStyle }}
           />
         </Space>
       );
-    else if (query.subTab == 'check')
+    else if (subTab == 'check')
       return (
         <Space size={10}>
           <Button
             size={'small'}
-            disabled={checkStatus.flag || touched}
+            disabled={checkStatus?.flag || touched}
             onClick={() => onExtra(ref.current?.onSetting)}
           >
             检查参数设置
@@ -117,7 +118,7 @@ const Layout = () => {
           <Button
             size={'small'}
             onClick={() => onExtra(ref.current?.onCheck)}
-            disabled={checkStatus.flag || touched}
+            disabled={checkStatus?.flag || touched}
           >
             一键执行检查
           </Button>
@@ -134,11 +135,11 @@ const Layout = () => {
               }
             }}
           >
-            {checkStatus.flag ? '取消封版锁定' : '封版锁定'}
+            {checkStatus?.flag ? '取消封版锁定' : '封版锁定'}
           </Button>
           <SyncOutlined
             title={'刷新'}
-            style={{ color: '#0079ff', fontSize: 16, ...checkStatus.disableStyle }}
+            style={{ color: '#0079ff', fontSize: 16, ...checkStatus?.disableStyle }}
             onClick={() => onExtra(ref.current?.onRefreshCheck)}
           />
         </Space>
@@ -159,12 +160,12 @@ const Layout = () => {
           </Button>
         </div>
       );
-  }, [release_num, query.subTab, globalState, touched]);
+  }, [release_num, tab, subTab, globalState, touched]);
 
   return (
     <div className={styles.prePublish}>
       <Tabs
-        activeKey={query.subTab}
+        activeKey={subTab}
         onChange={updateHref}
         animated={false}
         className={styles.onlineTab}

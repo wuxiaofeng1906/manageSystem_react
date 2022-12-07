@@ -112,6 +112,11 @@ const Check = (props: any, ref: any) => {
       release_num,
       release_sealing: globalState.locked ? 'no' : 'yes',
     });
+    setGlobalState({
+      ...globalState,
+      locked: !globalState.locked,
+      step: globalState.locked ? 1 : 2,
+    });
     // 封版自动跳转工单页
     if (!globalState.locked) {
       history.replace({
@@ -119,7 +124,6 @@ const Check = (props: any, ref: any) => {
         query: { tab, subTab: 'sheet' },
       });
     }
-    setGlobalState({ ...globalState, locked: !globalState.locked, step: 2 });
   };
 
   const getDetail = async (isRefresh = false) => {

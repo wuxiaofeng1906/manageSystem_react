@@ -12,7 +12,7 @@ import {
   FundTwoTone,
 } from '@ant-design/icons';
 import { getHeight } from '@/publicMethods/pageSet';
-import type { IStaticBy, IIdentity } from '@/hooks/statistic';
+import type { IStaticBy, IIdentity, Period } from '@/hooks/statistic';
 import { useStatistic } from '@/hooks/statistic';
 import { isEmpty, isString } from 'lodash';
 import type { ColumnsType } from 'antd/lib/table/interface';
@@ -28,6 +28,7 @@ interface IStatic {
   unit?: string;
   initFilter?: IStaticBy[];
   columnDefs?: any[];
+  period?: Period;
 }
 
 type INode = string | React.ReactNode;
@@ -53,6 +54,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   unit = '%',
   initFilter = ['week', 'month', 'quarter', 'year'],
   columnDefs,
+  period,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -72,7 +74,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showDenominator, len });
+    await handleStaticBy({ request, type, identity, showDenominator, len, period });
   };
 
   useEffect(() => {

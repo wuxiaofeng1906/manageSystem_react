@@ -122,7 +122,7 @@ const findParent = (departments: any[], dept: any, result: any) => {
   departments.forEach((item: any) => {
     if (item['deptName'] && deptName) {
       if (dept.dept == item.dept) {
-        const parentName = item['parent'].deptName;
+        const parentName = item['parent']?.deptName;
         if (parentName !== '北京企企科技有限公司') {
           // 过滤 北京企企科技有限公司
           result.unshift(parentName);
@@ -236,7 +236,7 @@ export const formatTreeData = ({
 
     // department
     const departments = elements.datas;
-    departments.forEach((dept: any) => {
+    departments?.forEach((dept: any) => {
       // 显示分子分母
       const denominator = showDenominator
         ? {
@@ -302,6 +302,7 @@ export const formatTreeData = ({
       }
     });
   });
+
   return converseArrayToOne(result);
 };
 export const checkLogin = () => {
@@ -333,7 +334,6 @@ export const formatD = (origin: any[]) => {
         let groups: string[] = [dept.deptName];
         findParent(departments, dept, groups);
         if (checkTesterGroup(groups)) return;
-        console.log(startTime, it.range);
         result.push({
           Group: groups,
           isDept: true,

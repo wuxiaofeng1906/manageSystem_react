@@ -22,10 +22,13 @@ export type IIdentity =
   | 'REFER'
   | 'ALL'
   | 'EXCLUDE_ONLINE';
+export type Period = 'period' | 'uptoperiod';
+
 export interface IRequest {
   request: (data: IStatisticQuery) => void;
   type: IStaticBy;
   identity?: IIdentity;
+  period?: Period;
   showDenominator?: boolean;
   len?: number;
 }
@@ -41,6 +44,7 @@ export const useStatistic = () => {
     identity,
     showDenominator = false,
     len,
+    period,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     renderColumn(type, showDenominator, len);
@@ -53,6 +57,7 @@ export const useStatistic = () => {
         params: type,
         identity,
         showDenominator,
+        period,
       });
       setRowData(data);
       setLoading(loading);

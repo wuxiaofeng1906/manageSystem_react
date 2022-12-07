@@ -1,14 +1,14 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import { formatD, formatTreeData } from '@/utils/utils';
-import { IStaticBy } from '@/hooks/statistic';
-import ConvergenceBugRate from '@/pages/kpi/performance/testers/convergenceBugRate';
+import { formatTreeData } from '@/utils/utils';
+import { IIdentity, IStaticBy } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
   client: GqlClient<object>;
   params: IStaticBy;
-  identity?: 'DEVELOPER' | 'TESTER';
+  identity?: IIdentity;
   showDenominator?: boolean;
+  period?: Period;
 }
 interface StaticOther {
   client: GqlClient<object>;
@@ -331,6 +331,72 @@ const StatisticServices = {
           }
         }
       }
+  `);
+    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+  },
+  // 线上p0p1占比 (6个指标)
+  async roundsP0P1TestRate({ client, params, identity, period }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:testBugP0P1PropDept(kind: "${condition.typeFlag}", ends: ${condition.ends},thous:${identity},period:"${period}") {
+        total{
+            dept
+            deptName
+            kpi
+             sideKpi{
+              numerator
+              denominator
+            }
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
+            }
+           sideKpi{
+            numerator
+            denominator
+            }
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+  },
+
+  async operationsAvgAvailable({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:devopsSeveralSysKpis(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        category
+        datas{
+          range{
+            start
+            end
+          }
+        depts{
+          dept
+          deptName
+          kpi
+          side{
+            numerator
+            denominator
+          }
+        }
+      }
+    }
+  }
   `);
     return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
   },

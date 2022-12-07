@@ -11,7 +11,6 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
 import IStaticPerformance, { IDrawer } from '@/components/IStaticPerformance';
 import { formatD } from '@/utils/utils';
-import { omit } from 'lodash';
 
 const ruleData: IRuleData[] = [
   {

@@ -163,6 +163,7 @@ const Check = (props: any, ref: any) => {
             open_pm: currentKey?.[it.open_pm] || '',
             open_time: currentKey?.[it.open_time] || '',
             log: currentKey?.[it.log] || '',
+            source: currentKey?.data_from ?? '',
           };
         }),
       );

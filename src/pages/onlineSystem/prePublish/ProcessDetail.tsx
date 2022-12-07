@@ -182,11 +182,11 @@ const ProcessDetail = (props: any, ref: any) => {
       title: `${flag ? '' : '解除'}锁定分支提示`,
       content: (
         <div>
-          请确认是否将该服务
+          请确认是否将对应服务的分支
           <strong style={{ color: flag ? '#52c41a' : '#fe7b00cf' }}>
-            {flag ? '' : '解除'}锁定分支
+            {flag ? '' : '解除'}锁定
           </strong>
-          ?
+          ？
           <Form
             form={sealForm}
             hidden={!includeAppsGlobal}

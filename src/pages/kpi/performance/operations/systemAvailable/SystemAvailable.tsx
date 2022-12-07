@@ -1,6 +1,8 @@
 import React from 'react';
 import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
+import {isEmpty} from "lodash";
+import {AgGridReact} from "ag-grid-react";
 // 累计线上千行bug率 -p0p1占比
 const ruleData: IRuleData[] = [
   {
@@ -18,12 +20,38 @@ const ruleData: IRuleData[] = [
 ];
 const SystemAvailable: React.FC<any> = () => {
   return (
-    <IStaticPerformance
-      ruleData={ruleData}
-      request={StatisticServices.operationsAvgAvailable}
-      len={4}
-      unit={'%'}
-    />
+    <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+
+        <AgGridReact
+          defaultColDef={{
+            resizable: true,
+            sortable: true,
+            filter: true,
+            flex: 1,
+            suppressMenu: true,
+          }}
+          autoGroupColumnDef={{
+            minWidth: 280,
+            headerName: '部门-人员',
+            cellRendererParams: { suppressCount: true },
+            pinned: 'left',
+            suppressMenu: false,
+          }}
+          pivotMode={true}
+          columnDefs={columnDefs ?? columns}
+          rowData={rowData}
+          rowHeight={32}
+          headerHeight={35}
+          onGridReady={onGridReady}
+          treeData={true}
+          animateRows={true}
+          groupDefaultExpanded={-1}
+          getDataPath={(source: any) => {
+            return source.Group;
+          }}
+        />
+      )}
+    </div>
   );
 };
 

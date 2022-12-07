@@ -295,6 +295,18 @@ const Check = (props: any, ref: any) => {
               ),
             },
             {
+              title: '数据来源',
+              dataIndex: 'source',
+              width: 100,
+              align: 'center',
+            },
+            {
+              title: '请联系',
+              dataIndex: 'contact',
+              width: 100,
+              align: 'center',
+            },
+            {
               title: '所属端',
               dataIndex: 'side',
               width: 90,

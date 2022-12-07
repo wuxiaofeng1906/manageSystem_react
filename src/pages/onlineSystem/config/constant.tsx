@@ -80,6 +80,8 @@ export const checkInfo = [
     disabled: false,
     rowKey: 'front_test_unit', // 接口参数取值
     api_url: 'test-unit', // 批量检查接口地址
+    source: '',
+    contact: '',
   },
   {
     check_type: '前端图标一致性检查是否通过',
@@ -94,6 +96,8 @@ export const checkInfo = [
     disabled: false,
     rowKey: 'icon_check',
     api_url: 'icon-check',
+    source: '',
+    contact: '',
   },
   {
     check_type: '前端代码遗漏检查是否通过',
@@ -108,6 +112,8 @@ export const checkInfo = [
     disabled: false,
     rowKey: 'front_version_data',
     api_url: 'version-check',
+    source: '',
+    contact: '',
   },
   {
     check_type: '前端服务git分支是否封版',
@@ -122,6 +128,8 @@ export const checkInfo = [
     rowKey: 'front_seal_data',
     disabled: false,
     api_url: 'sealing-version-check',
+    source: '',
+    contact: '',
   },
   {
     check_type: '后端单元测试运行是否通过',
@@ -136,6 +144,8 @@ export const checkInfo = [
     rowKey: 'backend_test_unit',
     disabled: false,
     api_url: 'test-unit',
+    source: '',
+    contact: '',
   },
   {
     check_type: '后端代码遗漏检查是否通过',
@@ -150,6 +160,8 @@ export const checkInfo = [
     disabled: false,
     rowKey: 'backend_version_data',
     api_url: 'version-check',
+    source: '',
+    contact: '',
   },
   {
     check_type: '构建时间对比校验是否通过',
@@ -164,20 +176,9 @@ export const checkInfo = [
     disabled: false,
     rowKey: 'libray_data',
     api_url: 'create-libray',
+    source: '',
+    contact: '',
   },
-  // {
-  //   check_type: '数据库升级验证是否通过',
-  //   side: 'backend',
-  //   status: 'version',
-  //   start: '',
-  //   end: '',
-  //   open: false,
-  //   open_pm: '',
-  //   open_time: '',
-  //   log: '',
-  //   rowKey: 'access',
-  //   disabled: false,
-  // },
   {
     check_type: '后端环境一致性检查是否通过',
     side: 'backend',
@@ -191,6 +192,8 @@ export const checkInfo = [
     rowKey: 'env_data',
     disabled: false,
     api_url: 'env-check',
+    source: '',
+    contact: '',
   },
   {
     check_type: '后端是否可以热更新',
@@ -205,6 +208,8 @@ export const checkInfo = [
     rowKey: 'hot_data',
     disabled: false,
     api_url: 'hot-update-check',
+    source: '',
+    contact: '',
   },
   {
     check_type: '后端服务git分支是否封版',
@@ -219,6 +224,8 @@ export const checkInfo = [
     rowKey: 'backend_seal_data',
     disabled: false,
     api_url: 'sealing-version-check',
+    source: '',
+    contact: '',
   },
   {
     check_type: '上线前检查checklist是否检查完成',
@@ -233,6 +240,8 @@ export const checkInfo = [
     rowKey: 'check_list_data',
     disabled: false,
     api_url: 'zt-check-list',
+    source: '',
+    contact: '',
   },
   {
     check_type: '需求阶段是否满足条件（需要测试需达到测试完毕/无需测试需要开发完毕）',
@@ -246,6 +255,8 @@ export const checkInfo = [
     log: 'check_log',
     rowKey: 'story_data',
     api_url: 'story-status',
+    source: '',
+    contact: '',
   },
   {
     check_type: 'previewsql是否已执行',
@@ -260,6 +271,8 @@ export const checkInfo = [
     rowKey: 'preview_sql_data',
     disabled: false,
     api_url: 'preview-sql',
+    source: '',
+    contact: '',
   },
   {
     check_type: 'web/h5部署时是否勾选自动化测试参数',
@@ -274,6 +287,8 @@ export const checkInfo = [
     log: '',
     rowKey: 'auto_h5_web_data',
     api_url: 'web-h5-automation',
+    source: '',
+    contact: '',
   },
   {
     check_type: '升级前自动化检查是否通过',
@@ -288,6 +303,8 @@ export const checkInfo = [
     disabled: true,
     rowKey: 'auto_obj_data', // 数组结构
     api_url: 'auto-check',
+    source: '',
+    contact: '',
   },
 ];
 // 日志弹窗

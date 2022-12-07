@@ -294,7 +294,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const memoEdit = useMemo(
     () => ({
       global: globalState.locked || globalState.finished,
-      disabled: !isEmpty(props.data?.release_num),
+      update: !isEmpty(props.data?.release_num), // 新增、修改
     }),
     [globalState, props.data],
   );
@@ -307,11 +307,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       maskClosable={false}
       destroyOnClose={true}
       width={1400}
-      title={`${memoEdit.disabled ? '修改' : '新增'}发布批次：选择该批次发布的项目与需求`}
+      title={`${memoEdit.update ? '修改' : '新增'}发布批次：选择该批次发布的项目与需求`}
       wrapClassName={styles.DemandListModal}
       onCancel={() => props.onOk?.()}
       footer={[
-        <Button onClick={showLog} hidden={!memoEdit.disabled}>
+        <Button onClick={showLog} hidden={!memoEdit.update}>
           查看日志
         </Button>,
         <Button onClick={() => props.onOk?.()}>取消</Button>,
@@ -331,7 +331,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   rules={[{ required: true, message: '请选择发布类型！' }]}
                 >
                   <Select
-                    disabled={memoEdit.disabled}
+                    disabled={memoEdit.update}
                     options={[
                       { label: '非积压发布', value: '1' },
                       { label: '灰度推线上', value: '2' },
@@ -348,7 +348,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   >
                     <Select
                       options={branchs}
-                      disabled={memoEdit.disabled}
+                      disabled={memoEdit.update}
                       placeholder={'上线分支'}
                       showSearch
                       allowClear
@@ -371,7 +371,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     >
                       <Select
                         placeholder={'发布环境类型'}
-                        disabled={memoEdit.disabled}
+                        disabled={memoEdit.update}
                         options={Object.keys(ClusterType).map((k) => ({
                           label: ClusterType[k],
                           value: k,
@@ -397,9 +397,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                               mode={'multiple'}
                               options={envs}
                               disabled={
-                                memoEdit.global ||
-                                env == 'global' ||
-                                (memoColumn?.isSprint && env == 'tenant')
+                                memoEdit.update
+                                  ? memoEdit.global
+                                  : memoEdit.update ||
+                                    env == 'global' ||
+                                    (memoColumn?.isSprint && env == 'tenant')
                               }
                               placeholder={'发布集群'}
                             />
@@ -418,7 +420,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                         showSearch
                         options={branchEnv}
                         placeholder={'镜像环境绑定'}
-                        disabled={memoEdit.global}
+                        disabled={memoEdit.update ? memoEdit.global : memoEdit.update}
                       />
                     </Form.Item>
                   </Col>
@@ -436,7 +438,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     selectedRowKeys: selected,
                     onChange: (selectedRowKeys) => setSelected(selectedRowKeys),
                     getCheckboxProps: (record) => ({
-                      disabled: memoEdit.global || record.disabled,
+                      disabled: memoEdit.update
+                        ? memoEdit.global
+                        : memoEdit.update || record.disabled,
                     }),
                   }}
                 />

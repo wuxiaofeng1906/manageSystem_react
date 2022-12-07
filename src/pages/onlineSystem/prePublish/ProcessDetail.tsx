@@ -83,6 +83,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const interfaceRef = useRef<GridApi>();
   const repairRef = useRef<GridApi>();
   const [form] = Form.useForm();
+  const [sealForm] = Form.useForm();
 
   const [pages, setPages] = useState({
     page_size: 20,
@@ -154,7 +155,7 @@ const ProcessDetail = (props: any, ref: any) => {
     }
   }, [basic, repair]);
 
-  const onSeal = async (flag = 'yes') => {
+  const onSeal = async (flag = true) => {
     let tips = '请选择未封版服务进行封版';
     if (!flag) tips = '请选择已封版服务进行解除封版';
     if (isEmpty(selectedRowKeys)) return infoMessage(`请先选择需${flag ? '' : '解除'}封版服务`);
@@ -167,22 +168,68 @@ const ProcessDetail = (props: any, ref: any) => {
       if (!confirmSide.includes(it.side)) noConfirmSide.push(ServerConfirmType[it.side]);
     });
     if (selectedRowKeys?.some((it) => it.is_sealing == flag)) return infoMessage(tips);
+    // 判断是否有apps、global 服务
+    // const includeAppsGlobal =
+    //   flag && selectedRowKeys?.some((it) => ['apps', 'global'].includes(it.apps));
+    const includeAppsGlobal = false;
+
     // 判断对应侧是否确认
     if (!isEmpty(noConfirmSide))
       return infoMessage(`『${uniq(noConfirmSide)?.join()}』对应侧服务未确认，请先确认后再锁定`);
     Modal.confirm({
-      title: `${flag ? '' : '解除'}封版提示`,
-      content: `请确认是否将该服务${flag ? '' : '解除'}封版?`,
+      centered: true,
+      width: 500,
+      title: `${flag ? '' : '解除'}锁定分支提示`,
+      content: (
+        <div>
+          请确认是否将该服务
+          <strong style={{ color: flag ? '#52c41a' : '#fe7b00cf' }}>
+            {flag ? '' : '解除'}锁定分支
+          </strong>
+          ?
+          <Form
+            form={sealForm}
+            hidden={!includeAppsGlobal}
+            size={'small'}
+            autoComplete={'off'}
+            style={{ marginTop: 10 }}
+            className={styles.resetForm}
+          >
+            <Form.Item
+              name={'is_build'}
+              label={'是否构建编译'}
+              rules={[{ message: '请填写是否构建编译', required: includeAppsGlobal }]}
+            >
+              <Select
+                placeholder={'是否构建编译'}
+                options={Object.keys(WhetherOrNot)?.map((it) => ({
+                  label: WhetherOrNot[it],
+                  value: it,
+                }))}
+              />
+            </Form.Item>
+            <Form.Item
+              name={'version'}
+              label={'前端预制数据版本号'}
+              rules={[{ message: '请填写前端预制数据版本号', required: includeAppsGlobal }]}
+            >
+              <Input placeholder={'前端预制数据版本号'} />
+            </Form.Item>
+          </Form>
+        </div>
+      ),
       onOk: async () => {
+        const values = await sealForm.validateFields();
         try {
           setLoading(true);
           reset();
           // 1.校验测试用例是否通过
-          if (flag == 'yes') {
+          if (flag) {
             try {
               await OnlineSystemServices.sealingCheck({
                 apps: selectedRowKeys?.map((it) => it.apps)?.join(',') ?? '',
                 release_num,
+                ...values,
               });
             } catch (e) {
               if (e?.code == 4001 && e?.msg) {
@@ -191,7 +238,7 @@ const ProcessDetail = (props: any, ref: any) => {
                   title: '测试用例未通过',
                   content: '该服务测试用例未通过,是否前往检查页，设置忽略检查测试用例？',
                   okText: '确定',
-                  onOk: (p) =>
+                  onOk: () =>
                     history.replace({
                       pathname: history.location.pathname,
                       query: { tab, subTab: 'check' },
@@ -205,7 +252,7 @@ const ProcessDetail = (props: any, ref: any) => {
             {
               user_id: user?.userid ?? '',
               app_id: selectedRowKeys?.map((it) => it._id)?.join(',') ?? '',
-              is_seal: flag == 'yes',
+              is_seal: flag,
             },
             { release_num },
           );
@@ -446,10 +493,10 @@ const ProcessDetail = (props: any, ref: any) => {
         </Form>
         <div className={styles.tableHeader}>
           <h4>二、应用服务</h4>
-          <Button size={'small'} onClick={() => onSeal('yes')} disabled={hasEdit}>
+          <Button size={'small'} onClick={() => onSeal(true)} disabled={hasEdit}>
             锁定分支
           </Button>
-          <Button size={'small'} onClick={() => onSeal('no')} disabled={hasEdit}>
+          <Button size={'small'} onClick={() => onSeal(false)} disabled={hasEdit}>
             解除锁定分支
           </Button>
           <Button

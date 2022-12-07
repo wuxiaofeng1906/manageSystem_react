@@ -92,34 +92,28 @@ export function valueMap(option: IRecord[], values: string[]) {
   return result;
 }
 
-// 合并行数据【可隐藏子项】
-export const mergeCellsTable = (data: any[], field: string, hide = false) => {
-  let repeat = 0; //重复项的第一项
-  let nextCurrent = 1; //下一项
-  let number = 1; // 序号【表格thead】
-  while (nextCurrent < data.length) {
-    let item = data.slice(repeat, repeat + 1)[0];
-    if (!item['rowSpan']) {
-      item['rowSpan'] = 1; //初始化为1
-      item['num'] = number;
-    }
-    //第一个对象与后面的对象相比，有相同项就累加，并且后面相同项设置为0
-    if (item[field] === data[nextCurrent][field]) {
-      if (hide) {
-        item['rowSpan'] = 1;
-      } else {
-        item['rowSpan']++;
+// 合并行数据
+export function mergeCellsTable(data: any[], key: string, rowspan: string = 'rowSpan') {
+  if (isEmpty(data)) return [];
+  return data
+    .reduce((result, item) => {
+      // 首先将字段作为新数组result取出
+      if (result.indexOf(item[key]) < 0) {
+        result.push(item[key]);
       }
-      data[nextCurrent]['rowSpan'] = 0;
-    } else {
-      number++;
-      data[nextCurrent]['num'] = number;
-      repeat = nextCurrent;
-    }
-    nextCurrent++;
-  }
-  return data;
-};
+      return result;
+    }, [])
+    .reduce((res: any, name: any) => {
+      const children = data.filter((item) => item[key] === name);
+      res = res.concat(
+        children.map((item, index) => ({
+          ...item,
+          [rowspan]: index === 0 ? children.length : 0, // 将第一行数据添加rowSpan字段
+        })),
+      );
+      return res;
+    }, []);
+}
 
 const findParent = (departments: any[], dept: any, result: any) => {
   const deptName = dept.deptName;

@@ -1,7 +1,22 @@
 .DemandListModal{
-  :global{
-    .ant-table-thead > tr > th, .ant-table-tbody > tr > td, .ant-table tfoot > tr > th, .ant-table tfoot > tr > td{
-      padding:5px 16px;
+  .onlineTable{
+    :global{
+
+      .ant-table,table,.table{
+        max-width:100%;
+        overflow: auto;
+      }
+      th, td {
+        white-space: nowrap;
+        padding:5px 10px;
+        min-width: 155px;
+        width: 155px;
+      }
+      td{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
     }
   }
 }

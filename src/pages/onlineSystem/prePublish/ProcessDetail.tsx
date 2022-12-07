@@ -95,7 +95,7 @@ const ProcessDetail = (props: any, ref: any) => {
     ref,
     () => ({
       onShow: () => {
-        if (basic.branch) setStoryModal({ visible: true, data: basic });
+        if (basic.branch) setStoryModal({ visible: true, data: { ...basic, server } });
       },
       onCancelPublish,
       onRefresh: () => init(true),
@@ -425,7 +425,12 @@ const ProcessDetail = (props: any, ref: any) => {
             保存
           </Button>
         </div>
-        <Form size={'small'} className={styles.resetForm} form={form} autoComplete="off">
+        <Form
+          size={'small'}
+          className={styles.resetForm + ' no-wrap-form'}
+          form={form}
+          autoComplete="off"
+        >
           <Row justify={'space-between'} gutter={8}>
             <Col span={10}>
               <Form.Item
@@ -511,7 +516,7 @@ const ProcessDetail = (props: any, ref: any) => {
         <Checkbox
           disabled={hasEdit}
           checked={checked}
-          style={{ marginLeft: 8 }}
+          style={{ marginLeft: 26 }}
           onChange={({ target }) => {
             setSelectedRowKeys(target.checked ? server : []);
             setChecked(target.checked);
@@ -537,6 +542,7 @@ const ProcessDetail = (props: any, ref: any) => {
             dataSource={memoGroup.table}
             columns={serverColumn}
             pagination={false}
+            bordered
             scroll={{ y: 400, x: 'min-content' }}
             rowSelection={{
               selectedRowKeys: selectedRowKeys?.map((it) => +it._id),

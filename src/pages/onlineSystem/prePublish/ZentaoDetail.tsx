@@ -20,6 +20,7 @@ import { initGridTable } from '@/utils/utils';
 import { useLocation, useParams } from 'umi';
 
 const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'key', allowClear: true };
+const initFilter = ['未开始', '进行中', '开发完', '测试中'];
 
 const ZentaoDetail = (props: any, ref: any) => {
   const client = useGqlClient();
@@ -159,7 +160,6 @@ const ZentaoDetail = (props: any, ref: any) => {
         result = findCondition(result, v, key);
       });
     }
-    console.log(result);
     if (flag) {
       setStoryData(result);
       setPages({ page: 1, page_size: 20, total: result?.length });
@@ -188,6 +188,9 @@ const ZentaoDetail = (props: any, ref: any) => {
   };
 
   const getTableList = async (force = false) => {
+    storyForm.setFieldsValue({
+      stage: initFilter,
+    });
     try {
       setSpin(true);
       const res = await OnlineSystemServices.getOnlineCalendarList(client, { branch, force });
@@ -198,6 +201,7 @@ const ZentaoDetail = (props: any, ref: any) => {
       let assignTo: Record<string, any> = {}; // 指派给
       let execution: Record<string, any> = {}; // 归属执行
       let org: Record<string, any> = {}; // 部门
+      let initData: any[] = [];
 
       res?.forEach((it: any) => {
         const assignToItem = it.assignedTo;
@@ -227,12 +231,14 @@ const ZentaoDetail = (props: any, ref: any) => {
           },
         };
         ztNo.push({ key: it.ztNo, value: it.ztNo, label: it.ztNo });
+        if (initFilter.includes(it.stage?.show?.zh)) {
+          initData.push(it);
+        }
       });
-
+      setStoryData(initData);
       setRecordCount({ category, stage, ztNo, assignTo, execution, org });
-      setStoryData(res);
       setOriginStoryData(res);
-      setPages({ page: 1, page_size: 20, total: res?.length || 0 });
+      setPages({ page: 1, page_size: 20, total: initData?.length || 0 });
       setSpin(false);
     } catch (e) {
       setSpin(false);

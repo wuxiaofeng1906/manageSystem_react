@@ -52,6 +52,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         cluster: props.data.cluster?.split(','),
         release_env: props.data.release_env,
       });
+      setSelected(props.data?.server?.map((it: any) => `${it.storyNum}&${it.project}`));
     }
   }, [props.visible, props.data]);
 
@@ -82,7 +83,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       setList(
         res?.map((it: any) => ({
           ...it,
-          type: it.apps == 'global' ? 'global' : 'tenant',
+          type: it.apps.includes('global') ? 'global' : 'tenant',
         })),
       );
       setSpin(false);
@@ -168,7 +169,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         cluster: noRelate?.flatMap((it) => (it.cluster ? [it.cluster] : [])),
       });
     }
-    setList(list.map((it) => ({ ...it, disabled: it.type !== v })));
+    setList(
+      list.map((it) => ({ ...it, disabled: v == 'global' ? it.type !== v : it.apps == 'global' })),
+    );
   };
 
   const updateStatus = (data: any, status: string, index: number) => {
@@ -214,13 +217,16 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       column: [
         {
           title: '序号',
-          dataIndex: 'applicant',
           width: 70,
+          render: (_: any, r: any, i: number) => i + 1,
+          fixed: 'left',
         },
         {
           title: '禅道执行名称',
           dataIndex: 'pro_name',
           ellipsis: { showTitle: false },
+          width: 200,
+          fixed: 'left',
           render: (v: string) => (
             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
           ),
@@ -233,6 +239,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         {
           title: '需求标题',
           dataIndex: 'title',
+          width: 150,
           ellipsis: { showTitle: false },
           render: (v: string) => (
             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
@@ -256,6 +263,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         {
           title: '是否涉及数据update',
           dataIndex: 'db_update',
+          // width: 150,
           render: (v: string) => WhetherOrNot[v] ?? (v || ''),
         },
         {
@@ -306,7 +314,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       okText={'确定'}
       maskClosable={false}
       destroyOnClose={true}
-      width={1400}
+      width={1200}
       title={`${memoEdit.update ? '修改' : '新增'}发布批次：选择该批次发布的项目与需求`}
       wrapClassName={styles.DemandListModal}
       onCancel={() => props.onOk?.()}
@@ -429,14 +437,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               <div className={styles.onlineTable}>
                 <Table
                   size={'small'}
-                  scroll={{ y: 400, x: 'min-content' }}
+                  scroll={{ y: 400, x: 500 }}
                   pagination={false}
                   columns={memoColumn.column}
-                  rowKey={(p) => p.story}
+                  rowKey={(p) => `${p.story}&${p.pro_id}`}
                   dataSource={list}
                   rowSelection={{
-                    selectedRowKeys: selected,
-                    onChange: (selectedRowKeys) => setSelected(selectedRowKeys),
+                    selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
+                    onChange: (selectedRowKeys, selectedRows) => setSelected(selectedRows),
                     getCheckboxProps: (record) => ({
                       disabled: memoEdit.update
                         ? memoEdit.global

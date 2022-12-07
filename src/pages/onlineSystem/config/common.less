@@ -1,6 +1,6 @@
-.calendarList,.prePublish{
+.prePublish{
   margin-top: -10px;
-  padding: 15px 10px 10px;
+  padding: 0;
   background: white;
 }
 .profileAndProcess{
@@ -42,6 +42,9 @@
       border-radius: 6px;
       border:1px solid #f0f0f0;
       padding: 8px;
+      &:last-of-type{
+        margin-top: -8px;
+      }
       &:before{
         border-bottom: 0 ;
       }
@@ -131,6 +134,9 @@
       margin-bottom: 10px;
     }
   }
+}
+.no-wrap-form .ant-form-item-control{
+  min-width: 0 !important;
 }
 .bgForm{
   background: #eaf7ffd1;

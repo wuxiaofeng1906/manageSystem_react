@@ -293,12 +293,12 @@ export const upgradeServicesColumn: (ColDef | ColGroupDef)[] = [
     pinned: 'left',
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
-  { headerName: '接口服务', field: 'api_server', minWidth: 120 },
-  { headerName: '接口Method', field: 'api_method', minWidth: 110 },
+  { headerName: '接口服务', field: 'api_server', minWidth: 110, maxWidth: 110 },
+  { headerName: '接口Method', field: 'api_method', minWidth: 110, maxWidth: 110 },
   { headerName: '接口URL', field: 'api_url', minWidth: 110, tooltipField: 'api_url' },
   { headerName: 'Data', field: 'api_data', minWidth: 130, tooltipField: 'api_data' },
   { headerName: 'Header', field: 'api_header', minWidth: 110, tooltipField: 'api_header' },
-  { headerName: '租户ID', field: 'tenant', minWidth: 110 },
+  { headerName: '租户ID', field: 'tenant', minWidth: 100, maxWidth: 100 },
 ];
 export const repairColumn: (ColDef | ColGroupDef)[] = [
   {
@@ -316,12 +316,12 @@ export const repairColumn: (ColDef | ColGroupDef)[] = [
     pinned: 'left',
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
-  { headerName: '数据修复内容', field: 'title', tooltipField: 'title', minWidth: 120 },
-  { headerName: '涉及租户', field: 'tenant', minWidth: 100 },
-  { headerName: '类型', field: 'recovery_type', minWidth: 100 },
-  { headerName: '修复提交人', field: 'author', minWidth: 100 },
-  { headerName: '分支', field: 'branch', minWidth: 120 },
-  { headerName: 'sql详情', field: 'sql_detail', width: 90, cellRenderer: 'log' },
+  { headerName: '数据修复内容', field: 'title', tooltipField: 'title' },
+  { headerName: '涉及租户', field: 'tenant', minWidth: 100, maxWidth: 100 },
+  { headerName: '类型', field: 'recovery_type', minWidth: 100, maxWidth: 100 },
+  { headerName: '修复提交人', field: 'author', minWidth: 110, maxWidth: 110 },
+  { headerName: '分支', field: 'branch', minWidth: 110, maxWidth: 110 },
+  { headerName: 'sql详情', field: 'sql_detail', width: 90, maxWidth: 110, cellRenderer: 'log' },
 ];
 export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   {

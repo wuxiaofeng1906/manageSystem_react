@@ -7,7 +7,7 @@ export type LogType =
   | 'online_system_manage_release_basic' // 上线系统发布过程单基础信息
   | 'online_system_manage_release' // 需求列表
   | 'online_system_manage_release_project_app' // 上线系统应用服务
-  | 'online_system_manage_release_api' // 上线系统升级接口
+  | 'online_system_manage_rd_repair' // 工单-升级接口
   | 'online_system_manage_release_data' // 上线系统数据修复
   | 'online_system_manage_check_detail'; // 检查详情
 

@@ -248,7 +248,7 @@ const Check = (props: any, ref: any) => {
 
     return onLog({
       title: '检查日志',
-      log: String(v),
+      log: isEmpty(v) ? '' : String(v),
       noData: '暂无检查日志',
       content,
       width,
@@ -493,7 +493,9 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
       content: (
         <>
           {log?.map((it: any) => (
-            <div>{it.operation_content}</div>
+            <div>
+              {it.create_time} {it.operation_content}
+            </div>
           ))}
         </>
       ),

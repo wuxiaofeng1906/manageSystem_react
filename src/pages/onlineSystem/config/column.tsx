@@ -400,19 +400,25 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
   ];
 };
 export const PublishUpgradeColumn: (ColDef | ColGroupDef)[] = [
-  { headerName: '序号', minWidth: 110, cellRenderer: (params: any) => String(+params.node.id + 1) },
-  { headerName: '接口服务', field: 'api_server', minWidth: 110 },
-  { headerName: '接口Method', field: 'api_method', minWidth: 110 },
+  {
+    headerName: '序号',
+    minWidth: 70,
+    width: 70,
+    cellRenderer: (params: any) => String(+params.node.id + 1),
+  },
+  { headerName: '接口服务', field: 'api_server', minWidth: 110, width: 110 },
+  { headerName: '接口Method', field: 'api_method', minWidth: 110, width: 110 },
   { headerName: '接口URL', field: 'api_url', minWidth: 110 },
   { headerName: 'Data', field: 'api_data', minWidth: 110 },
   { headerName: 'Header', field: 'api_header', minWidth: 110 },
-  { headerName: '涉及租户', field: 'tenant', minWidth: 110 },
+  { headerName: '涉及租户', field: 'tenant', minWidth: 110, width: 110 },
   {
     headerName: '并发数',
     field: 'concurrent',
-    minWidth: 110,
+    minWidth: 100,
+    width: 100,
     headerClass: 'ag-required',
     valueFormatter: (p) => p.value ?? 20,
   },
-  { headerName: '操作', minWidth: 110, cellRenderer: 'operation' },
+  { headerName: '操作', minWidth: 90, width: 90, cellRenderer: 'operation' },
 ];

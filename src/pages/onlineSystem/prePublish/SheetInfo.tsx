@@ -26,7 +26,7 @@ import DragIcon from '@/components/DragIcon';
 import { infoMessage } from '@/publicMethods/showMessages';
 import { useModel } from '@@/plugin-model/useModel';
 import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/config/column';
-import { ClusterType, PublishWay, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
+import { ClusterType, onLog, PublishWay, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
 import { history, useLocation, useParams } from 'umi';
 import { Prompt } from 'react-router-dom';
 import { initGridTable } from '@/utils/utils';
@@ -36,7 +36,6 @@ import { OnlineSystemServices } from '@/services/onlineSystem';
 import moment from 'moment';
 import { isEmpty, omit, isString } from 'lodash';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { useRequest } from 'ahooks';
 import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
@@ -47,12 +46,16 @@ const SheetInfo = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
-  const [globalState, envs, sqlList, setGlobalState] = useModel('onlineSystem', (online) => [
-    online.globalState,
-    online.envs,
-    online.sqlList,
-    online.setGlobalState,
-  ]);
+  const [globalState, envs, sqlList, setGlobalState, getLogInfo] = useModel(
+    'onlineSystem',
+    (online) => [
+      online.globalState,
+      online.envs,
+      online.sqlList,
+      online.setGlobalState,
+      online.getLogInfo,
+    ],
+  );
 
   const [spinning, setSpinning] = useState(false);
   const [confirmDisabled, setConfirmDisabled] = useState(false);
@@ -326,6 +329,24 @@ const SheetInfo = (props: any, ref: any) => {
       history.replace('/onlineSystem/releaseProcess');
     }
   };
+  const showLog = async () => {
+    const res = await getLogInfo({ release_num, options_model: 'online_system_manage_rd_repair' });
+    onLog({
+      title: '工单接口日志',
+      log: isEmpty(res) ? '' : '工单',
+      noData: '暂无工单接口日志',
+      content: (
+        <div>
+          {res?.map((it: any, index) => (
+            <div key={index}>
+              {it.create_time}
+              {it.operation_content}
+            </div>
+          ))}
+        </div>
+      ),
+    });
+  };
 
   // 是否关联了公告
   const hasAnnouncement = useMemo(() => {
@@ -574,7 +595,19 @@ const SheetInfo = (props: any, ref: any) => {
             frameworkComponents={{ select: renderSelect }}
           />
         </div>
-        <h4 style={{ margin: '16px 0' }}>三、升级接口</h4>
+        <h4 style={{ margin: '16px 0' }}>
+          三、升级接口{' '}
+          <img
+            title={'日志'}
+            src={require('../../../../public/logs.png')}
+            style={{
+              width: 18,
+              height: 18,
+              cursor: 'pointer',
+            }}
+            onClick={showLog}
+          />
+        </h4>
         <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
           <AgGridReact
             rowDragManaged={!finished}
@@ -600,16 +633,6 @@ const SheetInfo = (props: any, ref: any) => {
                     }}
                   />
                   {DragIcon(p)}
-                  <img
-                    title={'日志'}
-                    src={require('../../../../public/logs.png')}
-                    style={{
-                      width: 18,
-                      height: 18,
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => {}}
-                  />
                 </Space>
               ),
             }}

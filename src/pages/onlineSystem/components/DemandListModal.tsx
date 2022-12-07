@@ -42,22 +42,21 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
     if (!isEmpty(props.data)) {
       const branch = props.data?.branch;
-      form.setFieldsValue({
-        release_env_type: props.data.release_env_type,
-        cluster: props.data.cluster?.split(','),
-        release_env: props.data.release_env,
-      });
       if (branch) {
         const result = { branch, type: '1' };
         baseForm.setFieldsValue(result);
         setComputed(result);
       }
+      form.setFieldsValue({
+        release_env_type: props.data.release_env_type,
+        cluster: props.data.cluster?.split(','),
+        release_env: props.data.release_env,
+      });
     }
   }, [props.visible, props.data]);
 
   useEffect(() => {
     if (computed?.branch) {
-      form.resetFields();
       getRelatedStory();
       getTableList();
     }
@@ -195,14 +194,17 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     onLog({
       title: '项目与需求日志',
       log: isEmpty(log) ? '' : '参数',
+      noData: '暂无项目与需求日志！',
       content: (
         <>
           {log?.map((it: any) => (
-            <div>{it.operation_content}</div>
+            <div>
+              {it.create_time}
+              {it.operation_content}
+            </div>
           ))}
         </>
       ),
-      noData: '暂无项目与需求日志！',
     });
   };
 
@@ -350,6 +352,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                       placeholder={'上线分支'}
                       showSearch
                       allowClear
+                      onChange={() => form.resetFields()}
                     />
                   </Form.Item>
                 </Col>

@@ -52,7 +52,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   showHalfYear = false,
   len,
   unit = '%',
-  initFilter = ['week', 'month', 'quarter', 'year'],
+  initFilter,
   columnDefs,
   period,
 }) => {
@@ -91,20 +91,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   return (
     <PageContainer>
       <div style={{ background: 'white' }}>
-        {condition.map((it) => {
-          return (
-            <Button
-              type="text"
-              style={{ color: 'black' }}
-              icon={it.icon}
-              size={'large'}
-              hidden={!initFilter?.includes(it.type)}
-              onClick={() => changeStaticBy(it.type)}
-            >
-              {`${it.title}统计`}
-            </Button>
-          );
-        })}
+        <ConditionHeader initFilter={initFilter} onChange={changeStaticBy} />
         <label style={{ fontWeight: 'bold' }}>(统计单位：{unit})</label>
         <Button
           type="text"
@@ -200,5 +187,31 @@ export const IDrawer = ({
         </div>
       ))}
     </Drawer>
+  );
+};
+export const ConditionHeader = ({
+  initFilter = ['week', 'month', 'quarter', 'year'],
+  onChange,
+}: {
+  initFilter: IStaticBy[];
+  onChange: (type: IStaticBy) => void;
+}) => {
+  return (
+    <>
+      {condition.map((it) => {
+        return (
+          <Button
+            type="text"
+            style={{ color: 'black' }}
+            icon={it.icon}
+            size={'large'}
+            hidden={!initFilter?.includes(it.type)}
+            onClick={() => onChange(it.type)}
+          >
+            {`${it.title}统计`}
+          </Button>
+        );
+      })}
+    </>
   );
 };

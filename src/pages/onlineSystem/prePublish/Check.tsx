@@ -26,6 +26,7 @@ import moment from 'moment';
 import { useLocation, useModel, history, useParams } from 'umi';
 import { ICheckType, OnlineSystemServices } from '@/services/onlineSystem';
 import dayjs from 'dayjs';
+import DutyListServices from '@/services/dutyList';
 
 const Check = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
@@ -38,6 +39,7 @@ const Check = (props: any, ref: any) => {
   ]);
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const [dutyPerson, setDutyPerson] = useState<any>();
   const [list, setList] = useState(() =>
     checkInfo.map((it) => ({
       ...it,
@@ -48,6 +50,7 @@ const Check = (props: any, ref: any) => {
       open_pm: '',
       open_time: '',
       log: '',
+      contact: '',
     })),
   );
   const [show, setShow] = useState<{ visible: boolean; data: any }>({
@@ -60,7 +63,7 @@ const Check = (props: any, ref: any) => {
     () => ({
       onCheck,
       onLock,
-      onRefreshCheck: () => getDetail(true),
+      onRefreshCheck: () => init(true),
       onSetting: () => setShow({ visible: true, data: release_num }),
     }),
     [selected, ref, globalState, basic, list],
@@ -92,7 +95,7 @@ const Check = (props: any, ref: any) => {
       ),
     );
     infoMessage('任务正在进行中，请稍后刷新');
-    delay(getDetail, 2000);
+    delay(init(), 2000);
   };
 
   const onLock = async () => {
@@ -126,24 +129,42 @@ const Check = (props: any, ref: any) => {
     }
   };
 
-  const getDetail = async (isRefresh = false) => {
-    setSelected([]);
+  const init = async (isFresh = false) => {
+    const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
+    const to = from.endOf('w');
+
+    const range = {
+      start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
+      end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
+    };
     setSpin(true);
+    setSelected([]);
     try {
-      if (isRefresh) {
+      if (isFresh) {
         await Promise.all(
           ['zt-check-list', 'test-unit'].map((type) =>
             OnlineSystemServices.checkOpts(
               { release_num, user_id: user?.userid, api_url: type },
-              type,
+              type as ICheckType,
             ),
           ),
         );
       }
-      const res = await OnlineSystemServices.getCheckInfo({ release_num });
+      const [checkItem, firstDuty] = await Promise.all([
+        OnlineSystemServices.getCheckInfo({ release_num }),
+        isEmpty(dutyPerson) ? DutyListServices.getFirstDutyPerson(range) : null,
+      ]);
+      let orignDuty = dutyPerson;
+      if (isEmpty(orignDuty)) {
+        const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
+        duty?.forEach((it: any) => {
+          orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
+        });
+        setDutyPerson(orignDuty);
+      }
       setList(
         checkInfo.map((it) => {
-          const currentKey = res[it.rowKey];
+          const currentKey = checkItem[it.rowKey];
           const flag = it.rowKey == 'auto_obj_data';
           let status = 'skip';
           if (flag) {
@@ -163,7 +184,8 @@ const Check = (props: any, ref: any) => {
             open_pm: currentKey?.[it.open_pm] || '',
             open_time: currentKey?.[it.open_time] || '',
             log: currentKey?.[it.log] || '',
-            source: currentKey?.data_from ?? '',
+            source: currentKey?.data_from || it.source,
+            contact: orignDuty?.[it.contact] || '',
           };
         }),
       );
@@ -183,7 +205,7 @@ const Check = (props: any, ref: any) => {
       },
       data.api_url,
     );
-    delay(getDetail, 2000);
+    delay(init, 2000);
   };
 
   const showLog = (v: any, data: any) => {
@@ -263,7 +285,7 @@ const Check = (props: any, ref: any) => {
   useEffect(() => {
     if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
-      getDetail();
+      init();
     }
   }, [subTab, tab, release_num]);
 
@@ -298,7 +320,7 @@ const Check = (props: any, ref: any) => {
             {
               title: '数据来源',
               dataIndex: 'source',
-              width: 100,
+              width: 120,
               align: 'center',
             },
             {

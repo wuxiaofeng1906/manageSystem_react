@@ -103,9 +103,9 @@ export const zentaoStoryColumn: (ColDef | ColGroupDef)[] = [
     maxWidth: 70,
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
-  { headerName: '类型', field: 'category', minWidth: 100 },
-  { headerName: '编号', field: 'ztNo', minWidth: 110, cellRenderer: 'link' },
-  { headerName: '阶段', field: 'stage.show.zh', minWidth: 110 },
+  { headerName: '类型', field: 'category', minWidth: 100, maxWidth: 100 },
+  { headerName: '编号', field: 'ztNo', minWidth: 110, maxWidth: 110, cellRenderer: 'link' },
+  { headerName: '阶段', field: 'stage.show.zh', minWidth: 110, maxWidth: 110 },
   {
     headerName: '执行名称',
     field: 'execution.name',
@@ -117,13 +117,14 @@ export const zentaoStoryColumn: (ColDef | ColGroupDef)[] = [
     headerName: '应用服务',
     field: 'appservices',
     minWidth: 110,
-    cellRenderer: (p) => p.value?.join(',') ?? '',
+    cellRenderer: (p) => p.value?.join(',')?.replaceAll('notinvolved', '不涉及') || '',
     tooltipField: 'appservices',
   },
   {
     headerName: '严重等级',
     field: 'severity',
     minWidth: 110,
+    maxWidth: 110,
     valueFormatter: (p) =>
       p.value && !String(p.value)?.includes('级') ? `${p.value}级` : p.value || '',
   },

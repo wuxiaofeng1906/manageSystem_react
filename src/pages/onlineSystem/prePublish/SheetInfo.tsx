@@ -118,7 +118,7 @@ const SheetInfo = (props: any, ref: any) => {
         person_duty_num: orderValues?.person_duty_num ?? '',
         release_result: orderValues?.release_result ?? 'unknown',
         need_auto: baseValues?.need_auto ?? '',
-        auto_env: baseValues?.auto_env?.join(','),
+        auto_env: baseValues?.auto_env?.join(',') ?? '',
       },
       release_app: {
         ...release_app?.[0],
@@ -228,8 +228,11 @@ const SheetInfo = (props: any, ref: any) => {
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
-
-    const checkObj = omit({ ...order, ...base }, ['release_result']);
+    const ignore = ['release_result'];
+    if (base.need_auto == 'no') ignore.push('auto_env');
+    let valid = false;
+    const isSuccess = base.release_result == 'success';
+    const checkObj = omit({ ...order, ...base }, ignore);
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -237,9 +240,12 @@ const SheetInfo = (props: any, ref: any) => {
       ready_release_name: '请填写工单名称!',
       deployment: '请填写一键部署ID',
       release_way: '请填写发布方式',
+      need_auto: '请填写是否需要跑升级后自动化',
       auto_env: '请填写是否升级后自动化环境',
     };
-    const valid = Object.values(checkObj).some((it) => isEmpty(it));
+    if (isSuccess) {
+      valid = Object.values(checkObj).some((it) => isEmpty(it));
+    }
 
     if (valid) {
       const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
@@ -247,7 +253,7 @@ const SheetInfo = (props: any, ref: any) => {
       orderForm.setFieldsValue({ release_result: null });
       return;
     }
-    if (isEmpty(base.ready_release_name?.trim())) {
+    if (isEmpty(base.ready_release_name?.trim()) && isSuccess) {
       orderForm.setFieldsValue({ release_result: null });
       return infoMessage(errTip.ready_release_name);
     }
@@ -257,13 +263,17 @@ const SheetInfo = (props: any, ref: any) => {
     } else {
       // 二次确认标记发布结果
       const tips = {
-        cancel: { title: '取消发布提醒', content: '取消发布将删除工单，请确认是否取消发布?' },
+        draft: {
+          title: '置为草稿提醒',
+          content: '置为草稿将还原到初始生成工单信息,请确认是否置为草稿?',
+        },
         success: { title: '发布成功提醒', content: '请确认是否标记发布成功?' },
         failure: { title: '发布失败提醒', content: '请确认是否标记发布失败?' },
       };
       if (result == 'success') {
         setSuccessModal(true);
       } else {
+        setLeaveShow(false);
         Modal.confirm({
           okText: '确认',
           cancelText: '取消',
@@ -275,19 +285,14 @@ const SheetInfo = (props: any, ref: any) => {
           onOk: async () => {
             setConfirmDisabled(true);
             try {
-              if (result == 'cancel') {
-                await PreReleaseServices.removeRelease(
-                  {
-                    user_id: user?.userid ?? '',
-                    release_num,
-                  },
-                  false,
-                );
-              } else await onSave();
+              if (result == 'draft') {
+                await OnlineSystemServices.removeOrder({ release_num, user_id: user?.userid });
+                await getDetail();
+              } else await onSave(true); // 取消发布
             } catch (e) {
               setConfirmDisabled(false);
             }
-            history.replace(`/onlineSystem/releaseProcess`);
+            result !== 'draft' && history.replace(`/onlineSystem/releaseProcess`);
           },
           onCancel: () => {
             orderForm.setFieldsValue({ release_result: null });
@@ -337,7 +342,7 @@ const SheetInfo = (props: any, ref: any) => {
       noData: '暂无工单接口日志',
       content: (
         <div>
-          {res?.map((it: any, index) => (
+          {res?.map((it: any, index: number) => (
             <div key={index}>
               {it.create_time}
               {it.operation_content}
@@ -495,7 +500,7 @@ const SheetInfo = (props: any, ref: any) => {
                         options={[
                           { label: '发布成功', value: 'success', key: 'success' },
                           { label: '发布失败', value: 'failure', key: 'failure' },
-                          { label: '取消发布', value: 'cancel', key: 'cancel' },
+                          { label: '置为草稿', value: 'draft', key: 'draft' },
                           { label: ' ', value: 'unknown', key: 'unknown' },
                         ]}
                         style={{
@@ -565,12 +570,24 @@ const SheetInfo = (props: any, ref: any) => {
                     label: WhetherOrNot[it],
                     value: it,
                   }))}
+                  onChange={(v) => {
+                    if (v == 'yes') {
+                      baseForm.setFieldsValue({ auto_env: undefined });
+                    }
+                  }}
                 />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name={'auto_env'} label={'跑升级后自动化环境'} required>
-                <Select disabled={finished} options={envs} mode={'multiple'} />
+              <Form.Item noStyle shouldUpdate={(pre, next) => pre.need_auto != next.need_auto}>
+                {({ getFieldValue }) => {
+                  const needAuto = getFieldValue('need_auto') == 'yes';
+                  return (
+                    <Form.Item name={'auto_env'} label={'跑升级后自动化环境'} required={needAuto}>
+                      <Select disabled={finished || !needAuto} options={envs} mode={'multiple'} />
+                    </Form.Item>
+                  );
+                }}
               </Form.Item>
             </Col>
           </Row>
@@ -596,7 +613,7 @@ const SheetInfo = (props: any, ref: any) => {
           />
         </div>
         <h4 style={{ margin: '16px 0' }}>
-          三、升级接口{' '}
+          三、升级接口
           <img
             title={'日志'}
             src={require('../../../../public/logs.png')}
@@ -704,7 +721,7 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
           <InputNumber
             style={{ width: '100%' }}
             min={0}
-            max={99999999}
+            max={999999}
             disabled={globalState.finished}
           />
         </Form.Item>

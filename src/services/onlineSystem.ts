@@ -134,10 +134,10 @@ export const OnlineSystemServices = {
   async updateOrderDetail(data: any) {
     return request(`${baseUrl}/online/rd-repair-order`, { data, method: 'post' });
   },
-  // 更新一键部署id
-  async updateDeployId(data: any) {
-    return request(`${baseUrl}/online/one-deployment`, { data, method: 'post' });
+  async removeOrder(data: any) {
+    return request(`${baseUrl}/online/rd-repair-order`, { data, method: 'delete' });
   },
+
   // sql工单
   async sqlOrder() {
     return request(`${baseUrl}/online/sql-order`);
@@ -155,6 +155,10 @@ export const OnlineSystemServices = {
   },
   async getLog(params: any) {
     return request(`${baseUrl}/online/options-log`, { params });
+  },
+  // 获取 global、租户可上的服务
+  async getTenantGlobalApps() {
+    return request(`${baseUrl}/online/tenant-global`);
   },
 
   // 应用服务

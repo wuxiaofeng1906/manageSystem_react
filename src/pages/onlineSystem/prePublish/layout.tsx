@@ -161,7 +161,6 @@ const Layout = () => {
         </div>
       );
   }, [release_num, tab, subTab, globalState, touched]);
-
   return (
     <div className={styles.prePublish}>
       <Tabs

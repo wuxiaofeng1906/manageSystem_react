@@ -94,13 +94,13 @@ const ProcessDetail = (props: any, ref: any) => {
   useImperativeHandle(
     ref,
     () => ({
+      onCancelPublish,
+      onRefresh: () => init(true),
       onShow: () => {
         if (basic.branch) setStoryModal({ visible: true, data: { ...basic, server } });
       },
-      onCancelPublish,
-      onRefresh: () => init(true),
     }),
-    [release_num, basic, subTab, tab],
+    [release_num, basic, subTab, tab, server],
   );
 
   const init = async (refresh = false) => {
@@ -169,9 +169,8 @@ const ProcessDetail = (props: any, ref: any) => {
     });
     if (selectedRowKeys?.some((it) => it.is_sealing == flag)) return infoMessage(tips);
     // 判断是否有apps、global 服务
-    // const includeAppsGlobal =
-    //   flag && selectedRowKeys?.some((it) => ['apps', 'global'].includes(it.apps));
-    const includeAppsGlobal = false;
+    const includeAppsGlobal =
+      flag && selectedRowKeys?.some((it) => ['apps', 'global'].includes(it.apps));
 
     // 判断对应侧是否确认
     if (!isEmpty(noConfirmSide))
@@ -229,7 +228,6 @@ const ProcessDetail = (props: any, ref: any) => {
               await OnlineSystemServices.sealingCheck({
                 apps: selectedRowKeys?.map((it) => it.apps)?.join(',') ?? '',
                 release_num,
-                ...values,
               });
             } catch (e) {
               if (e?.code == 4001 && e?.msg) {
@@ -253,6 +251,7 @@ const ProcessDetail = (props: any, ref: any) => {
               user_id: user?.userid ?? '',
               app_id: selectedRowKeys?.map((it) => it._id)?.join(',') ?? '',
               is_seal: flag,
+              ...values,
             },
             { release_num },
           );
@@ -516,7 +515,6 @@ const ProcessDetail = (props: any, ref: any) => {
         <Checkbox
           disabled={hasEdit}
           checked={checked}
-          style={{ marginLeft: 26 }}
           onChange={({ target }) => {
             setSelectedRowKeys(target.checked ? server : []);
             setChecked(target.checked);

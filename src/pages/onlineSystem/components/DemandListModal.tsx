@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button } from 'antd';
+import dayjs from 'dayjs';
 import { useModel } from 'umi';
+import { isEmpty, difference, isEqual, intersection, uniqBy } from 'lodash';
 import styles from './DemandListModal.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import {
   ClusterType,
-  onLog,
   StoryStatus,
   WhetherOrNot,
+  onLog,
 } from '@/pages/onlineSystem/config/constant';
-import { isEmpty, difference, isEqual } from 'lodash';
 import { errorMessage, infoMessage } from '@/publicMethods/showMessages';
-import dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 
@@ -31,6 +31,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [selected, setSelected] = useState<any[]>([]);
   const [relatedStory, setRelatedStory] = useState<any>();
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
+  const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
 
   useEffect(() => {
     if (!props.visible) {
@@ -42,18 +43,18 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
     if (!isEmpty(props.data)) {
       const branch = props.data?.branch;
-      if (branch) {
-        const result = { branch, type: '1' };
-        baseForm.setFieldsValue(result);
-        setComputed(result);
-      }
       form.setFieldsValue({
         release_env_type: props.data.release_env_type,
         cluster: props.data.cluster?.split(','),
         release_env: props.data.release_env,
       });
-      setSelected(props.data?.server?.map((it: any) => `${it.storyNum}&${it.project}`));
+      if (branch) {
+        const result = { branch, type: '1' };
+        baseForm.setFieldsValue(result);
+        setComputed(result);
+      }
     }
+    getTenantGlobalApps();
   }, [props.visible, props.data]);
 
   useEffect(() => {
@@ -62,6 +63,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       getTableList();
     }
   }, [computed?.branch]);
+
+  const getTenantGlobalApps = async () => {
+    const res = await OnlineSystemServices.getTenantGlobalApps();
+    setAppServers(res);
+  };
 
   const getRelatedStory = async () => {
     const res = await OnlineSystemServices.getRelatedStory({
@@ -77,15 +83,38 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const getTableList = async () => {
     setSpin(true);
     try {
-      const res = await OnlineSystemServices.getStoryList({
-        branch: computed?.branch,
-      });
+      let apps: any;
+      if (isEmpty(appServers)) {
+        apps = await OnlineSystemServices.getTenantGlobalApps();
+        setAppServers(apps);
+      }
+      const res = await OnlineSystemServices.getStoryList({ branch: computed?.branch });
       setList(
-        res?.map((it: any) => ({
-          ...it,
-          type: it.apps.includes('global') ? 'global' : 'tenant',
-        })),
+        isEmpty(props.data?.release_env_type) || isEmpty(apps)
+          ? res
+          : res?.map((it: any) => ({
+              ...it,
+              disabled:
+                intersection(it.apps?.split(','), apps[props.data?.release_env_type])?.length == 0,
+            })),
       );
+      // 新增 -默认勾选特性项目
+      if (!props.data?.release_num) {
+        setSelected(
+          res?.map((it: any) => !['stagepatch', 'emergency', 'sprint'].includes(it.sprinttype)),
+        );
+      } else {
+        // 勾选上次选中项
+        let checkedArr: any[] = [];
+        props.data?.server?.forEach((it: any) => {
+          const result = res.find(
+            (source: any) => source.story == it.story_num && source.pro_id == it.project_id,
+          );
+          if (!isEmpty(result)) checkedArr.push(result);
+        });
+        setSelected(uniqBy(checkedArr, ['story', 'title']));
+      }
+
       setSpin(false);
     } catch (e) {
       setSpin(false);
@@ -158,24 +187,32 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     */
 
     form.setFieldsValue({
-      cluster: v == 'global' ? ['global'] : memoColumn.isSprint ? ['cn-northwest-0'] : [],
+      cluster: v == 'global' ? ['global'] : ['cn-northwest-0'],
     });
-    if (!memoColumn.isSprint) {
-      const noRelate = list.filter((it) => !relatedStory?.story?.includes(it.story));
+    if (!memoColumn.isSprint && v !== 'global') {
+      const noRelate = isEmpty(relatedStory?.story)
+        ? list
+        : list.filter((it) => relatedStory?.story?.includes(String(it.story)));
       setSelected(noRelate);
       form.setFieldsValue({
         cluster: noRelate?.flatMap((it) => (it.cluster ? [it.cluster] : [])),
       });
     }
+    if (isEmpty(appServers?.[v])) return;
     setList(
-      list.map((it) => ({ ...it, disabled: v == 'global' ? it.type !== v : it.apps == 'global' })),
+      list?.map((it: any) => ({
+        ...it,
+        disabled: intersection(it.apps?.split(','), appServers?.[v])?.length == 0,
+      })),
     );
   };
 
   const updateStatus = (data: any, status: string, index: number) => {
     Modal.confirm({
       title: '修改是否可热更提醒',
-      content: `请确认是否将『需求编号：${data.story_num}』的是否可热更 状态调整为 ${WhetherOrNot[status]}`,
+      content: `请确认是否将『执行名称：${data.pro_name ?? ''} 需求编号：${
+        data.story ?? ''
+      }』的是否可热更 状态调整为 ${WhetherOrNot[status]}`,
       onOk: () => {
         list[index].is_update = status;
         setList([...list]);
@@ -402,14 +439,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                             <Select
                               mode={'multiple'}
                               options={envs}
-                              disabled={
-                                memoEdit.update
-                                  ? memoEdit.global
-                                  : memoEdit.update ||
-                                    env == 'global' ||
-                                    (memoColumn?.isSprint && env == 'tenant')
-                              }
                               placeholder={'发布集群'}
+                              disabled={
+                                // global 、班车，特性项目 不可编辑
+                                env == 'global' || (memoColumn?.isSprint && env == 'tenant')
+                              }
                             />
                           </Form.Item>
                         );
@@ -442,11 +476,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   dataSource={list}
                   rowSelection={{
                     selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
-                    onChange: (selectedRowKeys, selectedRows) => setSelected(selectedRows),
+                    onChange: (_, selectedRows) => setSelected(selectedRows),
                     getCheckboxProps: (record) => ({
-                      disabled: memoEdit.update
-                        ? memoEdit.global
-                        : memoEdit.update || record.disabled,
+                      disabled: memoEdit.global || record.disabled,
                     }),
                   }}
                 />

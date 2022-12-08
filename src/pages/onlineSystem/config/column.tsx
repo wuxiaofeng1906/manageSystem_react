@@ -295,7 +295,7 @@ export const upgradeServicesColumn: (ColDef | ColGroupDef)[] = [
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
   { headerName: '接口服务', field: 'api_server', minWidth: 110, maxWidth: 110 },
-  { headerName: '接口Method', field: 'api_method', minWidth: 110, maxWidth: 110 },
+  { headerName: '接口Method', field: 'api_method', minWidth: 120, maxWidth: 120 },
   { headerName: '接口URL', field: 'api_url', minWidth: 110, tooltipField: 'api_url' },
   { headerName: 'Data', field: 'api_data', minWidth: 130, tooltipField: 'api_data' },
   { headerName: 'Header', field: 'api_header', minWidth: 110, tooltipField: 'api_header' },

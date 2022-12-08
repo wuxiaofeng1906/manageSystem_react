@@ -318,6 +318,14 @@ const Check = (props: any, ref: any) => {
               ),
             },
             {
+              title: '所属端',
+              dataIndex: 'side',
+              width: 90,
+              align: 'center',
+              onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
+              render: (v) => CheckTechnicalSide[v],
+            },
+            {
               title: '数据来源',
               dataIndex: 'source',
               width: 120,
@@ -328,14 +336,6 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'contact',
               width: 100,
               align: 'center',
-            },
-            {
-              title: '所属端',
-              dataIndex: 'side',
-              width: 90,
-              align: 'center',
-              onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
-              render: (v) => CheckTechnicalSide[v],
             },
             {
               title: '检查状态',

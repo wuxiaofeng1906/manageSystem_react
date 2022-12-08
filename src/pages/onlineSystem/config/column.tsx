@@ -275,6 +275,12 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
       { title: '需求创建人', dataIndex: 'create_user_name', width: 120 },
       { title: '需求指派人', dataIndex: 'assigned_to_name', width: 120 },
     );
+  arr.push({
+    title: '请求结果说明',
+    dataIndex: 'seal_result_dev',
+    width: 100,
+    render: (v) => <span>{v == 'yes' ? '封版成功' : v == 'no' ? '封版失败' : ''}</span>,
+  });
   return arr;
 };
 // 升级接口

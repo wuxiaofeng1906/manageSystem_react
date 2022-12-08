@@ -156,18 +156,20 @@ const ProcessDetail = (props: any, ref: any) => {
   }, [basic, repair]);
 
   const onSeal = async (flag = true) => {
-    let tips = '请选择未封版服务进行封版';
-    if (!flag) tips = '请选择已封版服务进行解除封版';
+    let tips = '请选择未封版服务进行分支锁定';
+    if (!flag) tips = '请选择已封版服务进行解除分支锁定';
     if (isEmpty(selectedRowKeys)) return infoMessage(`请先选择需${flag ? '' : '解除'}封版服务`);
-
     const confirmSide = serverConfirm.flatMap((it) =>
       it.confirm_result == 'yes' ? [it.confirm_type] : [],
     );
+    // 对应侧未确认
     let noConfirmSide: string[] = [];
     selectedRowKeys.forEach((it) => {
       if (!confirmSide.includes(it.side)) noConfirmSide.push(ServerConfirmType[it.side]);
     });
-    if (selectedRowKeys?.some((it) => it.is_sealing == flag)) return infoMessage(tips);
+    // 校验是否满足锁定、解除的条件
+    if (selectedRowKeys?.some((it) => it.is_sealing == (flag ? 'yes' : 'no')))
+      return infoMessage(tips);
     // 判断是否有apps、global 服务
     const includeAppsGlobal =
       flag && selectedRowKeys?.some((it) => ['apps', 'global'].includes(it.apps));
@@ -407,6 +409,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
   const memoGroup = useMemo(() => {
     const table = mergeCellsTable(server ?? [], 'apps');
+    console.log(table);
     return {
       opts: uniq(server?.map((it) => it.apps)),
       table,

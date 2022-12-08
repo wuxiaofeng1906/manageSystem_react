@@ -183,16 +183,26 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name={'side'}
-                label={'技术侧'}
-                rules={[{ required: true, message: '请选择技术侧' }]}
-              >
-                <Select
-                  placeholder={'技术侧'}
-                  mode={'multiple'}
-                  options={Object.entries(TechnicalSide).map(([k, v]) => ({ label: v, value: k }))}
-                />
+              <Form.Item noStyle shouldUpdate={(pre, next) => next.side != pre.side}>
+                {({ getFieldValue }) => {
+                  const side = getFieldValue('side');
+                  return (
+                    <Form.Item
+                      name={'side'}
+                      label={'技术侧'}
+                      rules={[{ required: true, message: '请选择技术侧' }]}
+                    >
+                      <Select
+                        placeholder={'技术侧'}
+                        mode={'multiple'}
+                        options={Object.entries(TechnicalSide).map(([k, v]) => ({
+                          label: v,
+                          value: k,
+                        }))}
+                      />
+                    </Form.Item>
+                  );
+                }}
               </Form.Item>
             </Col>
           </Row>

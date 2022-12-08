@@ -145,6 +145,11 @@ export const OnlineSystemServices = {
   async deployments(params: any) {
     return request(`${baseUrl}/online/one-deployment-id`, { params });
   },
+  // 工单-batch 版本
+  async getBatchVersion(params: any) {
+    return request(`${baseUrl}/online/batch-version`, { params });
+  },
+
   // 数据修复读取异常提示
   async abnormalApi(params: any) {
     return request(`${baseUrl}/online/abnormal-api`, { params, warn: false });

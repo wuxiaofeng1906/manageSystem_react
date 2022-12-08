@@ -26,7 +26,13 @@ import DragIcon from '@/components/DragIcon';
 import { infoMessage } from '@/publicMethods/showMessages';
 import { useModel } from '@@/plugin-model/useModel';
 import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/config/column';
-import { ClusterType, onLog, PublishWay, WhetherOrNot } from '@/pages/onlineSystem/config/constant';
+import {
+  ClusterType,
+  onLog,
+  OrderExecutionBy,
+  PublishWay,
+  WhetherOrNot,
+} from '@/pages/onlineSystem/config/constant';
 import { history, useLocation, useParams } from 'umi';
 import { Prompt } from 'react-router-dom';
 import { initGridTable } from '@/utils/utils';
@@ -34,7 +40,7 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import moment from 'moment';
-import { isEmpty, omit, isString } from 'lodash';
+import { isEmpty, omit, isString, pick } from 'lodash';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 
@@ -74,6 +80,7 @@ const SheetInfo = (props: any, ref: any) => {
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [deployments, setDeployments] = useState<any[]>([]);
   const [announcementList, setAnnouncementList] = useState<any[]>([]);
+  const [batchs, setBatchs] = useState<any[]>([]);
   const [leaveShow, setLeaveShow] = useState(false);
 
   const serverRef = useRef<GridApi>();
@@ -126,6 +133,7 @@ const SheetInfo = (props: any, ref: any) => {
           ? release_app?.[0]?.cluster
           : release_app?.[0]?.cluster?.join(','),
         database_version: release_app?.[0]?.database_version ?? '',
+        order_execution_time: baseValues?.order_execution_time ?? '',
       },
     });
     setLeaveShow(false);
@@ -182,6 +190,7 @@ const SheetInfo = (props: any, ref: any) => {
         deployment: res?.deployment?.map((it: any) => String(it.deployment_id)),
         auto_env: basicInfo?.auto_env ? basicInfo?.auto_env?.split(',') : [],
         need_auto: basicInfo?.need_auto || undefined,
+        order_execution_time: res?.release_app?.order_execution_time || undefined,
       });
       agFinished =
         !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
@@ -197,9 +206,11 @@ const SheetInfo = (props: any, ref: any) => {
   const getBaseList = async () => {
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
-    const res = await OnlineSystemServices.deployments({ release_num });
+    const deployIds = await OnlineSystemServices.deployments({ release_num });
+    const batch = await OnlineSystemServices.getBatchVersion({ release_num });
+    // setBatchs(batch?.map((it) => ({ label: it, value: it })));
     setDeployments(
-      res?.map((it: any) => ({
+      deployIds?.map((it: any) => ({
         label: `${it.deployment_id}(${it.app} ${it.check_end_time})`,
         value: String(it.deployment_id),
         deployment_id: it.deployment_id,
@@ -228,8 +239,10 @@ const SheetInfo = (props: any, ref: any) => {
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
+    const serverInfo = serverRef.current?.getRenderedNodes().map((it) => it.data);
     const ignore = ['release_result'];
     if (base.need_auto == 'no') ignore.push('auto_env');
+
     let valid = false;
     const isSuccess = base.release_result == 'success';
     const checkObj = omit({ ...order, ...base }, ignore);
@@ -242,6 +255,12 @@ const SheetInfo = (props: any, ref: any) => {
       release_way: '请填写发布方式',
       need_auto: '请填写是否需要跑升级后自动化',
       auto_env: '请填写是否升级后自动化环境',
+      order_execution_time: '请填写SQL工单执行顺序',
+      cluster: '请填写发布环境',
+      clear_redis: '请填写是否清理redis缓存',
+      is_recovery: '请填写是否涉及数据Recovery',
+      is_update: '请填写是否数据update',
+      clear_cache: '请填写是否清理应用缓存',
     };
     if (isSuccess) {
       valid = Object.values(checkObj).some((it) => isEmpty(it));
@@ -252,6 +271,15 @@ const SheetInfo = (props: any, ref: any) => {
       infoMessage(errTip[errArr?.[0]]);
       orderForm.setFieldsValue({ release_result: null });
       return;
+    }
+    if (!isEmpty(serverInfo)) {
+      if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.order_execution_time))
+        return infoMessage(errTip.order_execution_time);
+
+      const err = Object.entries(
+        pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
+      ).find((k, v) => isEmpty(v));
+      return infoMessage(errTip[err?.[0]]);
     }
     if (isEmpty(base.ready_release_name?.trim()) && isSuccess) {
       orderForm.setFieldsValue({ release_result: null });
@@ -398,15 +426,18 @@ const SheetInfo = (props: any, ref: any) => {
     return (
       <Select
         size={'small'}
-        value={p.value ? (field == 'cluster' ? p.value?.split(',') : p.value) : undefined}
+        value={isEmpty(p.value) ? undefined : field == 'cluster' ? p.value?.split(',') : p.value}
         style={{ width: '100%' }}
         disabled={agFinished}
+        allowClear={true}
         mode={field == 'cluster' ? 'multiple' : undefined}
         options={
           field == 'sql_order'
             ? agSql
             : field == 'cluster'
             ? agEnvs
+            : field == 'batch'
+            ? batchs
             : Object.keys(WhetherOrNot)?.map((k) => ({
                 value: k,
                 label: WhetherOrNot[k],
@@ -536,9 +567,20 @@ const SheetInfo = (props: any, ref: any) => {
                 <Input style={{ width: '100%' }} disabled />
               </Form.Item>
             </Col>
-            <Col span={18}>
+            <Col span={12}>
               <Form.Item name={'project'} label={'预发布项目'}>
                 <Input style={{ width: '100%' }} disabled />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item name={'order_execution_time'} label={'SQL工单执行时间'}>
+                <Select
+                  style={{ width: '100%' }}
+                  options={Object.entries(OrderExecutionBy)?.map(([k, v]) => ({
+                    label: v,
+                    value: k,
+                  }))}
+                />
               </Form.Item>
             </Col>
           </Row>

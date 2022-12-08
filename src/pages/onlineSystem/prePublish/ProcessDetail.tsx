@@ -541,7 +541,7 @@ const ProcessDetail = (props: any, ref: any) => {
             size={'small'}
             rowKey={(record) => +record._id}
             dataSource={memoGroup.table}
-            columns={serverColumn}
+            columns={serverColumn ?? []}
             pagination={false}
             bordered
             scroll={{ y: 400, x: 'min-content' }}

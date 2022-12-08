@@ -27,6 +27,14 @@ export const ZentaoPhase = {
   已关闭: 10,
 };
 export const ZentaoType = { Bug: 'bug', Story: 'story', B_Story: 'B_story', Task: 'task' };
+
+export const OrderExecutionBy = {
+  dbUpdateBefore: '数据库升级前',
+  dbUpdateAfter: '数据库升级后',
+  backServiceAfter: '后端接口升级前',
+  backInterfaceAfter: '后端接口升级后',
+  frontInterfaceAfter: '前端接口升级后',
+};
 export const CheckStatus = {
   skip: { text: '忽略', color: '#bfbfbf' },
   yes: { text: '通过', color: '#52c41a' },

@@ -370,6 +370,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       field: 'batch',
       minWidth: 110,
       hide: data?.release_type == 'global',
+      cellRenderer: 'select',
     },
     {
       headerName: '数据库版本',

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button } from 'antd';
 import dayjs from 'dayjs';
 import { useModel } from 'umi';
-import { isEmpty, difference, isEqual, intersection, uniqBy } from 'lodash';
+import { isEmpty, difference, isEqual, intersection } from 'lodash';
 import styles from './DemandListModal.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import {
@@ -89,15 +89,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         setAppServers(apps);
       }
       const res = await OnlineSystemServices.getStoryList({ branch: computed?.branch });
-      setList(
-        isEmpty(props.data?.release_env_type) || isEmpty(apps)
-          ? res
-          : res?.map((it: any) => ({
-              ...it,
-              disabled:
-                intersection(it.apps?.split(','), apps[props.data?.release_env_type])?.length == 0,
-            })),
-      );
+      setList(res);
       // 新增 -默认勾选特性项目
       if (!props.data?.release_num) {
         setSelected(
@@ -106,13 +98,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       } else {
         // 勾选上次选中项
         let checkedArr: any[] = [];
-        props.data?.server?.forEach((it: any) => {
-          const result = res.find(
-            (source: any) => source.story == it.story_num && source.pro_id == it.project_id,
+        res?.forEach((it: any) => {
+          const result = props.data?.server.find(
+            (source: any) => it.story == source.story_num && it.pro_id == source.project_id,
           );
-          if (!isEmpty(result)) checkedArr.push(result);
+
+          if (!isEmpty(result)) checkedArr.push(it);
         });
-        setSelected(uniqBy(checkedArr, ['story', 'title']));
+        setSelected(checkedArr);
       }
 
       setSpin(false);
@@ -358,7 +351,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           查看日志
         </Button>,
         <Button onClick={() => props.onOk?.()}>取消</Button>,
-        <Button type={'primary'} disabled={memoEdit.global || spin} onClick={onConfirm}>
+        <Button
+          type={'primary'}
+          disabled={(memoEdit.update ? memoEdit.global : memoEdit.update) || spin}
+          onClick={onConfirm}
+        >
           确定
         </Button>,
       ]}
@@ -478,7 +475,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
                     onChange: (_, selectedRows) => setSelected(selectedRows),
                     getCheckboxProps: (record) => ({
-                      disabled: memoEdit.global || record.disabled,
+                      disabled:
+                        memoEdit.global ||
+                        record.disabled ||
+                        (!isEmpty(props.data?.release_env_type) &&
+                          intersection(
+                            record.apps?.split(','),
+                            appServers?.[props.data?.release_env_type],
+                          )?.length == 0),
                     }),
                   }}
                 />

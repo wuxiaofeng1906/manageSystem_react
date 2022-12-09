@@ -278,6 +278,7 @@ const SheetInfo = (props: any, ref: any) => {
         orderForm.setFieldsValue({ release_result: null });
         return infoMessage(errTip.sql_action_time);
       }
+      // console.log(serverInfo[0]);
       // const err = Object.entries(
       //   pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
       // ).find((k, v) => isEmpty(v));
@@ -419,7 +420,7 @@ const SheetInfo = (props: any, ref: any) => {
       ...globalState,
       draft: isEmpty(upgradeData) ? true : upgradeData?.status !== 'save',
     });
-  }, [upgradeData?.status]);
+  }, [upgradeData?.status, tab, subTab]);
 
   useEffect(() => {
     setGlobalState({

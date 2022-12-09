@@ -305,6 +305,7 @@ export const formatTreeData = ({
 
   return converseArrayToOne(result);
 };
+
 export const checkLogin = () => {
   const token = localStorage.getItem('accessId');
   if (token) return { flag: true, redirect: '' };
@@ -315,52 +316,44 @@ export const checkLogin = () => {
 export const checkTesterGroup = (groups: string[]) =>
   intersection(groups, ['管理会计研发部', '供应链研发部'])?.length > 0;
 
-export const formatD = (origin: any[]) => {
+export const formatPivotMode = (origin: any[]) => {
   let result: any[] = [];
-  let columns: any[] = [];
   origin?.forEach((it) => {
     const data = it.datas;
-
     data?.forEach((obj: any) => {
       const startTime = obj.range.start;
       const departments = obj.datas;
-
       result.push({
         Group: ['研发中心'],
         isDept: true,
-        [startTime]: obj.total.kpi,
+        total: obj.total.kpi,
+        title: it.range.start,
+        subTitle: startTime,
       });
       departments?.forEach((dept: any) => {
         let groups: string[] = [dept.deptName];
         findParent(departments, dept, groups);
         if (checkTesterGroup(groups)) return;
         result.push({
-          Group: groups,
+          Group: dept.deptName,
           isDept: true,
-          [startTime]: dept.kpi,
+          total: dept.kpi,
           title: it.range.start,
           subTitle: startTime,
         });
-        columns.push(
-          {
-            field: 'total',
-            headerName: 'emergency占比',
-            aggFunc: (data: any) => {
-              let sum = 0;
-              data?.forEach(function (value: any) {
-                if (value) {
-                  sum = sum + parseFloat(value);
-                }
-              });
-              if (!sum) return 0;
-              return sum.toFixed(2);
-            },
-          },
-          { field: 'title', pivot: true, pivotComparator: () => 1 },
-          { field: 'subTitle', pivot: true },
-        );
       });
     });
   });
-  return { data: converseArrayToOne(result), columns };
+  return result;
+};
+
+export const aggFunc = (data: any, number = 0) => {
+  let sum = 0;
+  data?.forEach(function (value: any) {
+    if (value) {
+      sum = sum + parseFloat(value);
+    }
+  });
+  if (!sum) return 0;
+  return number > 0 ? sum.toFixed(number) : sum;
 };

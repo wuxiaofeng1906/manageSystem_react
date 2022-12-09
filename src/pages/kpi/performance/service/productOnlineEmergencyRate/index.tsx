@@ -6,11 +6,12 @@ import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMeth
 import moment from 'moment';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Button, Spin } from 'antd';
-import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { IDrawer } from '@/components/IStaticPerformance';
+import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
 import { isEmpty } from 'lodash';
+import { aggFunc } from '@/utils/utils';
 
 const ruleData: IRuleData[] = [
   {
@@ -79,7 +80,6 @@ const ProductOnlineEmergencyRate: React.FC = () => {
             return it.datas.map((child: any) => ({
               subTitle: moment(child.date).format('YYYYMMDD'),
               title: title,
-              // total: +((child.count / child.recordNum) * 2 * 100),
               total: child.kpi * 100,
             }));
           })
@@ -99,24 +99,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white' }}>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<CalendarTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('month')}
-          >
-            按月统计
-          </Button>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<ScheduleTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('quarter')}
-          >
-            按季统计
-          </Button>
+          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCatagory(v)} />
           <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
           <Button
             type="text"
@@ -144,20 +127,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
               minWidth: 80,
             }}
             columnDefs={[
-              {
-                field: 'total',
-                headerName: 'emergency占比',
-                aggFunc: (data: any) => {
-                  let sum = 0;
-                  data?.forEach(function (value: any) {
-                    if (value) {
-                      sum = sum + parseFloat(value);
-                    }
-                  });
-                  if (!sum) return 0;
-                  return sum.toFixed(2);
-                },
-              },
+              { field: 'total', headerName: 'emergency占比', aggFunc: (data) => aggFunc(data, 2) },
               { field: 'title', pivot: true, pivotComparator: () => 1 },
               { field: 'subTitle', pivot: true },
             ]}

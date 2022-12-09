@@ -3,14 +3,13 @@ import type { IRuleData } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
 import { AgGridReact } from 'ag-grid-react';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
-import moment from 'moment';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Button, Spin } from 'antd';
-import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { IDrawer } from '@/components/IStaticPerformance';
-import { isEmpty } from 'lodash';
+import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
+import { aggFunc } from '@/utils/utils';
 
 const ruleData: IRuleData[] = [
   {
@@ -56,7 +55,8 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const [catagory, setCatagory] = useState<'month' | 'quarter'>('month');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>();
+
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
@@ -78,25 +78,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
         },
         identity: 'DEVELOPER',
       });
-      setData(
-        data
-          ?.map((it: any) => {
-            const title =
-              catagory == 'quarter'
-                ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
-                : moment(it.range.start).format('MM月YYYY年');
-
-            if (isEmpty(it.datas)) return { title: title, total: 0 };
-
-            return it.datas.map((child: any) => ({
-              subTitle: moment(child.date).format('YYYYMMDD'),
-              title: title,
-              // total: +((child.count / child.recordNum) * 2 * 100),
-              total: child.kpi * 100,
-            }));
-          })
-          .flat(),
-      );
+      setData(data);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -111,24 +93,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white' }}>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<CalendarTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('month')}
-          >
-            按月统计
-          </Button>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<ScheduleTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('quarter')}
-          >
-            按季统计
-          </Button>
+          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCatagory(v)} />
           <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
           <Button
             type="text"
@@ -146,8 +111,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
             headerHeight={35}
             onGridReady={onGridReady}
             pivotMode={true}
-            rowData={data}
-            suppressAggFuncInHeader={true}
+            rowData={data ?? []}
             defaultColDef={{
               sortable: true,
               resizable: true,
@@ -155,21 +119,18 @@ const ProductOnlineEmergencyRate: React.FC = () => {
               flex: 1,
               minWidth: 80,
             }}
+            autoGroupColumnDef={{
+              minWidth: 150,
+              maxWidth: 180,
+              headerName: '部门-人员',
+              cellRendererParams: { suppressCount: true },
+              pinned: 'left',
+              suppressMenu: false,
+            }}
+            suppressAggFuncInHeader={true}
             columnDefs={[
-              {
-                field: 'total',
-                headerName: 'emergency占比',
-                aggFunc: (data: any) => {
-                  let sum = 0;
-                  data?.forEach(function (value: any) {
-                    if (value) {
-                      sum = sum + parseFloat(value);
-                    }
-                  });
-                  if (!sum) return 0;
-                  return sum.toFixed(2);
-                },
-              },
+              { field: 'Group', headerName: '部门', rowGroup: true, pinned: 'left' },
+              { field: 'total', headerName: 'emergency占比', aggFunc: (data) => aggFunc(data, 2) },
               { field: 'title', pivot: true, pivotComparator: () => 1 },
               { field: 'subTitle', pivot: true },
             ]}

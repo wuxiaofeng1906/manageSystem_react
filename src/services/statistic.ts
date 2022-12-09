@@ -1,6 +1,6 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import { formatTreeData } from '@/utils/utils';
+import { formatPivotMode, formatTreeData } from '@/utils/utils';
 import { IIdentity, IStaticBy, Period } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
@@ -723,12 +723,10 @@ const StatisticServices = {
     return { data: data.data };
   },
 
-  async onlineTestOnlineEmergency({ client, params, identity }: IStatisticQuery) {
-    const condition = getParamsByType(params);
-    if (condition.typeFlag === 0) return [];
+  async onlineTestOnlineEmergency({ client, params, identity }: StaticOther) {
     const { data } = await client.query(`
       {
-         data:devTestOnlineEmerPropOwner(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
+         data:devTestOnlineEmerPropOwner(kind: "${params.kind}", ends: ${params.ends},identity:${identity}) {
             range{
               start
               end
@@ -755,8 +753,7 @@ const StatisticServices = {
           }
       }
   `);
-    // return { data: formatD(data.data) };
-    return data.data;
+    return { data: formatPivotMode(data.data) };
   },
   //灰度千行bug率
   async grayThousBugRate({ client, params }: StaticOther) {

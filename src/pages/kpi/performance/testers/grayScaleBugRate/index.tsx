@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { IRuleData } from '@/components/IStaticPerformance';
-import { IDrawer } from '@/components/IStaticPerformance';
+import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
 import { Button, Spin } from 'antd';
-import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
@@ -11,6 +11,8 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
+import { aggFunc } from '@/utils/utils';
+
 const ruleData: IRuleData[] = [
   {
     title: '需求统计范围',
@@ -106,39 +108,11 @@ const GrayScaleBugRate: React.FC = () => {
     getTableSource();
   }, [catagory]);
 
-  const aggFunc = (data: any, number = 0) => {
-    let sum = 0;
-    data?.forEach(function (value: any) {
-      if (value) {
-        sum = sum + parseFloat(value);
-      }
-    });
-    if (!sum) return 0;
-    return number > 0 ? sum.toFixed(number) : sum;
-  };
-
   return (
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white' }}>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<CalendarTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('month')}
-          >
-            按月统计
-          </Button>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<ScheduleTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('quarter')}
-          >
-            按季统计
-          </Button>
+          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCatagory(v)} />
           <label style={{ fontWeight: 'bold' }}>(统计单位：个/Kloc)</label>
           <Button
             type="text"

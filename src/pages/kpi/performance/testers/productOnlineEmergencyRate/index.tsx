@@ -3,14 +3,13 @@ import type { IRuleData } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
 import { AgGridReact } from 'ag-grid-react';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
-import moment from 'moment';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Button, Spin } from 'antd';
-import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import IStaticPerformance, { IDrawer } from '@/components/IStaticPerformance';
-import { formatD } from '@/utils/utils';
+import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
+import { aggFunc } from '@/utils/utils';
 
 const ruleData: IRuleData[] = [
   {
@@ -56,8 +55,8 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const [catagory, setCatagory] = useState<'month' | 'quarter'>('month');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any[]>([]);
-  const [row, setRow] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>();
+
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
@@ -70,17 +69,18 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const getTableSource = async () => {
     setLoading(true);
     try {
-      const data = await StatisticServices.onlineTestOnlineEmergency({
+      const ends = getDate();
+      const { data } = await StatisticServices.onlineTestOnlineEmergency({
         client,
-        params: catagory,
+        params: {
+          kind: catagory == 'month' ? 2 : 3,
+          ends,
+        },
         identity: 'TESTER',
       });
-      const format = formatD(data);
-      setData(format.data);
-      setRow(format.columns);
+      setData(data);
       setLoading(false);
     } catch (e) {
-      console.log(e);
       setLoading(false);
     }
   };
@@ -90,14 +90,55 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   }, [catagory]);
 
   return (
-    <IStaticPerformance
-      ruleData={ruleData}
-      columnDefs={row}
-      request={StatisticServices.onlineTestOnlineEmergency}
-      identity={'TESTER'}
-      unit={'%'}
-      len={2}
-    />
+    <PageContainer>
+      <Spin spinning={loading} tip={'数据加载中...'}>
+        <div style={{ background: 'white' }}>
+          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCatagory(v)} />
+          <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+          <Button
+            type="text"
+            style={{ color: '#1890FF', float: 'right' }}
+            icon={<QuestionCircleTwoTone />}
+            size={'large'}
+            onClick={() => setVisible(true)}
+          >
+            计算规则
+          </Button>
+        </div>
+        <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
+          <AgGridReact
+            rowHeight={32}
+            headerHeight={35}
+            onGridReady={onGridReady}
+            pivotMode={true}
+            rowData={data ?? []}
+            defaultColDef={{
+              sortable: true,
+              resizable: true,
+              filter: true,
+              flex: 1,
+              minWidth: 80,
+            }}
+            autoGroupColumnDef={{
+              minWidth: 150,
+              maxWidth: 180,
+              headerName: '部门-人员',
+              cellRendererParams: { suppressCount: true },
+              pinned: 'left',
+              suppressMenu: false,
+            }}
+            suppressAggFuncInHeader={true}
+            columnDefs={[
+              { field: 'Group', headerName: '部门', rowGroup: true, pinned: 'left' },
+              { field: 'total', headerName: 'emergency占比', aggFunc: (data) => aggFunc(data, 2) },
+              { field: 'title', pivot: true, pivotComparator: () => 1 },
+              { field: 'subTitle', pivot: true },
+            ]}
+          />
+        </div>
+        <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
+      </Spin>
+    </PageContainer>
   );
 };
 

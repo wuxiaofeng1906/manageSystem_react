@@ -336,6 +336,7 @@ const SheetInfo = (props: any, ref: any) => {
                 await OnlineSystemServices.removeOrder({ release_num, user_id: user?.userid });
                 await getDetail();
               } else await onSave(true); // 取消发布
+              setConfirmDisabled(false);
             } catch (e) {
               setConfirmDisabled(false);
             }

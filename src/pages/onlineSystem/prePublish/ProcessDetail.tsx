@@ -177,10 +177,12 @@ const ProcessDetail = (props: any, ref: any) => {
     // 判断对应侧是否确认
     if (!isEmpty(noConfirmSide))
       return infoMessage(`『${uniq(noConfirmSide)?.join()}』对应侧服务未确认，请先确认后再锁定`);
+    includeAppsGlobal && sealForm.resetFields();
     Modal.confirm({
       centered: true,
       width: 500,
       title: `${flag ? '' : '解除'}锁定分支提示`,
+      okButtonProps: { disabled: confirmDisabled },
       content: (
         <div>
           请确认是否将对应服务的分支
@@ -212,7 +214,15 @@ const ProcessDetail = (props: any, ref: any) => {
             <Form.Item
               name={'version'}
               label={'前端预制数据版本号'}
-              rules={[{ message: '请填写前端预制数据版本号', required: includeAppsGlobal }]}
+              rules={[
+                {
+                  required: includeAppsGlobal,
+                  validator: (r, v, cb) => {
+                    if (!v?.trim()) return cb('请填写前端预制数据版本号');
+                    else return cb();
+                  },
+                },
+              ]}
             >
               <Input placeholder={'前端预制数据版本号'} />
             </Form.Item>
@@ -223,6 +233,7 @@ const ProcessDetail = (props: any, ref: any) => {
         const values = await sealForm.validateFields();
         try {
           setLoading(true);
+          setConfirmDisabled(true);
           reset();
           // 1.校验测试用例是否通过
           if (flag) {
@@ -232,6 +243,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 release_num,
               });
             } catch (e) {
+              setConfirmDisabled(false);
               if (e?.code == 4001 && e?.msg) {
                 setLoading(false);
                 Modal.confirm({
@@ -257,8 +269,10 @@ const ProcessDetail = (props: any, ref: any) => {
             },
             { release_num },
           );
+          setConfirmDisabled(false);
           setLoading(false);
         } catch (e) {
+          setConfirmDisabled(false);
           setLoading(false);
         }
       },
@@ -285,8 +299,10 @@ const ProcessDetail = (props: any, ref: any) => {
       content: `请确认是否要移除 ${
         type == 'server' ? gridSelected?.map((it) => it.apps)?.join(',') + '服务' : ''
       }?`,
+      okButtonProps: { disabled: confirmDisabled },
       onOk: async () => {
         setLoading(true);
+        setConfirmDisabled(true);
         reset();
         await removeRelease(
           {
@@ -297,6 +313,7 @@ const ProcessDetail = (props: any, ref: any) => {
           { release_num },
         );
         await getServerConfirm({ release_num });
+        setConfirmDisabled(false);
         setLoading(false);
       },
     });
@@ -331,6 +348,7 @@ const ProcessDetail = (props: any, ref: any) => {
             },
             false,
           );
+          setConfirmDisabled(false);
           history.replace('/onlineSystem/releaseProcess');
         } catch (e) {
           setConfirmDisabled(false);
@@ -388,9 +406,11 @@ const ProcessDetail = (props: any, ref: any) => {
       content: `请确认是否将『${ServerConfirmType[param.data.confirm_type]} - ${
         param.column.colId.includes('is_hot_update') ? '是否可热更' : '服务确认完成'
       }』状态调整为: ${WhetherOrNot[v]}`,
+      okButtonProps: { disabled: confirmDisabled },
       onOk: async () => {
         reset();
         setLoading(true);
+        setConfirmDisabled(true);
         await updateServerConfirm(
           {
             user_id: user?.userid ?? '',
@@ -401,6 +421,7 @@ const ProcessDetail = (props: any, ref: any) => {
           },
           { release_num },
         );
+        setConfirmDisabled(false);
         setLoading(false);
       },
     });

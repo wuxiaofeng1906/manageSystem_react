@@ -326,7 +326,7 @@ const ReleaseOrder = () => {
             } catch (e) {
               setConfirmDisabled(false);
             }
-            history.replace('/onlineSystem/releaseProcess?key=pre');
+            history.replace('/onlineSystem/releaseProcess');
           },
           onCancel: () => {
             orderForm.setFieldsValue({ release_result: null });
@@ -405,7 +405,7 @@ const ReleaseOrder = () => {
           announcement_time: 'after',
         });
       }
-      history.replace('/onDutyAndRelease/releaseProcess?key=pre');
+      history.replace('/onlineSystem/releaseProcess');
     }
   };
 

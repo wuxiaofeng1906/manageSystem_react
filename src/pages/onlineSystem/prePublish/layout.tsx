@@ -39,14 +39,18 @@ const Layout = () => {
     const checkStatus = ['success', 'failure'];
     let step = 0;
     OnlineSystemServices.getReleaseStatus({ release_num }).then((res) => {
+      let draft = true;
       step = checkStatus.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;
+      OnlineSystemServices.getOrderDetail({ release_num }).then((order) => {
+        draft = order?.status !== 'save';
+      });
       setGlobalState({
         ...globalState,
         step,
         locked: res?.release_sealing == 'yes',
         finished: checkStatus.includes(res?.release_result),
+        draft,
       });
-      console.log(globalState);
       updateHref(Step[step]);
     });
   }, [release_num]);

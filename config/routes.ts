@@ -175,7 +175,7 @@ export default [
         wrappers: ['../wrappers/auth'],
       },
       {
-        name: '发布过程单', // 新版本
+        name: '发布过程', // 新版本
         path: 'releaseProcess',
         component: './onlineSystem/releaseProcess/index',
         wrappers: ['../wrappers/auth'],

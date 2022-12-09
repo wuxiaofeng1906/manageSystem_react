@@ -93,7 +93,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       // 新增 -默认勾选特性项目
       if (!props.data?.release_num) {
         setSelected(
-          res?.map((it: any) => !['stagepatch', 'emergency', 'sprint'].includes(it.sprinttype)),
+          res?.flatMap((it: any) =>
+            ['stagepatch', 'emergency', 'sprint'].includes(it.sprinttype) ? [] : [it],
+          ),
         );
       } else {
         // 勾选上次选中项
@@ -475,14 +477,15 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
                     onChange: (_, selectedRows) => setSelected(selectedRows),
                     getCheckboxProps: (record) => ({
-                      disabled:
-                        memoEdit.global ||
-                        record.disabled ||
-                        (!isEmpty(props.data?.release_env_type) &&
-                          intersection(
-                            record.apps?.split(','),
-                            appServers?.[props.data?.release_env_type],
-                          )?.length == 0),
+                      disabled: memoEdit.update
+                        ? memoEdit.global
+                        : false ||
+                          record.disabled ||
+                          (!isEmpty(props.data?.release_env_type) &&
+                            intersection(
+                              record.apps?.split(','),
+                              appServers?.[props.data?.release_env_type],
+                            )?.length == 0),
                     }),
                   }}
                 />

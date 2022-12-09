@@ -46,7 +46,6 @@ import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOr
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 let agSql: any[] = [];
-let agEnvs: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
@@ -157,9 +156,6 @@ const SheetInfo = (props: any, ref: any) => {
   }, [subTab, tab, release_num]);
 
   useEffect(() => {
-    if (!isEmpty(envs)) {
-      agEnvs = envs;
-    }
     if (!isEmpty(sqlList)) {
       agSql = sqlList;
     }
@@ -190,12 +186,21 @@ const SheetInfo = (props: any, ref: any) => {
             }`
           : '',
         deployment: res?.deployment?.map((it: any) => String(it.deployment_id)),
-        auto_env: basicInfo?.auto_env ? basicInfo?.auto_env?.split(',') : [],
+        auto_env:
+          basicInfo?.need_auto == 'no'
+            ? []
+            : basicInfo?.auto_env
+            ? basicInfo?.auto_env?.split(',')
+            : [],
         need_auto: basicInfo?.need_auto || undefined,
         sql_action_time: res?.release_app?.sql_action_time || undefined,
       });
       agFinished =
         !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
+      setGlobalState({
+        ...globalState,
+        draft: isEmpty(res) ? true : res?.status !== 'save',
+      });
       setFinished(agFinished);
       setUpgradeData(res);
       setSpinning(false);
@@ -247,6 +252,7 @@ const SheetInfo = (props: any, ref: any) => {
     let valid = false;
     const isSuccess = base.release_result == 'success';
     const checkObj = omit({ ...order, ...base }, ignore);
+    let showErrTip = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -263,30 +269,34 @@ const SheetInfo = (props: any, ref: any) => {
       is_update: '请填写是否数据update',
       clear_cache: '请填写是否清理应用缓存',
     };
+    // 发布成功-> 数据完整性校验
     if (isSuccess) {
+      // 基础信息
       valid = Object.values(checkObj).some((it) => isEmpty(it));
+      if (valid) {
+        const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
+        showErrTip = errTip[errArr?.[0]];
+      } else if (isEmpty(base.ready_release_name?.trim())) {
+        orderForm.setFieldsValue({ release_result: null });
+        showErrTip = errTip.ready_release_name;
+      }
+      // 服务信息
+      else if (!isEmpty(serverInfo)) {
+        if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.sql_action_time)) {
+          showErrTip = errTip.sql_action_time;
+        }
+        const err = Object.entries(
+          pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
+        ).find((k, v) => isEmpty(v));
+        if (!isEmpty(err)) {
+          showErrTip = errTip[err?.[0]];
+        }
+      }
     }
 
-    if (valid) {
-      const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
-      infoMessage(errTip[errArr?.[0]]);
+    if (showErrTip) {
       orderForm.setFieldsValue({ release_result: null });
-      return;
-    }
-    if (!isEmpty(serverInfo) && isSuccess) {
-      if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.sql_action_time)) {
-        orderForm.setFieldsValue({ release_result: null });
-        return infoMessage(errTip.sql_action_time);
-      }
-      // console.log(serverInfo[0]);
-      // const err = Object.entries(
-      //   pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
-      // ).find((k, v) => isEmpty(v));
-      // return infoMessage(errTip[err?.[0]]);
-    }
-    if (isEmpty(base.ready_release_name?.trim()) && isSuccess) {
-      orderForm.setFieldsValue({ release_result: null });
-      return infoMessage(errTip.ready_release_name);
+      return infoMessage(showErrTip);
     }
     // 发布结果为空，直接保存
     if (isEmpty(result?.trim()) || result == 'unknown') {
@@ -353,6 +363,7 @@ const SheetInfo = (props: any, ref: any) => {
       await onSave(true);
       agFinished = true;
       setFinished(true);
+      setLeaveShow(false);
       await PreReleaseServices.automation(params);
       // 关联公告并勾选挂起公告
       if (!hasAnnouncement && data.announcement) {
@@ -418,13 +429,6 @@ const SheetInfo = (props: any, ref: any) => {
   useEffect(() => {
     setGlobalState({
       ...globalState,
-      draft: isEmpty(upgradeData) ? true : upgradeData?.status !== 'save',
-    });
-  }, [upgradeData?.status, tab, subTab]);
-
-  useEffect(() => {
-    setGlobalState({
-      ...globalState,
       locked: finished ? true : globalState?.locked,
       finished,
       step: finished ? 2 : globalState.step,
@@ -436,24 +440,13 @@ const SheetInfo = (props: any, ref: any) => {
     return (
       <Select
         size={'small'}
-        value={
-          isEmpty(p.value)
-            ? undefined
-            : field == 'cluster'
-            ? isString(p.value)
-              ? p.value?.split(',')
-              : p.value
-            : p.value
-        }
+        value={isEmpty(p.value) ? undefined : p.value}
         style={{ width: '100%' }}
         disabled={agFinished}
         allowClear={true}
-        mode={field == 'cluster' ? 'multiple' : undefined}
         options={
           field == 'sql_order'
             ? agSql || sqlList
-            : field == 'cluster'
-            ? agEnvs || envs
             : field == 'batch'
             ? batchs
             : Object.keys(WhetherOrNot)?.map((k) => ({
@@ -631,7 +624,7 @@ const SheetInfo = (props: any, ref: any) => {
                     value: it,
                   }))}
                   onChange={(v) => {
-                    if (v == 'yes') {
+                    if (v == 'no') {
                       baseForm.setFieldsValue({ auto_env: undefined });
                     }
                   }}

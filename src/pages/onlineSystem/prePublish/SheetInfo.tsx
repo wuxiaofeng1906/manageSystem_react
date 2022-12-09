@@ -89,6 +89,7 @@ const SheetInfo = (props: any, ref: any) => {
   useImperativeHandle(ref, () => ({ onSave }), [release_num, upgradeData, deployments]);
 
   const onSave = async (flag = false) => {
+    if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
     const upgrade_api = upgradeRef.current
       ?.getRenderedNodes()
       .map((it) => it.data)
@@ -101,7 +102,7 @@ const SheetInfo = (props: any, ref: any) => {
       ready_release_num: release_num,
       user_id: user?.userid,
       upgrade_api,
-      deployment: deployments.flatMap((it) =>
+      deployment: deployments?.flatMap((it) =>
         baseValues.deployment.includes(String(it.value))
           ? [
               {
@@ -433,9 +434,9 @@ const SheetInfo = (props: any, ref: any) => {
         mode={field == 'cluster' ? 'multiple' : undefined}
         options={
           field == 'sql_order'
-            ? agSql
+            ? agSql || sqlList
             : field == 'cluster'
-            ? agEnvs
+            ? agEnvs || envs
             : field == 'batch'
             ? batchs
             : Object.keys(WhetherOrNot)?.map((k) => ({

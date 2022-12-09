@@ -16,7 +16,7 @@ export default () => {
     locked: false,
     finished: false,
     step: 1,
-    draft: false,
+    draft: true,
   });
   const [basic, setBasic] = useState<any>();
   const [server, setServer] = useState<any[]>([]);

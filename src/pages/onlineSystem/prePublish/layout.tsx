@@ -46,6 +46,7 @@ const Layout = () => {
         locked: res?.release_sealing == 'yes',
         finished: checkStatus.includes(res?.release_result),
       });
+      console.log(globalState);
       updateHref(Step[step]);
     });
   }, [release_num]);

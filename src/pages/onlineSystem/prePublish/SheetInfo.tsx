@@ -196,6 +196,7 @@ const SheetInfo = (props: any, ref: any) => {
       agFinished =
         !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
       setGlobalState({ ...globalState, draft: res?.status !== 'save' });
+      console.log(globalState, res?.status !== 'save');
       setFinished(agFinished);
       setUpgradeData(res);
       setSpinning(false);
@@ -277,10 +278,10 @@ const SheetInfo = (props: any, ref: any) => {
       if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.order_execution_time))
         return infoMessage(errTip.order_execution_time);
 
-      const err = Object.entries(
-        pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
-      ).find((k, v) => isEmpty(v));
-      return infoMessage(errTip[err?.[0]]);
+      // const err = Object.entries(
+      //   pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
+      // ).find((k, v) => isEmpty(v));
+      // return infoMessage(errTip[err?.[0]]);
     }
     if (isEmpty(base.ready_release_name?.trim()) && isSuccess) {
       orderForm.setFieldsValue({ release_result: null });
@@ -427,7 +428,15 @@ const SheetInfo = (props: any, ref: any) => {
     return (
       <Select
         size={'small'}
-        value={isEmpty(p.value) ? undefined : field == 'cluster' ? p.value?.split(',') : p.value}
+        value={
+          isEmpty(p.value)
+            ? undefined
+            : field == 'cluster'
+            ? isString(p.value)
+              ? p.value?.split(',')
+              : p.value
+            : p.value
+        }
         style={{ width: '100%' }}
         disabled={agFinished}
         allowClear={true}

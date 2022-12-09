@@ -185,6 +185,7 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
             <Col span={12}>
               <Form.Item noStyle shouldUpdate={(pre, next) => next.side != pre.side}>
                 {({ getFieldValue }) => {
+                  const backendFront = 'backendFront';
                   const side = getFieldValue('side');
                   return (
                     <Form.Item
@@ -198,6 +199,11 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
                         options={Object.entries(TechnicalSide).map(([k, v]) => ({
                           label: v,
                           value: k,
+                          disabled: isEmpty(side)
+                            ? false
+                            : side == backendFront
+                            ? k !== backendFront
+                            : k == backendFront,
                         }))}
                       />
                     </Form.Item>

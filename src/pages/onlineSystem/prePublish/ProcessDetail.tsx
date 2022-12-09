@@ -558,7 +558,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 setChecked(arr.length == server?.length);
                 setSelectedRowKeys(arr);
               },
-              getCheckboxProps: (record) => ({ disabled: hasEdit }),
+              getCheckboxProps: () => ({ disabled: hasEdit }),
             }}
           />
         </div>

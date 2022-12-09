@@ -13,7 +13,7 @@ import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/co
 import type { IStatisticQuery } from '@/services/statistic';
 
 // 统计
-export type IStaticBy = 'year' | 'halfYear' | 'quarter' | 'month' | 'week';
+export type IStaticBy = 'year' | 'halfYear' | 'quarter' | 'month' | 'week' | 'day';
 export type IIdentity =
   | 'DEVELOPER'
   | 'TESTER'

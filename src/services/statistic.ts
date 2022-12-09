@@ -1,7 +1,7 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
 import { formatTreeData } from '@/utils/utils';
-import { IIdentity, IStaticBy } from '@/hooks/statistic';
+import { IIdentity, IStaticBy, Period } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
   client: GqlClient<object>;
@@ -373,10 +373,11 @@ const StatisticServices = {
     return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
   },
 
+  // 运维 -系统可用，修复，可用时间
   async operationsAvgAvailable({ client, params }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const { data } = await client.query(`
       {
          data:devopsSeveralSysKpis(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         category
@@ -398,7 +399,30 @@ const StatisticServices = {
     }
   }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+    return { data: data.data };
+  },
+
+  // 运维 - 响应时长
+  async operationsAvgRespTime({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    const { data } = await client.query(`
+      {
+         data:devopsAvgRespDura(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+          maxsize
+          datas{
+            range{
+            start
+            end
+          }
+          datas{
+            cluster
+            duration
+          }
+      }
+    }
+  }
+  `);
+    return { data: data.data };
   },
 
   // 已发布需求平均关闭时长

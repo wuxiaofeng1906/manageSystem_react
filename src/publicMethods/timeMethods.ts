@@ -1,6 +1,7 @@
 import * as dayjs from 'dayjs'; // 使用dayjs
 import moment from 'moment';
-import type { IStaticBy } from '@/hooks/statistic'; // 使用moment
+import type { IStaticBy } from '@/hooks/statistic';
+import { isEmpty } from 'lodash'; // 使用moment
 
 function formatMomentTime(time: any) {
   return time === null ? null : moment(time, 'YYYY-MM-DD');
@@ -221,6 +222,28 @@ function getHalfYearTime(year = 4) {
   return half;
 }
 
+// 最近一个月的天数据
+export function getAllDate(start: string, end: string) {
+  console.log(start, end);
+  if (isEmpty(start) || isEmpty(end)) return [];
+  let everyDay: string[] = [];
+  let startArr: any[] = start?.split('-');
+  let endArr: any[] = end?.split('-');
+  let db = new Date();
+  db.setUTCFullYear(startArr[0], startArr[1] - 1, startArr[2]);
+  let de = new Date();
+  de.setUTCFullYear(endArr[0], endArr[1] - 1, endArr[2]);
+  let unixDb = db.getTime();
+  let unixDe = de.getTime();
+  let stamp;
+  const oneDay = 24 * 60 * 60 * 1000;
+  for (stamp = unixDb; stamp <= unixDe; ) {
+    everyDay.push(dayjs(stamp).format('YYYY-MM-DD'));
+    stamp = stamp + oneDay;
+  }
+  return everyDay;
+}
+
 // 获取年的开始和结束时间
 function getYearsTime() {
   const ranges = new Array();
@@ -239,7 +262,7 @@ function getYearsTime() {
 
 const getParamsByType = (type: IStaticBy, isCurMonth = false) => {
   let typeFlag = 0;
-  let ends = [];
+  let ends: string | any[] = [];
   if (type === 'week') {
     typeFlag = 1;
     ends = getWeeksRange(8);
@@ -255,8 +278,16 @@ const getParamsByType = (type: IStaticBy, isCurMonth = false) => {
   } else if (type == 'halfYear') {
     typeFlag = 5;
     ends = getHalfYearTime();
+  } else if (type == 'day') {
+    typeFlag = 0;
+    ends = dayjs().format('YYYY-MM-DD');
   }
-  return { typeFlag, ends: JSON.stringify(ends?.map((it) => (type == 'week' ? it.to : it.end))) };
+  return {
+    typeFlag,
+    ends: JSON.stringify(
+      typeFlag == 0 ? ends : (ends as any[])?.map((it) => (type == 'week' ? it.to : it.end)),
+    ),
+  };
 };
 
 // 根据开始和结束时间，获取开始时间当周的周一和结束时间当周的周末。

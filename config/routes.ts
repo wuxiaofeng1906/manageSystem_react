@@ -824,6 +824,24 @@ export default [
               },
             ],
           },
+          {
+            name: '运维',
+            path: '/kpi/performance/operations',
+            routes: [
+              {
+                name: '系统可用/修复时间',
+                path: 'systemAvailable',
+                component: './kpi/performance/operations/systemAvailable',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '系统响应时间',
+                path: 'systemAvgRespTime',
+                component: './kpi/performance/operations/systemAvgRespTime',
+                wrappers: ['../wrappers/auth'],
+              },
+            ],
+          },
         ],
       },
       {

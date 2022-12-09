@@ -38,6 +38,7 @@ export interface IRuleData {
   table?: { dataSource: any[]; column: ColumnsType<any> }; // 支持antd table
 }
 const condition: { icon: React.ReactNode; title: string; type: IStaticBy }[] = [
+  { icon: <ProfileTwoTone />, title: '按天', type: 'day' },
   { icon: <ProfileTwoTone />, title: '按周', type: 'week' },
   { icon: <CalendarTwoTone />, title: '按月', type: 'month' },
   { icon: <ScheduleTwoTone />, title: '按季', type: 'quarter' },
@@ -122,7 +123,6 @@ const IStaticPerformance: React.FC<IStatic> = ({
               pinned: 'left',
               suppressMenu: false,
             }}
-            pivotMode={true}
             columnDefs={columnDefs ?? columns}
             rowData={rowData}
             rowHeight={32}
@@ -193,7 +193,7 @@ export const ConditionHeader = ({
   initFilter = ['week', 'month', 'quarter', 'year'],
   onChange,
 }: {
-  initFilter: IStaticBy[];
+  initFilter?: IStaticBy[];
   onChange: (type: IStaticBy) => void;
 }) => {
   return (

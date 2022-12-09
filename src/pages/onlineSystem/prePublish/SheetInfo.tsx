@@ -76,6 +76,7 @@ const SheetInfo = (props: any, ref: any) => {
     upgrade_api: any[];
     release_app: any;
     basic_data: any;
+    status: 'draft' | 'save';
   } | null>();
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [deployments, setDeployments] = useState<any[]>([]);
@@ -195,8 +196,6 @@ const SheetInfo = (props: any, ref: any) => {
       });
       agFinished =
         !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
-      setGlobalState({ ...globalState, draft: res?.status !== 'save' });
-      console.log(globalState, res?.status !== 'save');
       setFinished(agFinished);
       setUpgradeData(res);
       setSpinning(false);
@@ -274,10 +273,11 @@ const SheetInfo = (props: any, ref: any) => {
       orderForm.setFieldsValue({ release_result: null });
       return;
     }
-    if (!isEmpty(serverInfo)) {
-      if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.sql_action_time))
+    if (!isEmpty(serverInfo) && isSuccess) {
+      if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.sql_action_time)) {
+        orderForm.setFieldsValue({ release_result: null });
         return infoMessage(errTip.sql_action_time);
-
+      }
       // const err = Object.entries(
       //   pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
       // ).find((k, v) => isEmpty(v));
@@ -413,6 +413,13 @@ const SheetInfo = (props: any, ref: any) => {
   const computedServer = useMemo(() => PublishSeverColumn(upgradeData?.basic_data), [
     upgradeData?.basic_data,
   ]);
+
+  useEffect(() => {
+    setGlobalState({
+      ...globalState,
+      draft: isEmpty(upgradeData) ? true : upgradeData?.status !== 'save',
+    });
+  }, [upgradeData?.status]);
 
   useEffect(() => {
     setGlobalState({

@@ -134,7 +134,7 @@ const SheetInfo = (props: any, ref: any) => {
           ? release_app?.[0]?.cluster
           : release_app?.[0]?.cluster?.join(','),
         database_version: release_app?.[0]?.database_version ?? '',
-        order_execution_time: baseValues?.order_execution_time ?? '',
+        sql_action_time: baseValues?.sql_action_time ?? '',
       },
     });
     setLeaveShow(false);
@@ -191,7 +191,7 @@ const SheetInfo = (props: any, ref: any) => {
         deployment: res?.deployment?.map((it: any) => String(it.deployment_id)),
         auto_env: basicInfo?.auto_env ? basicInfo?.auto_env?.split(',') : [],
         need_auto: basicInfo?.need_auto || undefined,
-        order_execution_time: res?.release_app?.order_execution_time || undefined,
+        sql_action_time: res?.release_app?.sql_action_time || undefined,
       });
       agFinished =
         !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
@@ -257,7 +257,7 @@ const SheetInfo = (props: any, ref: any) => {
       release_way: '请填写发布方式',
       need_auto: '请填写是否需要跑升级后自动化',
       auto_env: '请填写是否升级后自动化环境',
-      order_execution_time: '请填写SQL工单执行顺序',
+      sql_action_time: '请填写SQL工单执行顺序',
       cluster: '请填写发布环境',
       clear_redis: '请填写是否清理redis缓存',
       is_recovery: '请填写是否涉及数据Recovery',
@@ -275,8 +275,8 @@ const SheetInfo = (props: any, ref: any) => {
       return;
     }
     if (!isEmpty(serverInfo)) {
-      if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.order_execution_time))
-        return infoMessage(errTip.order_execution_time);
+      if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.sql_action_time))
+        return infoMessage(errTip.sql_action_time);
 
       // const err = Object.entries(
       //   pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
@@ -583,7 +583,7 @@ const SheetInfo = (props: any, ref: any) => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name={'order_execution_time'} label={'SQL工单执行时间'}>
+              <Form.Item name={'sql_action_time'} label={'SQL工单执行时间'}>
                 <Select
                   style={{ width: '100%' }}
                   options={Object.entries(OrderExecutionBy)?.map(([k, v]) => ({

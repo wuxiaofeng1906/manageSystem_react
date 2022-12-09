@@ -16,8 +16,8 @@ export default () => {
     locked: false,
     finished: false,
     step: 1,
-    draft: true,
   });
+  const [draft, setDraft] = useState(true);
   const [basic, setBasic] = useState<any>();
   const [server, setServer] = useState<any[]>([]);
   const [api, setApi] = useState<any[]>([]);
@@ -134,6 +134,8 @@ export default () => {
     api,
     repair,
     serverConfirm,
+    draft,
+    setDraft,
     setGlobalState,
     getReleaseInfo,
     getRepairInfo,

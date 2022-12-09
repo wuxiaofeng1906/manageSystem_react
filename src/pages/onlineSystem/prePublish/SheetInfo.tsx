@@ -51,22 +51,28 @@ const SheetInfo = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
-  const [globalState, envs, sqlList, setGlobalState, getLogInfo] = useModel(
-    'onlineSystem',
-    (online) => [
-      online.globalState,
-      online.envs,
-      online.sqlList,
-      online.setGlobalState,
-      online.getLogInfo,
-    ],
-  );
+  const [
+    globalState,
+    envs,
+    sqlList,
+    setGlobalState,
+    getLogInfo,
+    setDraft,
+  ] = useModel('onlineSystem', (online) => [
+    online.globalState,
+    online.envs,
+    online.sqlList,
+    online.setGlobalState,
+    online.getLogInfo,
+    online.setDraft,
+  ]);
 
   const [spinning, setSpinning] = useState(false);
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   const [tableHeight, setTableHeight] = useState((window.innerHeight - 460) / 2);
-  const [baseForm] = Form.useForm(); // 工单基础摄制组
+  const [baseForm] = Form.useForm(); // 工单基础
   const [orderForm] = Form.useForm();
+  const [sqlForm] = Form.useForm();
   const [finished, setFinished] = useState(false);
   const [visible, setVisible] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
@@ -97,6 +103,7 @@ const SheetInfo = (props: any, ref: any) => {
     const release_app = serverRef.current?.getRenderedNodes().map((it) => it.data) ?? [];
     const baseValues = baseForm.getFieldsValue();
     const orderValues = orderForm.getFieldsValue();
+    const sqlValues = sqlForm.getFieldsValue();
 
     await OnlineSystemServices.updateOrderDetail({
       ready_release_num: release_num,
@@ -134,7 +141,7 @@ const SheetInfo = (props: any, ref: any) => {
           ? release_app?.[0]?.cluster
           : release_app?.[0]?.cluster?.join(','),
         database_version: release_app?.[0]?.database_version ?? '',
-        sql_action_time: baseValues?.sql_action_time ?? '',
+        sql_action_time: sqlValues.sql_action_time || '',
       },
     });
     setLeaveShow(false);
@@ -193,13 +200,15 @@ const SheetInfo = (props: any, ref: any) => {
             ? basicInfo?.auto_env?.split(',')
             : [],
         need_auto: basicInfo?.need_auto || undefined,
-        sql_action_time: res?.release_app?.sql_action_time || undefined,
       });
       agFinished =
         !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
+
+      setDraft(res?.status !== 'save');
       setGlobalState({
-        ...globalState,
-        draft: isEmpty(res) ? true : res?.status !== 'save',
+        step: finished ? 2 : globalState.step,
+        locked: finished ? true : globalState?.locked,
+        finished: agFinished,
       });
       setFinished(agFinished);
       setUpgradeData(res);
@@ -250,7 +259,7 @@ const SheetInfo = (props: any, ref: any) => {
     if (base.need_auto == 'no') ignore.push('auto_env');
 
     let valid = false;
-    const isSuccess = base.release_result == 'success';
+    const isSuccess = order.release_result == 'success';
     const checkObj = omit({ ...order, ...base }, ignore);
     let showErrTip = '';
     const errTip = {
@@ -262,13 +271,13 @@ const SheetInfo = (props: any, ref: any) => {
       release_way: '请填写发布方式',
       need_auto: '请填写是否需要跑升级后自动化',
       auto_env: '请填写是否升级后自动化环境',
-      sql_action_time: '请填写SQL工单执行顺序',
       cluster: '请填写发布环境',
       clear_redis: '请填写是否清理redis缓存',
       is_recovery: '请填写是否涉及数据Recovery',
       is_update: '请填写是否数据update',
       clear_cache: '请填写是否清理应用缓存',
     };
+
     // 发布成功-> 数据完整性校验
     if (isSuccess) {
       // 基础信息
@@ -277,23 +286,18 @@ const SheetInfo = (props: any, ref: any) => {
         const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
         showErrTip = errTip[errArr?.[0]];
       } else if (isEmpty(base.ready_release_name?.trim())) {
-        orderForm.setFieldsValue({ release_result: null });
         showErrTip = errTip.ready_release_name;
       }
       // 服务信息
       else if (!isEmpty(serverInfo)) {
-        if (!isEmpty(serverInfo?.[0].sql_order) && isEmpty(base.sql_action_time)) {
-          showErrTip = errTip.sql_action_time;
-        }
         const err = Object.entries(
           pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
-        ).find((k, v) => isEmpty(v));
+        ).find(([k, v]) => isEmpty(v));
         if (!isEmpty(err)) {
           showErrTip = errTip[err?.[0]];
         }
       }
     }
-
     if (showErrTip) {
       orderForm.setFieldsValue({ release_result: null });
       return infoMessage(showErrTip);
@@ -426,15 +430,6 @@ const SheetInfo = (props: any, ref: any) => {
     upgradeData?.basic_data,
   ]);
 
-  useEffect(() => {
-    setGlobalState({
-      ...globalState,
-      locked: finished ? true : globalState?.locked,
-      finished,
-      step: finished ? 2 : globalState.step,
-    });
-  }, [finished]);
-
   const renderSelect = (p: CellClickedEvent) => {
     const field = p.column.colId;
     return (
@@ -455,12 +450,49 @@ const SheetInfo = (props: any, ref: any) => {
               }))
         }
         onChange={(v) => {
-          const rowNode = serverRef.current?.getRowNode(String(p.rowIndex));
-          rowNode?.setData({ ...p.data, [field]: v });
+          let flag = field == 'sql_order' && !isEmpty(v);
+          if (flag) {
+            sqlForm.resetFields();
+            Modal.confirm({
+              centered: true,
+              title: 'SQL工单执行时间填写',
+              content: (
+                <Form form={sqlForm}>
+                  <Form.Item
+                    name={'sql_action_time'}
+                    label={'SQL工单执行时间'}
+                    rules={[{ message: '请填写SQL工单执行顺序', required: true }]}
+                  >
+                    <Select
+                      style={{ width: '100%' }}
+                      options={Object.entries(OrderExecutionBy)?.map(([k, v]) => ({
+                        label: v,
+                        value: k,
+                      }))}
+                    />
+                  </Form.Item>
+                </Form>
+              ),
+              onOk: async () => {
+                await sqlForm.validateFields();
+                updateFieldValue(p, v);
+              },
+              onCancel: () => {
+                updateFieldValue(p, undefined);
+              },
+            });
+          } else {
+            updateFieldValue(p, v);
+          }
           if (!leaveShow) setLeaveShow(true);
         }}
       />
     );
+  };
+
+  const updateFieldValue = (p: CellClickedEvent, v?: string) => {
+    const rowNode = serverRef.current?.getRowNode(String(p.rowIndex));
+    rowNode?.setData({ ...p.data, [p.column.colId]: v });
   };
 
   return (
@@ -536,7 +568,7 @@ const SheetInfo = (props: any, ref: any) => {
                     <Form.Item name={'release_result'}>
                       <Select
                         allowClear
-                        disabled={globalState.draft || finished}
+                        disabled={draft || finished}
                         className={styles.selectColor}
                         onChange={() => onSaveBeforeCheck(true)}
                         options={[
@@ -578,20 +610,9 @@ const SheetInfo = (props: any, ref: any) => {
                 <Input style={{ width: '100%' }} disabled />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={18}>
               <Form.Item name={'project'} label={'预发布项目'}>
                 <Input style={{ width: '100%' }} disabled />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name={'sql_action_time'} label={'SQL工单执行时间'}>
-                <Select
-                  style={{ width: '100%' }}
-                  options={Object.entries(OrderExecutionBy)?.map(([k, v]) => ({
-                    label: v,
-                    value: k,
-                  }))}
-                />
               </Form.Item>
             </Col>
           </Row>

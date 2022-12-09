@@ -19,7 +19,8 @@ const tabs = [
 const Layout = () => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
-  const [globalState, setGlobalState] = useModel('onlineSystem', (online) => [
+  const [draft, globalState, setGlobalState] = useModel('onlineSystem', (online) => [
+    online.draft,
     online.globalState,
     online.setGlobalState,
   ]);
@@ -39,17 +40,12 @@ const Layout = () => {
     const checkStatus = ['success', 'failure'];
     let step = 0;
     OnlineSystemServices.getReleaseStatus({ release_num }).then((res) => {
-      let draft = true;
       step = checkStatus.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;
-      OnlineSystemServices.getOrderDetail({ release_num }).then((order) => {
-        draft = order?.status !== 'save';
-      });
       setGlobalState({
         ...globalState,
         step,
         locked: res?.release_sealing == 'yes',
         finished: checkStatus.includes(res?.release_result),
-        draft,
       });
       updateHref(Step[step]);
     });
@@ -152,9 +148,7 @@ const Layout = () => {
     else
       return (
         <div>
-          {globalState.draft && (
-            <strong style={{ color: '#fe7b00cf', marginRight: 16 }}>状态：草稿态</strong>
-          )}
+          {draft && <strong style={{ color: '#fe7b00cf', marginRight: 16 }}>状态：草稿态</strong>}
           <Button
             size={'small'}
             onClick={() => ref.current?.onSave()}
@@ -165,7 +159,7 @@ const Layout = () => {
           </Button>
         </div>
       );
-  }, [release_num, tab, subTab, globalState, touched]);
+  }, [release_num, tab, subTab, globalState, touched, draft]);
   return (
     <div className={styles.prePublish}>
       <Tabs

@@ -361,7 +361,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       headerName: '环境',
       field: 'cluster',
       minWidth: 220,
-      valueFormatter: (p) => p.value?.replaceAll('cn-northwest-', ''),
+      valueFormatter: (p) => p.value?.replaceAll('cn-northwest-', '集群'),
     },
     { headerName: '应用', field: 'apps', minWidth: 110 },
     { headerName: '镜像源环境', field: 'release_env', minWidth: 110 },

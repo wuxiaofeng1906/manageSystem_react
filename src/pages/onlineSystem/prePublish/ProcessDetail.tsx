@@ -456,7 +456,6 @@ const ProcessDetail = (props: any, ref: any) => {
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
   const memoGroup = useMemo(() => {
     const table = mergeCellsTable(server ?? [], 'apps');
-    console.log(table);
     return {
       opts: uniq(server?.map((it) => it.apps)),
       table,

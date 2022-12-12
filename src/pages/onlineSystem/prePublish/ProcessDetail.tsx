@@ -368,9 +368,7 @@ const ProcessDetail = (props: any, ref: any) => {
     const updateData = pick(
       {
         ...values,
-        plan_release_time: moment(values.plan_release_time)
-          .startOf('d')
-          .format('YYYY-MM-DD HH:mm:ss'),
+        plan_release_time: moment(values.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
       },
       ['release_name', 'release_env', 'plan_release_time'],
     );

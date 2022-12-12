@@ -212,6 +212,7 @@ const SheetInfo = (props: any, ref: any) => {
         locked: finished ? true : globalState?.locked,
         finished: agFinished,
       });
+      setLeaveShow(false);
       setFinished(agFinished);
       setUpgradeData(res);
       setSpinning(false);

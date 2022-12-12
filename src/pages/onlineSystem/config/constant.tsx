@@ -106,7 +106,7 @@ export const checkInfo = [
     rowKey: 'icon_check',
     api_url: 'icon-check',
     source: '研发管理平台',
-    contact: 'SQA',
+    contact: '前端',
   },
   {
     check_type: '前端代码遗漏检查是否通过',
@@ -122,7 +122,7 @@ export const checkInfo = [
     rowKey: 'front_version_data',
     api_url: 'version-check',
     source: '研发管理平台',
-    contact: 'SQA',
+    contact: '前端',
   },
   {
     check_type: '前端服务git分支是否封版',

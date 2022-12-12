@@ -218,11 +218,11 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
   const flag = data.some(
     (it: any) => it.project.includes('stage-patch') || it.project.includes('emergency'),
   );
-  let arr = [
+  let arr: any[] = [
     {
       title: '应用',
       dataIndex: 'apps',
-      onCell: (row: any) => ({ rowSpan: +row?.rowSpan ?? 1 }),
+      onCell: (row: any) => ({ rowSpan: 2 }),
       width: 100,
     },
     {
@@ -230,8 +230,8 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
       dataIndex: 'project',
       width: 200,
       ellipsis: { showTitle: false },
-      render: (v: string) => (
-        <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />
+      render: (v: string, row: any) => (
+        <Ellipsis key={row._id} title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />
       ),
     },
     {
@@ -260,19 +260,19 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
         title: '是否涉及数据update',
         dataIndex: 'data_upgrade',
         width: 150,
-        render: (v) => <span>{cpWhetherOrNot[v] ?? v}</span>,
+        render: (v: string) => <span>{cpWhetherOrNot[v] ?? v}</span>,
       },
       {
         title: '是否涉及数据Recovery',
         dataIndex: 'is_recovery',
         width: 160,
-        render: (v) => <span>{cpWhetherOrNot[v] ?? v}</span>,
+        render: (v: string) => <span>{cpWhetherOrNot[v] ?? v}</span>,
       },
       {
         title: '是否可热更',
         dataIndex: 'is_hot_update',
         width: 120,
-        render: (v) => <span>{cpWhetherOrNot[v] ?? v}</span>,
+        render: (v: string) => <span>{cpWhetherOrNot[v] ?? v}</span>,
       },
       { title: '需求创建人', dataIndex: 'create_user_name', width: 120 },
       { title: '需求指派人', dataIndex: 'assigned_to_name', width: 120 },

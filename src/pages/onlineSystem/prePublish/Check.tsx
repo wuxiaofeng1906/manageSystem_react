@@ -168,11 +168,11 @@ const Check = (props: any, ref: any) => {
           const flag = it.rowKey == 'auto_obj_data';
           let status = 'skip';
           if (flag) {
-            status = isEmpty(currentKey)
-              ? ''
-              : currentKey?.some((it: any) => it?.check_result == 'no')
-              ? 'no'
-              : 'yes';
+            status =
+              (!isEmpty(currentKey) &&
+                currentKey?.find((it: any) => ['yes', 'no', 'skip'].includes(it?.check_result))
+                  ?.check_result) ||
+              '';
           }
           return {
             ...it,
@@ -191,6 +191,7 @@ const Check = (props: any, ref: any) => {
       );
       setSpin(false);
     } catch (e) {
+      console.log(e);
       setSpin(false);
     }
   };
@@ -322,7 +323,6 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'side',
               width: 90,
               align: 'center',
-              onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
               render: (v) => CheckTechnicalSide[v],
             },
             {

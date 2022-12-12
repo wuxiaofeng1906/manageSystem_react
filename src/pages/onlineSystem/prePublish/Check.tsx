@@ -76,26 +76,31 @@ const Check = (props: any, ref: any) => {
       const param = await OnlineSystemServices.getCheckSettingDetail({ release_num });
       if (param?.default == 'yes') return infoMessage('请先设置检查参数');
     }
-    const checkList = list.flatMap((it) =>
-      selected.includes(it.rowKey) && it.api_url
-        ? [
-            {
-              user_id: user?.userid ?? '',
-              release_num,
-              is_ignore: it.open ? 'no' : 'yes',
-              side: it.side,
-              api_url: it.api_url as ICheckType,
-            },
-          ]
-        : [],
-    );
-    await Promise.all(
-      checkList.map((data) =>
-        OnlineSystemServices.checkOpts(omit(data, ['api_url']), data.api_url),
-      ),
-    );
-    infoMessage('任务正在进行中，请稍后刷新');
-    delay(init(), 2000);
+    try {
+      setSpin(true);
+      const checkList = list.flatMap((it) =>
+        selected.includes(it.rowKey) && it.api_url
+          ? [
+              {
+                user_id: user?.userid ?? '',
+                release_num,
+                is_ignore: it.open ? 'no' : 'yes',
+                side: it.side,
+                api_url: it.api_url as ICheckType,
+              },
+            ]
+          : [],
+      );
+      await Promise.all(
+        checkList.map((data) =>
+          OnlineSystemServices.checkOpts(omit(data, ['api_url']), data.api_url),
+        ),
+      );
+      infoMessage('任务正在进行中，请稍后刷新');
+      setSpin(false);
+    } catch (e) {
+      setSpin(false);
+    }
   };
 
   const onLock = async () => {
@@ -206,7 +211,9 @@ const Check = (props: any, ref: any) => {
       },
       data.api_url,
     );
-    delay(init, 2000);
+    if (data.open) {
+      infoMessage('任务正在执行中，请稍后刷新查看');
+    } else delay(init, 500);
   };
 
   const showLog = (v: any, data: any) => {

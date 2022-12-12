@@ -47,7 +47,6 @@ export const applicationConfigColumn: (ColDef | ColGroupDef)[] = [
     headerName: '可上线环境',
     field: 'release_env',
     minWidth: 130,
-    tooltipField: 'release_env',
     valueFormatter: (p) => ClusterType[p.value],
   },
   {

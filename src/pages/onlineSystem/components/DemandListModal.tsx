@@ -20,7 +20,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [baseForm] = Form.useForm();
   const [computed, setComputed] = useState<any>();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
-  const [globalState, envs, branchs, getLogInfo] = useModel('onlineSystem', (online) => [
+  const [globalState, envs, getLogInfo] = useModel('onlineSystem', (online) => [
     online.globalState,
     online.envs,
     online.branchs,
@@ -32,6 +32,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [relatedStory, setRelatedStory] = useState<any>();
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
   const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
+  const [branchs, setBranchs] = useState<any[]>();
 
   useEffect(() => {
     if (!props.visible) {
@@ -41,6 +42,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       setSelected([]);
       return;
     }
+    OnlineSystemServices.getBranch().then((res) => {
+      setBranchs(res?.map((it: any) => ({ label: it.branch_name, value: it.branch_name })));
+    });
     if (!isEmpty(props.data)) {
       const branch = props.data?.branch;
       form.setFieldsValue({
@@ -174,12 +178,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const onChange = (v: string) => {
-    setSelected([]);
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
       2. 班车、特性 默认集群0
       3.global 默认global
+      4. 特性项目 默认勾选未关联的需求项目
     */
     let selectedData: any[] = [];
     if (!memoColumn.isSprint && v !== 'global') {
@@ -223,6 +227,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
   const updateStatus = (data: any, status: string, index: number) => {
     Modal.confirm({
+      centered: true,
       title: '修改是否可热更提醒',
       content: `请确认是否将『执行名称：${data.pro_name ?? ''} 需求编号：${
         data.story ?? ''

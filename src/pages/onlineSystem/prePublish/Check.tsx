@@ -495,10 +495,9 @@ export default forwardRef(Check);
 
 const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
   const [form] = Form.useForm();
-  const [compareBranch, getLogInfo] = useModel('onlineSystem', (online) => [
-    online.branchs,
-    online.getLogInfo,
-  ]);
+  const [getLogInfo] = useModel('onlineSystem', (online) => [online.getLogInfo]);
+
+  const [compareBranch, setCompareBranch] = useState<any[]>();
   const [disabled, setDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -525,6 +524,9 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
 
   useEffect(() => {
     if (!props.init.visible) return form.resetFields();
+    OnlineSystemServices.getBranch().then((res) => {
+      setCompareBranch(res?.map((it: any) => ({ label: it.branch_name, value: it.branch_name })));
+    });
     getDetail();
   }, [props.init.visible]);
 

@@ -77,6 +77,7 @@ export const preProcessColumn: (ColDef | ColGroupDef)[] = [
     headerName: '发布集群',
     field: 'cluster',
     minWidth: 140,
+    tooltipField: 'cluster',
     valueFormatter: (p) => formatCluster(p.value),
   },
   {
@@ -372,6 +373,7 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   },
 ];
 export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
+  console.log(data);
   return [
     {
       headerName: '环境',
@@ -385,7 +387,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       headerName: 'batch版本',
       field: 'batch',
       minWidth: 110,
-      hide: data?.release_type == 'global',
+      hide: data?.release_type?.release_type == 'global',
       cellRenderer: 'select',
     },
     {
@@ -432,7 +434,7 @@ export const PublishUpgradeColumn: (ColDef | ColGroupDef)[] = [
   },
   { headerName: '接口服务', field: 'api_server', minWidth: 110, width: 110 },
   { headerName: '接口Method', field: 'api_method', minWidth: 110, width: 110 },
-  { headerName: '接口URL', field: 'api_url', minWidth: 110 },
+  { headerName: '接口URL', field: 'api_url', minWidth: 110, tooltipField: 'api_url' },
   { headerName: 'Data', field: 'api_data', minWidth: 110 },
   { headerName: 'Header', field: 'api_header', minWidth: 110 },
   { headerName: '涉及租户', field: 'tenant', minWidth: 110, width: 110 },

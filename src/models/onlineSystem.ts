@@ -24,7 +24,6 @@ export default () => {
   const [repair, setRepair] = useState<any>({ count: 0, page: 1, page_size: 20, data: [] });
   const [serverConfirm, setServerConfirm] = useState<any[]>([]);
   const [envs, setEnvs] = useState<any[]>([]);
-  const [branchs, setBranchs] = useState<any[]>([]);
   const [sqlList, setSqlList] = useState<any[]>([]);
 
   const getReleaseInfo = async (data: any, refreshData: any = null) => {
@@ -100,8 +99,6 @@ export default () => {
   const getSelectList = async () => {
     const res = await PreReleaseServices.environment();
     const sqlOrder = await OnlineSystemServices.sqlOrder();
-    const branch = await OnlineSystemServices.getBranch();
-    setBranchs(branch?.map((it: any) => ({ label: it.branch_name, value: it.branch_name })));
     setEnvs(
       res?.map((it: any) => ({
         label: it.online_environment_name ?? '',
@@ -127,7 +124,6 @@ export default () => {
   return {
     globalState,
     envs,
-    branchs,
     sqlList,
     basic,
     server,

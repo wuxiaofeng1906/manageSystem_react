@@ -21,6 +21,7 @@ import {
 } from 'antd';
 import {
   preServerColumn,
+  formatCluster,
   repairColumn,
   serverConfirmColumn,
   upgradeServicesColumn,
@@ -141,9 +142,7 @@ const ProcessDetail = (props: any, ref: any) => {
       form.setFieldsValue({
         ...basic,
         plan_release_time: basic?.plan_release_time ? moment(basic?.plan_release_time) : null,
-        cluster: basic?.cluster?.includes('cn-northwest-')
-          ? basic?.cluster?.replaceAll('cn-northwest-', '集群')
-          : basic?.cluster,
+        cluster: formatCluster(basic?.cluster),
       });
     }
     if (!isEmpty(repair)) {
@@ -382,7 +381,7 @@ const ProcessDetail = (props: any, ref: any) => {
           form.setFieldsValue({
             ...init,
             plan_release_time: init?.plan_release_time ? moment(init?.plan_release_time) : null,
-            cluster: basic?.cluster?.replaceAll('cn-northwest-', '集群'),
+            cluster: formatCluster(basic?.cluster),
           });
         },
         onOk: async () => {

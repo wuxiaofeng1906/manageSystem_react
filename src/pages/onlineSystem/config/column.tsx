@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { ColumnsType } from 'antd/lib/table';
-import { sum } from 'lodash';
+import { isEmpty, sum } from 'lodash';
 import {
   PublishStatus,
   ReleaseOrderStatus,
@@ -11,8 +11,10 @@ import {
 import Ellipsis from '@/components/Elipsis';
 const cpWhetherOrNot = { ...WhetherOrNot, unknown: '免' };
 
-const formatCluster = (p) =>
-  p?.value?.includes('cn-northwest-') ? p?.value?.replaceAll('cn-northwest-', '集群') : p.value;
+export const formatCluster = (value: string) =>
+  isEmpty(value)
+    ? ''
+    : value?.replace('cn-northwest-global', 'global')?.replaceAll('cn-northwest-', '集群');
 
 export const calendarColumn: (ColDef | ColGroupDef)[] = [
   {
@@ -75,7 +77,7 @@ export const preProcessColumn: (ColDef | ColGroupDef)[] = [
     headerName: '发布集群',
     field: 'cluster',
     minWidth: 140,
-    valueFormatter: formatCluster,
+    valueFormatter: (p) => formatCluster(p.value),
   },
   {
     headerName: '上线分支',
@@ -375,7 +377,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       headerName: '环境',
       field: 'cluster',
       minWidth: 220,
-      valueFormatter: (p) => p.value?.replaceAll('cn-northwest-', '集群'),
+      valueFormatter: (p) => formatCluster(p.value),
     },
     { headerName: '应用', field: 'apps', minWidth: 110 },
     { headerName: '镜像源环境', field: 'release_env', minWidth: 110 },

@@ -25,7 +25,7 @@ import {
   serverConfirmColumn,
   upgradeServicesColumn,
 } from '@/pages/onlineSystem/config/column';
-import { groupBy, isEmpty, uniq } from 'lodash';
+import { groupBy, isEmpty, pick, uniq, isEqual } from 'lodash';
 import { initGridTable, mergeCellsTable } from '@/utils/utils';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi } from 'ag-grid-community';
@@ -365,22 +365,48 @@ const ProcessDetail = (props: any, ref: any) => {
 
   const onSave = async () => {
     const values = await form.validateFields();
-    try {
-      setLoading(true);
-      reset();
-      await updateBasic(
-        {
-          user_id: user?.userid ?? '',
-          release_env: values?.release_env,
-          release_num,
-          release_name: values.release_name,
-          plan_release_time: moment(values.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
+    const updateData = pick(
+      {
+        ...values,
+        plan_release_time: moment(values.plan_release_time)
+          .startOf('d')
+          .format('YYYY-MM-DD HH:mm:ss'),
+      },
+      ['release_name', 'release_env', 'plan_release_time'],
+    );
+    const init = pick(basic, ['release_name', 'release_env', 'plan_release_time']);
+    if (!isEqual(init, updateData)) {
+      Modal.confirm({
+        centered: true,
+        title: '保存基础信息提示',
+        content: '请确认是否需要保存基础信息？',
+        onCancel: () => {
+          form.setFieldsValue({
+            ...init,
+            plan_release_time: init?.plan_release_time ? moment(init?.plan_release_time) : null,
+            cluster: basic?.cluster?.replaceAll('cn-northwest-', '集群'),
+          });
         },
-        { release_num },
-      );
-      setLoading(false);
-    } catch (e) {
-      setLoading(false);
+        onOk: async () => {
+          try {
+            setLoading(true);
+            reset();
+            await updateBasic(
+              {
+                user_id: user?.userid ?? '',
+                release_env: values?.release_env,
+                release_num,
+                release_name: values.release_name,
+                plan_release_time: moment(values.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
+              },
+              { release_num },
+            );
+            setLoading(false);
+          } catch (e) {
+            setLoading(false);
+          }
+        },
+      });
     }
   };
 
@@ -444,15 +470,13 @@ const ProcessDetail = (props: any, ref: any) => {
       <div className={styles.processDetail}>
         <div className={styles.tableHeader}>
           <h4>一、基础信息</h4>
-          <Button size={'small'} onClick={onSave} disabled={hasEdit}>
-            保存
-          </Button>
         </div>
         <Form
           size={'small'}
           className={styles.resetForm + ' no-wrap-form'}
           form={form}
           autoComplete="off"
+          onBlur={onSave}
         >
           <Row justify={'space-between'} gutter={8}>
             <Col span={10}>

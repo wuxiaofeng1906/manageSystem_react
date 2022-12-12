@@ -222,7 +222,7 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
     {
       title: '应用',
       dataIndex: 'apps',
-      onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
+      onCell: (row: any) => ({ rowSpan: +row?.rowSpan ?? 1 }),
       width: 100,
     },
     {
@@ -230,13 +230,15 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
       dataIndex: 'project',
       width: 200,
       ellipsis: { showTitle: false },
-      render: (v) => <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />,
+      render: (v: string) => (
+        <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />
+      ),
     },
     {
       title: '是否封版',
       dataIndex: 'is_sealing',
       width: 120,
-      render: (v) => (
+      render: (v: string) => (
         <span style={{ color: v == 'yes' ? 'green' : 'initial' }}>{cpWhetherOrNot[v] ?? v}</span>
       ),
     },
@@ -275,11 +277,23 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
       { title: '需求创建人', dataIndex: 'create_user_name', width: 120 },
       { title: '需求指派人', dataIndex: 'assigned_to_name', width: 120 },
     );
+  //是否封版 请求结果  no ->yes 解版成功，yes->yes 封版成功  yes->no 封版失败+说明， no->no 解版失败+说明
   arr.push({
     title: '请求结果说明',
     dataIndex: 'seal_result_dev',
     width: 100,
-    render: (v) => <span>{v == 'yes' ? '封版成功' : v == 'no' ? '封版失败' : ''}</span>,
+    render: (v: string, row: any) => {
+      const isSeal = { yes: '封版', no: '解版' };
+      return (
+        <span>
+          {['yes', 'no'].includes(v)
+            ? v == 'yes'
+              ? `${isSeal[row.is_sealing]}成功`
+              : `${isSeal[row.is_sealing]}失败 ${row?.seal_result_dev_log || ''}`
+            : ''}
+        </span>
+      );
+    },
   });
   return arr;
 };

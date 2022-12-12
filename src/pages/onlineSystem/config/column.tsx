@@ -222,8 +222,9 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
     {
       title: '应用',
       dataIndex: 'apps',
-      onCell: (row: any) => ({ rowSpan: 2 }),
       width: 100,
+      onCell: (row: any) => ({ rowSpan: row.rowSpan }),
+      render: (v: string) => <span>{v}</span>,
     },
     {
       title: '项目名称',
@@ -252,7 +253,7 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
         title: '需求标题',
         dataIndex: 'title',
         width: 200,
-        render: (v) => (
+        render: (v: string) => (
           <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />
         ),
       },

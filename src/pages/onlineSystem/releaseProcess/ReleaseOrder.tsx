@@ -377,6 +377,7 @@ const ReleaseOrder = () => {
   };
 
   const onSuccessConfirm = async (data: any) => {
+    const announcement_num = orderForm.getFieldValue('announcement_num');
     setVisible(false);
     if (isEmpty(data)) {
       orderForm.setFieldsValue({ release_result: null });
@@ -398,7 +399,7 @@ const ReleaseOrder = () => {
       setFinished(true);
       await PreReleaseServices.automation(params);
       // 关联公告并勾选挂起公告
-      if (!hasAnnouncement && data.announcement) {
+      if (!isEmpty(announcement_num) && announcement_num !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),
@@ -448,12 +449,6 @@ const ReleaseOrder = () => {
     setOrderData(sortArr);
     formatCompare(compareData?.opsData ?? [], sortArr);
   };
-
-  // 是否关联了公告
-  const hasAnnouncement = useMemo(() => {
-    const announce = orderForm.getFieldValue('announcement_num');
-    return isEmpty(announce) || announce == '免';
-  }, [orderForm?.getFieldValue('announcement_num')]);
 
   window.onresize = function () {
     setTableHeight((window.innerHeight - 370) / 2);
@@ -685,7 +680,7 @@ const ReleaseOrder = () => {
           <ModalSuccessCheck
             visible={visible}
             onOk={(v?: any) => onSuccessConfirm(v)}
-            disabled={hasAnnouncement}
+            announce={orderForm.getFieldValue('announcement_num')}
           />
         </div>
       </PageContainer>
@@ -697,10 +692,10 @@ export default ReleaseOrder;
 export const ModalSuccessCheck = ({
   visible,
   onOk,
-  disabled,
+  announce,
 }: {
   visible: boolean;
-  disabled: boolean;
+  announce: string;
   onOk: (v?: any) => void;
 }) => {
   const [form] = Form.useForm();
@@ -771,7 +766,11 @@ export const ModalSuccessCheck = ({
         </Form.Item>
 
         <Form.Item label="是否挂起升级后公告" name="announcement" valuePropName="checked">
-          <Checkbox value="yes" defaultChecked={true} disabled={disabled} />
+          <Checkbox
+            value="yes"
+            defaultChecked={true}
+            disabled={isEmpty(announce) || announce == '免'}
+          />
         </Form.Item>
       </Form>
     </Modal>

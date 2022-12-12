@@ -218,7 +218,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 {
                   required: includeAppsGlobal,
                   validator: (r, v, cb) => {
-                    if (!v?.trim()) return cb('请填写前端预制数据版本号');
+                    if (!v?.trim() && includeAppsGlobal) return cb('请填写前端预制数据版本号');
                     else return cb();
                   },
                 },

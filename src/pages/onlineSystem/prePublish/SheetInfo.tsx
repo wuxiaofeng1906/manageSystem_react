@@ -352,6 +352,7 @@ const SheetInfo = (props: any, ref: any) => {
 
   const onSuccessConfirm = async (data: any) => {
     setSuccessModal(false);
+    const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({ release_result: null });
     } else {
@@ -373,7 +374,7 @@ const SheetInfo = (props: any, ref: any) => {
       setLeaveShow(false);
       await PreReleaseServices.automation(params);
       // 关联公告并勾选挂起公告
-      if (!hasAnnouncement && data.announcement) {
+      if (!isEmpty(announce) && announce !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),
@@ -401,12 +402,6 @@ const SheetInfo = (props: any, ref: any) => {
       ),
     });
   };
-
-  // 是否关联了公告
-  const hasAnnouncement = useMemo(() => {
-    const announce = baseForm.getFieldValue('announcement_num');
-    return isEmpty(announce) || announce == '免';
-  }, [orderForm?.getFieldValue('announcement_num')]);
 
   const hasPermission = useMemo(() => {
     return { save: true };
@@ -747,7 +742,7 @@ const SheetInfo = (props: any, ref: any) => {
         <ModalSuccessCheck
           visible={successModal}
           onOk={(v?: any) => onSuccessConfirm(v)}
-          disabled={hasAnnouncement}
+          announce={orderForm.getFieldValue('announcement_num')}
         />
       </div>
     </Spin>

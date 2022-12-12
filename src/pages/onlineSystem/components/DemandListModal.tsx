@@ -205,7 +205,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     form.setFieldsValue({
       cluster:
         v == 'global'
-          ? [v]
+          ? ['cn-northwest-global']
           : memoColumn.isSprint
           ? ['cn-northwest-0']
           : selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : [])),

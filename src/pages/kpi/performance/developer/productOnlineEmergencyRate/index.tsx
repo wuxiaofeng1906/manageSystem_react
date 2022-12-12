@@ -56,11 +56,18 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>();
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
+  window.onresize = function () {
+    setGridHeight(window.innerHeight - 250);
+    gridRef.current?.sizeColumnsToFit();
+  };
+
   const getDate = () => {
     const ends = catagory == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
     return JSON.stringify(ends?.map((it) => it.end));
@@ -105,7 +112,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
             计算规则
           </Button>
         </div>
-        <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
+        <div className={'ag-theme-alpine'} style={{ width: '100%', height: gridHeight }}>
           <AgGridReact
             rowHeight={32}
             headerHeight={35}

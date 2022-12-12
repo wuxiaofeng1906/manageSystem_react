@@ -43,11 +43,18 @@ const SystemAvgRespTime = () => {
   const [gridData, setGridData] = useState<any[]>();
   const [columns, setColumns] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
+  window.onresize = function () {
+    setGridHeight(window.innerHeight - 250);
+    gridRef.current?.sizeColumnsToFit();
+  };
+
   const getDetail = async () => {
     setLoading(true);
     try {
@@ -134,7 +141,7 @@ const SystemAvgRespTime = () => {
         });
       } else if (type == 'day') {
         component.push({
-          headerName: dayjs(data[index]).format('YYYY年MM月DD日'),
+          headerName: dayjs(data[index]).format('MM月DD日YYYY年'),
           field: data[index],
           cellRenderer: (p) => cellRenderer(p, showSplit, len),
           minWidth: 100,
@@ -172,7 +179,7 @@ const SystemAvgRespTime = () => {
           >
             计算规则
           </Button>
-          <div className={'ag-theme-alpine'} style={{ width: '100%', height: 500 }}>
+          <div className={'ag-theme-alpine'} style={{ width: '100%', height: gridHeight }}>
             <AgGridReact
               rowHeight={32}
               headerHeight={35}

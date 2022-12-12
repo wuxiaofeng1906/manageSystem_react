@@ -175,24 +175,43 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
   const onChange = (v: string) => {
     setSelected([]);
+    const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
       2. 班车、特性 默认集群0
       3.global 默认global
     */
-
-    form.setFieldsValue({
-      cluster: v == 'global' ? ['global'] : ['cn-northwest-0'],
-    });
+    let selectedData: any[] = [];
     if (!memoColumn.isSprint && v !== 'global') {
-      const noRelate = isEmpty(relatedStory?.story)
+      selectedData = isEmpty(relatedStory?.story)
         ? list
         : list.filter((it) => relatedStory?.story?.includes(String(it.story)));
-      setSelected(noRelate);
-      form.setFieldsValue({
-        cluster: noRelate?.flatMap((it) => (it.cluster ? [it.cluster] : [])),
-      });
+    } else {
+      // 默认勾选 特性项目
+      list
+        .filter((it) => !['stagepatch', 'emergency', 'sprint'].includes(it.sprinttype))
+        .forEach((o) => {
+          const flag =
+            intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0;
+          const nothing = isEmpty(
+            selectedData?.find(
+              (checked: any) => checked.story == o.story && checked.pro_id == o.pro_id,
+            ),
+          );
+          flag && nothing && selectedData.push(o);
+        });
     }
+
+    form.setFieldsValue({
+      cluster:
+        v == 'global'
+          ? [v]
+          : memoColumn.isSprint
+          ? ['cn-northwest-0']
+          : selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : [])),
+    });
+    setSelected(selectedData);
+
     if (isEmpty(appServers?.[v])) return;
     setList(
       list?.map((it: any) => ({

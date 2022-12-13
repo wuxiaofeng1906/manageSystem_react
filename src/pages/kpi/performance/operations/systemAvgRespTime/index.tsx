@@ -9,7 +9,7 @@ import { useGqlClient } from '@/hooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { IStaticBy } from '@/hooks/statistic';
 import StatisticServices from '@/services/statistic';
-import { isEmpty, isNumber, sortBy } from 'lodash';
+import { groupBy, omit, isNumber, sortBy } from 'lodash';
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import {
   getAllDate,
@@ -63,19 +63,21 @@ const SystemAvgRespTime = () => {
         params: catagory,
       });
       let result: any[] = [];
-      Array.from({ length: data?.maxsize }, (k, i) => {
-        result.push({ cluster: `cn-northwest-${i}` });
-      });
+      let format: any[] = [];
       data?.datas?.forEach((it: any) => {
-        const sortData = sortBy(it.datas, 'cluster');
-
-        result?.forEach((o: any) => {
-          const fi = sortData.find((it) => it.cluster == o.cluster);
-          if (!isEmpty(fi)) o[it.range.start] = fi.duration;
+        sortBy(it.datas, 'cluster')?.forEach((o) => {
+          result.push({ [it.range.start]: o.duration, cluster: o.cluster });
         });
       });
 
-      setGridData(result);
+      Object.entries(groupBy(result, 'cluster')).forEach(([k, v]) => {
+        let date = {};
+        v?.forEach((value) => {
+          date = { ...date, ...omit(value, ['cluster']) };
+        });
+        format.push({ cluster: k, ...date });
+      });
+      setGridData(format);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -83,7 +85,7 @@ const SystemAvgRespTime = () => {
   };
 
   useEffect(() => {
-    renderColumn(catagory);
+    renderColumn(catagory, false, 2);
     getDetail();
   }, [catagory]);
 
@@ -189,12 +191,19 @@ const SystemAvgRespTime = () => {
                 {
                   headerName: '集群',
                   field: 'cluster',
-                  maxWidth: 100,
+                  minWidth: 100,
+                  maxWidth: 130,
                   pinned: 'left',
-                  valueFormatter: (p) => p.value?.replace('cn-northwest-', '集群'),
+                  rowGroup: false,
+                  showRowGroup: true,
+                  valueFormatter: (p) =>
+                    p.value
+                      ?.replace('cn-northwest-', '集群')
+                      ?.replaceAll('cn-apnorthbj-', '腾讯生产集群'),
                 },
                 ...columns,
               ]}
+              groupDisplayType={'multipleColumns'}
               defaultColDef={{
                 sortable: true,
                 resizable: true,

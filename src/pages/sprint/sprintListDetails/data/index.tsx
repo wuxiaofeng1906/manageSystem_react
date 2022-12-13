@@ -504,6 +504,36 @@ const LoadTesterCombobox = () => {
   return deptMan;
 };
 
+const LoadTesterUEDCombobox = () => {
+  const deptMan = [<Option value="NA">NA</Option>];
+  const { data: { test = [], ued = [] } = {} } = useQuery(`
+          {
+            test:WxDeptUsers(techs:[TEST]){
+                id
+                userName
+                hired
+              }
+              ued:WxDeptUsers(deptNames:["UED"]){
+               id
+               userName
+               hired
+            }
+          }
+      `);
+  const result = [...test, ...ued]?.filter((it: any) => it.hired != '0');
+  if (result && result.length > 0) {
+    for (let index = 0; index < result.length; index += 1) {
+      deptMan.push(
+        <Option value={result[index].id} key={result[index].id}>
+          {result[index].userName}
+        </Option>,
+      );
+    }
+  }
+
+  return deptMan;
+};
+
 // 获取项目名称
 const GetSprintProject = () => {
   const projectArray = [];
@@ -532,6 +562,7 @@ export {
   getDeptMemner,
   LoadCombobox,
   LoadTesterCombobox,
+  LoadTesterUEDCombobox,
   GetSprintProject,
   calTypeCount,
 };

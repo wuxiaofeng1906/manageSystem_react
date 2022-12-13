@@ -62,7 +62,7 @@ import {
   queryDevelopViews,
   queryRepeats,
   LoadCombobox,
-  LoadTesterCombobox,
+  LoadTesterUEDCombobox,
   GetSprintProject,
   calTypeCount,
 } from './data';
@@ -1938,7 +1938,7 @@ const SprintList: React.FC<any> = () => {
                   maxTagCount={'responsive'}
                   optionFilterProp="children"
                 >
-                  {LoadTesterCombobox()}
+                  {LoadTesterUEDCombobox()}
                 </Select>
               </Form.Item>
             </Col>
@@ -2733,7 +2733,7 @@ const SprintList: React.FC<any> = () => {
                   maxTagCount={'responsive'}
                   optionFilterProp="children"
                 >
-                  {LoadTesterCombobox()}
+                  {LoadTesterUEDCombobox()}
                 </Select>
               </Form.Item>
             </Col>

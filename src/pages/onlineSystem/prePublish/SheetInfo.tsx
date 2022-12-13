@@ -27,6 +27,7 @@ import { infoMessage } from '@/publicMethods/showMessages';
 import { useModel } from '@@/plugin-model/useModel';
 import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/config/column';
 import {
+  AutoCheckType,
   ClusterType,
   onLog,
   OrderExecutionBy,
@@ -43,6 +44,7 @@ import moment from 'moment';
 import { isEmpty, omit, isString, pick } from 'lodash';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
+import usePermission from '@/hooks/permission';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 let agSql: any[] = [];
@@ -50,6 +52,7 @@ let agSql: any[] = [];
 const SheetInfo = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
+  const { onlineSystemPermission } = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [
     globalState,
@@ -359,7 +362,7 @@ const SheetInfo = (props: any, ref: any) => {
     } else {
       let params: any[] = [];
       const ignoreCheck = data.ignoreCheck;
-      ['ui', 'applet'].forEach((type) => {
+      Object.keys(AutoCheckType).forEach((type) => {
         params.push({
           user_id: user?.userid ?? '',
           ignore_check: ignoreCheck ? 'yes' : 'no',
@@ -372,7 +375,6 @@ const SheetInfo = (props: any, ref: any) => {
       await onSave(true);
       agFinished = true;
       setFinished(true);
-      setLeaveShow(false);
       await PreReleaseServices.automation(params);
       // 关联公告并勾选挂起公告
       if (!isEmpty(announce) && announce !== '免' && data.announcement) {
@@ -404,9 +406,7 @@ const SheetInfo = (props: any, ref: any) => {
     });
   };
 
-  const hasPermission = useMemo(() => {
-    return { save: true };
-  }, [user]);
+  const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
 
   window.onresize = function () {
     setTableHeight((window.innerHeight - 460) / 2);
@@ -567,7 +567,7 @@ const SheetInfo = (props: any, ref: any) => {
                     <Form.Item name={'release_result'}>
                       <Select
                         allowClear
-                        disabled={draft || finished}
+                        disabled={!hasPermission.orderPublish || draft || finished}
                         className={styles.selectColor}
                         onChange={() => onSaveBeforeCheck(true)}
                         options={[

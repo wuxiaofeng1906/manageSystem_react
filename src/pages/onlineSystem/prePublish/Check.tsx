@@ -27,10 +27,12 @@ import { useLocation, useModel, history, useParams } from 'umi';
 import { ICheckType, OnlineSystemServices } from '@/services/onlineSystem';
 import dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
+import usePermission from '@/hooks/permission';
 
 const Check = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
+  const { onlineSystemPermission } = usePermission();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [globalState, setGlobalState, basic] = useModel('onlineSystem', (online) => [
     online.globalState,
@@ -63,6 +65,7 @@ const Check = (props: any, ref: any) => {
     () => ({
       onCheck,
       onLock,
+      onPushCheckFailMsg,
       onRefreshCheck: () => init(true),
       onSetting: () => setShow({ visible: true, data: release_num }),
     }),
@@ -289,6 +292,14 @@ const Check = (props: any, ref: any) => {
       width,
     });
   };
+  const onPushCheckFailMsg = () => {
+    Modal.confirm({
+      centered: true,
+      title: '一键推送检查失败信息提示：',
+      content: '请确认是否一键推送检查失败信息到值班群？',
+      onOk: async () => {},
+    });
+  };
 
   useEffect(() => {
     if (subTab == 'check' && release_num && tab == 'process') {
@@ -297,7 +308,10 @@ const Check = (props: any, ref: any) => {
     }
   }, [subTab, tab, release_num]);
 
-  const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
+  const hasEdit = useMemo(
+    () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,
+    [globalState, user?.group],
+  );
 
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
@@ -317,7 +331,7 @@ const Check = (props: any, ref: any) => {
             {
               title: '检查类别',
               dataIndex: 'check_type',
-              width: 300,
+              width: 320,
               fixed: 'left',
               render: (v) => (
                 <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>

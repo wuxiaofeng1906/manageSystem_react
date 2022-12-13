@@ -33,6 +33,7 @@ const ApplicationServerConfig = () => {
     const selected = gridRef.current?.getSelectedRows();
     if (isEmpty(selected)) return infoMessage('请先选择删除项！');
     Modal.confirm({
+      centered: true,
       icon: <InfoCircleOutlined style={{ color: 'red' }} />,
       title: '应用服务配置删除提示',
       content: '请确认是否删除该服务?',
@@ -94,7 +95,7 @@ const ApplicationServerConfig = () => {
                   ...v,
                   app_id: activeItem?.app_id,
                   remark: v.remark || '',
-                  side: v?.side?.join(','),
+                  side: v?.side?.length == 2 ? 'backendFront' : v?.side?.join(','),
                   release_env: v?.release_env?.join(','),
                   user_id: user?.userid ?? '',
                 });
@@ -140,7 +141,10 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
     if (props.data) {
       form.setFieldsValue({
         ...props.data,
-        side: props.data?.side?.split(','),
+        side:
+          props.data?.side?.split(',')?.length == 2
+            ? ['backendFront']
+            : props.data?.side?.split(','),
         release_env: props.data?.release_env?.split(','),
       });
     }
@@ -320,8 +324,17 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row>
-            <Col span={24}>
+          <Row gutter={6}>
+            <Col span={12}>
+              <Form.Item
+                name={'pkg_check'}
+                label={'是否做发布包检查'}
+                rules={[{ message: '请选择是否做发布包检查', required: true }]}
+              >
+                <Select placeholder={'是否做发布包检查'} options={memoWhetherOrNot} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
               <Form.Item name={'remark'} label={'备注'}>
                 <Input.TextArea placeholder={'备注'} />
               </Form.Item>

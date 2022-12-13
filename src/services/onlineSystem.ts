@@ -13,7 +13,8 @@ export type ICheckType =
   | 'web-h5-automation' // 自动化检查
   | 'sealing-version-check' // 分支封版
   | 'story-status' // 需求阶段
-  | 'auto-check'; // 升级自动化检查
+  | 'auto-check' // 升级自动化检查
+  | 'release-package-check'; // 后端是否为发布包
 
 export const OnlineSystemServices = {
   async getProjects() {
@@ -22,10 +23,6 @@ export const OnlineSystemServices = {
   // 上线分支
   async getBranch() {
     return request(`${baseUrl}/sonar/branch`);
-  },
-  // 上线计划
-  async getOnlineList(params: any) {
-    return request(`${baseUrl}/online/release-plan`, { params });
   },
 
   // 发布过程列表

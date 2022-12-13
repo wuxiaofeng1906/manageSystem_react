@@ -45,6 +45,7 @@ import {
 import moment from 'moment';
 import PreReleaseServices from '@/services/preRelease';
 import { OnlineSystemServices } from '@/services/onlineSystem';
+import usePermission from '@/hooks/permission';
 
 const color = { yes: '#2BF541', no: '#faad14' };
 let agEdit = '';
@@ -79,6 +80,7 @@ const ProcessDetail = (props: any, ref: any) => {
     data: null,
   }); // 需求列表
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
+  const { onlineSystemPermission } = usePermission();
 
   const confirmRef = useRef<GridApi>();
   const interfaceRef = useRef<GridApi>();
@@ -461,6 +463,7 @@ const ProcessDetail = (props: any, ref: any) => {
 
   const serverColumn = useMemo(() => preServerColumn(server), [server]);
 
+  const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
       <div className={styles.processDetail}>
@@ -541,10 +544,20 @@ const ProcessDetail = (props: any, ref: any) => {
         </Form>
         <div className={styles.tableHeader}>
           <h4>二、应用服务</h4>
-          <Button size={'small'} onClick={() => onSeal(true)} disabled={hasEdit}>
+          <Button
+            size={'small'}
+            hidden={!hasPermission.branchLock}
+            onClick={() => onSeal(true)}
+            disabled={hasEdit}
+          >
             锁定分支
           </Button>
-          <Button size={'small'} onClick={() => onSeal(false)} disabled={hasEdit}>
+          <Button
+            size={'small'}
+            hidden={!hasPermission.branchUnlock}
+            onClick={() => onSeal(false)}
+            disabled={hasEdit}
+          >
             解除锁定分支
           </Button>
           <Button
@@ -552,6 +565,7 @@ const ProcessDetail = (props: any, ref: any) => {
             disabled={hasEdit}
             className={styles.remove}
             onClick={() => onDelete('server')}
+            hidden={!hasPermission.delete}
           >
             移除
           </Button>
@@ -610,6 +624,7 @@ const ProcessDetail = (props: any, ref: any) => {
             size={'small'}
             className={styles.remove}
             onClick={() => onDelete('api')}
+            hidden={!hasPermission.delete}
           >
             移除
           </Button>
@@ -637,6 +652,7 @@ const ProcessDetail = (props: any, ref: any) => {
             size={'small'}
             className={styles.remove}
             onClick={() => onDelete('repair')}
+            hidden={!hasPermission.delete}
           >
             移除
           </Button>
@@ -682,7 +698,10 @@ const ProcessDetail = (props: any, ref: any) => {
                   <Select
                     size={'small'}
                     value={p.value}
-                    disabled={p.data.is_sealing == 'yes'}
+                    disabled={
+                      p.data.is_sealing == 'yes' ||
+                      !(isConfirm ? hasPermission.serverConfirm : hasPermission.hotUpdate)
+                    }
                     style={{
                       width: '100%',
                       color: isConfirm ? color[p.value] : 'initial',

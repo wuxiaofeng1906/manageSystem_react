@@ -46,8 +46,9 @@ const usePermission = () => {
       baseInfo: roles?.includes(158), // 修改基础信息
       checkStatus: roles?.includes(158), // 检查状态
       paramSetting: roles?.includes(158), // 检查参数设置
-      mutiCheck: roles?.includes(158), // 批量检查
-      preLock: roles?.includes(158), // 封板
+      multiCheck: roles?.includes(158), // 批量检查
+      preLock: roles?.includes(158), // 封版
+      pushMessage: roles?.includes(158), // 一键推送检查失败信息
       orderSave: roles?.includes(158), // 工单保存
       orderPublish: roles?.includes(158), // 工单发布
     };

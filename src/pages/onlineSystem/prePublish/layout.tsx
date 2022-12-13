@@ -8,6 +8,7 @@ import { BarsOutlined, SyncOutlined } from '@ant-design/icons';
 import styles from '../config/common.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { Step } from '@/pages/onlineSystem/config/constant';
+import usePermission from '@/hooks/permission';
 
 const tabs = [
   { name: '项目与服务详情', comp: ProcessDetail, key: 'server' },
@@ -24,6 +25,10 @@ const Layout = () => {
     online.globalState,
     online.setGlobalState,
   ]);
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
+  const { onlineSystemPermission } = usePermission();
+
   const [touched, setTouched] = useState(false);
   const ref = useRef() as React.MutableRefObject<{
     onRefresh: Function;
@@ -34,18 +39,19 @@ const Layout = () => {
     onCheck: Function;
     onLock: Function;
     onSave: Function;
+    onPushCheckFailMsg: Function;
   }>;
   useEffect(() => {
     if (!release_num) return;
-    const checkStatus = ['success', 'failure'];
+    const status = ['success', 'failure'];
     let step = 0;
     OnlineSystemServices.getReleaseStatus({ release_num }).then((res) => {
-      step = checkStatus.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;
+      step = status.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;
       setGlobalState({
         ...globalState,
         step,
         locked: res?.release_sealing == 'yes',
-        finished: checkStatus.includes(res?.release_result),
+        finished: status.includes(res?.release_result),
       });
       updateHref(Step[step]);
     });
@@ -58,10 +64,10 @@ const Layout = () => {
     });
 
   const onExtra = async (fn: Function) => {
-    if (checkStatus.flag || touched) return;
+    if (checkStatus || touched) return;
     setTouched(true);
     try {
-      await fn();
+      await fn?.();
       setTouched(false);
     } catch (e) {
       setTouched(false);
@@ -69,27 +75,23 @@ const Layout = () => {
   };
 
   const checkStatus = useMemo(() => {
-    if (tab !== 'process') return {};
-    const flag = globalState.locked || globalState.finished;
-    return {
-      disableStyle: flag
-        ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
-        : { cursor: touched ? 'not-allowed' : 'pointer' },
-      flag,
-    };
+    if (tab !== 'process') return true;
+    return globalState.locked || globalState.finished;
   }, [globalState, touched, tab, subTab]);
 
   const renderTabContent = useMemo(() => {
+    const hasPermission = onlineSystemPermission();
     if (subTab == 'server')
       return (
         <Space size={10}>
-          <BarsOutlined
-            onClick={() => {
-              if (checkStatus.flag || touched) return;
-              ref.current?.onShow?.();
-            }}
+          <Button
+            type={'text'}
             title={'需求列表'}
-            style={{ color: '#0079ff', fontSize: 16, ...checkStatus?.disableStyle }}
+            disabled={touched || checkStatus}
+            hidden={!hasPermission.storyList}
+            icon={<BarsOutlined />}
+            style={{ border: 'none', background: 'initial' }}
+            onClick={() => ref.current?.onShow?.()}
           />
           <Button
             size={'small'}
@@ -98,11 +100,14 @@ const Layout = () => {
           >
             取消发布
           </Button>
-          <SyncOutlined
+          <Button
             title={'刷新'}
-            spin={touched}
+            type={'text'}
+            hidden={!hasPermission.refresh}
+            disabled={touched || checkStatus}
+            icon={<SyncOutlined />}
+            style={{ border: 'none', background: 'initial' }}
             onClick={() => onExtra(ref.current?.onRefresh)}
-            style={{ color: '#0079ff', fontSize: 16, ...checkStatus?.disableStyle }}
           />
         </Space>
       );
@@ -111,21 +116,24 @@ const Layout = () => {
         <Space size={10}>
           <Button
             size={'small'}
-            disabled={checkStatus?.flag || touched}
+            disabled={checkStatus || touched}
             onClick={() => onExtra(ref.current?.onSetting)}
+            hidden={!hasPermission.paramSetting}
           >
             检查参数设置
           </Button>
           <Button
             size={'small'}
             onClick={() => onExtra(ref.current?.onCheck)}
-            disabled={checkStatus?.flag || touched}
+            disabled={checkStatus || touched}
+            hidden={!hasPermission.multiCheck}
           >
             一键执行检查
           </Button>
           <Button
             size={'small'}
             disabled={globalState.finished || touched}
+            hidden={!hasPermission.preLock}
             onClick={async () => {
               setTouched(true);
               try {
@@ -136,11 +144,23 @@ const Layout = () => {
               }
             }}
           >
-            {checkStatus?.flag ? '取消封版锁定' : '封版锁定'}
+            {checkStatus ? '取消封版锁定' : '封版锁定'}
           </Button>
-          <SyncOutlined
+          <Button
+            size={'small'}
+            disabled={globalState.finished || touched}
+            hidden={!hasPermission.pushMessage}
+            onClick={() => onExtra(ref.current?.onPushCheckFailMsg)}
+          >
+            一键推送检查失败信息
+          </Button>
+          <Button
             title={'刷新'}
-            style={{ color: '#0079ff', fontSize: 16, ...checkStatus?.disableStyle }}
+            type={'text'}
+            hidden={!hasPermission.refresh}
+            disabled={touched || checkStatus}
+            icon={<SyncOutlined />}
+            style={{ border: 'none', background: 'initial' }}
             onClick={() => onExtra(ref.current?.onRefreshCheck)}
           />
         </Space>
@@ -150,6 +170,7 @@ const Layout = () => {
         <div>
           {draft && <strong style={{ color: '#fe7b00cf', marginRight: 16 }}>状态：草稿态</strong>}
           <Button
+            hidden={!hasPermission.orderSave}
             size={'small'}
             onClick={() => ref.current?.onSave()}
             disabled={globalState.finished}
@@ -159,7 +180,8 @@ const Layout = () => {
           </Button>
         </div>
       );
-  }, [release_num, tab, subTab, globalState, touched, draft]);
+  }, [release_num, tab, subTab, globalState, touched, draft, user?.group]);
+
   return (
     <div className={styles.prePublish}>
       <Tabs

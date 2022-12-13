@@ -344,8 +344,8 @@ export const repairColumn: (ColDef | ColGroupDef)[] = [
   { headerName: '涉及租户', field: 'tenant', minWidth: 100, maxWidth: 100 },
   { headerName: '类型', field: 'recovery_type', minWidth: 100, maxWidth: 100 },
   { headerName: '修复提交人', field: 'author', minWidth: 110, maxWidth: 110 },
-  { headerName: '分支', field: 'branch', minWidth: 110, maxWidth: 110 },
-  { headerName: 'sql详情', field: 'sql_detail', width: 90, maxWidth: 110, cellRenderer: 'log' },
+  { headerName: '分支', field: 'branch', minWidth: 110, maxWidth: 180 },
+  { headerName: 'sql详情', field: 'sql_detail', width: 90, maxWidth: 100, cellRenderer: 'log' },
 ];
 export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   {

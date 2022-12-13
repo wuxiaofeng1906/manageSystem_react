@@ -34,7 +34,8 @@ export const applicationConfigColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '技术侧',
     field: 'side',
-    minWidth: 150,
+    minWidth: 100,
+    maxWidth: 100,
     valueFormatter: (p) => TechnicalSide[p.value],
   },
   {
@@ -77,6 +78,12 @@ export const applicationConfigColumn: (ColDef | ColGroupDef)[] = [
     headerName: '是否涉及数据修复/升级(backend/apps/build)',
     field: 'is_have_data_recovery',
     minWidth: 220,
+    valueFormatter: formatWhetherNot,
+  },
+  {
+    headerName: '是否做发布包检查',
+    field: 'pkg_check',
+    minWidth: 140,
     valueFormatter: formatWhetherNot,
   },
   {

@@ -239,7 +239,7 @@ export const checkInfo = [
   {
     check_type: '后端是否为发布包(config.yaml不包含有SNAPSHOT)',
     side: 'backend',
-    status: 'sealing_version',
+    status: 'check_result',
     start: 'version_check_start_time',
     end: 'version_check_end_time',
     open: false,

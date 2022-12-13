@@ -188,7 +188,7 @@ const Layout = () => {
         activeKey={subTab}
         onChange={updateHref}
         animated={false}
-        className={styles.onlineTab}
+        className={styles.subTabs}
         tabBarExtraContent={renderTabContent}
       >
         {tabs?.map((it, index) => {

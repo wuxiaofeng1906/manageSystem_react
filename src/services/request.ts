@@ -95,7 +95,7 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
         }
         return Promise.reject(res);
       }
-      if (msg && res?.msg !== 'success' && isString(res?.msg)) {
+      if ((msg && isString(res?.msg)) || (msg && res?.msg !== 'success')) {
         message.info(msg === true ? res?.msg : msg);
       }
       return res?.data;

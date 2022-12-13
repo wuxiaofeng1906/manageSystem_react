@@ -82,7 +82,7 @@ export const applicationConfigColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '是否做发布包检查',
-    field: 'pkg_check',
+    field: 'is_release_package',
     minWidth: 140,
     valueFormatter: formatWhetherNot,
   },

@@ -327,7 +327,7 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
           <Row gutter={6}>
             <Col span={12}>
               <Form.Item
-                name={'pkg_check'}
+                name={'is_release_package'}
                 label={'是否做发布包检查'}
                 rules={[{ message: '请选择是否做发布包检查', required: true }]}
               >

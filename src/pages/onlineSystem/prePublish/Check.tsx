@@ -297,7 +297,7 @@ const Check = (props: any, ref: any) => {
       centered: true,
       title: '一键推送检查失败信息提示：',
       content: '请确认是否一键推送检查失败信息到值班群？',
-      onOk: async () => {},
+      onOk: () => OnlineSystemServices.pushFailMsg({ release_num }),
     });
   };
 

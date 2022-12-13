@@ -106,6 +106,9 @@ export const OnlineSystemServices = {
   async getCheckSettingDetail(params: any) {
     return request(`${baseUrl}/online/check-param`, { params });
   },
+  async pushFailMsg(params: any) {
+    return request(`${baseUrl}/online/check-msg-push`, { params, msg: '推送成功' });
+  },
 
   // 一键执行检查/修改启用状态
   async checkOpts(data: any, type: ICheckType) {

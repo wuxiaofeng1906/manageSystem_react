@@ -23,7 +23,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [globalState, envs, getLogInfo] = useModel('onlineSystem', (online) => [
     online.globalState,
     online.envs,
-    online.branchs,
     online.getLogInfo,
   ]);
   const [list, setList] = useState<any[]>([]);

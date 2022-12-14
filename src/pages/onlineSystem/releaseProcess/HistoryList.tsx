@@ -48,7 +48,7 @@ const HistoryList = () => {
     setGridHeight(Number(getHeight()) - 140);
   };
 
-  const getTableList = async (page = 1, page_size = 20) => {
+  const getTableList = async (page = 1, page_size = pages.page_size) => {
     try {
       setSpinning(true);
       const values = form.getFieldsValue();

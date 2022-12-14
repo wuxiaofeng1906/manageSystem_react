@@ -320,7 +320,7 @@ const ProcessDetail = (props: any, ref: any) => {
     });
   };
 
-  const getTableList = async (page = 1, page_size = 20) => {
+  const getTableList = async (page = 1, page_size = pages.page_size) => {
     reset();
     await getRepairInfo({ release_num }, page, page_size);
   };

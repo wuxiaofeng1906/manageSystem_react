@@ -162,7 +162,7 @@ const ZentaoDetail = (props: any, ref: any) => {
     }
     if (flag) {
       setStoryData(result);
-      setPages({ page: 1, page_size: 20, total: result?.length });
+      setPages({ page: 1, page_size: pages.page_size, total: result?.length });
     } else setTestData(result);
   };
 

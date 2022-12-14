@@ -39,7 +39,7 @@ const announcementList = () => {
     params.api.sizeColumnsToFit();
   };
 
-  const getList = async (page = 1, page_size = 20) => {
+  const getList = async (page = 1, page_size = pages.page_size) => {
     setSpinning(true);
     try {
       const values = form.getFieldsValue();

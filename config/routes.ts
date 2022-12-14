@@ -238,6 +238,7 @@ export default [
                 path: 'avgCodePerWeek',
                 component: './kpi/performance/developer/avgCodePerWeek',
                 // wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '千行Bug率',
@@ -245,6 +246,7 @@ export default [
                 path: 'thousandBugsRate',
                 component: './kpi/performance/developer/thousandBugsRate',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '千行Bug率(不含线上)',
@@ -252,6 +254,7 @@ export default [
                 path: 'thouBugsRateExcludeOnline',
                 component: './kpi/performance/developer/thouBugsRateExcludeOnline',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '单元测试覆盖率',
@@ -435,14 +438,14 @@ export default [
                 component: './kpi/performance/developer/blockingTestWorkload',
               },
               {
-                name: '累计千行bug率',
+                name: '千行bug率',
                 icon: 'table',
                 path: 'cumulativeLineBugRate',
                 component: './kpi/performance/developer/cumulativeLineBugRate',
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '累计千行bug率（不含线上）',
+                name: '千行bug率（不含线上）',
                 path: 'cumulativeLineBugRateExcludeOnline',
                 component: './kpi/performance/developer/cumulativeLineBugRateExcludeOnline',
                 wrappers: ['../wrappers/auth'],
@@ -473,6 +476,7 @@ export default [
                 path: 'on-lineBugRate-new',
                 component: './kpi/performance/testers/on-lineBugRate-new',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '线上千行bug率(参考)',
@@ -480,6 +484,7 @@ export default [
                 path: 'on-lineBugRateRefer',
                 component: './kpi/performance/testers/on-lineBugRateRefer',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '线上千行bug率(含测试)',
@@ -487,6 +492,7 @@ export default [
                 path: 'on_lineBugIncTester',
                 component: './kpi/performance/testers/on_lineBugIncTester',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '线上千行bug率P0P1占比',
@@ -553,7 +559,7 @@ export default [
                 icon: 'table',
                 path: 'bugRateConvergency',
                 component: './kpi/performance/testers/bugRateConvergency',
-                // hideInMenu: true,
+                hideInMenu: true,
               },
               {
                 name: '计划偏差率',
@@ -645,21 +651,21 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '累计线上千行bug率',
+                name: '线上千行bug率',
                 icon: 'table',
                 path: 'cumulativeLineBugRate',
                 component: './kpi/performance/testers/cumulativeLineBugRate',
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '累计线上千行bug率参考',
+                name: '线上千行bug率参考',
                 icon: 'table',
                 path: 'cumulativeLineBugRateReference',
                 component: './kpi/performance/testers/cumulativeLineBugRateReference',
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '累计线上千行bug率（含测试）',
+                name: '线上千行bug率（含测试）',
                 icon: 'table',
                 path: 'cumulativeLineBugRateTests',
                 component: './kpi/performance/testers/cumulativeLineBugRateTests',

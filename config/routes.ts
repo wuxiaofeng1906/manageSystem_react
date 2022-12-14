@@ -868,7 +868,7 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '系统响应时间',
+                name: '系统平均响应时间',
                 path: 'systemAvgRespTime',
                 component: './kpi/performance/operations/systemAvgRespTime',
                 wrappers: ['../wrappers/auth'],

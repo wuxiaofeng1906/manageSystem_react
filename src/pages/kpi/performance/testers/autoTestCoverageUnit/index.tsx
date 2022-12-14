@@ -69,14 +69,11 @@ export default () => {
     gridRef.current?.sizeColumnsToFit();
   };
 
-  const getDate = () => {
-    const ends = category == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
-    return JSON.stringify(ends?.map((it) => it.end));
-  };
-
   const getTableSource = async () => {
     setLoading(true);
     try {
+      const { data } = StatisticServices.autoTestCoverageUnit({ client, params: category });
+      console.log(data);
       setData([]);
       setLoading(false);
     } catch (e) {
@@ -117,7 +114,7 @@ export default () => {
               resizable: true,
               filter: true,
               flex: 1,
-              minWidth: 80,
+              minWidth: 100,
             }}
             onRowGroupOpened={(e) => {
               console.log(e);
@@ -133,10 +130,10 @@ export default () => {
             columnDefs={[
               { field: 'Group', headerName: '部门', rowGroup: true, pinned: 'left' },
               { field: 'name', headerName: '分支名称' },
-              { field: 'title', pivot: true, pivotComparator: () => 1 },
-              { field: 'execution', pivot: true, headerName: '自动化覆盖率执行完成时间' },
-              { field: 'structure', pivot: true, headerName: '结构覆盖率' },
-              { field: 'branch', pivot: true, headerName: '分支覆盖率' },
+              { field: 'title', pivotIndex: 0 },
+              { field: 'execution', headerName: '自动化覆盖率执行完成时间', aggFunc: 'sum' },
+              { field: 'structure', aggFunc: 'sum', headerName: '结构覆盖率' },
+              { field: 'branch', aggFunc: 'sum', headerName: '分支覆盖率' },
             ]}
           />
         </div>

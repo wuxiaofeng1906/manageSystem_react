@@ -829,5 +829,56 @@ const StatisticServices = {
   `);
     return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
   },
+
+  // 自动化单元测试覆盖率
+  async autoTestCoverageUnit({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    const { data } = await client.query(`
+       autoTestCoverPropRuntimeE(ends:${condition.ends}, kind:${condition.typeFlag}) {
+        range{
+          start
+          end
+        }
+        datas{
+          dept
+          deptName
+          parent
+          instCover{
+            numerator
+            denominator
+          }
+          branchCover{
+            numerator
+            denominator
+          }
+          tech {
+            name
+            instCover {
+              numerator
+              denominator
+            }
+            branchCover {
+              numerator
+              denominator
+            }
+          }
+          execution{
+            runtime
+            name
+            branch
+            instCover{
+              numerator
+              denominator
+            }
+            branchCover{
+              numerator
+              denominator
+            }
+          }
+        }
+      }
+    `);
+    return { data: data.data };
+  },
 };
 export default StatisticServices;

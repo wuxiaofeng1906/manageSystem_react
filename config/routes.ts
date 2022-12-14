@@ -502,24 +502,6 @@ export default [
                 hideInMenu: true,
               },
               {
-                name: '线上千行bug率P0P1占比',
-                path: 'onlineTestThouBugRate',
-                component: './kpi/performance/testers/onlineTestThouBugRate',
-                wrappers: ['../wrappers/auth'],
-              },
-              {
-                name: '线上千行bug率P0P1占比(参考)',
-                path: 'onlineReferThouBugRate',
-                component: './kpi/performance/testers/onlineReferThouBugRate',
-                wrappers: ['../wrappers/auth'],
-              },
-              {
-                name: '线上千行bug率P0P1占比(含测试)',
-                path: 'onlineOwnThouBugRate',
-                component: './kpi/performance/testers/onlineOwnThouBugRate',
-                wrappers: ['../wrappers/auth'],
-              },
-              {
                 name: '用例执行率',
                 icon: 'table',
                 path: 'exampleCarryRate',
@@ -693,6 +675,24 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
+                name: '线上千行bug率P0P1占比',
+                path: 'onlineTestThouBugRate',
+                component: './kpi/performance/testers/onlineTestThouBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '线上千行bug率P0P1占比(参考)',
+                path: 'onlineReferThouBugRate',
+                component: './kpi/performance/testers/onlineReferThouBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '线上千行bug率P0P1占比(含测试)',
+                path: 'onlineOwnThouBugRate',
+                component: './kpi/performance/testers/onlineOwnThouBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
                 name: '累计线上千行bug率P0P1占比',
                 icon: 'table',
                 path: 'cumulativeTestLineBugRate',
@@ -718,6 +718,14 @@ export default [
                 path: 'productOnlineEmergencyRate',
                 component: './kpi/performance/testers/productOnlineEmergencyRate',
                 wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '自动化单元测试覆盖率',
+                icon: 'table',
+                path: 'autoTestCoverageUnit',
+                component: './kpi/performance/testers/autoTestCoverageUnit',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
             ],
           },
@@ -777,7 +785,6 @@ export default [
                 path: 'deliveryThroughput',
                 component: './kpi/performance/service/deliveryThroughput',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
               },
             ],
           },

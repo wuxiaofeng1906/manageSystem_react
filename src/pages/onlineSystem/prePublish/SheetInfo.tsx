@@ -146,7 +146,9 @@ const SheetInfo = (props: any, ref: any) => {
           ? release_app?.[0]?.cluster
           : release_app?.[0]?.cluster?.join(','),
         database_version: release_app?.[0]?.database_version ?? '',
-        sql_action_time: sqlValues.sql_action_time || '',
+        sql_action_time: sqlValues?.sql_action_time || '',
+        batch: release_app?.[0]?.batch ?? '',
+        sql_order: release_app?.[0]?.sql_order ?? '',
       },
     });
     setLeaveShow(false);
@@ -437,7 +439,7 @@ const SheetInfo = (props: any, ref: any) => {
         value={isEmpty(p.value) ? undefined : p.value}
         style={{ width: '100%' }}
         disabled={agFinished}
-        allowClear={true}
+        allowClear={['batch', 'sql_order'].includes(field)}
         options={
           field == 'sql_order'
             ? agSql || sqlList

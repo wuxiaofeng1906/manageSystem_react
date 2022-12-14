@@ -374,12 +374,11 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   },
 ];
 export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
-  console.log(data);
   return [
     {
       headerName: '环境',
       field: 'cluster',
-      minWidth: 220,
+      minWidth: 180,
       valueFormatter: (p) => formatCluster(p.value),
     },
     { headerName: '应用', field: 'apps', minWidth: 110 },

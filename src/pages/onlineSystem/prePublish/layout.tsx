@@ -132,6 +132,14 @@ const Layout = () => {
           </Button>
           <Button
             size={'small'}
+            disabled={checkStatus || touched}
+            hidden={!hasPermission.pushMessage}
+            onClick={() => onExtra(ref.current?.onPushCheckFailMsg)}
+          >
+            一键推送检查失败信息
+          </Button>
+          <Button
+            size={'small'}
             disabled={globalState.finished || touched}
             hidden={!hasPermission.preLock}
             onClick={async () => {
@@ -145,14 +153,6 @@ const Layout = () => {
             }}
           >
             {checkStatus ? '取消封版锁定' : '封版锁定'}
-          </Button>
-          <Button
-            size={'small'}
-            disabled={globalState.finished || touched}
-            hidden={!hasPermission.pushMessage}
-            onClick={() => onExtra(ref.current?.onPushCheckFailMsg)}
-          >
-            一键推送检查失败信息
           </Button>
           <Button
             title={'刷新'}

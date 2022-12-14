@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useGqlClient } from '@/hooks/index';
-import { isNumber } from 'lodash';
 import {
   getMonthWeek,
   getTwelveMonthTime,
@@ -11,6 +10,7 @@ import {
 } from '@/publicMethods/timeMethods';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { IStatisticQuery } from '@/services/statistic';
+import { renderFormat } from '@/utils/utils';
 
 // 统计
 export type IStaticBy = 'year' | 'halfYear' | 'quarter' | 'month' | 'week' | 'day';
@@ -47,7 +47,7 @@ export const useStatistic = () => {
     period,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    renderColumn(type, showDenominator, len);
+    renderColumn({ type, showSplit: showDenominator, len });
     setRowData([]);
     setLoading(true);
     try {
@@ -67,33 +67,16 @@ export const useStatistic = () => {
     }
   };
 
-  const cellRenderer = (params: any, showSplit = false, len?: number) => {
-    const node = params.data;
-    const result = params.value;
-    let numerator = 0; // 分子
-    let denominator = 0; // 分母
-    if (showSplit) {
-      const currentTime = params.column?.colId;
-      numerator = node[`${currentTime}_numerator`] ?? 0; // 分子
-      denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
-    }
-    const weight = node?.isDept ? 'bold' : 'initial';
-    const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
-    if (isNumber(result)) {
-      if (showSplit)
-        return `<span>
-                <label style="font-weight: ${weight}">${data}</label>
-                <label style="color: gray"> (${numerator},${denominator})</label>
-            </span>`;
-      return `<span style="font-weight: ${weight}">${data}</span>`;
-    }
-    return `<span style="font-weight: ${weight};color: ${
-      node?.isDept ? 'initial' : 'silver'
-    }"> 0</span>`;
-  };
-
   // column
-  const renderColumn = (type: IStaticBy, showSplit = false, len?: number) => {
+  const renderColumn = ({
+    type,
+    showSplit = false,
+    len,
+  }: {
+    type: IStaticBy;
+    showSplit?: boolean;
+    len?: number;
+  }) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
       year: getYearsTime,
@@ -111,14 +94,14 @@ export const useStatistic = () => {
         component.push({
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => cellRenderer(p, showSplit, len),
+          cellRenderer: (p) => renderFormat({ params: p, showSplit, len }),
           minWidth: 100,
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => cellRenderer(p, showSplit, len),
+              cellRenderer: (p: any) => renderFormat({ params: p, showSplit, len }),
               headerName: data[index].title,
               field: data[index].start?.toString(),
             },
@@ -129,5 +112,5 @@ export const useStatistic = () => {
     setColumns(component);
   };
 
-  return { handleStaticBy, columns, rowData, loading };
+  return { handleStaticBy, renderColumn, columns, rowData, loading };
 };

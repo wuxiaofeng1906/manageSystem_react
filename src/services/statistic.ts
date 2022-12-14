@@ -879,8 +879,7 @@ const StatisticServices = {
         }
       }
     `);
-    console.log(formatAutoTestCover(data.data, condition.typeFlag));
-    return { data: data.data };
+    return { data: formatAutoTestCover(data.data, condition.typeFlag) };
   },
 
   // 自动化发现BUG数

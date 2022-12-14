@@ -1,6 +1,7 @@
 import { IRecord } from '@/namespaces/interface';
-import { isEmpty, isEqual, omit, intersection } from 'lodash';
+import { isEmpty, isEqual, omit, intersection, isNumber } from 'lodash';
 import moment from 'moment';
+import { getMonthWeek } from '@/publicMethods/timeMethods';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -357,40 +358,61 @@ export const formatPivotMode = (origin: any[], kind: number) => {
   });
   return result;
 };
+
 export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
   let result: any[] = [];
-  if (isEmpty(origin)) return result;
-  origin?.forEach((it) => {
-    const data = it.datas;
-
-    if (isEmpty(data)) {
-      result.push({ Group: ['研发中心'], total: 0, title: it.range.start });
-    } else
-      data?.forEach((obj: any) => {
-        const startTime = it.range.start;
-        const departments = obj.datas;
-        result.push({
-          title: it.range.start,
-          Group: ['研发中心'],
-          isDept: true,
-          total: obj.total.kpi,
-          subTitle: moment(startTime).format('YYYYMMDD'),
-        });
-        departments?.forEach((dept: any) => {
-          let groups: string[] = [dept.deptName];
-          findParent(departments, dept, groups);
-          if (checkTesterGroup(groups)) return;
-          result.push({
-            title: it.range.start,
-            Group: groups.concat(dept.execution?.map((it: any) => it.name)),
-            isDept: true,
-            [`instCover${startTime}`]: dept?.execution?.[0].instCover.numerator,
-            [`branchCover${startTime}`]: dept?.execution?.[0].instCover.numerator,
-          });
-        });
+  let column: any[] = [];
+  origin?.reverse()?.forEach((it: any) => {
+    const start = it.range.start;
+    const title =
+      kind == 1
+        ? getMonthWeek(start)
+        : kind == 2
+        ? moment(start).format('MM月YYYY年')
+        : kind == 3
+        ? `${moment(start).format('YYYY年')}${moment(start).quarter()}季`
+        : moment(start).format('YYYY');
+    column.push({
+      headerName: title,
+      children: [
+        { headerName: '自动化覆盖率执行完成时间', field: `execution${start}` },
+        {
+          headerName: '结构覆盖率',
+          field: `instCove${start}`,
+          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+        },
+        {
+          headerName: '分支覆盖率',
+          field: `branCove${start}`,
+          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+        },
+      ],
+    });
+    it.datas?.forEach((node: any) => {
+      let Group = [node.deptName];
+      if (node.dept != 59) {
+        findNode(it.datas, node, Group);
+      }
+      result.push({
+        Group,
+        branch: '',
+        isDept: true,
+        [`branCove${start}`]: node?.branchCover?.numerator,
+        [`execution${start}`]: 10,
+        [`instCove${start}`]: node.instCover?.numerator,
       });
+    });
   });
-  return result;
+  return { rowData: converseArrayToOne(result) || [], column };
+};
+
+const findNode = (data: any[], item: any, groups: string[]) => {
+  data?.forEach((it: any) => {
+    if (it.dept == item.parent) {
+      groups.unshift(it.deptName);
+      findNode(data, it, groups);
+    }
+  });
 };
 
 export const aggFunc = (data: any, number = 0) => {
@@ -402,4 +424,37 @@ export const aggFunc = (data: any, number = 0) => {
   });
   if (!sum) return 0;
   return number > 0 ? sum.toFixed(number) : sum;
+};
+
+export const renderFormat = ({
+  params,
+  showSplit = false,
+  len,
+}: {
+  params: any;
+  showSplit?: boolean;
+  len?: number;
+}) => {
+  const node = params.data;
+  const result = params.value;
+  let numerator = 0; // 分子
+  let denominator = 0; // 分母
+  if (showSplit) {
+    const currentTime = params.column?.colId;
+    numerator = node[`${currentTime}_numerator`] ?? 0; // 分子
+    denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
+  }
+  const weight = node?.isDept ? 'bold' : 'initial';
+  const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
+  if (isNumber(result)) {
+    if (showSplit)
+      return `<span>
+                <label style="font-weight: ${weight}">${data}</label>
+                <label style="color: gray"> (${numerator},${denominator})</label>
+            </span>`;
+    return `<span style="font-weight: ${weight}">${data}</span>`;
+  }
+  return `<span style="font-weight: ${weight};color: ${
+    node?.isDept ? 'initial' : 'silver'
+  }"> 0</span>`;
 };

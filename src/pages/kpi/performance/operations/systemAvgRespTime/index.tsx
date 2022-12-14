@@ -5,11 +5,12 @@ import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useRef, useState, useEffect } from 'react';
 import dayjs from 'dayjs';
+import { renderFormat } from '@/utils/utils';
 import { useGqlClient } from '@/hooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { IStaticBy } from '@/hooks/statistic';
 import StatisticServices from '@/services/statistic';
-import { groupBy, omit, isNumber, sortBy } from 'lodash';
+import { groupBy, omit, sortBy } from 'lodash';
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import {
   getAllDate,
@@ -38,7 +39,7 @@ const ruleData: IRuleData[] = [
 const SystemAvgRespTime = () => {
   const gqlClient = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [catagory, setCatagory] = useState<IStaticBy>('quarter');
+  const [category, setCategory] = useState<IStaticBy>('quarter');
   const [loading, setLoading] = useState(false);
   const [gridData, setGridData] = useState<any[]>();
   const [columns, setColumns] = useState<any[]>([]);
@@ -60,7 +61,7 @@ const SystemAvgRespTime = () => {
     try {
       const { data } = await StatisticServices.operationsAvgRespTime({
         client: gqlClient,
-        params: catagory,
+        params: category,
       });
       let result: any[] = [];
       let format: any[] = [];
@@ -85,22 +86,9 @@ const SystemAvgRespTime = () => {
   };
 
   useEffect(() => {
-    renderColumn(catagory, 2);
+    renderColumn(category, 2);
     getDetail();
-  }, [catagory]);
-
-  const cellRenderer = (params: any, len?: number) => {
-    const node = params.data;
-    const result = params.value;
-    const weight = node?.isDept ? 'bold' : 'initial';
-    const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
-    if (isNumber(result)) {
-      return `<span style="font-weight: ${weight}">${data}</span>`;
-    }
-    return `<span style="font-weight: ${weight};color: ${
-      node?.isDept ? 'initial' : 'silver'
-    }"> 0</span>`;
-  };
+  }, [category]);
 
   const renderColumn = (type: IStaticBy, len?: number) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
@@ -126,21 +114,21 @@ const SystemAvgRespTime = () => {
         component.push({
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => cellRenderer(p, len),
+          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
           minWidth: 100,
         });
       } else if (type == 'day') {
         component.push({
           headerName: dayjs(data[index]).format('MM月DD日YYYY年'),
           field: data[index],
-          cellRenderer: (p) => cellRenderer(p, len),
+          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
           minWidth: 100,
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => cellRenderer(p, len),
+              cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
               headerName: data[index].title,
               field: data[index].start?.toString(),
             },
@@ -156,7 +144,7 @@ const SystemAvgRespTime = () => {
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white', minHeight: '530px' }}>
           <ConditionHeader
-            onChange={(v) => setCatagory(v)}
+            onChange={(v) => setCategory(v)}
             initFilter={['day', 'week', 'month', 'quarter', 'year']}
           />
           <label style={{ fontWeight: 'bold' }}>(统计单位：ms)</label>

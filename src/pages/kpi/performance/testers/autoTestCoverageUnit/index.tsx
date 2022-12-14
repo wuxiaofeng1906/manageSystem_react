@@ -11,6 +11,7 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
 import StatisticServices from '@/services/statistic';
 import { IStaticBy } from '@/hooks/statistic';
+import { isEmpty, isNumber } from 'lodash';
 
 const ruleData: IRuleData[] = [
   {
@@ -53,7 +54,7 @@ const ruleData: IRuleData[] = [
 export default () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [category, setCategory] = useState<IStaticBy>('month');
+  const [category, setCategory] = useState<IStaticBy>('week');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>();
@@ -73,7 +74,9 @@ export default () => {
     setLoading(true);
     try {
       const { data } = await StatisticServices.autoTestCoverageUnit({ client, params: category });
-      console.log(data);
+
+      gridRef.current?.setColumnDefs(data.column);
+      gridRef.current?.setRowData(data?.rowData);
       setData([]);
       setLoading(false);
     } catch (e) {
@@ -108,7 +111,7 @@ export default () => {
             headerHeight={35}
             onGridReady={onGridReady}
             pivotMode={true}
-            rowData={data ?? []}
+            // rowData={data ?? []}
             suppressAggFuncInHeader={true}
             defaultColDef={{
               sortable: true,
@@ -121,21 +124,17 @@ export default () => {
               console.log(e);
             }}
             autoGroupColumnDef={{
-              minWidth: 150,
-              maxWidth: 180,
+              minWidth: 260,
+              maxWidth: 280,
               headerName: '部门-项目',
               cellRendererParams: { suppressCount: true },
               pinned: 'left',
               suppressMenu: false,
             }}
-            columnDefs={[
-              { field: 'Group', headerName: '部门', rowGroup: true, pinned: 'left' },
-              { field: 'name', headerName: '分支名称' },
-              { field: 'title', pivotIndex: 0 },
-              { field: 'execution', headerName: '自动化覆盖率执行完成时间', aggFunc: 'sum' },
-              { field: 'structure', aggFunc: 'sum', headerName: '结构覆盖率' },
-              { field: 'branch', aggFunc: 'sum', headerName: '分支覆盖率' },
-            ]}
+            treeData={true}
+            groupDefaultExpanded={-1}
+            getDataPath={(source: any) => source.Group}
+            columnDefs={[]}
           />
         </div>
         <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />

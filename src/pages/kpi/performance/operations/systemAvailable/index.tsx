@@ -3,22 +3,12 @@ import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticPerform
 import StatisticServices from '@/services/statistic';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
-
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { IStaticBy } from '@/hooks/statistic';
+import { IStaticBy, useStatistic } from '@/hooks/statistic';
 import { useGqlClient } from '@/hooks';
-import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-import {
-  getFourQuarterTime,
-  getHalfYearTime,
-  getMonthWeek,
-  getTwelveMonthTime,
-  getWeeksRange,
-  getYearsTime,
-} from '@/publicMethods/timeMethods';
-import { isEmpty, isNumber } from 'lodash';
+import { isEmpty } from 'lodash';
 
 // 运维 系统可用性
 const ruleData: IRuleData[] = [
@@ -72,11 +62,11 @@ const tabs = {
 };
 const SystemAvailable: React.FC<any> = () => {
   const gqlClient = useGqlClient();
+  const { renderColumn, columns } = useStatistic();
   const gridRef = useRef<GridApi>();
   const [category, setCategory] = useState<IStaticBy>('quarter');
   const [loading, setLoading] = useState(false);
   const [gridData, setGridData] = useState<any[]>();
-  const [columns, setColumns] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -84,7 +74,7 @@ const SystemAvailable: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
   useEffect(() => {
-    renderColumn(category, 2);
+    renderColumn({ type: category, len: 2 });
     getDetail();
   }, [category]);
 
@@ -109,54 +99,6 @@ const SystemAvailable: React.FC<any> = () => {
     } catch (e) {
       setLoading(false);
     }
-  };
-  const cellRenderer = (params: any, len?: number) => {
-    const node = params.data;
-    const result = params.value;
-    const weight = node?.isDept ? 'bold' : 'initial';
-    const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
-    if (isNumber(result)) {
-      return `<span style="font-weight: ${weight}">${data}</span>`;
-    }
-    return `<span style="font-weight: ${weight};color: ${
-      node?.isDept ? 'initial' : 'silver'
-    }"> 0</span>`;
-  };
-
-  const renderColumn = (type: IStaticBy, len?: number) => {
-    const component: (ColDef | ColGroupDef)[] = new Array();
-    const typeMap = {
-      year: getYearsTime,
-      halfYear: getHalfYearTime,
-      quarter: getFourQuarterTime,
-      month: getTwelveMonthTime,
-    };
-    const ranges = typeMap[type]?.();
-    const weekRanges = type == 'week' ? getWeeksRange(8) : [];
-    const data = type == 'week' ? weekRanges?.reverse() : ranges;
-    for (let index = 0; index < data?.length; index += 1) {
-      if (type == 'week') {
-        const startTime = data[index].from;
-        const weekName = getMonthWeek(startTime);
-        component.push({
-          headerName: weekName,
-          field: startTime?.toString(),
-          cellRenderer: (p) => cellRenderer(p, len),
-          minWidth: 100,
-        });
-      } else
-        component.push(
-          Object.assign(
-            {
-              cellRenderer: (p: any) => cellRenderer(p, len),
-              headerName: data[index].title,
-              field: data[index].start?.toString(),
-            },
-            type == 'month' ? { minWidth: 110 } : {},
-          ),
-        );
-    }
-    setColumns(component);
   };
 
   return (

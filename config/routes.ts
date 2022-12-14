@@ -254,6 +254,7 @@ export default [
                 path: 'thouBugsRateExcludeOnline',
                 component: './kpi/performance/developer/thouBugsRateExcludeOnline',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '单元测试覆盖率',

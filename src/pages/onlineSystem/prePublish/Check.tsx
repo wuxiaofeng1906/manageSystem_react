@@ -20,7 +20,7 @@ import {
   onLog,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
-import { isEmpty, omit, delay, isString } from 'lodash';
+import { isEmpty, omit, delay, isString, uniq } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 import { useLocation, useModel, history, useParams } from 'umi';
@@ -149,14 +149,20 @@ const Check = (props: any, ref: any) => {
     setSelected([]);
     try {
       if (isFresh) {
-        await Promise.all(
-          ['zt-check-list', 'test-unit'].map((type) =>
-            OnlineSystemServices.checkOpts(
-              { release_num, user_id: user?.userid, api_url: type },
-              type as ICheckType,
-            ),
-          ),
+        // 忽略 不用跑检查
+        const autoCheck = list.flatMap((it) =>
+          ['zt-check-list', 'test-unit'].includes(it.api_url) && it.open ? [it.api_url] : [],
         );
+        if (!isEmpty(uniq(autoCheck))) {
+          await Promise.all(
+            uniq(autoCheck).map((type) =>
+              OnlineSystemServices.checkOpts(
+                { release_num, user_id: user?.userid, api_url: type },
+                type as ICheckType,
+              ),
+            ),
+          );
+        }
       }
       const [checkItem, firstDuty] = await Promise.all([
         OnlineSystemServices.getCheckInfo({ release_num }),

@@ -72,11 +72,12 @@ export default () => {
   const getTableSource = async () => {
     setLoading(true);
     try {
-      const { data } = StatisticServices.autoTestCoverageUnit({ client, params: category });
+      const { data } = await StatisticServices.autoTestCoverageUnit({ client, params: category });
       console.log(data);
       setData([]);
       setLoading(false);
     } catch (e) {
+      console.log(e);
       setLoading(false);
     }
   };

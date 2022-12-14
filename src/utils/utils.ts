@@ -319,7 +319,7 @@ export const checkLogin = () => {
 export const checkTesterGroup = (groups: string[]) =>
   intersection(groups, ['管理会计研发部', '供应链研发部'])?.length > 0;
 
-export const formatPivotMode = (origin: any[], kind: 2 | 3 = 2) => {
+export const formatPivotMode = (origin: any[], kind: number) => {
   let result: any[] = [];
   if (isEmpty(origin)) return result;
   origin?.reverse()?.forEach((it) => {
@@ -344,7 +344,6 @@ export const formatPivotMode = (origin: any[], kind: 2 | 3 = 2) => {
         });
         departments?.forEach((dept: any) => {
           let groups: string[] = [dept.deptName];
-          findParent(departments, dept, groups);
           if (checkTesterGroup(groups)) return;
           result.push({
             title,
@@ -352,6 +351,41 @@ export const formatPivotMode = (origin: any[], kind: 2 | 3 = 2) => {
             isDept: true,
             total: dept.kpi,
             subTitle: moment(startTime).format('YYYYMMDD'),
+          });
+        });
+      });
+  });
+  return result;
+};
+export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
+  let result: any[] = [];
+  if (isEmpty(origin)) return result;
+  origin?.forEach((it) => {
+    const data = it.datas;
+
+    if (isEmpty(data)) {
+      result.push({ Group: ['研发中心'], total: 0, title: it.range.start });
+    } else
+      data?.forEach((obj: any) => {
+        const startTime = it.range.start;
+        const departments = obj.datas;
+        result.push({
+          title: it.range.start,
+          Group: ['研发中心'],
+          isDept: true,
+          total: obj.total.kpi,
+          subTitle: moment(startTime).format('YYYYMMDD'),
+        });
+        departments?.forEach((dept: any) => {
+          let groups: string[] = [dept.deptName];
+          findParent(departments, dept, groups);
+          if (checkTesterGroup(groups)) return;
+          result.push({
+            title: it.range.start,
+            Group: groups.concat(dept.execution?.map((it: any) => it.name)),
+            isDept: true,
+            [`instCover${startTime}`]: dept?.execution?.[0].instCover.numerator,
+            [`branchCover${startTime}`]: dept?.execution?.[0].instCover.numerator,
           });
         });
       });

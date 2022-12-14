@@ -720,6 +720,13 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
+                name: '自动化发现bug数',
+                icon: 'table',
+                path: 'autoDiscoveryBugCount',
+                component: './kpi/performance/testers/autoDiscoveryBugCount',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
                 name: '自动化单元测试覆盖率',
                 icon: 'table',
                 path: 'autoTestCoverageUnit',

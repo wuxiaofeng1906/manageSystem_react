@@ -1,6 +1,6 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import { formatPivotMode, formatTreeData } from '@/utils/utils';
+import { formatAutoTestCover, formatPivotMode, formatTreeData } from '@/utils/utils';
 import { IIdentity, IStaticBy, Period } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
@@ -834,38 +834,16 @@ const StatisticServices = {
   async autoTestCoverageUnit({ client, params }: IStatisticQuery) {
     const condition = getParamsByType(params);
     const { data } = await client.query(`
-       autoTestCoverPropRuntimeE(ends:${condition.ends}, kind:${condition.typeFlag}) {
-        range{
-          start
-          end
-        }
-        datas{
-          dept
-          deptName
-          parent
-          instCover{
-            numerator
-            denominator
+      {
+       data:autoTestCoverPropRuntimeE(ends:${condition.ends}, kind:"${condition.typeFlag}") {
+          range{
+            start
+            end
           }
-          branchCover{
-            numerator
-            denominator
-          }
-          tech {
-            name
-            instCover {
-              numerator
-              denominator
-            }
-            branchCover {
-              numerator
-              denominator
-            }
-          }
-          execution{
-            runtime
-            name
-            branch
+          datas{
+            dept
+            deptName
+            parent
             instCover{
               numerator
               denominator
@@ -874,11 +852,76 @@ const StatisticServices = {
               numerator
               denominator
             }
+            tech {
+              name
+              instCover {
+                numerator
+                denominator
+              }
+              branchCover {
+                numerator
+                denominator
+              }
+            }
+            execution{
+              name
+              branch
+              instCover{
+                numerator
+                denominator
+              }
+              branchCover{
+                numerator
+                denominator
+              }
+            }
           }
         }
       }
     `);
+    console.log(formatAutoTestCover(data.data, condition.typeFlag));
     return { data: data.data };
+  },
+
+  // 自动化发现BUG数
+  async autoDiscoveryBugCount({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:testAtuoFoundBugDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
+              kpi
+            }
+            users {
+              userId
+              userName
+              kpi
+              hired
+            }
+          }
+        }
+      }
+  `);
+    return {
+      data: formatTreeData({ origin: data.data, isTest: true }),
+      loading,
+    };
   },
 };
 export default StatisticServices;

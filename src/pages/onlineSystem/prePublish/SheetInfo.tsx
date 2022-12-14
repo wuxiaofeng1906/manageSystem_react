@@ -46,8 +46,9 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
 
-let agFinished = false; // 处理ag-grid 拿不到最新的state
+let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
+let agBatch: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
@@ -91,7 +92,6 @@ const SheetInfo = (props: any, ref: any) => {
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [deployments, setDeployments] = useState<any[]>([]);
   const [announcementList, setAnnouncementList] = useState<any[]>([]);
-  const [batchs, setBatchs] = useState<any[]>([]);
   const [leaveShow, setLeaveShow] = useState(false);
 
   const serverRef = useRef<GridApi>();
@@ -227,11 +227,11 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const getBaseList = async () => {
+    const batch = await OnlineSystemServices.getBatchVersion({ release_num });
+    agBatch = batch?.map((it: string) => ({ label: it, value: it })) ?? [];
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
     const deployIds = await OnlineSystemServices.deployments({ release_num });
-    const batch = await OnlineSystemServices.getBatchVersion({ release_num });
-    // setBatchs(batch?.map((it) => ({ label: it, value: it })));
     setDeployments(
       deployIds?.map((it: any) => ({
         label: `${it.deployment_id}(${it.app} ${it.check_end_time})`,
@@ -444,7 +444,7 @@ const SheetInfo = (props: any, ref: any) => {
           field == 'sql_order'
             ? agSql || sqlList
             : field == 'batch'
-            ? batchs
+            ? agBatch
             : Object.keys(WhetherOrNot)?.map((k) => ({
                 value: k,
                 label: WhetherOrNot[k],

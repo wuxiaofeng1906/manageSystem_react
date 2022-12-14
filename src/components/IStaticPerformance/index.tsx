@@ -131,9 +131,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
             treeData={true}
             animateRows={true}
             groupDefaultExpanded={-1}
-            getDataPath={(source: any) => {
-              return source.Group;
-            }}
+            getDataPath={(source: any) => source.Group}
           />
         )}
       </div>

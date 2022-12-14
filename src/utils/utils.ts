@@ -1,5 +1,6 @@
 import { IRecord } from '@/namespaces/interface';
-import { isEmpty, isEqual, omit, intersection } from 'lodash';
+import { isEmpty, isEqual, omit, intersection, sortBy } from 'lodash';
+import moment from 'moment';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -286,7 +287,9 @@ export const formatTreeData = ({
               usersGroup.push(side[user.tech]);
             }
           }
-          usersGroup.push(user.userName);
+          if (user?.hired != '0') {
+            usersGroup.push(user.userName);
+          }
           result.push({
             Group: usersGroup,
             isDept: false,
@@ -316,33 +319,42 @@ export const checkLogin = () => {
 export const checkTesterGroup = (groups: string[]) =>
   intersection(groups, ['管理会计研发部', '供应链研发部'])?.length > 0;
 
-export const formatPivotMode = (origin: any[]) => {
+export const formatPivotMode = (origin: any[], kind: 2 | 3 = 2) => {
   let result: any[] = [];
-  origin?.forEach((it) => {
+  if (isEmpty(origin)) return result;
+  origin?.reverse()?.forEach((it) => {
     const data = it.datas;
-    data?.forEach((obj: any) => {
-      const startTime = obj.range.start;
-      const departments = obj.datas;
-      result.push({
-        Group: ['研发中心'],
-        isDept: true,
-        total: obj.total.kpi,
-        title: it.range.start,
-        subTitle: startTime,
-      });
-      departments?.forEach((dept: any) => {
-        let groups: string[] = [dept.deptName];
-        findParent(departments, dept, groups);
-        if (checkTesterGroup(groups)) return;
+    const title =
+      kind == 2
+        ? moment(it.range.start).format('YYYY月MM年')
+        : `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`;
+
+    if (isEmpty(data)) {
+      result.push({ Group: ['研发中心'], total: 0, title });
+    } else
+      data?.forEach((obj: any) => {
+        const startTime = obj.range.start;
+        const departments = obj.datas;
         result.push({
-          Group: dept.deptName,
+          title,
+          Group: ['研发中心'],
           isDept: true,
-          total: dept.kpi,
-          title: it.range.start,
-          subTitle: startTime,
+          total: obj.total.kpi,
+          subTitle: moment(startTime).format('YYYYMMDD'),
+        });
+        departments?.forEach((dept: any) => {
+          let groups: string[] = [dept.deptName];
+          findParent(departments, dept, groups);
+          if (checkTesterGroup(groups)) return;
+          result.push({
+            title,
+            Group: dept.deptName,
+            isDept: true,
+            total: dept.kpi,
+            subTitle: moment(startTime).format('YYYYMMDD'),
+          });
         });
       });
-    });
   });
   return result;
 };

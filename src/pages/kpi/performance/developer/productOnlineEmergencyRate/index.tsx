@@ -79,10 +79,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
       const ends = getDate();
       const { data } = await StatisticServices.onlineTestOnlineEmergency({
         client,
-        params: {
-          kind: catagory == 'month' ? 2 : 3,
-          ends,
-        },
+        params: { kind: catagory == 'month' ? 2 : 3, ends },
         identity: 'DEVELOPER',
       });
       setData(data);
@@ -124,21 +121,25 @@ const ProductOnlineEmergencyRate: React.FC = () => {
               resizable: true,
               filter: true,
               flex: 1,
-              minWidth: 80,
+              minWidth: 100,
             }}
             autoGroupColumnDef={{
               minWidth: 150,
               maxWidth: 180,
-              headerName: '部门-人员',
+              headerName: '部门',
               cellRendererParams: { suppressCount: true },
               pinned: 'left',
               suppressMenu: false,
             }}
             suppressAggFuncInHeader={true}
             columnDefs={[
-              { field: 'Group', headerName: '部门', rowGroup: true, pinned: 'left' },
+              { field: 'Group', rowGroup: true },
               { field: 'total', headerName: 'emergency占比', aggFunc: (data) => aggFunc(data, 2) },
-              { field: 'title', pivot: true, pivotComparator: () => 1 },
+              {
+                field: 'title',
+                pivot: true,
+                pivotComparator: () => 1,
+              },
               { field: 'subTitle', pivot: true },
             ]}
           />

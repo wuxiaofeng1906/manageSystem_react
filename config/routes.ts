@@ -363,6 +363,13 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
+                name: '任务计划偏差率',
+                icon: 'table',
+                path: 'taskScheduleRate',
+                component: './kpi/performance/developer/taskScheduleRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
                 name: 'A类客户服务投入比',
                 icon: 'table',
                 path: 'cusInputRate_A',
@@ -568,6 +575,13 @@ export default [
                 component: './kpi/performance/testers/palnDeviationRate',
                 wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
+              },
+              {
+                name: '任务计划偏差率',
+                icon: 'table',
+                path: 'taskScheduleRate',
+                component: './kpi/performance/testers/taskScheduleRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: 'A类客户服务投入比',

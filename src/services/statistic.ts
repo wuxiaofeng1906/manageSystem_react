@@ -753,7 +753,7 @@ const StatisticServices = {
           }
       }
   `);
-    return { data: formatPivotMode(data.data) };
+    return { data: formatPivotMode(data.data, params.kind) };
   },
   //灰度千行bug率
   async grayThousBugRate({ client, params }: StaticOther) {
@@ -791,6 +791,43 @@ const StatisticServices = {
       }
   `);
     return { data: data.data };
+  },
+
+  // 任务计划偏差率
+  async taskScheduleRate({ client, params, identity }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:devTestPlanDeviationRateDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
+            }
+            users {
+              userId
+              userName
+              kpi
+              hired
+            }
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
   },
 };
 export default StatisticServices;

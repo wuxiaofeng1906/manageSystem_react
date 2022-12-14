@@ -182,6 +182,8 @@ const ProcessDetail = (props: any, ref: any) => {
     Modal.confirm({
       centered: true,
       width: 500,
+      okText: '确认',
+      cancelText: '取消',
       title: `${flag ? '' : '解除'}锁定分支提示`,
       okButtonProps: { disabled: confirmDisabled },
       content: (
@@ -251,6 +253,7 @@ const ProcessDetail = (props: any, ref: any) => {
                   title: '测试用例未通过',
                   content: '该服务测试用例未通过,是否前往检查页，设置忽略检查测试用例？',
                   okText: '确定',
+                  cancelText: '取消',
                   onOk: () =>
                     history.replace({
                       pathname: history.location.pathname,
@@ -296,6 +299,8 @@ const ProcessDetail = (props: any, ref: any) => {
     Modal.confirm({
       centered: true,
       title: '移除提示',
+      okText: '确认',
+      cancelText: '取消',
       icon: <InfoCircleOutlined style={{ color: 'red' }} />,
       content: `请确认是否要移除 ${
         type == 'server' ? gridSelected?.map((it) => it.apps)?.join(',') + '服务' : ''
@@ -379,6 +384,8 @@ const ProcessDetail = (props: any, ref: any) => {
         centered: true,
         title: '保存基础信息提示',
         content: '请确认是否需要保存基础信息？',
+        okText: '确认',
+        cancelText: '取消',
         onCancel: () => {
           form.setFieldsValue({
             ...init,
@@ -427,6 +434,8 @@ const ProcessDetail = (props: any, ref: any) => {
       width: 500,
       maskClosable: false,
       centered: true,
+      okText: '确认',
+      cancelText: '取消',
       title: '修改服务确认提醒',
       content: `请确认是否将『${ServerConfirmType[param.data.confirm_type]} - ${
         param.column.colId.includes('is_hot_update') ? '是否可热更' : '服务确认完成'

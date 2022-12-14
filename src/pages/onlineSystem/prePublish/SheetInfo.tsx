@@ -457,6 +457,8 @@ const SheetInfo = (props: any, ref: any) => {
             Modal.confirm({
               centered: true,
               title: 'SQL工单执行时间填写',
+              okText: '确认',
+              cancelText: '取消',
               content: (
                 <Form form={sqlForm}>
                   <Form.Item

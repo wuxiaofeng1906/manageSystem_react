@@ -255,6 +255,7 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
         title: '需求标题',
         dataIndex: 'title',
         width: 200,
+        ellipsis: { showTitle: false },
         render: (v: string) => (
           <Ellipsis title={v} width={190} placement={'bottomLeft'} color={'#108ee9'} />
         ),

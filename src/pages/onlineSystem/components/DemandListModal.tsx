@@ -281,6 +281,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           ellipsis: { showTitle: false },
           width: 200,
           fixed: 'left',
+          ellipsis: { showTitle: false },
           render: (v: string) => (
             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
           ),
@@ -303,6 +304,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           title: '需求阶段',
           dataIndex: 'status',
           width: 90,
+          ellipsis: { showTitle: false },
           render: (v: string) => StoryStatus[v] ?? '',
         },
         {
@@ -501,15 +503,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
                     onChange: (_, selectedRows) => setSelected(selectedRows),
                     getCheckboxProps: (record) => ({
-                      disabled: memoEdit.update
-                        ? memoEdit.global
-                        : false ||
-                          record.disabled ||
-                          (!isEmpty(props.data?.release_env_type) &&
-                            intersection(
-                              record.apps?.split(','),
-                              appServers?.[props.data?.release_env_type],
-                            )?.length == 0),
+                      disabled:
+                        (memoEdit.update ? globalState.finished : false) ||
+                        record.disabled ||
+                        (!isEmpty(props.data?.release_env_type) &&
+                          intersection(
+                            record.apps?.split(','),
+                            appServers?.[props.data?.release_env_type],
+                          )?.length == 0),
                     }),
                   }}
                 />

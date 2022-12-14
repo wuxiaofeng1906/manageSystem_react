@@ -20,7 +20,7 @@ import { initGridTable } from '@/utils/utils';
 import { useLocation, useParams } from 'umi';
 
 const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'key', allowClear: true };
-const initFilter = ['未开始', '进行中', '开发完', '测试中'];
+const initFilter = ['未开始', '进行中'];
 
 const ZentaoDetail = (props: any, ref: any) => {
   const client = useGqlClient();
@@ -190,6 +190,7 @@ const ZentaoDetail = (props: any, ref: any) => {
   const getTableList = async (force = false) => {
     storyForm.setFieldsValue({
       stage: initFilter,
+      category: ['Bug', 'Task'],
     });
     try {
       setSpin(true);
@@ -231,7 +232,7 @@ const ZentaoDetail = (props: any, ref: any) => {
           },
         };
         ztNo.push({ key: it.ztNo, value: it.ztNo, label: it.ztNo });
-        if (initFilter.includes(it.stage?.show?.zh)) {
+        if (initFilter.includes(it.stage?.show?.zh) && ['Task', 'Bug'].includes(it.category)) {
           initData.push(it);
         }
       });
@@ -356,7 +357,7 @@ const ZentaoDetail = (props: any, ref: any) => {
             </Col>
           </Row>
         </Form>
-        <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
+        <div style={{ height: tableHeight > 300 ? tableHeight : 300, width: '100%' }}>
           <AgGridReact
             columnDefs={zentaoStoryColumn}
             rowData={storyData?.slice(
@@ -447,7 +448,7 @@ const ZentaoDetail = (props: any, ref: any) => {
             </Col>
           </Row>
         </Form>
-        <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
+        <div style={{ height: tableHeight > 300 ? tableHeight : 300, width: '100%' }}>
           <AgGridReact
             columnDefs={zentaoTestColumn}
             rowData={testData}

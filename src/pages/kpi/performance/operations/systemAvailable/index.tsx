@@ -73,7 +73,7 @@ const tabs = {
 const SystemAvailable: React.FC<any> = () => {
   const gqlClient = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [catagory, setCatagory] = useState<IStaticBy>('quarter');
+  const [category, setCategory] = useState<IStaticBy>('quarter');
   const [loading, setLoading] = useState(false);
   const [gridData, setGridData] = useState<any[]>();
   const [columns, setColumns] = useState<any[]>([]);
@@ -84,21 +84,22 @@ const SystemAvailable: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
   useEffect(() => {
-    renderColumn(catagory);
+    renderColumn(category, 2);
     getDetail();
-  }, [catagory]);
+  }, [category]);
 
   const getDetail = async () => {
     setLoading(true);
     try {
+      // @ts-ignore
       const { data } = await StatisticServices.operationsAvgAvailable({
         client: gqlClient,
-        params: catagory,
+        params: category,
       });
       let formatData: any;
       data?.forEach((it: any) => {
         let data: any;
-        it.datas?.forEach((o) => {
+        it.datas?.forEach((o: any) => {
           data = { ...data, [o.range.start]: o.depts?.kpi };
         });
         formatData = { ...formatData, [it.category]: data };
@@ -109,24 +110,12 @@ const SystemAvailable: React.FC<any> = () => {
       setLoading(false);
     }
   };
-  const cellRenderer = (params: any, showSplit = false, len?: number) => {
+  const cellRenderer = (params: any, len?: number) => {
     const node = params.data;
     const result = params.value;
-    let numerator = 0; // 分子
-    let denominator = 0; // 分母
-    if (showSplit) {
-      const currentTime = params.column?.colId;
-      numerator = node[`${currentTime}_numerator`] ?? 0; // 分子
-      denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
-    }
     const weight = node?.isDept ? 'bold' : 'initial';
     const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
     if (isNumber(result)) {
-      if (showSplit)
-        return `<span>
-                <label style="font-weight: ${weight}">${data}</label>
-                <label style="color: gray"> (${numerator},${denominator})</label>
-            </span>`;
       return `<span style="font-weight: ${weight}">${data}</span>`;
     }
     return `<span style="font-weight: ${weight};color: ${
@@ -134,7 +123,7 @@ const SystemAvailable: React.FC<any> = () => {
     }"> 0</span>`;
   };
 
-  const renderColumn = (type: IStaticBy, showSplit = false, len?: number) => {
+  const renderColumn = (type: IStaticBy, len?: number) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
       year: getYearsTime,
@@ -152,14 +141,14 @@ const SystemAvailable: React.FC<any> = () => {
         component.push({
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => cellRenderer(p, showSplit, len),
+          cellRenderer: (p) => cellRenderer(p, len),
           minWidth: 100,
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => cellRenderer(p, showSplit, len),
+              cellRenderer: (p: any) => cellRenderer(p, len),
               headerName: data[index].title,
               field: data[index].start?.toString(),
             },
@@ -174,7 +163,7 @@ const SystemAvailable: React.FC<any> = () => {
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white', minHeight: '530px' }}>
-          <ConditionHeader onChange={(v) => setCatagory(v)} />
+          <ConditionHeader onChange={(v) => setCategory(v)} />
           <Button
             type="text"
             style={{ color: '#1890FF', float: 'right' }}

@@ -85,28 +85,16 @@ const SystemAvgRespTime = () => {
   };
 
   useEffect(() => {
-    renderColumn(catagory, false, 2);
+    renderColumn(catagory, 2);
     getDetail();
   }, [catagory]);
 
-  const cellRenderer = (params: any, showSplit = false, len?: number) => {
+  const cellRenderer = (params: any, len?: number) => {
     const node = params.data;
     const result = params.value;
-    let numerator = 0; // 分子
-    let denominator = 0; // 分母
-    if (showSplit) {
-      const currentTime = params.column?.colId;
-      numerator = node[`${currentTime}_numerator`] ?? 0; // 分子
-      denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
-    }
     const weight = node?.isDept ? 'bold' : 'initial';
     const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
     if (isNumber(result)) {
-      if (showSplit)
-        return `<span>
-                <label style="font-weight: ${weight}">${data}</label>
-                <label style="color: gray"> (${numerator},${denominator})</label>
-            </span>`;
       return `<span style="font-weight: ${weight}">${data}</span>`;
     }
     return `<span style="font-weight: ${weight};color: ${
@@ -114,7 +102,7 @@ const SystemAvgRespTime = () => {
     }"> 0</span>`;
   };
 
-  const renderColumn = (type: IStaticBy, showSplit = false, len?: number) => {
+  const renderColumn = (type: IStaticBy, len?: number) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
       year: getYearsTime,
@@ -138,21 +126,21 @@ const SystemAvgRespTime = () => {
         component.push({
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => cellRenderer(p, showSplit, len),
+          cellRenderer: (p) => cellRenderer(p, len),
           minWidth: 100,
         });
       } else if (type == 'day') {
         component.push({
           headerName: dayjs(data[index]).format('MM月DD日YYYY年'),
           field: data[index],
-          cellRenderer: (p) => cellRenderer(p, showSplit, len),
+          cellRenderer: (p) => cellRenderer(p, len),
           minWidth: 100,
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => cellRenderer(p, showSplit, len),
+              cellRenderer: (p: any) => cellRenderer(p, len),
               headerName: data[index].title,
               field: data[index].start?.toString(),
             },
@@ -187,6 +175,7 @@ const SystemAvgRespTime = () => {
               headerHeight={35}
               rowData={gridData}
               onGridReady={onGridReady}
+              groupDisplayType={'multipleColumns'}
               columnDefs={[
                 {
                   headerName: '集群',
@@ -203,13 +192,12 @@ const SystemAvgRespTime = () => {
                 },
                 ...columns,
               ]}
-              groupDisplayType={'multipleColumns'}
               defaultColDef={{
                 sortable: true,
                 resizable: true,
                 filter: true,
                 flex: 1,
-                minWidth: 80,
+                minWidth: 100,
               }}
             />
           </div>

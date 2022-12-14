@@ -1,5 +1,5 @@
 import { IRecord } from '@/namespaces/interface';
-import { isEmpty, isEqual, omit, intersection, sortBy } from 'lodash';
+import { isEmpty, isEqual, omit, intersection } from 'lodash';
 import moment from 'moment';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
@@ -326,7 +326,7 @@ export const formatPivotMode = (origin: any[], kind: 2 | 3 = 2) => {
     const data = it.datas;
     const title =
       kind == 2
-        ? moment(it.range.start).format('YYYY月MM年')
+        ? moment(it.range.start).format('MM月YYYY年')
         : `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`;
 
     if (isEmpty(data)) {

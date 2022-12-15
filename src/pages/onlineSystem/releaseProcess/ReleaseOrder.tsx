@@ -619,7 +619,7 @@ const ReleaseOrder = () => {
                       onClick={() => {
                         if (!p.data.release_num) return;
                         history.push(
-                          `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}&history=true`,
+                          `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}`,
                         );
                       }}
                     >

@@ -44,13 +44,13 @@ const usePermission = () => {
       serverConfirm: roles?.includes(156), // 服务确认
       hotUpdate: roles?.includes(157), // 是否可热更
       baseInfo: roles?.includes(158), // 修改基础信息
-      checkStatus: roles?.includes(158), // 检查状态
+      checkStatus: roles?.includes(158), // 修改检查忽略状态
       paramSetting: roles?.includes(158), // 检查参数设置
       multiCheck: roles?.includes(158), // 批量检查
-      preLock: roles?.includes(158), // 封版
+      preLock: roles?.includes(158), // 封版、取消封版
       pushMessage: roles?.includes(158), // 一键推送检查失败信息
       orderSave: roles?.includes(158), // 工单保存
-      orderPublish: roles?.includes(158), // 工单发布
+      orderPublish: roles?.includes(158), // 工单标记发布结果
     };
   }, [authority]);
 

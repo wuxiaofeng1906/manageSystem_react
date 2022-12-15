@@ -2,7 +2,7 @@ import type { GqlClient } from '@/hooks';
 import { useQuery } from '@/hooks';
 import React from 'react';
 import { Select } from 'antd';
-import { isEmpty, sortBy } from 'lodash';
+import { isEmpty, sortBy, uniqBy } from 'lodash';
 
 const { Option } = Select;
 
@@ -469,10 +469,10 @@ const LoadCombobox = (params: any) => {
   }
 
   const { data: { WxDeptUsers = [] } = {} } = useQuery(deptMember);
-
-  if (WxDeptUsers && WxDeptUsers.length > 0) {
-    for (let index = 0; index < WxDeptUsers.length; index += 1) {
-      deptMan.push(<Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>);
+  const uniqData: any[] = uniqBy(WxDeptUsers, 'id');
+  if (!isEmpty(uniqData)) {
+    for (let index = 0; index < uniqData?.length; index += 1) {
+      deptMan.push(<Option value={uniqData[index].id}> {uniqData[index].userName}</Option>);
     }
   }
 
@@ -491,6 +491,36 @@ const LoadTesterCombobox = () => {
           }
       `);
   const result = WxDeptUsers?.filter((it: any) => it.hired != '0');
+  if (result && result.length > 0) {
+    for (let index = 0; index < result.length; index += 1) {
+      deptMan.push(
+        <Option value={result[index].id} key={result[index].id}>
+          {result[index].userName}
+        </Option>,
+      );
+    }
+  }
+
+  return deptMan;
+};
+
+const LoadTesterUEDCombobox = () => {
+  const deptMan = [<Option value="NA">NA</Option>];
+  const { data: { test = [], ued = [] } = {} } = useQuery(`
+          {
+            test:WxDeptUsers(techs:[TEST]){
+                id
+                userName
+                hired
+              }
+              ued:WxDeptUsers(deptNames:["UED"]){
+               id
+               userName
+               hired
+            }
+          }
+      `);
+  const result = [...test, ...ued]?.filter((it: any) => it.hired != '0');
   if (result && result.length > 0) {
     for (let index = 0; index < result.length; index += 1) {
       deptMan.push(
@@ -532,6 +562,7 @@ export {
   getDeptMemner,
   LoadCombobox,
   LoadTesterCombobox,
+  LoadTesterUEDCombobox,
   GetSprintProject,
   calTypeCount,
 };

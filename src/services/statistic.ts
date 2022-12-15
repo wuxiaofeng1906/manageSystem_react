@@ -1,17 +1,19 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import { formatTreeData } from '@/utils/utils';
-import { IStaticBy } from '@/hooks/statistic';
+import { formatAutoTestCover, formatPivotMode, formatTreeData } from '@/utils/utils';
+import { IIdentity, IStaticBy, Period } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
   client: GqlClient<object>;
   params: IStaticBy;
-  identity?: 'DEVELOPER' | 'TESTER';
+  identity?: IIdentity;
   showDenominator?: boolean;
+  period?: Period;
 }
 interface StaticOther {
   client: GqlClient<object>;
   params: { kind: number; ends: string };
+  identity?: 'DEVELOPER' | 'TESTER';
 }
 const StatisticServices = {
   // patch
@@ -332,6 +334,96 @@ const StatisticServices = {
   `);
     return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
   },
+  // 线上p0p1占比 (6个指标)
+  async roundsP0P1TestRate({ client, params, identity, period }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:testBugP0P1PropDept(kind: "${condition.typeFlag}", ends: ${condition.ends},thous:${identity},period:"${period}") {
+        total{
+            dept
+            deptName
+            kpi
+             sideKpi{
+              numerator
+              denominator
+            }
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
+            }
+           sideKpi{
+            numerator
+            denominator
+            }
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+  },
+
+  // 运维 -系统可用，修复，可用时间
+  async operationsAvgAvailable({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data } = await client.query(`
+      {
+         data:devopsSeveralSysKpis(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        category
+        datas{
+          range{
+            start
+            end
+          }
+        depts{
+          dept
+          deptName
+          kpi
+          side{
+            numerator
+            denominator
+          }
+        }
+      }
+    }
+  }
+  `);
+    return { data: data.data };
+  },
+
+  // 运维 - 响应时长
+  async operationsAvgRespTime({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    const { data } = await client.query(`
+      {
+         data:devopsAvgRespDura(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+          maxsize
+          datas{
+            range{
+            start
+            end
+          }
+          datas{
+            cluster
+            duration
+          }
+      }
+    }
+  }
+  `);
+    return { data: data.data };
+  },
 
   // 已发布需求平均关闭时长
   async averageShutdownDuration({ client, params }: IStatisticQuery) {
@@ -575,6 +667,39 @@ const StatisticServices = {
   `);
     return { data: formatTreeData({ origin: data.data }), loading };
   },
+  async convergenceBugRate({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:bugConvUpToPeriodTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+              total {
+                dept
+                deptName
+                kpi
+              }
+              range {
+                start
+                end
+              }
+              datas {
+                dept
+                deptName
+                kpi
+                sideKpi {
+                  testKpi
+                  devkpi
+                }
+                parent {
+                  dept
+                  deptName
+                }
+              }
+            }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+  },
 
   // 产品上线后引入emergency
   async onlineEmergency({ client, params }: StaticOther) {
@@ -596,6 +721,39 @@ const StatisticServices = {
       }
   `);
     return { data: data.data };
+  },
+
+  async onlineTestOnlineEmergency({ client, params, identity }: StaticOther) {
+    const { data } = await client.query(`
+      {
+         data:devTestOnlineEmerPropOwner(kind: "${params.kind}", ends: ${params.ends},identity:${identity}) {
+            range{
+              start
+              end
+            }
+            datas{
+              total{
+                dept
+                kpi
+              }
+              range{
+                start
+                end
+              }
+              datas{
+                dept
+                deptName
+                kpi
+                parent{
+                  dept
+                  deptName
+                }
+              }
+            }
+          }
+      }
+  `);
+    return { data: formatPivotMode(data.data, params.kind) };
   },
   //灰度千行bug率
   async grayThousBugRate({ client, params }: StaticOther) {
@@ -633,6 +791,136 @@ const StatisticServices = {
       }
   `);
     return { data: data.data };
+  },
+
+  // 任务计划偏差率
+  async taskScheduleRate({ client, params, identity }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:devTestPlanDeviationRateDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
+            }
+            users {
+              userId
+              userName
+              kpi
+              hired
+            }
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
+  },
+
+  // 自动化单元测试覆盖率
+  async autoTestCoverageUnit({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    const { data } = await client.query(`
+      {
+       data:autoTestCoverPropRuntimeE(ends:${condition.ends}, kind:"${condition.typeFlag}") {
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent
+            instCover{
+              numerator
+              denominator
+            }
+            branchCover{
+              numerator
+              denominator
+            }
+            tech {
+              name
+              instCover {
+                numerator
+                denominator
+              }
+              branchCover {
+                numerator
+                denominator
+              }
+            }
+            execution{
+              name
+              branch
+              instCover{
+                numerator
+                denominator
+              }
+              branchCover{
+                numerator
+                denominator
+              }
+            }
+          }
+        }
+      }
+    `);
+    return { data: formatAutoTestCover(data.data, condition.typeFlag) };
+  },
+
+  // 自动化发现BUG数
+  async autoDiscoveryBugCount({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:testAtuoFoundBugDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
+              kpi
+            }
+            users {
+              userId
+              userName
+              kpi
+              hired
+            }
+          }
+        }
+      }
+  `);
+    return {
+      data: formatTreeData({ origin: data.data, isTest: true }),
+      loading,
+    };
   },
 };
 export default StatisticServices;

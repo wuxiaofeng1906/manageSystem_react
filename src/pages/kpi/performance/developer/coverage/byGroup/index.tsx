@@ -1,23 +1,30 @@
-import React, {useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridReact} from 'ag-grid-react';
+import React, { useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GqlClient, useGqlClient } from '@/hooks';
 import {
-  getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime, getYearsTime
+  getWeeksRange,
+  getMonthWeek,
+  getTwelveMonthTime,
+  getFourQuarterTime,
+  getYearsTime,
 } from '@/publicMethods/timeMethods';
-import {Button, Drawer} from "antd";
+import { Button, Drawer } from 'antd';
 import {
-  ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone, AppstoreTwoTone
-} from "@ant-design/icons";
-import {customRound, getHeight} from "@/publicMethods/pageSet";
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone,
+} from '@ant-design/icons';
+import { customRound, getHeight } from '@/publicMethods/pageSet';
 
-import {converseCoverageFormatForAgGrid} from "../../devMethod/deptDataAnalyze";
-
+import { converseCoverageFormatForAgGrid } from '../../devMethod/deptDataAnalyze';
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
@@ -26,13 +33,12 @@ const quarterTime = getFourQuarterTime();
 
 /* region 表格渲染 */
 
-
 // 表格代码渲染
 function coverageCellRenderer(params: any) {
   const node = params.data;
 
   if (params.value) {
-    const result = customRound((Number(params.value) * 100), 2);
+    const result = customRound(Number(params.value) * 100, 2);
     if (node && node.isDept === true) {
       return `<span style="font-weight: bold"> ${result}</span>`;
     }
@@ -45,14 +51,11 @@ function coverageCellRenderer(params: any) {
   }
 
   return `<span style="color: silver"> ${0}</span>`;
-
-
 }
 
 /* endregion */
 
 /* region 动态定义列 */
-
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -103,7 +106,6 @@ const columsForMonths = () => {
 };
 
 const columsForQuarters = () => {
-
   const component = new Array();
   for (let index = 0; index < quarterTime.length; index += 1) {
     const endtime = quarterTime[index].end;
@@ -155,28 +157,28 @@ const columsForYears = () => {
 /* region 数据处理 */
 
 const queryFrontCoverage = async (client: GqlClient<object>, params: string) => {
-  let ends = "";
+  let ends = '';
   let typeFlag = 0;
   if (params === 'week') {
     const timeRange = new Array();
     for (let index = 0; index < weekRanges.length; index += 1) {
       timeRange.push(`"${weekRanges[index].to}"`);
     }
-    ends = `[${timeRange.join(",")}]`;
+    ends = `[${timeRange.join(',')}]`;
     typeFlag = 0;
   } else if (params === 'month') {
     const timeRange = new Array();
     for (let index = 0; index < monthRanges.length; index += 1) {
       timeRange.push(`"${monthRanges[index].end}"`);
     }
-    ends = `[${timeRange.join(",")}]`;
+    ends = `[${timeRange.join(',')}]`;
     typeFlag = 2;
   } else if (params === 'quarter') {
     const timeRange = new Array();
     for (let index = 0; index < quarterTime.length; index += 1) {
       timeRange.push(`"${quarterTime[index].end}"`);
     }
-    ends = `[${timeRange.join(",")}]`;
+    ends = `[${timeRange.join(',')}]`;
     typeFlag = 3;
   } else if (params === 'year') {
     const timeRange = new Array();
@@ -184,7 +186,7 @@ const queryFrontCoverage = async (client: GqlClient<object>, params: string) => 
     for (let index = 0; index < yearsTime.length; index += 1) {
       timeRange.push(`"${yearsTime[index].end}"`);
     }
-    ends = `[${timeRange.join(",")}]`;
+    ends = `[${timeRange.join(',')}]`;
     typeFlag = 4;
   } else {
     return [];
@@ -193,7 +195,7 @@ const queryFrontCoverage = async (client: GqlClient<object>, params: string) => 
   //  fileCoverageDept(kind:"${typeFlag}",ends:${ends}){
   //   fileCoverageDept(kind: "4", ends: ["2021-12-31","2020-12-31","2019-12-31"]){
   //    fileCoverageDept(kind:"4",ends:["2021-12-31"]){
-  const {data} = await client.query(`
+  const { data } = await client.query(`
        {
         fileCoverageDept(kind:"${typeFlag}",ends:${ends}){
             total{
@@ -257,9 +259,7 @@ const CodeReviewTableList: React.FC<any> = () => {
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() =>
-    queryFrontCoverage(gqlClient, 'quarter'),
-  );
+  const { data, loading } = useRequest(() => queryFrontCoverage(gqlClient, 'quarter'));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -288,7 +288,6 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs(weekColums);
     const datas: any = await queryFrontCoverage(gqlClient, 'week');
     gridApi.current?.setRowData(datas);
-
   };
 
   // 按月统计
@@ -299,7 +298,6 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs(monthColums);
     const datas: any = await queryFrontCoverage(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
-
   };
 
   // 按季度统计
@@ -332,28 +330,62 @@ const CodeReviewTableList: React.FC<any> = () => {
     setVisible(false);
   };
 
-  const cssIndent = {textIndent: '2em'};
+  const cssIndent = { textIndent: '2em' };
   /* endregion */
 
   return (
     <PageContainer>
-      <div style={{background: 'white'}}>
-        <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
-                onClick={statisticsByWeeks}>按周统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<CalendarTwoTone/>} size={'large'}
-                onClick={statisticsByMonths}>按月统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
-                onClick={statisticsByQuarters}>按季统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
-                onClick={statisticsByYear}>按年统计</Button>
+      <div style={{ background: 'white' }}>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ProfileTwoTone />}
+          size={'large'}
+          onClick={statisticsByWeeks}
+        >
+          按周统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<CalendarTwoTone />}
+          size={'large'}
+          onClick={statisticsByMonths}
+        >
+          按月统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ScheduleTwoTone />}
+          size={'large'}
+          onClick={statisticsByQuarters}
+        >
+          按季统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<AppstoreTwoTone />}
+          size={'large'}
+          onClick={statisticsByYear}
+        >
+          按年统计
+        </Button>
 
-        <label style={{fontWeight: "bold"}}>(统计单位：%)</label>
-        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
-                size={'large'} onClick={showRules}>计算规则</Button>
-
+        <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+        <Button
+          type="text"
+          style={{ color: '#1890FF', float: 'right' }}
+          icon={<QuestionCircleTwoTone />}
+          size={'large'}
+          onClick={showRules}
+        >
+          计算规则
+        </Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
@@ -362,16 +394,15 @@ const CodeReviewTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            suppressMenu: true
+            suppressMenu: true,
           }}
           autoGroupColumnDef={{
             minWidth: 280,
             headerName: '部门-人员',
-            cellRendererParams: {suppressCount: true},
+            cellRendererParams: { suppressCount: true },
             pinned: 'left',
-            suppressMenu: false
+            suppressMenu: false,
           }}
-
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
@@ -381,29 +412,38 @@ const CodeReviewTableList: React.FC<any> = () => {
           getDataPath={(source: any) => {
             return source.Group;
           }}
-        >
-        </AgGridReact>
+        ></AgGridReact>
       </div>
       <div>
-        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
-                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.统计周期</strong></p>
+        <Drawer
+          title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
+          placement="right"
+          width={300}
+          closable={false}
+          onClose={onClose}
+          visible={messageVisible}
+        >
+          <p>
+            <strong>1.统计周期</strong>
+          </p>
 
           <p style={cssIndent}>按周统计：覆盖率为当周最新的覆盖率(累计)；</p>
           <p style={cssIndent}>按月统计：覆盖率为当月最新的覆盖率(累计)；</p>
           <p style={cssIndent}>按季统计：覆盖率为当季度最新的覆盖率(累计)；</p>
 
-          <p style={{color: "#1890FF"}}><strong>2.计算公式</strong></p>
+          <p style={{ color: '#1890FF' }}>
+            <strong>2.计算公式</strong>
+          </p>
           <p style={cssIndent}>结构覆盖率 = 所拥有文件结构覆盖数之和/所有拥有文件总结构数之和；</p>
           <p style={cssIndent}>分支覆盖率 = 所拥有文件分支覆盖数之和/所有拥有文件总分支数之和；</p>
 
-          <p><strong>3.取值</strong></p>
+          <p>
+            <strong>3.取值</strong>
+          </p>
           <p style={cssIndent}>前端取值：结构数：Statements；支数：Branches；</p>
           <p style={cssIndent}>后端取值：结构数：Instructions Cov；分支数：Branches；</p>
-
         </Drawer>
       </div>
-
     </PageContainer>
   );
 };

@@ -12,7 +12,7 @@ import {
   FundTwoTone,
 } from '@ant-design/icons';
 import { getHeight } from '@/publicMethods/pageSet';
-import type { IStaticBy, IIdentity } from '@/hooks/statistic';
+import type { IStaticBy, IIdentity, Period } from '@/hooks/statistic';
 import { useStatistic } from '@/hooks/statistic';
 import { isEmpty, isString } from 'lodash';
 import type { ColumnsType } from 'antd/lib/table/interface';
@@ -26,6 +26,9 @@ interface IStatic {
   identity?: IIdentity;
   len?: number;
   unit?: string;
+  initFilter?: IStaticBy[];
+  columnDefs?: any[];
+  period?: Period;
 }
 
 type INode = string | React.ReactNode;
@@ -34,6 +37,14 @@ export interface IRuleData {
   child: INode[];
   table?: { dataSource: any[]; column: ColumnsType<any> }; // 支持antd table
 }
+const condition: { icon: React.ReactNode; title: string; type: IStaticBy }[] = [
+  { icon: <ProfileTwoTone />, title: '按天', type: 'day' },
+  { icon: <ProfileTwoTone />, title: '按周', type: 'week' },
+  { icon: <CalendarTwoTone />, title: '按月', type: 'month' },
+  { icon: <ScheduleTwoTone />, title: '按季', type: 'quarter' },
+  { icon: <FundTwoTone />, title: '按半年', type: 'halfYear' },
+  { icon: <AppstoreTwoTone />, title: '按年', type: 'year' },
+];
 const IStaticPerformance: React.FC<IStatic> = ({
   request,
   ruleData,
@@ -42,6 +53,9 @@ const IStaticPerformance: React.FC<IStatic> = ({
   showHalfYear = false,
   len,
   unit = '%',
+  initFilter,
+  columnDefs,
+  period,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -61,7 +75,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showDenominator, len });
+    await handleStaticBy({ request, type, identity, showDenominator, len, period });
   };
 
   useEffect(() => {
@@ -78,53 +92,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   return (
     <PageContainer>
       <div style={{ background: 'white' }}>
-        <Button
-          type="text"
-          style={{ color: 'black' }}
-          icon={<ProfileTwoTone />}
-          size={'large'}
-          onClick={() => changeStaticBy('week')}
-        >
-          按周统计
-        </Button>
-        <Button
-          type="text"
-          style={{ color: 'black' }}
-          icon={<CalendarTwoTone />}
-          size={'large'}
-          onClick={() => changeStaticBy('month')}
-        >
-          按月统计
-        </Button>
-        <Button
-          type="text"
-          style={{ color: 'black' }}
-          icon={<ScheduleTwoTone />}
-          size={'large'}
-          onClick={() => changeStaticBy('quarter')}
-        >
-          按季统计
-        </Button>
-        {showHalfYear && (
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<FundTwoTone />}
-            size={'large'}
-            onClick={() => changeStaticBy('halfYear')}
-          >
-            按半年统计
-          </Button>
-        )}
-        <Button
-          type="text"
-          style={{ color: 'black' }}
-          icon={<AppstoreTwoTone />}
-          size={'large'}
-          onClick={() => changeStaticBy('year')}
-        >
-          按年统计
-        </Button>
+        <ConditionHeader initFilter={initFilter} onChange={changeStaticBy} />
         <label style={{ fontWeight: 'bold' }}>(统计单位：{unit})</label>
         <Button
           type="text"
@@ -155,7 +123,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
               pinned: 'left',
               suppressMenu: false,
             }}
-            columnDefs={columns}
+            columnDefs={columnDefs ?? columns}
             rowData={rowData}
             rowHeight={32}
             headerHeight={35}
@@ -163,10 +131,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
             treeData={true}
             animateRows={true}
             groupDefaultExpanded={-1}
-            getDataPath={(source: any) => {
-              console.log(source.Group);
-              return source.Group;
-            }}
+            getDataPath={(source: any) => source.Group}
           />
         )}
       </div>
@@ -220,5 +185,31 @@ export const IDrawer = ({
         </div>
       ))}
     </Drawer>
+  );
+};
+export const ConditionHeader = ({
+  initFilter = ['week', 'month', 'quarter', 'year'],
+  onChange,
+}: {
+  initFilter?: IStaticBy[];
+  onChange: (type: IStaticBy) => void;
+}) => {
+  return (
+    <>
+      {condition.map((it) => {
+        return (
+          <Button
+            type="text"
+            style={{ color: 'black' }}
+            icon={it.icon}
+            size={'large'}
+            hidden={!initFilter?.includes(it.type)}
+            onClick={() => onChange(it.type)}
+          >
+            {`${it.title}统计`}
+          </Button>
+        );
+      })}
+    </>
   );
 };

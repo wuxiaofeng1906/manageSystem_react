@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { IRuleData } from '@/components/IStaticPerformance';
-import { IDrawer } from '@/components/IStaticPerformance';
+import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
 import { useGqlClient } from '@/hooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -16,14 +16,9 @@ import moment from 'moment';
 import { isEmpty } from 'lodash';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
-import {
-  CalendarTwoTone,
-  QuestionCircleTwoTone,
-  ScheduleTwoTone,
-  ProfileTwoTone,
-  AppstoreTwoTone,
-} from '@ant-design/icons';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
+import { aggFunc } from '@/utils/utils';
 const ruleData: IRuleData[] = [
   {
     title: '统计周期',
@@ -50,28 +45,6 @@ const ruleData: IRuleData[] = [
   },
 ];
 const DeliveryThroughput: React.FC = () => {
-  const condition = [
-    {
-      icon: <ProfileTwoTone />,
-      type: 'week',
-      text: '按周统计',
-    },
-    {
-      icon: <CalendarTwoTone />,
-      type: 'month',
-      text: '按月统计',
-    },
-    {
-      icon: <ScheduleTwoTone />,
-      type: 'quarter',
-      text: '按季统计',
-    },
-    {
-      icon: <AppstoreTwoTone />,
-      type: 'year',
-      text: '按年统计',
-    },
-  ];
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
   const [catagory, setCatagory] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
@@ -150,42 +123,7 @@ const DeliveryThroughput: React.FC = () => {
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white' }}>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<ProfileTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('week')}
-          >
-            按周统计
-          </Button>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<CalendarTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('month')}
-          >
-            按月统计
-          </Button>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<ScheduleTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('quarter')}
-          >
-            按季统计
-          </Button>
-          <Button
-            type="text"
-            style={{ color: 'black' }}
-            icon={<AppstoreTwoTone />}
-            size={'large'}
-            onClick={() => setCatagory('year')}
-          >
-            按年统计
-          </Button>
+          <ConditionHeader onChange={(v) => setCatagory(v)} />
           <label style={{ fontWeight: 'bold' }}>(统计单位：FP)</label>
           <Button
             type="text"
@@ -216,16 +154,7 @@ const DeliveryThroughput: React.FC = () => {
               {
                 field: 'total',
                 headerName: '吞吐量',
-                aggFunc: (data: any) => {
-                  let sum = 0;
-                  data?.forEach(function (value: any) {
-                    if (value) {
-                      sum = sum + parseFloat(value);
-                    }
-                  });
-                  if (!sum) return 0;
-                  return sum.toFixed(2);
-                },
+                aggFunc: (data) => aggFunc(data, 2),
               },
               { field: 'title', pivot: true, pivotComparator: () => 1 },
               { field: 'subTitle', pivot: true },

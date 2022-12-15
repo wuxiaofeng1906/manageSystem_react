@@ -1,5 +1,7 @@
 import { IRecord } from '@/namespaces/interface';
-import { isEmpty, isEqual, omit, intersection } from 'lodash';
+import { isEmpty, isEqual, omit, intersection, isNumber } from 'lodash';
+import moment from 'moment';
+import { getMonthWeek } from '@/publicMethods/timeMethods';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -122,7 +124,7 @@ const findParent = (departments: any[], dept: any, result: any) => {
   departments.forEach((item: any) => {
     if (item['deptName'] && deptName) {
       if (dept.dept == item.dept) {
-        const parentName = item['parent'].deptName;
+        const parentName = item['parent']?.deptName;
         if (parentName !== '北京企企科技有限公司') {
           // 过滤 北京企企科技有限公司
           result.unshift(parentName);
@@ -236,7 +238,7 @@ export const formatTreeData = ({
 
     // department
     const departments = elements.datas;
-    departments.forEach((dept: any) => {
+    departments?.forEach((dept: any) => {
       // 显示分子分母
       const denominator = showDenominator
         ? {
@@ -286,7 +288,9 @@ export const formatTreeData = ({
               usersGroup.push(side[user.tech]);
             }
           }
-          usersGroup.push(user.userName);
+          if (user?.hired != '0') {
+            usersGroup.push(user.userName);
+          }
           result.push({
             Group: usersGroup,
             isDept: false,
@@ -302,8 +306,10 @@ export const formatTreeData = ({
       }
     });
   });
+
   return converseArrayToOne(result);
 };
+
 export const checkLogin = () => {
   const token = localStorage.getItem('accessId');
   if (token) return { flag: true, redirect: '' };
@@ -313,3 +319,142 @@ export const checkLogin = () => {
 // 测试指标-不显示 管理会计研发部，供应链研发部 及子部门
 export const checkTesterGroup = (groups: string[]) =>
   intersection(groups, ['管理会计研发部', '供应链研发部'])?.length > 0;
+
+export const formatPivotMode = (origin: any[], kind: number) => {
+  let result: any[] = [];
+  if (isEmpty(origin)) return result;
+  origin?.reverse()?.forEach((it) => {
+    const data = it.datas;
+    const title =
+      kind == 2
+        ? moment(it.range.start).format('MM月YYYY年')
+        : `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`;
+
+    if (isEmpty(data)) {
+      result.push({ Group: ['研发中心'], total: 0, title });
+    } else
+      data?.forEach((obj: any) => {
+        const startTime = obj.range.start;
+        const departments = obj.datas;
+        result.push({
+          title,
+          Group: ['研发中心'],
+          isDept: true,
+          total: obj.total.kpi,
+          subTitle: moment(startTime).format('YYYYMMDD'),
+        });
+        departments?.forEach((dept: any) => {
+          let groups: string[] = [dept.deptName];
+          if (checkTesterGroup(groups)) return;
+          result.push({
+            title,
+            Group: dept.deptName,
+            isDept: true,
+            total: dept.kpi,
+            subTitle: moment(startTime).format('YYYYMMDD'),
+          });
+        });
+      });
+  });
+  return result;
+};
+
+export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
+  let result: any[] = [];
+  let column: any[] = [];
+  origin?.reverse()?.forEach((it: any) => {
+    const start = it.range.start;
+    const title =
+      kind == 1
+        ? getMonthWeek(start)
+        : kind == 2
+        ? moment(start).format('MM月YYYY年')
+        : kind == 3
+        ? `${moment(start).format('YYYY年')}${moment(start).quarter()}季`
+        : moment(start).format('YYYY');
+    column.push({
+      headerName: title,
+      children: [
+        { headerName: '自动化覆盖率执行完成时间', field: `execution${start}` },
+        {
+          headerName: '结构覆盖率',
+          field: `instCove${start}`,
+          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+        },
+        {
+          headerName: '分支覆盖率',
+          field: `branCove${start}`,
+          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+        },
+      ],
+    });
+    it.datas?.forEach((node: any) => {
+      let Group = [node.deptName];
+      if (node.dept != 59) {
+        findNode(it.datas, node, Group);
+      }
+      result.push({
+        Group,
+        branch: '',
+        isDept: true,
+        [`branCove${start}`]: node?.branchCover?.numerator,
+        [`execution${start}`]: 10,
+        [`instCove${start}`]: node.instCover?.numerator,
+      });
+    });
+  });
+  return { rowData: converseArrayToOne(result) || [], column };
+};
+
+const findNode = (data: any[], item: any, groups: string[]) => {
+  data?.forEach((it: any) => {
+    if (it.dept == item.parent) {
+      groups.unshift(it.deptName);
+      findNode(data, it, groups);
+    }
+  });
+};
+
+export const aggFunc = (data: any, number = 0) => {
+  let sum = 0;
+  data?.forEach(function (value: any) {
+    if (value) {
+      sum = sum + parseFloat(value);
+    }
+  });
+  if (!sum) return 0;
+  return number > 0 ? sum.toFixed(number) : sum;
+};
+
+export const renderFormat = ({
+  params,
+  showSplit = false,
+  len,
+}: {
+  params: any;
+  showSplit?: boolean;
+  len?: number;
+}) => {
+  const node = params.data;
+  const result = params.value;
+  let numerator = 0; // 分子
+  let denominator = 0; // 分母
+  if (showSplit) {
+    const currentTime = params.column?.colId;
+    numerator = node[`${currentTime}_numerator`] ?? 0; // 分子
+    denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
+  }
+  const weight = node?.isDept ? 'bold' : 'initial';
+  const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
+  if (isNumber(result)) {
+    if (showSplit)
+      return `<span>
+                <label style="font-weight: ${weight}">${data}</label>
+                <label style="color: gray"> (${numerator},${denominator})</label>
+            </span>`;
+    return `<span style="font-weight: ${weight}">${data}</span>`;
+  }
+  return `<span style="font-weight: ${weight};color: ${
+    node?.isDept ? 'initial' : 'silver'
+  }"> 0</span>`;
+};

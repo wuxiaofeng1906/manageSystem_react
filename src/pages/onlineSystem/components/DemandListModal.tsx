@@ -128,11 +128,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       values = await form.validateFields();
       if (isEmpty(selected)) return infoMessage('请勾选发布项目与需求！');
     }
+    setSpin(true);
     if (!release_num) {
       const res = await DutyListServices.getDutyNum();
       release_num = res.ready_release_num;
     }
-    setSpin(true);
     // 灰度发布
     if (!isPreRelease) {
       setSpin(false);

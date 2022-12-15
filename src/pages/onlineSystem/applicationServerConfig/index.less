@@ -1,0 +1,24 @@
+.applicationServerConfig{
+  margin-top: -10px;
+  padding: 15px 10px 10px;
+  background: white;
+  .btnBox{
+    margin-bottom: 5px;
+    :global{
+      .ant-btn-primary{
+        border-radius: 4px;
+        color:#1890ff;
+        border-color: #e0e0e0;
+        background:  #ecf5ff;
+        &:first-child{
+          margin-right: 15px;
+        }
+      }
+    }
+  }
+  :global{
+    .ant-form-item-control{
+      min-width: 0 !important;
+    }
+  }
+}

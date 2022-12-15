@@ -2,7 +2,10 @@ import { IRecord } from '@/namespaces/interface';
 import { isEmpty, isEqual, omit, intersection, isNumber } from 'lodash';
 import moment from 'moment';
 import { getMonthWeek } from '@/publicMethods/timeMethods';
-
+import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
+import cls from 'classnames';
+import { LocalstorageKeys } from '@/namespaces';
+import { useModel } from 'umi';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
@@ -90,34 +93,28 @@ export function valueMap(option: IRecord[], values: string[]) {
   return result;
 }
 
-// 合并行数据【可隐藏子项】
-export const mergeCellsTable = (data: any[], field: string, hide = false) => {
-  let repeat = 0; //重复项的第一项
-  let nextCurrent = 1; //下一项
-  let number = 1; // 序号【表格thead】
-  while (nextCurrent < data.length) {
-    let item = data.slice(repeat, repeat + 1)[0];
-    if (!item['rowSpan']) {
-      item['rowSpan'] = 1; //初始化为1
-      item['num'] = number;
-    }
-    //第一个对象与后面的对象相比，有相同项就累加，并且后面相同项设置为0
-    if (item[field] === data[nextCurrent][field]) {
-      if (hide) {
-        item['rowSpan'] = 1;
-      } else {
-        item['rowSpan']++;
+// 合并行数据
+export function mergeCellsTable(data: any[], key: string, rowspan: string = 'rowSpan') {
+  if (isEmpty(data)) return [];
+  return data
+    .reduce((result, item) => {
+      // 首先将字段作为新数组result取出
+      if (result.indexOf(item[key]) < 0) {
+        result.push(item[key]);
       }
-      data[nextCurrent]['rowSpan'] = 0;
-    } else {
-      number++;
-      data[nextCurrent]['num'] = number;
-      repeat = nextCurrent;
-    }
-    nextCurrent++;
-  }
-  return data;
-};
+      return result;
+    }, [])
+    .reduce((res: any, name: any) => {
+      const children = data.filter((item) => item[key] === name);
+      res = res.concat(
+        children.map((item, index) => ({
+          ...item,
+          [rowspan]: index === 0 ? children.length : 0, // 将第一行数据添加rowSpan字段
+        })),
+      );
+      return res;
+    }, []);
+}
 
 const findParent = (departments: any[], dept: any, result: any) => {
   const deptName = dept.deptName;
@@ -319,6 +316,49 @@ export const checkLogin = () => {
 // 测试指标-不显示 管理会计研发部，供应链研发部 及子部门
 export const checkTesterGroup = (groups: string[]) =>
   intersection(groups, ['管理会计研发部', '供应链研发部'])?.length > 0;
+
+const initColDef: ColDef = { resizable: true, suppressMenu: true, flex: 1, filter: true };
+
+const onGridReady = (params: GridReadyEvent, ref: React.MutableRefObject<GridApi | undefined>) => {
+  ref.current = params.api;
+  params.api.sizeColumnsToFit();
+};
+
+export const initGridTable = ({
+  ref,
+  border = false,
+  height = 32,
+  options,
+}: {
+  ref: React.MutableRefObject<GridApi | undefined>;
+  border?: boolean;
+  height?: number;
+  options?: ColDef;
+}) => ({
+  className: cls('ag-theme-alpine', 'ag-initialize-theme'),
+  defaultColDef: {
+    ...initColDef,
+    ...{
+      cellStyle: {
+        ...(border ? { 'border-right': 'solid 0.5px #E3E6E6' } : {}),
+        'line-height': `${height}px`,
+      },
+    },
+    ...options,
+  },
+  onGridReady: (v: GridReadyEvent) => onGridReady(v, ref),
+  onGridSizeChanged: (v: GridReadyEvent) => onGridReady(v, ref),
+  rowHeight: height,
+  headerHeight: height,
+});
+
+export const getkeyFromvalue = (object: Record<any, any>, value: any): any => {
+  for (let ob in object) {
+    if (object.hasOwnProperty(ob)) {
+      if (object[ob] === value) return ob;
+    }
+  }
+};
 
 export const formatPivotMode = (origin: any[], kind: number) => {
   let result: any[] = [];

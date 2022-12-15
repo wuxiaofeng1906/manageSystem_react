@@ -1,10 +1,10 @@
-import {getRowSpanMarginPosition} from "@/publicMethods/agGrid/cellRenderer";
-import {CELL_LENGTH} from "@/pages/kpi/forProject/PorjectKpiDetail/components/constant";
+import { getRowSpanMarginPosition } from '@/publicMethods/agGrid/cellRenderer';
+import { CELL_LENGTH } from '@/pages/kpi/forProject/PorjectKpiDetail/components/constant';
 
 const TitleWidth = {
   minWidth: CELL_LENGTH.SIX_LENGTH,
   maxWidth: CELL_LENGTH.SIX_LENGTH,
-  pinned: "left"
+  pinned: 'left',
 };
 const CommonWidth = {
   minWidth: CELL_LENGTH.EIGHT_LENGTH,
@@ -28,12 +28,15 @@ export const stageWorkloadColumn: any = [
     rowSpan: (params: any) => params.data?.rowSpan || 1,
     cellRenderer: (params: any) => {
       if (params.data?.rowSpan) {
-        return `<div style="font-weight: bold;margin-top: ${getRowSpanMarginPosition(params.data?.rowSpan, true)}px">
+        return `<div style="font-weight: bold;margin-top: ${getRowSpanMarginPosition(
+          params.data?.rowSpan,
+          true,
+        )}px">
                     <div>阶段工作量<br/>（单位：人天）</div>
                 </div>`;
       }
-      return "";
-    }
+      return '';
+    },
   },
   {
     headerName: '阶段',
@@ -170,12 +173,15 @@ export const StageWorkloadColums: any = [
     rowSpan: (params: any) => params.data?.rowSpan || 1,
     cellRenderer: (params: any) => {
       if (params.data?.rowSpan) {
-        return `<div style="font-weight: bold;margin-top: ${getRowSpanMarginPosition(params.data?.rowSpan, false)}px">
+        return `<div style="font-weight: bold;margin-top: ${getRowSpanMarginPosition(
+          params.data?.rowSpan,
+          false,
+        )}px">
                    ${params.value}
                 </div>`;
       }
-      return "";
-    }
+      return '';
+    },
   },
   {
     headerName: '阶段',
@@ -236,12 +242,15 @@ export const reviewDefectColums: any = [
     rowSpan: (params: any) => params.data?.rowSpan || 1,
     cellRenderer: (params: any) => {
       if (params.data?.rowSpan) {
-        return `<div style="font-weight: bold;margin-top: ${getRowSpanMarginPosition(params.data?.rowSpan, false)}px">
+        return `<div style="font-weight: bold;margin-top: ${getRowSpanMarginPosition(
+          params.data?.rowSpan,
+          false,
+        )}px">
                    ${params.value}
                 </div>`;
       }
-      return "";
-    }
+      return '';
+    },
   },
   {
     headerName: '',
@@ -267,14 +276,14 @@ export const reviewDefectColums: any = [
     headerName: '是否裁剪',
     field: 'cut',
     ...CommonWidth,
-    cellRenderer: "reviewCutRenderer"
+    cellRenderer: 'reviewCutRenderer',
     // editable: (params: any) => {
     //   if (params.data?.kind === '合计' || params.data?.cut === '是否裁剪') {
     //     return false;
     //   }
     //   return true;
     // },
-    // cellEditor: 'agSelectCellEditor',
+    // cellEditor: 'cellEditor',
     // cellEditorParams: {values: ['是', '否']},
     // cellRenderer: (params: any) => {
     //   if (params.data?.kind === '合计') {
@@ -521,12 +530,15 @@ export const processQualityColums: any = [
     rowSpan: (params: any) => params.data?.rowSpan || 1,
     cellRenderer: (params: any) => {
       if (params.data?.rowSpan) {
-        return `<div style="font-weight: bold;margin-top: ${getRowSpanMarginPosition(params.data?.rowSpan, true)}px">
+        return `<div style="font-weight: bold;margin-top: ${getRowSpanMarginPosition(
+          params.data?.rowSpan,
+          true,
+        )}px">
                    过程质量<br/>补充数据
                 </div>`;
       }
-      return "";
-    }
+      return '';
+    },
   },
   {
     headerName: '',
@@ -564,14 +576,14 @@ export const processQualityColums: any = [
     headerName: '是否裁剪',
     field: 'cut',
     ...CommonWidth,
-    cellRenderer: "processQuaCutRenderer"
+    cellRenderer: 'processQuaCutRenderer',
     // editable: (params: any) => {
     //   if (params.data?.cut === '度量值' || params.data?.cut === '一次提测通过率') {
     //     return false;
     //   }
     //   return true;
     // },
-    // cellEditor: 'agSelectCellEditor',
+    // cellEditor: 'cellEditor',
     // cellEditorParams: {values: ['是', '否']},
     // cellRenderer: (params: any) => {
     //   if (
@@ -671,9 +683,7 @@ export const processQualityColums: any = [
 
       if (params.value) {
         if (params.data?.cut === '一次提测通过率') {
-          return `<div style="margin-top: 10px">${(Number(params.value) * 100).toFixed(
-            2,
-          )}%</div>`;
+          return `<div style="margin-top: 10px">${(Number(params.value) * 100).toFixed(2)}%</div>`;
         }
         return Number(params.value).toFixed(2);
       }

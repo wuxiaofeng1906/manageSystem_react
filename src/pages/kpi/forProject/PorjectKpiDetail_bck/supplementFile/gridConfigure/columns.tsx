@@ -300,7 +300,8 @@ const getStageWorkloadColumns = () => {
         }
         return params.value;
       },
-    }, {
+    },
+    {
       headerName: '阶段生产率',
       field: 'stageRatio',
       valueFormatter: (params: any) => {
@@ -478,8 +479,8 @@ const getReviewDefectColumns = () => {
         }
         return true;
       },
-      cellEditor: 'agSelectCellEditor',
-      cellEditorParams: {values: ['是', '否']},
+      cellEditor: 'cellEditor',
+      cellEditorParams: { values: ['是', '否'] },
       cellRenderer: (params: any) => {
         if (params.data?.kind === '合计') {
           return '-';
@@ -783,8 +784,8 @@ const getProcessQualityColumns = () => {
         }
         return true;
       },
-      cellEditor: 'agSelectCellEditor',
-      cellEditorParams: {values: ['是', '否']},
+      cellEditor: 'cellEditor',
+      cellEditorParams: { values: ['是', '否'] },
       cellRenderer: (params: any) => {
         if (
           params.value === null ||

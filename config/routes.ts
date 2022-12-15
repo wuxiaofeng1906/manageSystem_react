@@ -134,23 +134,21 @@ export default [
     ],
   },
   {
-    name: '值班与发布',
+    name: '值班',
     icon: 'DeploymentUnitOutlined',
-    path: '/onDutyAndRelease',
-    access: 'devCenter', // 仅研发中心人员可见，客服不可见
+    path: '/onDuty',
     routes: [
       {
         name: '值班计划',
         icon: 'table',
         path: 'dutyPlan',
-        component: './onDutyAndRelease/dutyPlan',
+        component: './onDuty/dutyPlan',
       },
       {
         name: '值班列表',
         icon: 'table',
         path: 'dutyList',
-        // access: 'dutyManager',
-        component: './onDutyAndRelease/dutyDirectory/dutyList',
+        component: './onDuty/dutyDirectory/dutyList',
         wrappers: ['../wrappers/auth'],
       },
       {
@@ -158,60 +156,80 @@ export default [
         icon: 'table',
         path: 'dutyCatalog/:id',
         hideInMenu: true,
-        // access: 'dutyManager',
-        component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
+        component: './onDuty/dutyDirectory/dutyCatalog',
         wrappers: ['../wrappers/auth'],
       },
+    ],
+  },
+  {
+    name: '上线系统',
+    icon: 'CodeSandboxOutlined',
+    path: '/onlineSystem',
+    access: 'devCenter', // 仅研发中心人员可见，客服不可见
+    routes: [
       {
-        name: '发布过程',
-        icon: 'table',
+        name: '发布过程', // 旧版本
         path: 'preRelease',
-        component: './onDutyAndRelease/preRelease',
+        component: './onlineSystem/preRelease',
         hideInMenu: true,
         wrappers: ['../wrappers/auth'],
       },
       {
         name: '发布过程', // 新版本
-        icon: 'table',
         path: 'releaseProcess',
-        component: './onDutyAndRelease/releaseProcess/index',
+        component: './onlineSystem/releaseProcess/index',
         wrappers: ['../wrappers/auth'],
       },
       {
         name: '灰度推生产', // 新版本积压工单
-        icon: 'table',
         path: 'releaseOrder/:id',
         hideInMenu: true,
-        component: './onDutyAndRelease/releaseProcess/ReleaseOrder',
+        component: './onlineSystem/releaseProcess/ReleaseOrder',
         wrappers: ['../wrappers/auth'],
       },
       {
         name: '发布历史',
-        icon: 'table',
         path: 'releaseHistory',
-        component: './onDutyAndRelease/releaseHistory',
+        component: './onlineSystem/releaseHistory',
         hideInMenu: true,
       },
       {
         name: '正式发布',
-        icon: 'table',
         path: 'officialRelease',
-        component: './onDutyAndRelease/officialRelease',
+        component: './onlineSystem/officialRelease',
         hideInMenu: true,
       },
       {
         name: '升级公告',
-        icon: 'table',
         path: 'announcementList',
-        component: './onDutyAndRelease/announcement/announcementList',
+        component: './onlineSystem/announcement/AnnouncementList',
         wrappers: ['../wrappers/auth'],
       },
       {
         name: '升级公告详情',
-        icon: 'table',
         path: 'announcementDetail/:id/:type/:status',
-        component: './onDutyAndRelease/announcement/announcementDetail',
+        component: './onlineSystem/announcement/announcementDetail',
         hideInMenu: true,
+        wrappers: ['../wrappers/auth'],
+      },
+      // {
+      //   name: '上线日历',
+      //   path: 'profile/:branch',
+      //   component: './onlineSystem/prePublish/profile', // 禅道概况
+      //   wrappers: ['../wrappers/auth'],
+      //   hideInMenu: true,
+      // },
+      {
+        name: '发布过程单',
+        path: 'prePublish/:release_num/:branch',
+        component: './onlineSystem/prePublish',
+        wrappers: ['../wrappers/auth'],
+        hideInMenu: true,
+      },
+      {
+        name: '应用服务',
+        path: 'applicationServerConfig',
+        component: './onlineSystem/applicationServerConfig',
         wrappers: ['../wrappers/auth'],
       },
     ],

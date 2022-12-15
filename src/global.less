@@ -65,3 +65,17 @@ ol {
 .custom-tooltip.ag-tooltip-hiding {
   opacity: 0;
 }
+.ag-initialize-theme{
+  .ag-required {
+    .ag-header-cell-text {
+      &:before {
+        margin-right: 5px;
+        color: #fb4c3a;
+        content: '*';
+      }
+    }
+  }
+}
+.no-wrap-form .ant-form-item-control{
+  min-width: 0 !important;
+}

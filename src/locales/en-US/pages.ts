@@ -23,7 +23,7 @@ export default {
   'pages.login.registerAccount': 'Register Account',
   'pages.welcome.advancedComponent': 'Advanced Component',
   'pages.welcome.link': 'Welcome',
-  'pages.welcome.advancedLayout': 'Advanced Layout',
+  'pages.welcome.advancedLayout': 'Advanced ProfileLayout',
   'pages.welcome.alertMessage': 'Faster and stronger heavy-duty components have been released.',
   'pages.admin.subPage.title': 'This page can only be viewed by Admin',
   'pages.admin.subPage.alertMessage':

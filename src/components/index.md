@@ -78,8 +78,8 @@ export default () => {
           value: 'Pro Table',
         },
         {
-          label: 'Pro Layout',
-          value: 'Pro Layout',
+          label: 'Pro ProfileLayout',
+          value: 'Pro ProfileLayout',
         },
       ]}
       onSearch={(value) => {
@@ -244,8 +244,8 @@ RightContent 是以上几个组件的组合，同时新增了 plugins 的 `Selec
         value: 'Pro Table',
       },
       {
-        label: <a href="https://prolayout.ant.design/">Pro Layout</a>,
-        value: 'Pro Layout',
+        label: <a href="https://prolayout.ant.design/">Pro ProfileLayout</a>,
+        value: 'Pro ProfileLayout',
       },
     ]}
   />

@@ -5,7 +5,7 @@ import cs from 'classnames';
 import './index.css';
 
 interface EllipsisProps extends TooltipPropsWithTitle {
-  width?: number;
+  width?: number | string;
 }
 const Ellipsis = ({ width = 80, className, ...props }: EllipsisProps) => {
   const [visible, setVisible] = useState(false);
@@ -22,7 +22,7 @@ const Ellipsis = ({ width = 80, className, ...props }: EllipsisProps) => {
       style={{ width }}
       ref={(e) => {
         if (e && e?.scrollWidth > e?.clientWidth) {
-          setVisible(true);
+          setVisible(e && e?.scrollWidth > e?.clientWidth);
         }
       }}
     >

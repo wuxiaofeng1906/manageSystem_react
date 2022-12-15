@@ -66,7 +66,7 @@ const SystemAvgRespTime = () => {
       let result: any[] = [];
       let format: any[] = [];
       data?.datas?.forEach((it: any) => {
-        sortBy(it.datas, 'cluster')?.forEach((o) => {
+        it.datas?.forEach((o) => {
           result.push({ [it.range.start]: o.duration, cluster: o.cluster });
         });
       });
@@ -78,7 +78,7 @@ const SystemAvgRespTime = () => {
         });
         format.push({ cluster: k, ...date });
       });
-      setGridData(format);
+      setGridData(sortBy(format, 'cluster'));
       setLoading(false);
     } catch (e) {
       setLoading(false);

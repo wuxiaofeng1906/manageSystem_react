@@ -234,11 +234,11 @@ const SheetInfo = (props: any, ref: any) => {
     const deployIds = await OnlineSystemServices.deployments({ release_num });
     setDeployments(
       deployIds?.map((it: any) => ({
-        label: `${it.deployment_id}(${it.app} ${it.check_end_time})`,
+        label: `${it.deployment_id}(${it.app} ${it.check_start_time})`,
         value: String(it.deployment_id),
         deployment_id: it.deployment_id,
         app: it.app,
-        deployment_time: it.check_end_time,
+        deployment_time: it.check_start_time,
       })),
     );
     setDutyList(

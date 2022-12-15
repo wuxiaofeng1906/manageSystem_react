@@ -4,7 +4,7 @@ import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch } from 'antd';
 import { InfoCircleOutlined, RightOutlined, DownOutlined } from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, cloneDeep, isArray, intersection } from 'lodash';
+import { isEmpty, sortBy, cloneDeep, isArray, intersection, difference } from 'lodash';
 import dayjs from 'dayjs';
 import { valueMap } from '@/utils/utils';
 import { history, useModel } from 'umi';
@@ -317,7 +317,11 @@ const VisualView = () => {
       preData(clusterMap);
       const basic = await PreReleaseServices.releaseBaseline();
       const formatBasicCluster = computeFn(
-        (basic.group ?? []).concat(basic.exist_clu ?? []),
+        difference((basic.group ?? []).concat(basic.exist_clu ?? []), [
+          'cn-northwest-01',
+          'cn-northwest-10',
+          ...ignore,
+        ]),
         clusterMap,
       );
       // 排序(动态列计算)

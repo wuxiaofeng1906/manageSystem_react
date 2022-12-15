@@ -62,7 +62,7 @@ import {
   queryDevelopViews,
   queryRepeats,
   LoadCombobox,
-  LoadTesterCombobox,
+  LoadTesterUEDCombobox,
   GetSprintProject,
   calTypeCount,
 } from './data';
@@ -316,7 +316,8 @@ const SprintList: React.FC<any> = () => {
       showTestConfirmFlag,
       ztId,
     );
-    ora_filter_data = datas?.result;
+    // ora_filter_data = datas?.result;
+    setData(datas);
     onSelectChanged();
   };
 
@@ -1460,6 +1461,7 @@ const SprintList: React.FC<any> = () => {
   }, []);
 
   const onRemoveTab = (key: string) => {
+    formForQuery.resetFields();
     const data = tabs?.filter((it: any) => it.projectid !== +key);
     localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify(data));
     if (prjId == key) {
@@ -1468,6 +1470,7 @@ const SprintList: React.FC<any> = () => {
     setTabs(data);
   };
   const onTabChange = (v: number) => {
+    formForQuery.resetFields();
     const current = tabs?.find((it: any) => it.projectid == v);
     history.replace({ pathname: history.location.pathname, query: current });
   };
@@ -1938,7 +1941,7 @@ const SprintList: React.FC<any> = () => {
                   maxTagCount={'responsive'}
                   optionFilterProp="children"
                 >
-                  {LoadTesterCombobox()}
+                  {LoadTesterUEDCombobox()}
                 </Select>
               </Form.Item>
             </Col>
@@ -2733,7 +2736,7 @@ const SprintList: React.FC<any> = () => {
                   maxTagCount={'responsive'}
                   optionFilterProp="children"
                 >
-                  {LoadTesterCombobox()}
+                  {LoadTesterUEDCombobox()}
                 </Select>
               </Form.Item>
             </Col>

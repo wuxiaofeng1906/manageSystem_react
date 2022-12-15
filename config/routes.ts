@@ -381,6 +381,13 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
+                name: '任务计划偏差率',
+                icon: 'table',
+                path: 'taskScheduleRate',
+                component: './kpi/performance/developer/taskScheduleRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
                 name: 'A类客户服务投入比',
                 icon: 'table',
                 path: 'cusInputRate_A',
@@ -466,6 +473,13 @@ export default [
                 name: '千行bug率（不含线上）',
                 path: 'cumulativeLineBugRateExcludeOnline',
                 component: './kpi/performance/developer/cumulativeLineBugRateExcludeOnline',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '上线后emergency占比',
+                icon: 'table',
+                path: 'productOnlineEmergencyRate',
+                component: './kpi/performance/developer/productOnlineEmergencyRate',
                 wrappers: ['../wrappers/auth'],
               },
             ],
@@ -563,6 +577,13 @@ export default [
                 // hideInMenu: true,
               },
               {
+                name: '任务计划偏差率',
+                icon: 'table',
+                path: 'taskScheduleRate',
+                component: './kpi/performance/testers/taskScheduleRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
                 name: 'A类客户服务投入比',
                 icon: 'table',
                 path: 'cusInputRate_A',
@@ -608,7 +629,6 @@ export default [
                 path: 'avgTimeOnline',
                 component: './kpi/performance/testers/avgTimeOnline',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true,
               },
               {
                 name: '生产规模',
@@ -630,14 +650,12 @@ export default [
                 path: 'shuttleDelay',
                 component: './kpi/performance/testers/shuttleDelay',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true,
               },
               {
                 name: '灰度千行bug率',
                 icon: 'table',
                 path: 'grayScaleBugRate',
                 component: './kpi/performance/testers/grayScaleBugRate',
-                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '轮次测试P0+P1占比',
@@ -645,7 +663,6 @@ export default [
                 path: 'roundsTestRate',
                 component: './kpi/performance/testers/roundsTestRate',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '线上千行bug率',
@@ -653,7 +670,6 @@ export default [
                 path: 'cumulativeLineBugRate',
                 component: './kpi/performance/testers/cumulativeLineBugRate',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '线上千行bug率参考',
@@ -661,7 +677,6 @@ export default [
                 path: 'cumulativeLineBugRateReference',
                 component: './kpi/performance/testers/cumulativeLineBugRateReference',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '线上千行bug率（含测试）',
@@ -669,7 +684,73 @@ export default [
                 path: 'cumulativeLineBugRateTests',
                 component: './kpi/performance/testers/cumulativeLineBugRateTests',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '累计千行bug率收敛',
+                icon: 'table',
+                path: 'convergenceBugRate',
+                component: './kpi/performance/testers/convergenceBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '线上千行bug率P0P1占比',
+                path: 'onlineTestThouBugRate',
+                component: './kpi/performance/testers/onlineTestThouBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '线上千行bug率P0P1占比(参考)',
+                path: 'onlineReferThouBugRate',
+                component: './kpi/performance/testers/onlineReferThouBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '线上千行bug率P0P1占比(含测试)',
+                path: 'onlineOwnThouBugRate',
+                component: './kpi/performance/testers/onlineOwnThouBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '累计线上千行bug率P0P1占比',
+                icon: 'table',
+                path: 'cumulativeTestLineBugRate',
+                component: './kpi/performance/testers/cumulativeTestLineBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '累计线上千行bug率P0P1占比参考',
+                path: 'cumulativeReferLineBugRate',
+                component: './kpi/performance/testers/cumulativeReferLineBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '累计线上千行bug率P0P1占比（含测试）',
+                icon: 'table',
+                path: 'cumulativeOwnLineBugRate',
+                component: './kpi/performance/testers/cumulativeOwnLineBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '上线后emergency占比',
+                icon: 'table',
+                path: 'productOnlineEmergencyRate',
+                component: './kpi/performance/testers/productOnlineEmergencyRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '自动化发现bug数',
+                icon: 'table',
+                path: 'autoDiscoveryBugCount',
+                component: './kpi/performance/testers/autoDiscoveryBugCount',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '自动化单元测试覆盖率',
+                icon: 'table',
+                path: 'autoTestCoverageUnit',
+                component: './kpi/performance/testers/autoTestCoverageUnit',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
             ],
           },
@@ -729,7 +810,6 @@ export default [
                 path: 'deliveryThroughput',
                 component: './kpi/performance/service/deliveryThroughput',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -792,6 +872,24 @@ export default [
                 icon: 'table',
                 path: 'exampleCarryRate',
                 component: './kpi/performance/testers/exampleCarryRate',
+                wrappers: ['../wrappers/auth'],
+              },
+            ],
+          },
+          {
+            name: '运维',
+            path: '/kpi/performance/operations',
+            routes: [
+              {
+                name: '系统可用/修复时间',
+                path: 'systemAvailable',
+                component: './kpi/performance/operations/systemAvailable',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '系统平均响应时间',
+                path: 'systemAvgRespTime',
+                component: './kpi/performance/operations/systemAvgRespTime',
                 wrappers: ['../wrappers/auth'],
               },
             ],

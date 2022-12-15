@@ -36,21 +36,23 @@ const usePermission = () => {
   const onlineSystemPermission = useCallback(() => {
     const roles = authority?.flatMap((it: any) => (it?.parentId == 114 ? [+it.id] : [])) ?? [];
     return {
-      delete: roles?.includes(152), // 移除
-      refresh: roles?.includes(152), // 刷新
-      branchLock: roles?.includes(153), // 锁定分支
-      branchUnlock: roles?.includes(154), // 取消锁定分支
-      storyList: roles?.includes(155), // 需求列表
-      serverConfirm: roles?.includes(156), // 服务确认
-      hotUpdate: roles?.includes(157), // 是否可热更
-      baseInfo: roles?.includes(158), // 修改基础信息
-      checkStatus: roles?.includes(158), // 修改检查忽略状态
-      paramSetting: roles?.includes(158), // 检查参数设置
-      multiCheck: roles?.includes(158), // 批量检查
-      preLock: roles?.includes(158), // 封版、取消封版
-      pushMessage: roles?.includes(158), // 一键推送检查失败信息
-      orderSave: roles?.includes(158), // 工单保存
-      orderPublish: roles?.includes(158), // 工单标记发布结果
+      delete: roles?.includes(159), // 移除
+      refreshCheck: roles?.includes(160), // 检查刷新
+      refreshOnline: roles?.includes(161), // 项目与服务刷新
+      branchLock: roles?.includes(162), // 锁定分支
+      branchUnlock: roles?.includes(163), // 取消锁定分支
+      storyList: roles?.includes(164), // 需求列表
+      serverConfirm: roles?.includes(165), // 服务确认
+      hotUpdate: roles?.includes(166), // 是否可热更
+      baseInfo: roles?.includes(167), // 修改基础信息
+      checkStatus: roles?.includes(168), // 修改检查忽略状态
+      paramSetting: roles?.includes(169), // 检查参数设置
+      multiCheck: roles?.includes(170), // 批量检查
+      preLock: roles?.includes(171), // 封版、取消封版
+      pushMessage: roles?.includes(172), // 一键推送检查失败信息
+      orderSave: roles?.includes(173), // 工单保存
+      orderPublish: roles?.includes(174), // 工单标记发布结果
+      cancelPublish: roles?.includes(175), // 取消发布
     };
   }, [authority]);
 

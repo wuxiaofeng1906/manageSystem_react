@@ -493,7 +493,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 name={'release_name'}
                 rules={[{ required: true, message: '请填写批次名称' }]}
               >
-                <Input placeholder={'批次名称'} disabled={hasEdit} />
+                <Input placeholder={'批次名称'} disabled={!hasPermission.baseInfo || hasEdit} />
               </Form.Item>
             </Col>
             <Col span={14}>
@@ -531,7 +531,11 @@ const ProcessDetail = (props: any, ref: any) => {
                 name={'release_env'}
                 rules={[{ required: true, message: '请填写镜像环境绑定' }]}
               >
-                <Select placeholder={'镜像环境绑定'} disabled={hasEdit} options={branchEnv} />
+                <Select
+                  placeholder={'镜像环境绑定'}
+                  disabled={!hasPermission.baseInfo || hasEdit}
+                  options={branchEnv}
+                />
               </Form.Item>
             </Col>
             <Col span={5}>
@@ -545,7 +549,7 @@ const ProcessDetail = (props: any, ref: any) => {
                   placeholder={'发布时间'}
                   showTime
                   format="YYYY-MM-DD HH:mm"
-                  disabled={hasEdit}
+                  disabled={!hasPermission.baseInfo || hasEdit}
                 />
               </Form.Item>
             </Col>

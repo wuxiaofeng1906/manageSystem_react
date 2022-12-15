@@ -95,6 +95,7 @@ const Layout = () => {
           />
           <Button
             size={'small'}
+            hidden={!hasPermission.cancelPublish}
             disabled={touched || globalState.finished}
             onClick={() => ref.current?.onCancelPublish?.()}
           >
@@ -103,7 +104,7 @@ const Layout = () => {
           <Button
             title={'刷新'}
             type={'text'}
-            hidden={!hasPermission.refresh}
+            hidden={!hasPermission.refreshOnline}
             disabled={touched || checkStatus}
             icon={<SyncOutlined />}
             style={{ border: 'none', background: 'initial' }}
@@ -157,7 +158,7 @@ const Layout = () => {
           <Button
             title={'刷新'}
             type={'text'}
-            hidden={!hasPermission.refresh}
+            hidden={!hasPermission.refreshCheck}
             disabled={touched || checkStatus}
             icon={<SyncOutlined />}
             style={{ border: 'none', background: 'initial' }}

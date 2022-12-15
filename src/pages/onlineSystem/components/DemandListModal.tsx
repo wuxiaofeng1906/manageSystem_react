@@ -335,7 +335,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               v
             ) : (
               <Select
-                disabled={!permission}
+                disabled={user?.group !== 'superGroup'}
                 value={v}
                 style={{ width: '100%' }}
                 options={Object.keys(WhetherOrNot)?.map((k) => ({
@@ -350,9 +350,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         { title: '需求指派人', dataIndex: 'ass_to', width: 100 },
       ],
     };
-  }, [JSON.stringify(list)]);
-
-  const permission = useMemo(() => user?.group == 'superGroup', [user]);
+  }, [JSON.stringify(list), user?.group]);
 
   const memoEdit = useMemo(
     () => ({

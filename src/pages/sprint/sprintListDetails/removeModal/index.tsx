@@ -16,7 +16,6 @@ import {
 import type { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import type { ColumnsType } from 'antd/lib/table';
-import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
 import { isEmpty, pick } from 'lodash';
 import { useLocation } from 'umi';
@@ -200,9 +199,20 @@ const RemoveModal = (
 
   const getTestUserList = async () => {
     try {
-      const res = await getDeptMemner(client, 'TEST');
+      const { data: { test = [], ued = [] } = {} } = await client.query(`{
+      test:WxDeptUsers(techs:[TEST]){
+                id
+                userName
+                hired
+              }
+              ued:WxDeptUsers(deptNames:["UED"]){
+               id
+               userName
+               hired
+            }
+      }`);
       setTestUser(
-        res
+        [...test, ...ued]
           ?.filter((it: any) => it.hired != '0')
           ?.map((it: any) => ({ label: it.userName, value: it.id })),
       );

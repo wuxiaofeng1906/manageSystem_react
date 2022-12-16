@@ -922,5 +922,45 @@ const StatisticServices = {
       loading,
     };
   },
+  // 自动化提效比
+  async autoEffectRate({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:testAtuotEffectPropDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
+              kpi
+            }
+            users {
+              userId
+              userName
+              kpi
+              hired
+            }
+          }
+        }
+      }
+  `);
+    return {
+      data: formatTreeData({ origin: data.data, isTest: true }),
+      loading,
+    };
+  },
 };
 export default StatisticServices;

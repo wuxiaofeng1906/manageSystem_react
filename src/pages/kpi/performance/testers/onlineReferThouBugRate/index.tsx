@@ -23,7 +23,7 @@ const OnlineReferThouBugRate: React.FC<any> = () => {
       request={StatisticServices.roundsP0P1TestRate}
       identity={'REFER'}
       period={'uptoperiod'}
-      len={4}
+      len={3}
       unit={'%'}
     />
   );

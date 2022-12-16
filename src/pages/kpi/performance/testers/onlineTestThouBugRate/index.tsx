@@ -23,7 +23,7 @@ const OnlineThouBugTestRate: React.FC<any> = () => {
       request={StatisticServices.roundsP0P1TestRate}
       identity={'TEST'}
       period={'uptoperiod'}
-      len={4}
+      len={3}
       unit={'%'}
     />
   );

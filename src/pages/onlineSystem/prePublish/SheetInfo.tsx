@@ -110,11 +110,10 @@ const SheetInfo = (props: any, ref: any) => {
           concurrent: it.concurrent ?? 20,
           api_header: it.api_header ?? '',
         })) || [];
-    const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) ?? [];
+    const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
     const baseValues = baseForm.getFieldsValue();
     const orderValues = orderForm.getFieldsValue();
     const sqlValues = sqlForm.getFieldsValue();
-
     await OnlineSystemServices.updateOrderDetail({
       ready_release_num: release_num,
       user_id: user?.userid,

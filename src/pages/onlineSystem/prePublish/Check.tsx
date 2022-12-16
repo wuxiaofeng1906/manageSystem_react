@@ -183,10 +183,10 @@ const Check = (props: any, ref: any) => {
           let status = 'skip';
           if (flag) {
             status =
-              (!isEmpty(currentKey) &&
-                currentKey?.find((it: any) => ['yes', 'no', 'skip'].includes(it?.check_result))
-                  ?.check_result) ||
-              '';
+              (isEmpty(currentKey)
+                ? ''
+                : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
+                    ?.check_result) || 'yes';
           }
           return {
             ...it,

@@ -145,9 +145,11 @@
       padding:5px 10px;
     }
     td{
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
+      &:not(:first-child){
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
     }
   }
 }

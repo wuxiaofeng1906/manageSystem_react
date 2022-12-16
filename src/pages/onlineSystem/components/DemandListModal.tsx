@@ -280,7 +280,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           ellipsis: { showTitle: false },
           width: 200,
           fixed: 'left',
-          ellipsis: { showTitle: false },
           render: (v: string) => (
             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
           ),

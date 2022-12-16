@@ -286,16 +286,22 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
     title: '请求结果说明',
     dataIndex: 'seal_result_dev',
     width: 100,
+    ellipsis: { showTitle: false },
     render: (v: string, row: any) => {
       const isSeal = { yes: '封版', no: '解版' };
       return (
-        <span>
-          {['yes', 'no'].includes(v)
-            ? v == 'yes'
-              ? `${isSeal[row.is_sealing]}成功`
-              : `${isSeal[row.is_sealing]}失败 ${row?.seal_result_dev_log || ''}`
-            : ''}
-        </span>
+        <Ellipsis
+          width={100}
+          placement={'bottomLeft'}
+          color={'#108ee9'}
+          title={
+            ['yes', 'no'].includes(v)
+              ? v == 'yes'
+                ? `${isSeal[row.is_sealing]}成功`
+                : `${isSeal[row.is_sealing]}失败 ${row?.seal_result_dev_log || ''}`
+              : ''
+          }
+        />
       );
     },
   });
@@ -324,6 +330,7 @@ export const upgradeServicesColumn: (ColDef | ColGroupDef)[] = [
   { headerName: 'Data', field: 'api_data', minWidth: 130, tooltipField: 'api_data' },
   { headerName: 'Header', field: 'api_header', minWidth: 110, tooltipField: 'api_header' },
   { headerName: '租户ID', field: 'tenant', minWidth: 100, maxWidth: 100 },
+  { headerName: '提交人', field: 'author', minWidth: 100, maxWidth: 100 },
 ];
 export const repairColumn: (ColDef | ColGroupDef)[] = [
   {

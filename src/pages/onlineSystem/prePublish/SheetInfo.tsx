@@ -605,7 +605,7 @@ const SheetInfo = (props: any, ref: any) => {
         <Form
           size={'small'}
           form={baseForm}
-          className={styles.resetForm}
+          className={styles.resetForm + ' no-wrap-form'}
           onFieldsChange={() => {
             if (!leaveShow) setLeaveShow(true);
           }}

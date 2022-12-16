@@ -745,6 +745,13 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
+                name: '自动化提效比',
+                icon: 'table',
+                path: 'autoEffectRate',
+                component: './kpi/performance/testers/autoEffectRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
                 name: '自动化单元测试覆盖率',
                 icon: 'table',
                 path: 'autoTestCoverageUnit',

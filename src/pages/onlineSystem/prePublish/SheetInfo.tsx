@@ -497,7 +497,6 @@ const SheetInfo = (props: any, ref: any) => {
     const rowNode = serverRef.current?.getRowNode(String(p.rowIndex));
     rowNode?.setData({ ...p.data, [p.column.colId]: v });
   };
-
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <Prompt
@@ -689,49 +688,54 @@ const SheetInfo = (props: any, ref: any) => {
             frameworkComponents={{ select: renderSelect }}
           />
         </div>
-        <h4 style={{ margin: '16px 0' }}>
-          三、升级接口
-          <img
-            title={'日志'}
-            src={require('../../../../public/logs.png')}
-            style={{
-              width: 18,
-              height: 18,
-              cursor: 'pointer',
-            }}
-            onClick={showLog}
-          />
-        </h4>
-        <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
-          <AgGridReact
-            rowDragManaged={!finished}
-            animateRows={true}
-            onRowDragEnd={onDrag}
-            columnDefs={PublishUpgradeColumn}
-            rowData={upgradeData?.upgrade_api ?? []}
-            {...initGridTable({ ref: upgradeRef, height: 30 })}
-            frameworkComponents={{
-              operation: (p: CellClickedEvent) => (
-                <Space size={8}>
-                  <img
-                    title={'编辑'}
-                    src={require('../../../../public/edit.png')}
-                    style={{
-                      width: 18,
-                      height: 18,
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => {
-                      setVisible(true);
-                      setActiveItem({ ...p.data, rowIndex: String(p.rowIndex) });
-                    }}
-                  />
-                  {DragIcon(p)}
-                </Space>
-              ),
-            }}
-          />
-        </div>
+        {upgradeData?.basic_data?.release_type?.release_way !== 'keep_server' && (
+          <>
+            <h4 style={{ margin: '16px 0' }}>
+              三、升级接口
+              <img
+                title={'日志'}
+                src={require('../../../../public/logs.png')}
+                style={{
+                  width: 18,
+                  height: 18,
+                  cursor: 'pointer',
+                }}
+                onClick={showLog}
+              />
+            </h4>
+            <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
+              <AgGridReact
+                rowDragManaged={!finished}
+                animateRows={true}
+                onRowDragEnd={onDrag}
+                columnDefs={PublishUpgradeColumn}
+                rowData={upgradeData?.upgrade_api ?? []}
+                {...initGridTable({ ref: upgradeRef, height: 30 })}
+                frameworkComponents={{
+                  operation: (p: CellClickedEvent) => (
+                    <Space size={8}>
+                      <img
+                        title={'编辑'}
+                        src={require('../../../../public/edit.png')}
+                        style={{
+                          width: 18,
+                          height: 18,
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => {
+                          setVisible(true);
+                          setActiveItem({ ...p.data, rowIndex: String(p.rowIndex) });
+                        }}
+                      />
+                      {DragIcon(p)}
+                    </Space>
+                  ),
+                }}
+              />
+            </div>
+          </>
+        )}
+
         <EditModal
           visible={visible}
           data={activeItem}

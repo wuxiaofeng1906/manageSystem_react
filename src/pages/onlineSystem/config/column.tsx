@@ -394,6 +394,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       headerName: '数据库版本',
       field: 'database_version',
       minWidth: 110,
+      hide: data?.release_type?.release_way == 'keep_server',
     },
     {
       headerName: '数据Recovery',

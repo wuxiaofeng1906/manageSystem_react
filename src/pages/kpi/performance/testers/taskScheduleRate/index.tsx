@@ -28,6 +28,7 @@ const TaskScheduleRate: React.FC<any> = () => {
       request={StatisticServices.taskScheduleRate}
       identity={'TESTER'}
       unit={'%'}
+      len={2}
     />
   );
 };

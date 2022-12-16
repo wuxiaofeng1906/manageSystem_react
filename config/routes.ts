@@ -757,7 +757,7 @@ export default [
                 path: 'autoTestCoverageUnit',
                 component: './kpi/performance/testers/autoTestCoverageUnit',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true,
+                // hideInMenu: true,
               },
             ],
           },

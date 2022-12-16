@@ -226,7 +226,8 @@ const Check = (props: any, ref: any) => {
   };
 
   const showLog = (v: any, data: any) => {
-    if (hasEdit || !data.open || v == '') return;
+    if (isEmpty(v) || (isEmpty(v?.before) && data.rowKey == 'libray_data'))
+      return infoMessage('暂无检查日志');
     let type = data.rowKey;
     let width = 700;
     let content = v;
@@ -464,9 +465,7 @@ const Check = (props: any, ref: any) => {
                     width: 18,
                     height: 18,
                     marginRight: 10,
-                    ...(hasEdit || !record.open || v == ''
-                      ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
-                      : { cursor: 'pointer' }),
+                    cursor: 'pointer',
                   }}
                   src={require('../../../../public/logs.png')}
                   title={'日志'}

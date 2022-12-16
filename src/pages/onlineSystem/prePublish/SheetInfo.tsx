@@ -638,7 +638,7 @@ const SheetInfo = (props: any, ref: any) => {
             </Col>
             <Col span={6}>
               <Form.Item name={'ready_release_name'} label={'工单名称'} required>
-                <Input style={{ width: '100%' }} />
+                <Input style={{ width: '100%' }} disabled={finished} />
               </Form.Item>
             </Col>
             <Col span={6}>

@@ -28,11 +28,21 @@ export const dutyColumn = [
     field: 'global',
   },
   {
+    headerName: 'openApi&qtms值班',
+    field: 'openapi',
+    minWidth: 160,
+  },
+  {
     headerName: 'qbos&sore值班',
     field: 'qbos与store',
+    minWidth: 140,
   },
   {
     headerName: 'jsf值班',
     field: 'jsf',
+  },
+  {
+    headerName: 'emitter值班',
+    field: 'emitter',
   },
 ];

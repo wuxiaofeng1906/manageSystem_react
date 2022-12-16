@@ -64,15 +64,25 @@ const ApplicationServerConfig = () => {
     getConfigList();
   }, []);
 
+  const hasPermission = useMemo(() => {
+    const roles =
+      user?.authority?.flatMap((it: any) => (it?.parentId == 176 ? [+it.id] : [])) ?? [];
+    return {
+      add: roles?.includes(177), // 新增
+      edit: roles?.includes(178), // 修改
+      delete: roles?.includes(179), // 删除}
+    };
+  }, [user?.authority]);
+
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <PageContainer>
         <div className={styles.applicationServerConfig}>
           <div className={styles.btnBox}>
-            <Button type={'primary'} onClick={() => setEditModal(true)}>
+            <Button type={'primary'} hidden={!hasPermission.add} onClick={() => setEditModal(true)}>
               新增
             </Button>
-            <Button type={'primary'} onClick={onRemove}>
+            <Button type={'primary'} onClick={onRemove} hidden={!hasPermission.delete}>
               删除
             </Button>
           </div>
@@ -106,6 +116,7 @@ const ApplicationServerConfig = () => {
             }}
             visible={editModal}
             data={activeItem}
+            disabled={!hasPermission.edit}
           />
         </div>
       </PageContainer>
@@ -114,7 +125,7 @@ const ApplicationServerConfig = () => {
 };
 export default ApplicationServerConfig;
 
-const EditModal = (props: ModalFuncProps & { data: any }) => {
+const EditModal = (props: ModalFuncProps & { data: any; disabled: boolean }) => {
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState(false);
   const [form] = Form.useForm();
@@ -160,11 +171,11 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
       onCancel={() => props?.onCancel?.()}
       onOk={onConfirm}
       destroyOnClose={true}
-      okButtonProps={{ disabled: loading || touched }}
+      okButtonProps={{ disabled: props.disabled || loading || touched }}
       width={950}
     >
       <Spin spinning={loading || touched} tip={`数据${touched ? '保存' : '加载'}中...`}>
-        <Form form={form} autoComplete={'off'}>
+        <Form form={form} autoComplete={'off'} disabled={props.disabled}>
           <Row gutter={6}>
             <Col span={12}>
               <Form.Item

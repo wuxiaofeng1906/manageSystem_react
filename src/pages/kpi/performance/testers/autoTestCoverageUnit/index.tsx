@@ -57,7 +57,6 @@ export default () => {
   const [category, setCategory] = useState<IStaticBy>('week');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any[]>();
   const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -75,12 +74,13 @@ export default () => {
     try {
       const { data } = await StatisticServices.autoTestCoverageUnit({ client, params: category });
 
-      gridRef.current?.setColumnDefs(data.column);
+      gridRef.current?.setColumnDefs([
+        { field: 'branch', headerName: '分支', pinned: 'left' },
+        ...data.column,
+      ]);
       gridRef.current?.setRowData(data?.rowData);
-      setData([]);
       setLoading(false);
     } catch (e) {
-      console.log(e);
       setLoading(false);
     }
   };

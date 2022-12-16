@@ -433,14 +433,39 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
       if (node.dept != 59) {
         findNode(it.datas, node, Group);
       }
+
       result.push({
         Group,
         branch: '',
         isDept: true,
         [`branCove${start}`]: node?.branchCover?.numerator,
-        [`execution${start}`]: 10,
+        [`execution${start}`]: 0,
         [`instCove${start}`]: node.instCover?.numerator,
       });
+      if (!isEmpty(node.tech)) {
+        node.tech.forEach((tech: any) => {
+          result.push({
+            Group: [...Group, tech.name == '1' ? '前端' : '后端'],
+            branch: tech?.branch,
+            isDept: true,
+            [`branCove${start}`]: tech?.branchCover,
+            [`execution${start}`]: tech?.runtime,
+            [`instCove${start}`]: tech?.instCover,
+          });
+        });
+      }
+      if (!isEmpty(node.execution)) {
+        node.execution.forEach((exec: any) => {
+          result.push({
+            Group: [...Group, exec.name],
+            branch: exec?.branch,
+            isDept: true,
+            [`branCove${start}`]: exec?.branchCover?.denominator,
+            [`execution${start}`]: exec?.runtime,
+            [`instCove${start}`]: exec?.instCover?.denominator,
+          });
+        });
+      }
     });
   });
   return { rowData: converseArrayToOne(result) || [], column };

@@ -871,6 +871,9 @@ const StatisticServices = {
                 denominator
               }
               branchCover{
+                both
+                front
+                backend
                 numerator
                 denominator
               }

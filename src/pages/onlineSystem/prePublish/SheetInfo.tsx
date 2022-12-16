@@ -101,15 +101,19 @@ const SheetInfo = (props: any, ref: any) => {
 
   const onSave = async (flag = false) => {
     if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
-    const upgrade_api = upgradeRef.current
-      ?.getRenderedNodes()
-      .map((it) => it.data)
-      ?.map((it) => ({ ...it, concurrent: it.concurrent ?? 20, api_header: it.api_header ?? '' }));
-    const release_app = serverRef.current?.getRenderedNodes().map((it) => it.data) ?? [];
+    const upgrade_api =
+      upgradeRef.current
+        ?.getRenderedNodes()
+        ?.map((it) => it.data)
+        ?.map((it) => ({
+          ...it,
+          concurrent: it.concurrent ?? 20,
+          api_header: it.api_header ?? '',
+        })) || [];
+    const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
     const baseValues = baseForm.getFieldsValue();
     const orderValues = orderForm.getFieldsValue();
     const sqlValues = sqlForm.getFieldsValue();
-
     await OnlineSystemServices.updateOrderDetail({
       ready_release_num: release_num,
       user_id: user?.userid,
@@ -262,7 +266,7 @@ const SheetInfo = (props: any, ref: any) => {
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
-    const serverInfo = serverRef.current?.getRenderedNodes().map((it) => it.data);
+    const serverInfo = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
     const ignore = ['release_result'];
     if (base.need_auto == 'no') ignore.push('auto_env');
 
@@ -299,7 +303,7 @@ const SheetInfo = (props: any, ref: any) => {
       // 服务信息
       else if (!isEmpty(serverInfo)) {
         const err = Object.entries(
-          pick(serverInfo[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
+          pick(serverInfo?.[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
         ).find(([k, v]) => isEmpty(v));
         if (!isEmpty(err)) {
           showErrTip = errTip[err?.[0]];

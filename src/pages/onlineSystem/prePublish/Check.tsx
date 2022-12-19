@@ -182,11 +182,10 @@ const Check = (props: any, ref: any) => {
           const flag = it.rowKey == 'auto_obj_data';
           let status = 'skip';
           if (flag) {
-            status =
-              (isEmpty(currentKey)
-                ? ''
-                : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
-                    ?.check_result) || 'yes';
+            status = isEmpty(currentKey)
+              ? ''
+              : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
+                  ?.check_result || 'yes';
           }
           return {
             ...it,

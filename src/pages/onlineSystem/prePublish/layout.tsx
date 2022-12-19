@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Tabs, Button, Space } from 'antd';
 import ProcessDetail from './ProcessDetail';
 import Check from './Check';
@@ -166,7 +166,7 @@ const Layout = () => {
           />
         </Space>
       );
-    else
+    else if (subTab == 'sheet')
       return (
         <div>
           {draft && <strong style={{ color: '#fe7b00cf', marginRight: 16 }}>状态：草稿态</strong>}
@@ -181,6 +181,7 @@ const Layout = () => {
           </Button>
         </div>
       );
+    return <Fragment />;
   }, [release_num, tab, subTab, globalState, touched, draft, user?.group]);
 
   return (

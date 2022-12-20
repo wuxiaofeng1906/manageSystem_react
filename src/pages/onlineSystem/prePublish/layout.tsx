@@ -173,9 +173,17 @@ const Layout = () => {
           <Button
             hidden={!hasPermission.orderSave}
             size={'small'}
-            onClick={() => ref.current?.onSave()}
-            disabled={globalState.finished}
+            disabled={globalState.finished || touched}
             style={{ width: 100, background: '#46a0fc', color: 'white' }}
+            onClick={async () => {
+              setTouched(true);
+              try {
+                await ref.current?.onSave?.();
+                setTouched(false);
+              } catch (e) {
+                setTouched(false);
+              }
+            }}
           >
             保存
           </Button>

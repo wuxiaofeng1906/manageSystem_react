@@ -238,15 +238,15 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
       ),
     },
     {
-      title: '是否封版',
+      title: '是否锁定',
       dataIndex: 'is_sealing',
       width: 120,
       render: (v: string) => (
         <span style={{ color: v == 'yes' ? 'green' : 'initial' }}>{cpWhetherOrNot[v] ?? v}</span>
       ),
     },
-    { title: '封版/封版人', dataIndex: 'sealing_user', width: 120 },
-    { title: '封版/封版时间', dataIndex: 'sealing_time', width: 180 },
+    { title: '锁定/解锁人', dataIndex: 'sealing_user', width: 120 },
+    { title: '锁定/解锁时间', dataIndex: 'sealing_time', width: 180 },
   ];
   if (flag)
     arr.push(

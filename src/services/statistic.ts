@@ -854,6 +854,7 @@ const StatisticServices = {
             }
             tech {
               name
+              runtime
               instCover {
                 numerator
                 denominator
@@ -866,6 +867,7 @@ const StatisticServices = {
             execution{
               name
               branch
+              runtime
               instCover{
                 numerator
                 denominator
@@ -883,6 +885,44 @@ const StatisticServices = {
       }
     `);
     return { data: formatAutoTestCover(data.data, condition.typeFlag) };
+  },
+
+  async autoTestCoverageServer({ client, params }: any) {
+    const { data } = await client.query(`
+      {
+       data:autoTestCoverPropApps(branchName:"${params.branchName}", runtimes:"${params.runtimes}") {
+         runtime
+          branch
+          datas {
+                tech {
+                  name
+                  instCover {
+                    numerator
+                    denominator
+                  }
+                  branchCover {
+                    numerator
+                    denominator
+                  }
+                }
+                datas {
+                  name
+                  instCover {
+                    numerator
+                    denominator
+                  }
+                  branchCover {
+                    numerator
+                    denominator
+                  }
+                }
+              }
+        }
+      }
+    `);
+    console.log(data);
+    return data;
+    // return { data: formatAutoTestCover(data.data, ) };
   },
 
   // 自动化发现BUG数

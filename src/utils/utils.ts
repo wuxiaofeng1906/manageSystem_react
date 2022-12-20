@@ -447,7 +447,7 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
           result.push({
             Group: [...Group, tech.name == '1' ? '前端' : '后端'],
             branch: tech?.branch,
-            isDept: true,
+            isDept: false,
             [`branCove${start}`]: tech?.branchCover,
             [`execution${start}`]: tech?.runtime,
             [`instCove${start}`]: tech?.instCover,
@@ -459,7 +459,8 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
           result.push({
             Group: [...Group, exec.name],
             branch: exec?.branch,
-            isDept: true,
+            isDept: false,
+            isProject: true,
             [`branCove${start}`]: exec?.branchCover?.denominator,
             [`execution${start}`]: exec?.runtime,
             [`instCove${start}`]: exec?.instCover?.denominator,

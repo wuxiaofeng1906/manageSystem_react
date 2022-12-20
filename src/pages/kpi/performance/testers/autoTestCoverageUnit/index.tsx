@@ -4,14 +4,11 @@ import { Button, Spin } from 'antd';
 import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticPerformance';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
-import { aggFunc } from '@/utils/utils';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
+import { GridApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
 import StatisticServices from '@/services/statistic';
 import { IStaticBy } from '@/hooks/statistic';
-import { isEmpty, isNumber } from 'lodash';
 
 const ruleData: IRuleData[] = [
   {
@@ -84,6 +81,17 @@ export default () => {
       setLoading(false);
     }
   };
+  const getTestApps = async (param: CellClickedEvent) => {
+    if (param.data?.isProject) {
+      const runtime: any[] = Object.entries(param.data)?.flatMap(([k, v]) =>
+        k.startsWith('execution') ? [v] : [],
+      );
+      const res = await StatisticServices.autoTestCoverageServer({
+        client,
+        params: { runtimes: runtime || [], branchName: param.data.branch },
+      });
+    }
+  };
 
   useEffect(() => {
     getTableSource();
@@ -120,8 +128,11 @@ export default () => {
               flex: 1,
               minWidth: 100,
             }}
-            onRowGroupOpened={(e) => {
-              console.log(e);
+            // onRowGroupOpened={(e) => {
+            //   getTestApps(e);
+            // }}
+            onRowDoubleClicked={(e) => {
+              getTestApps(e);
             }}
             autoGroupColumnDef={{
               minWidth: 260,
@@ -134,7 +145,6 @@ export default () => {
             treeData={true}
             groupDefaultExpanded={-1}
             getDataPath={(source: any) => source.Group}
-            columnDefs={[]}
           />
         </div>
         <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />

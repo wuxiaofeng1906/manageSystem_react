@@ -98,8 +98,7 @@ const ICard = (params: {
                   e.stopPropagation();
                   const backlogType = params.data.release_type == 'backlog_release';
                   let href = `/onlineSystem/prePublish/${params.data.release_num}/${params.data.branch}`;
-                  if (backlogType)
-                    href = `/onDutyAndRelease/releaseOrder${params.data.release_num}`;
+                  if (backlogType) href = `/onlineSystem/releaseOrder/${params.data.release_num}`;
                   history.push(href);
                 }}
               />

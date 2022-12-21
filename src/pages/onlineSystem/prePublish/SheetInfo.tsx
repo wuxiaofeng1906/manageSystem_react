@@ -361,10 +361,10 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const onSuccessConfirm = async (data: any) => {
-    setSuccessModal(false);
     const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({ release_result: null });
+      setSuccessModal(false);
     } else {
       let params: any[] = [];
       const ignoreCheck = data.ignoreCheck;
@@ -390,6 +390,7 @@ const SheetInfo = (props: any, ref: any) => {
           announcement_time: 'after',
         });
       }
+      setSuccessModal(false);
       history.replace('/onlineSystem/releaseProcess');
     }
   };

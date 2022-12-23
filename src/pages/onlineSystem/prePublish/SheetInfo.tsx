@@ -177,7 +177,7 @@ const SheetInfo = (props: any, ref: any) => {
     if (!isEmpty(sqlList)) {
       agSql = sqlList;
     }
-  }, [envs, sqlList]);
+  }, [sqlList]);
 
   const getDetail = async () => {
     setSpinning(true);

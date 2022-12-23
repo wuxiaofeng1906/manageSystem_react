@@ -23,7 +23,7 @@ const CumulativeTestLineBugRate: React.FC<any> = () => {
       request={StatisticServices.roundsP0P1TestRate}
       identity={'TEST'}
       period={'period'}
-      len={3}
+      len={2}
       unit={'%'}
     />
   );

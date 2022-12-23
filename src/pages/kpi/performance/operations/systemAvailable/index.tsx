@@ -90,7 +90,10 @@ const SystemAvailable: React.FC<any> = () => {
       data?.forEach((it: any) => {
         let data: any;
         it.datas?.forEach((o: any) => {
-          data = { ...data, [o.range.start]: o.depts?.kpi };
+          data = {
+            ...data,
+            [o.range.start]: o.depts?.kpi * (it.category == 'avgusable' ? 1 : 100),
+          };
         });
         formatData = { ...formatData, [it.category]: data };
       });

@@ -378,9 +378,9 @@ const ReleaseOrder = () => {
 
   const onSuccessConfirm = async (data: any) => {
     const announcement_num = orderForm.getFieldValue('announcement_num');
-    setVisible(false);
     if (isEmpty(data)) {
       orderForm.setFieldsValue({ release_result: null });
+      setVisible(false);
     } else {
       let params: any[] = [];
       const ignoreCheck = data.ignoreCheck;
@@ -398,6 +398,7 @@ const ReleaseOrder = () => {
       agFinished = true;
       setFinished(true);
       await PreReleaseServices.automation(params);
+
       // 关联公告并勾选挂起公告
       if (!isEmpty(announcement_num) && announcement_num !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
@@ -406,6 +407,7 @@ const ReleaseOrder = () => {
           announcement_time: 'after',
         });
       }
+      setVisible(false);
       history.replace('/onlineSystem/releaseProcess');
     }
   };
@@ -702,10 +704,14 @@ export const ModalSuccessCheck = ({
   const [loading, setLoading] = useState(false);
 
   const onConfirm = async () => {
-    const values = await form.validateFields();
     setLoading(true);
-    onOk(values);
-    setLoading(false);
+    try {
+      const values = await form.validateFields();
+      await onOk(values);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

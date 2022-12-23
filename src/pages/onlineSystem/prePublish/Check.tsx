@@ -75,10 +75,10 @@ const Check = (props: any, ref: any) => {
   const onCheck = async () => {
     if (isEmpty(selected)) return infoMessage('请先选择检查项！');
     // [前端、后端代码遗漏]检查 判断是否设置检查参数
-    if (selected.some((key) => key.includes('version_data'))) {
-      const param = await OnlineSystemServices.getCheckSettingDetail({ release_num });
-      if (param?.default == 'yes') return infoMessage('请先设置检查参数');
-    }
+    // if (selected.some((key) => key.includes('version_data'))) {
+    //   const param = await OnlineSystemServices.getCheckSettingDetail({ release_num });
+    //   if (param?.default == 'yes') return infoMessage('请先设置检查参数');
+    // }
     try {
       setSpin(true);
       const checkList = list.flatMap((it) =>

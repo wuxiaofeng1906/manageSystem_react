@@ -278,27 +278,27 @@ export const formatTreeData = ({
       const users = dept.users;
       if (users) {
         users.forEach((user: any) => {
-          const usersGroup = JSON.parse(JSON.stringify(groups));
-          if (!managers.includes(user.userName) && showSide) {
-            // 对管理人员的部门不加前后端，直接显示在部门下面
-            if (['1', '2'].includes(user.tech)) {
-              usersGroup.push(side[user.tech]);
-            }
-          }
           if (user?.hired != '0') {
+            const usersGroup = JSON.parse(JSON.stringify(groups));
+            if (!managers.includes(user.userName) && showSide) {
+              // 对管理人员的部门不加前后端，直接显示在部门下面
+              if (['1', '2'].includes(user.tech)) {
+                usersGroup.push(side[user.tech]);
+              }
+            }
             usersGroup.push(user.userName);
+            result.push({
+              Group: usersGroup,
+              isDept: false,
+              [startTime]: user.kpi * percent,
+              ...(showDenominator
+                ? {
+                    [`${startTime}_numerator`]: user.sideKpi.numerator,
+                    [`${startTime}_denominator`]: user.sideKpi.denominator,
+                  }
+                : {}),
+            });
           }
-          result.push({
-            Group: usersGroup,
-            isDept: false,
-            [startTime]: user.kpi * percent,
-            ...(showDenominator
-              ? {
-                  [`${startTime}_numerator`]: user.sideKpi.numerator,
-                  [`${startTime}_denominator`]: user.sideKpi.denominator,
-                }
-              : {}),
-          });
         });
       }
     });

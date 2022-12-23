@@ -370,7 +370,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+    return { data: formatTreeData({ origin: data.data, isTest: true, percent: 100 }), loading };
   },
 
   // 运维 -系统可用，修复，可用时间
@@ -698,7 +698,7 @@ const StatisticServices = {
             }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+    return { data: formatTreeData({ origin: data.data, isTest: true, percent: 100 }), loading };
   },
 
   // 产品上线后引入emergency
@@ -958,7 +958,7 @@ const StatisticServices = {
       }
   `);
     return {
-      data: formatTreeData({ origin: data.data, isTest: true }),
+      data: formatTreeData({ origin: data.data, isTest: true, percent: 100 }),
       loading,
     };
   },

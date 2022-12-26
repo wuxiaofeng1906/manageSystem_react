@@ -1,14 +1,16 @@
 // 自动化单元测试覆盖率
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Spin } from 'antd';
+import { Button } from 'antd';
 import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticPerformance';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { GridApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import StatisticServices from '@/services/statistic';
 import { IStaticBy } from '@/hooks/statistic';
+import { isEmpty, intersection, difference, isEqual, uniqBy } from 'lodash';
+import { RowGroupOpenedEvent } from 'ag-grid-community/dist/lib/events';
 
 const ruleData: IRuleData[] = [
   {
@@ -47,13 +49,14 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-
+let exec: string[] = [];
 export default () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [category, setCategory] = useState<IStaticBy>('week');
+  const [category, setCategory] = useState<IStaticBy>('month');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [rowData, setRowData] = useState<any[]>([]);
   const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -75,23 +78,91 @@ export default () => {
         { field: 'branch', headerName: '分支', pinned: 'left' },
         ...data.column,
       ]);
-      gridRef.current?.setRowData(data?.rowData);
+      setRowData(data?.rowData);
+      exec = data?.project;
       setLoading(false);
     } catch (e) {
       setLoading(false);
     }
   };
-  const getTestApps = async (param: CellClickedEvent) => {
-    if (param.data?.isProject) {
-      const runtime: any[] = Object.entries(param.data)?.flatMap(([k, v]) =>
-        k.startsWith('execution') ? [v] : [],
-      );
-      const res = await StatisticServices.autoTestCoverageServer({
-        client,
-        params: { runtimes: runtime || [], branchName: param.data.branch },
+
+  const getProjectApps = async (param: RowGroupOpenedEvent) => {
+    if (
+      isEmpty(param.data) ||
+      !param.expanded ||
+      !param.data?.isProject ||
+      intersection(param.data.Group, exec)?.length == 0
+    )
+      return;
+    setLoading(true);
+    exec = difference(exec, param.data.Group);
+    let ranges: string[] = [];
+    let runtime: string[] = [];
+    let apps: any[] = [];
+    let Group: any[] = param.data?.Group;
+    Object.entries(param.data ?? {})?.forEach(([k, v]) => {
+      if (k.startsWith('execution') && v) {
+        runtime.push(v);
+        ranges.push(k?.replaceAll('execution', ''));
+      }
+    });
+    const res = await StatisticServices.autoTestCoverageServer({
+      client,
+      params: { runtimes: runtime || [], branchName: param.data.branch },
+    });
+    ranges?.forEach((range) => {
+      res?.forEach((it: any) => {
+        it.datas?.forEach((data: any) => {
+          const tech = data.tech;
+          if (!isEmpty(tech)) {
+            Group.push(tech.name == '2' ? '后端' : '前端');
+            apps.push({
+              Group: Group,
+              branch: it?.branch,
+              isDept: false,
+              [`branCove${range}`]:
+                ((tech?.branchCover?.numerator || 0) / (tech?.branchCover?.denominator || 0)) * 100,
+              [`execution${range}`]: it?.runtime,
+              [`instCove${range}`]:
+                ((tech?.instCover?.numerator || 0) / (tech?.instCover?.denominator || 0)) * 100,
+            });
+          }
+
+          data.datas?.forEach((app: any) => {
+            apps.push({
+              Group: [...Group, app.name],
+              branch: it?.branch,
+              isDept: false,
+              [`branCove${range}`]:
+                ((app?.branchCover?.numerator || 0) / (app?.branchCover?.denominator || 0)) * 100,
+              [`execution${range}`]: it?.runtime,
+              [`instCove${range}`]:
+                ((app?.instCover?.numerator || 0) / (app?.instCover?.denominator || 0)) * 100,
+            });
+          });
+        });
       });
-    }
+    });
+    const parent = [...param.data.Group]?.slice(0, param.data.Group?.length - 1);
+    setRowData(
+      uniqBy(
+        [
+          ...rowData.filter((it) => !isEqual(it.Group, [...parent, ''])),
+          { ...param.data, Group: parent },
+          ...apps,
+        ],
+        'Group',
+      ),
+    );
+    setLoading(false);
   };
+
+  useEffect(() => {
+    if (gridRef.current) {
+      if (loading) gridRef.current.showLoadingOverlay();
+      else gridRef.current.hideOverlay();
+    }
+  }, [loading]);
 
   useEffect(() => {
     getTableSource();
@@ -99,56 +170,50 @@ export default () => {
 
   return (
     <PageContainer>
-      <Spin spinning={loading} tip={'数据加载中...'}>
-        <div style={{ background: 'white' }}>
-          <ConditionHeader onChange={(v) => setCategory(v)} />
-          <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
-          <Button
-            type="text"
-            style={{ color: '#1890FF', float: 'right' }}
-            icon={<QuestionCircleTwoTone />}
-            size={'large'}
-            onClick={() => setVisible(true)}
-          >
-            计算规则
-          </Button>
-        </div>
-        <div className={'ag-theme-alpine'} style={{ width: '100%', height: gridHeight }}>
-          <AgGridReact
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
-            pivotMode={true}
-            // rowData={data ?? []}
-            suppressAggFuncInHeader={true}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
-              flex: 1,
-              minWidth: 100,
-            }}
-            // onRowGroupOpened={(e) => {
-            //   getTestApps(e);
-            // }}
-            onRowDoubleClicked={(e) => {
-              getTestApps(e);
-            }}
-            autoGroupColumnDef={{
-              minWidth: 260,
-              maxWidth: 280,
-              headerName: '部门-项目',
-              cellRendererParams: { suppressCount: true },
-              pinned: 'left',
-              suppressMenu: false,
-            }}
-            treeData={true}
-            groupDefaultExpanded={-1}
-            getDataPath={(source: any) => source.Group}
-          />
-        </div>
-        <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
-      </Spin>
+      <div style={{ background: 'white' }}>
+        <ConditionHeader onChange={(v) => setCategory(v)} />
+        <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+        <Button
+          type="text"
+          style={{ color: '#1890FF', float: 'right' }}
+          icon={<QuestionCircleTwoTone />}
+          size={'large'}
+          onClick={() => setVisible(true)}
+        >
+          计算规则
+        </Button>
+      </div>
+      <div className={'ag-theme-alpine'} style={{ width: '100%', height: gridHeight }}>
+        <AgGridReact
+          rowHeight={32}
+          headerHeight={35}
+          onGridReady={onGridReady}
+          rowData={rowData}
+          pivotMode={true}
+          suppressAggFuncInHeader={true}
+          defaultColDef={{
+            sortable: true,
+            resizable: true,
+            filter: true,
+            flex: 1,
+            minWidth: 100,
+          }}
+          onRowGroupOpened={getProjectApps}
+          autoGroupColumnDef={{
+            minWidth: 260,
+            maxWidth: 350,
+            headerName: '部门-项目',
+            cellRendererParams: { suppressCount: true },
+            pinned: 'left',
+            suppressMenu: false,
+          }}
+          treeData={true}
+          groupDefaultExpanded={-1}
+          isGroupOpenByDefault={(params) => !exec.includes(params.key)}
+          getDataPath={(source: any) => source.Group}
+        />
+      </div>
+      <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
     </PageContainer>
   );
 };

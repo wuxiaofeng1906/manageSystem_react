@@ -1,5 +1,5 @@
 import { IRecord } from '@/namespaces/interface';
-import { isEmpty, isEqual, omit, intersection, isNumber } from 'lodash';
+import { isEmpty, isEqual, omit, intersection, isNumber, uniq } from 'lodash';
 import moment from 'moment';
 import { getMonthWeek } from '@/publicMethods/timeMethods';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -149,7 +149,7 @@ const side = {
   2: '后端',
 };
 
-const converseArrayToOne = (origin: any) => {
+export const converseArrayToOne = (origin: any) => {
   const source: any[] = [];
   for (let index = 0; index < origin.length; index += 1) {
     let repeat = false;
@@ -402,6 +402,7 @@ export const formatPivotMode = (origin: any[], kind: number) => {
 export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
   let result: any[] = [];
   let column: any[] = [];
+  let project: any[] = [];
   origin?.reverse()?.forEach((it: any) => {
     const start = it.range.start;
     const title =
@@ -438,9 +439,11 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
         Group,
         branch: '',
         isDept: true,
-        [`branCove${start}`]: node?.branchCover?.numerator,
-        [`execution${start}`]: 0,
-        [`instCove${start}`]: node.instCover?.numerator,
+        [`branCove${start}`]:
+          ((node?.branchCover?.numerator || 0) / (node.branchCover?.denominator || 0)) * 100,
+        [`execution${start}`]: '',
+        [`instCove${start}`]:
+          ((node.instCover?.numerator || 0) / (node.instCover?.denominator || 0)) * 100,
       });
       if (!isEmpty(node.tech)) {
         node.tech.forEach((tech: any) => {
@@ -448,28 +451,36 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
             Group: [...Group, tech.name == '1' ? '前端' : '后端'],
             branch: tech?.branch,
             isDept: false,
-            [`branCove${start}`]: tech?.branchCover,
+            [`branCove${start}`]:
+              ((tech?.branchCover?.numerator || 0) / (tech?.branchCover?.denominator || 0)) * 100,
             [`execution${start}`]: tech?.runtime,
-            [`instCove${start}`]: tech?.instCover,
+            [`instCove${start}`]:
+              ((tech?.instCover?.numerator || 0) / (tech?.instCover?.denominator || 0)) * 100,
           });
         });
       }
       if (!isEmpty(node.execution)) {
         node.execution.forEach((exec: any) => {
-          result.push({
-            Group: [...Group, exec.name],
-            branch: exec?.branch,
-            isDept: false,
-            isProject: true,
-            [`branCove${start}`]: exec?.branchCover?.denominator,
-            [`execution${start}`]: exec?.runtime,
-            [`instCove${start}`]: exec?.instCover?.denominator,
-          });
+          project.push(exec.name);
+          result.push(
+            {
+              Group: [...Group, exec.name],
+              branch: exec?.branch,
+              isDept: false,
+              isProject: true,
+              [`branCove${start}`]:
+                ((exec?.branchCover?.numerator || 0) / (exec?.branchCover?.denominator || 0)) * 100,
+              [`execution${start}`]: exec?.runtime,
+              [`instCove${start}`]:
+                ((exec?.instCover?.numerator || 0) / (exec?.instCover?.denominator || 0)) * 100,
+            },
+            { Group: [...Group, exec.name, ''] },
+          );
         });
       }
     });
   });
-  return { rowData: converseArrayToOne(result) || [], column };
+  return { rowData: converseArrayToOne(result) || [], column, project: uniq(project) };
 };
 
 const findNode = (data: any[], item: any, groups: string[]) => {

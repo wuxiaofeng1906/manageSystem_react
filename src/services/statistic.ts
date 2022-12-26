@@ -920,9 +920,7 @@ const StatisticServices = {
         }
       }
     `);
-    console.log(data);
-    return data;
-    // return { data: formatAutoTestCover(data.data, ) };
+    return data.data;
   },
 
   // 自动化发现BUG数

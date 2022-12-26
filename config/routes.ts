@@ -783,7 +783,19 @@ export default [
               },
             ],
           },
-          ...ProjectKpiRoute,
+          // ...ProjectKpiRoute,
+          {
+            name: '项目',
+            path: '/kpi/performance/project',
+            routes: [
+              {
+                name: '实际产出率',
+                path: 'actualOutputRate',
+                component: './kpi/performance/project/actualOutputRate',
+                wrappers: ['../wrappers/auth'],
+              },
+            ],
+          },
           {
             name: '服务',
             icon: 'table',

@@ -50,7 +50,7 @@ import usePermission from '@/hooks/permission';
 const color = { yes: '#2BF541', no: '#faad14' };
 let agEdit = '';
 const ProcessDetail = (props: any, ref: any) => {
-  const { release_num } = useParams() as { release_num: string };
+  const { release_num, branch } = useParams() as { release_num: string; branch: string };
   const { subTab, tab } = useLocation()?.query as { tab: string; subTab: string };
 
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -171,9 +171,11 @@ const ProcessDetail = (props: any, ref: any) => {
     // 校验是否满足锁定、解除的条件
     if (selectedRowKeys?.some((it) => it.is_sealing == (flag ? 'yes' : 'no')))
       return infoMessage(tips);
-    // 判断是否有apps、global 服务
+    // 判断是否有apps、global 服务,
     const includeAppsGlobal =
       flag && selectedRowKeys?.some((it) => ['apps', 'global'].includes(it.apps));
+    const isRequired =
+      includeAppsGlobal && (branch.includes('sprint') || branch.includes('release'));
 
     // 判断对应侧是否确认
     if (!isEmpty(noConfirmSide))
@@ -219,9 +221,9 @@ const ProcessDetail = (props: any, ref: any) => {
               label={'前端预制数据版本号'}
               rules={[
                 {
-                  required: includeAppsGlobal,
+                  required: isRequired,
                   validator: (r, v, cb) => {
-                    if (!v?.trim() && includeAppsGlobal) return cb('请填写前端预制数据版本号');
+                    if (!v?.trim() && isRequired) return cb('请填写前端预制数据版本号');
                     else return cb();
                   },
                 },
@@ -270,6 +272,7 @@ const ProcessDetail = (props: any, ref: any) => {
               app_id: selectedRowKeys?.map((it) => it._id)?.join(',') ?? '',
               is_seal: flag,
               ...values,
+              version: values?.version ?? '',
             },
             { release_num },
           );

@@ -226,7 +226,10 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
       title: '应用',
       dataIndex: 'apps',
       width: 100,
-      render: (v: string, row: any) => ({ children: v, props: { rowSpan: row.rowSpan } }),
+      render: (v: string, row: any) => ({
+        children: <Ellipsis title={v} width={100} placement={'bottomLeft'} color={'#108ee9'} />,
+        props: { rowSpan: row.rowSpan },
+      }),
     },
     {
       title: '项目名称',
@@ -285,10 +288,10 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
   arr.push({
     title: '请求结果说明',
     dataIndex: 'seal_result_dev',
-    width: 100,
+    width: 120,
     ellipsis: { showTitle: false },
     render: (v: string, row: any) => {
-      const isSeal = { yes: '封版', no: '解版' };
+      const isSeal = { yes: '锁定', no: '解除锁定' };
       return (
         <Ellipsis
           width={100}

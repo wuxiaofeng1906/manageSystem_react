@@ -502,6 +502,14 @@ const SheetInfo = (props: any, ref: any) => {
     const rowNode = serverRef.current?.getRowNode(String(p.rowIndex));
     rowNode?.setData({ ...p.data, [p.column.colId]: v });
   };
+
+  useEffect(() => {
+    if (globalState?.finished) {
+      agFinished = true;
+      setFinished(true);
+    }
+  }, [globalState?.finished]);
+
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <Prompt

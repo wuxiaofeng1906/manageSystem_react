@@ -109,12 +109,14 @@ const Check = (props: any, ref: any) => {
   const onLock = async () => {
     /*
      * 1.检查是否封版，是否已确认
-     * 2. 检查状态是否通过、忽略
+     * 2. 检查状态是否通过、忽略[除后端是否可以热更新]
      */
 
     if (!globalState.locked) {
       await OnlineSystemServices.checkProcess({ release_num });
-      const flag = list.some((it) => !['yes', 'skip'].includes(it.status));
+      const flag = list.some(
+        (it) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status),
+      );
       if (flag) return infoMessage('各项检查状态未达到『 通过、忽略 』，不能进行封版锁定');
     }
 
@@ -441,7 +443,7 @@ const Check = (props: any, ref: any) => {
                 />
               ),
             },
-            { title: '启用/忽略人', dataIndex: 'open_pm', width: 100 },
+            { title: '启用/忽略人', dataIndex: 'open_pm', width: 100, align: 'center' },
             {
               title: '启用/忽略时间',
               dataIndex: 'open_time',

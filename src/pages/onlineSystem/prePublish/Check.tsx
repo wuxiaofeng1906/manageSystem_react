@@ -443,7 +443,7 @@ const Check = (props: any, ref: any) => {
                 />
               ),
             },
-            { title: '启用/忽略人', dataIndex: 'open_pm', width: 100 },
+            { title: '启用/忽略人', dataIndex: 'open_pm', width: 100, align: 'center' },
             {
               title: '启用/忽略时间',
               dataIndex: 'open_time',

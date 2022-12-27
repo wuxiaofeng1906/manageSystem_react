@@ -72,6 +72,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const [checked, setChecked] = useState(false); // 服务项
   const [loading, setLoading] = useState(false);
+  const [hasBranch, setHasBranch] = useState(false);
   const [errorTips, setErrorTips] = useState('');
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   const [checkBoxOpt, setCheckBoxOpt] = useState<string[]>([]);
@@ -115,6 +116,8 @@ const ProcessDetail = (props: any, ref: any) => {
         refresh ? { release_num, user_id: user?.userid ?? '' } : null,
       );
       await OnlineSystemServices.abnormalApi({ release_num });
+      const res = await OnlineSystemServices.initDataBranch({ branch });
+      setHasBranch(res?.have_branch == 'yes');
       setLoading(false);
     } catch (e) {
       agEdit = e?.msg;
@@ -653,7 +656,9 @@ const ProcessDetail = (props: any, ref: any) => {
             </div>
           )}
         </div>
-        <div style={{ height: 300, width: '100%' }}>
+        <div
+          style={{ width: '100%', maxHeight: 300, height: api?.length * 40 + 30, minHeight: 100 }}
+        >
           <AgGridReact
             rowSelection={'multiple'}
             columnDefs={upgradeServicesColumn}
@@ -661,8 +666,11 @@ const ProcessDetail = (props: any, ref: any) => {
             {...initGridTable({ ref: interfaceRef, height: 30 })}
           />
         </div>
+        <h4 style={{ marginTop: 10 }}>
+          四、backend/apps/init-data库是否存在上线分支： {hasBranch ? '是' : '否'}
+        </h4>
         <div className={styles.tableHeader}>
-          <h4>四、数据修复/升级</h4>
+          <h4>五、数据修复/升级</h4>
           <Button
             disabled={hasEdit}
             size={'small'}
@@ -673,7 +681,14 @@ const ProcessDetail = (props: any, ref: any) => {
             移除
           </Button>
         </div>
-        <div style={{ height: 300, width: '100%' }}>
+        <div
+          style={{
+            width: '100%',
+            maxHeight: 300,
+            height: repair?.data?.length * 40 + 30,
+            minHeight: 100,
+          }}
+        >
           <AgGridReact
             rowSelection={'multiple'}
             columnDefs={repairColumn}
@@ -697,9 +712,16 @@ const ProcessDetail = (props: any, ref: any) => {
           onShowSizeChange={(size) => getTableList(1, size)}
         />
         <div>
-          <h4>五、服务确认</h4>
+          <h4>六、服务确认</h4>
         </div>
-        <div style={{ height: 300, width: '100%' }}>
+        <div
+          style={{
+            width: '100%',
+            maxHeight: 300,
+            height: serverConfirm?.length * 40 + 30,
+            minHeight: 100,
+          }}
+        >
           <AgGridReact
             columnDefs={serverConfirmColumn}
             rowData={serverConfirm}

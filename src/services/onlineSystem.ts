@@ -176,6 +176,9 @@ export const OnlineSystemServices = {
   async removeAppConfig(data: any) {
     return request(`${baseUrl}/online/app-config`, { data, method: 'delete', msg: '删除成功' });
   },
+  async initDataBranch(params: any) {
+    return request(`${baseUrl}/online/init-data-branch`, { params });
+  },
 
   async getOrgList(client: GqlClient<object>) {
     const { data } = await client.query(`

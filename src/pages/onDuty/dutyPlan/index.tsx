@@ -1185,7 +1185,7 @@ const DutyPlan: React.FC<any> = () => {
         visible={isPlanVisble} //
         onCancel={planModalCancel}
         centered={true}
-        width={600}
+        width={650}
         footer={null}
         maskClosable={false}
       >
@@ -1351,7 +1351,7 @@ const DutyPlan: React.FC<any> = () => {
               <Row gutter={40} style={{ marginTop: -25 }}>
                 <Col span={10}>
                   <Form.Item name="firstJsf" label="jsf" style={{ marginTop: 7 }}>
-                    <Select showSearch style={{ width: 100, marginLeft: 60 }}>
+                    <Select showSearch style={{ width: 'calc(100% - 60px)', marginLeft: 60 }}>
                       {allUsers.jsf}
                     </Select>
                   </Form.Item>
@@ -1359,7 +1359,7 @@ const DutyPlan: React.FC<any> = () => {
 
                 <Col span={14}>
                   <Form.Item name="secondJsf" label="jsf第二值班人" style={{ marginTop: 7 }}>
-                    <Select showSearch style={{ width: 122, marginLeft: 60 }}>
+                    <Select showSearch style={{ width: 'calc(100% - 60px)', marginLeft: 60 }}>
                       {allUsers.jsf}
                     </Select>
                   </Form.Item>
@@ -1369,7 +1369,7 @@ const DutyPlan: React.FC<any> = () => {
               <Row gutter={40} style={{ marginTop: -25 }}>
                 <Col span={10}>
                   <Form.Item name="firstEmitter" label="emitter" style={{ marginTop: 7 }}>
-                    <Select showSearch style={{ width: 100, marginLeft: 22 }}>
+                    <Select showSearch style={{ width: 'calc(100% - 22px)', marginLeft: 22 }}>
                       {allUsers.emitter}
                     </Select>
                   </Form.Item>
@@ -1381,7 +1381,7 @@ const DutyPlan: React.FC<any> = () => {
                     label="emitter第二值班人"
                     style={{ marginTop: 7 }}
                   >
-                    <Select showSearch style={{ width: 122, marginLeft: 22 }}>
+                    <Select showSearch style={{ width: 'calc(100% - 22px)', marginLeft: 22 }}>
                       {allUsers.emitter}
                     </Select>
                   </Form.Item>

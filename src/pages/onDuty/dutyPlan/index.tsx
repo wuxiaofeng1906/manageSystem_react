@@ -37,6 +37,7 @@ import {
 import { judgeAuthorityByName } from '@/publicMethods/authorityJudge';
 import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
 import { parseSaveCardData } from './data/cardDataAlaysis';
+import styles from './index.less';
 
 const { RangePicker } = DatePicker;
 // 已选中的事件
@@ -1195,6 +1196,7 @@ const DutyPlan: React.FC<any> = () => {
             layout={'horizontal'}
             onFinish={submitForm}
             initialValues={{ projects }}
+            className={styles['no-wrap-form']}
           >
             <Form.Item label="值班时间" name="dutyTime" required={true}>
               <RangePicker style={{ width: '100%', color: 'red' }} disabled />

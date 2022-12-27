@@ -657,7 +657,7 @@ const ProcessDetail = (props: any, ref: any) => {
           )}
         </div>
         <div
-          style={{ width: '100%', maxHeight: 300, height: api?.length * 40 + 30, minHeight: 100 }}
+          style={{ width: '100%', maxHeight: 300, height: api?.length * 40 + 30, minHeight: 150 }}
         >
           <AgGridReact
             rowSelection={'multiple'}
@@ -685,8 +685,8 @@ const ProcessDetail = (props: any, ref: any) => {
           style={{
             width: '100%',
             maxHeight: 300,
+            minHeight: 150,
             height: repair?.data?.length * 40 + 30,
-            minHeight: 100,
           }}
         >
           <AgGridReact
@@ -718,8 +718,8 @@ const ProcessDetail = (props: any, ref: any) => {
           style={{
             width: '100%',
             maxHeight: 300,
+            minHeight: 150,
             height: serverConfirm?.length * 40 + 30,
-            minHeight: 100,
           }}
         >
           <AgGridReact

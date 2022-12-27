@@ -894,29 +894,29 @@ const StatisticServices = {
          runtime
           branch
           datas {
-                tech {
-                  name
-                  instCover {
-                    numerator
-                    denominator
-                  }
-                  branchCover {
-                    numerator
-                    denominator
-                  }
+              tech {
+                name
+                instCover {
+                  numerator
+                  denominator
                 }
-                datas {
-                  name
-                  instCover {
-                    numerator
-                    denominator
-                  }
-                  branchCover {
-                    numerator
-                    denominator
-                  }
+                branchCover {
+                  numerator
+                  denominator
                 }
               }
+            datas {
+              name
+              instCover {
+                numerator
+                denominator
+              }
+              branchCover {
+                numerator
+                denominator
+              }
+            }
+          }
         }
       }
     `);

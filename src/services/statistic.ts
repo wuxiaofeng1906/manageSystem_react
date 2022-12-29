@@ -414,6 +414,10 @@ const StatisticServices = {
             start
             end
           }
+          total{
+            cluster
+            duration
+          }
           datas{
             cluster
             duration

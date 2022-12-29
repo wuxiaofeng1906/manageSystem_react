@@ -224,7 +224,6 @@ function getHalfYearTime(year = 4) {
 
 // 最近一个月的天数据
 export function getAllDate(start: string, end: string) {
-  console.log(start, end);
   if (isEmpty(start) || isEmpty(end)) return [];
   let everyDay: string[] = [];
   let startArr: any[] = start?.split('-');

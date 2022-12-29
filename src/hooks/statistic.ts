@@ -10,7 +10,8 @@ import {
 } from '@/publicMethods/timeMethods';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { IStatisticQuery } from '@/services/statistic';
-import { renderFormat } from '@/utils/utils';
+import { renderFormat } from '@/utils/statistic';
+import { isEmpty } from 'lodash';
 
 // 统计
 export type IStaticBy = 'year' | 'halfYear' | 'quarter' | 'month' | 'week' | 'day';
@@ -31,6 +32,7 @@ export interface IRequest {
   period?: Period;
   showDenominator?: boolean;
   len?: number;
+  formatColumn?: boolean;
 }
 export const useStatistic = () => {
   const gqlClient = useGqlClient();
@@ -45,14 +47,17 @@ export const useStatistic = () => {
     showDenominator = false,
     len,
     period,
+    formatColumn = true,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    renderColumn({ type, showSplit: showDenominator, len });
+    if (formatColumn) {
+      renderColumn({ type, showSplit: showDenominator, len });
+    }
     setRowData([]);
     setLoading(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-shadow
-      const { data, loading }: any = await request({
+      const { data, loading, column }: any = await request({
         client: gqlClient,
         params: type,
         identity,
@@ -60,6 +65,9 @@ export const useStatistic = () => {
         period,
       });
       setRowData(data);
+      if (!isEmpty(column)) {
+        setColumns(column);
+      }
       setLoading(loading);
     } catch (e) {
       setLoading(false);

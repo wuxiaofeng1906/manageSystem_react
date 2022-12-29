@@ -1,4 +1,4 @@
-import { checkTesterGroup } from '@/utils/utils';
+import { checkTesterGroup } from '@/utils/statistic';
 // 查找父部门
 const findParent = (departDatas: any, depts: any, result: any) => {
   const idx = depts.deptName;

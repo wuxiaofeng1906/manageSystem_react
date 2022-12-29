@@ -18,7 +18,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
-import { aggFunc } from '@/utils/utils';
+import { aggFunc } from '@/utils/statistic';
 const ruleData: IRuleData[] = [
   {
     title: '统计周期',

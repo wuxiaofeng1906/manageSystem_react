@@ -5,12 +5,12 @@ import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useRef, useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { renderFormat } from '@/utils/utils';
+import { renderFormat } from '@/utils/statistic';
 import { useGqlClient } from '@/hooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { IStaticBy } from '@/hooks/statistic';
 import StatisticServices from '@/services/statistic';
-import { groupBy, omit, sortBy } from 'lodash';
+import { sortBy } from 'lodash';
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import {
   getAllDate,

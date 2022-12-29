@@ -11,7 +11,7 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
-import { aggFunc } from '@/utils/utils';
+import { aggFunc } from '@/utils/statistic';
 
 const ruleData: IRuleData[] = [
   {

@@ -79,12 +79,13 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
+
 const ActualOutputRate: React.FC<any> = () => {
   return (
     <IStaticPerformance
       ruleData={ruleData}
-      request={StatisticServices.patch}
-      identity={'DEVELOPER'}
+      request={StatisticServices.actualRate}
+      formatColumn={false}
       unit={'%'}
     />
   );

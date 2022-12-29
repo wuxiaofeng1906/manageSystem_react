@@ -1,6 +1,12 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import { formatAutoTestCover, formatPivotMode, formatTreeData } from '@/utils/utils';
+import {
+  formatActual,
+  formatActualColumn,
+  formatAutoTestCover,
+  formatPivotMode,
+  formatTreeData,
+} from '@/utils/statistic';
 import { IIdentity, IStaticBy, Period } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
@@ -1005,6 +1011,61 @@ const StatisticServices = {
     return {
       data: formatTreeData({ origin: data.data, isTest: true, percent: 100 }),
       loading,
+    };
+  },
+
+  // 项目实际产出率
+  async actualRate({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:devProjActualProdProp(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+          range{
+            start
+            end
+          }
+          datas{
+            closedAt
+            execName{
+              id
+              name
+            }
+            total{
+              kpi
+              numerator
+              denominator
+            }
+            stageDatas{
+              story{
+                numerator
+                denominator
+                kpi
+              }
+              overview{
+                numerator
+                denominator
+                kpi
+              }
+              develop{
+                numerator
+                denominator
+                kpi
+              }
+              test{
+                numerator
+                denominator
+                kpi
+              }
+            }
+          }
+        }
+      }
+  `);
+    return {
+      data: formatActual(data.data),
+      loading,
+      column: formatActualColumn(JSON.parse(condition.ends), condition.typeFlag),
     };
   },
 };

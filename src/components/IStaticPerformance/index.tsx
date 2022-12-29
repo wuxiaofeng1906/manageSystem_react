@@ -29,6 +29,7 @@ interface IStatic {
   initFilter?: IStaticBy[];
   columnDefs?: any[];
   period?: Period;
+  formatColumn?: boolean;
 }
 
 type INode = string | React.ReactNode;
@@ -56,6 +57,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   initFilter,
   columnDefs,
   period,
+  formatColumn = true,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -75,7 +77,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showDenominator, len, period });
+    await handleStaticBy({ request, type, identity, showDenominator, len, period, formatColumn });
   };
 
   useEffect(() => {

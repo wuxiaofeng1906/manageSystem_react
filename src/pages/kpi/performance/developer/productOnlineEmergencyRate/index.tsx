@@ -9,7 +9,7 @@ import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
 import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
-import { aggFunc } from '@/utils/utils';
+import { aggFunc } from '@/utils/statistic';
 
 const ruleData: IRuleData[] = [
   {

@@ -137,7 +137,11 @@ const ProductOnlineEmergencyRate: React.FC = () => {
               minWidth: 80,
             }}
             columnDefs={[
-              { field: 'total', headerName: 'emergency占比', aggFunc: (data) => aggFunc(data, 2) },
+              {
+                field: 'total',
+                headerName: 'emergency占比',
+                aggFunc: (data) => aggFunc(data, 2, true),
+              },
               { field: 'title', pivot: true, pivotComparator: () => 1 },
               { field: 'subTitle', pivot: true },
             ]}

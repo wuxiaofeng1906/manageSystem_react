@@ -64,21 +64,21 @@ const SystemAvgRespTime = () => {
         params: category,
       });
       let result: any[] = [];
-      let format: any[] = [];
       data?.datas?.forEach((it: any) => {
-        it.datas?.forEach((o) => {
-          result.push({ [it.range.start]: o.duration, cluster: o.cluster });
+        result.push({ [it.range.start]: it.total.duration, cluster: [it.total.cluster] });
+        sortBy(it.datas, 'cluster')?.forEach((o) => {
+          result.push({
+            [it.range.start]: o.duration,
+            cluster: [
+              it.total.cluster,
+              o.cluster
+                ?.replace('cn-northwest-', '集群')
+                ?.replaceAll('cn-apnorthbj-', '腾讯生产集群'),
+            ],
+          });
         });
       });
-
-      Object.entries(groupBy(result, 'cluster')).forEach(([k, v]) => {
-        let date = {};
-        v?.forEach((value) => {
-          date = { ...date, ...omit(value, ['cluster']) };
-        });
-        format.push({ cluster: k, ...date });
-      });
-      setGridData(sortBy(format, 'cluster'));
+      setGridData(result);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -163,23 +163,19 @@ const SystemAvgRespTime = () => {
               headerHeight={35}
               rowData={gridData}
               onGridReady={onGridReady}
-              groupDisplayType={'multipleColumns'}
-              columnDefs={[
-                {
-                  headerName: '集群',
-                  field: 'cluster',
-                  minWidth: 100,
-                  maxWidth: 130,
-                  pinned: 'left',
-                  rowGroup: false,
-                  showRowGroup: true,
-                  valueFormatter: (p) =>
-                    p.value
-                      ?.replace('cn-northwest-', '集群')
-                      ?.replaceAll('cn-apnorthbj-', '腾讯生产集群'),
-                },
-                ...columns,
-              ]}
+              autoGroupColumnDef={{
+                minWidth: 280,
+                maxWidth: 280,
+                headerName: '集群',
+                cellRendererParams: { suppressCount: true },
+                pinned: 'left',
+                suppressMenu: false,
+              }}
+              treeData={true}
+              animateRows={true}
+              groupDefaultExpanded={-1}
+              getDataPath={(source: any) => source.cluster}
+              columnDefs={columns}
               defaultColDef={{
                 sortable: true,
                 resizable: true,

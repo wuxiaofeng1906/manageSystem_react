@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { IRuleData } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
 import { AgGridReact } from 'ag-grid-react';
-import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
+import { getFourQuarterTime, getTwelveMonthTime, getYearsTime } from '@/publicMethods/timeMethods';
 import moment from 'moment';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Button, Spin } from 'antd';
@@ -43,7 +43,7 @@ const ruleData: IRuleData[] = [
 const ProductOnlineEmergencyRate: React.FC = () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [catagory, setCatagory] = useState<'month' | 'quarter'>('month');
+  const [catagory, setCatagory] = useState<'month' | 'quarter' | 'year'>('month');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
@@ -52,7 +52,12 @@ const ProductOnlineEmergencyRate: React.FC = () => {
     params.api.sizeColumnsToFit();
   };
   const getDate = () => {
-    const ends = catagory == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
+    const ends =
+      catagory == 'month'
+        ? getTwelveMonthTime(3)
+        : catagory == 'year'
+        ? getYearsTime()
+        : getFourQuarterTime(false, 6);
     return JSON.stringify(ends?.map((it) => it.end));
   };
 
@@ -63,7 +68,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
       const { data } = await StatisticServices.onlineEmergency({
         client,
         params: {
-          kind: catagory == 'month' ? 2 : 3,
+          kind: catagory == 'month' ? 2 : catagory == 'quarter' ? 3 : 4,
           ends,
         },
       });
@@ -73,6 +78,8 @@ const ProductOnlineEmergencyRate: React.FC = () => {
             const title =
               catagory == 'quarter'
                 ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
+                : catagory == 'year'
+                ? moment(it.range.start).format('YYYY年')
                 : moment(it.range.start).format('MM月YYYY年');
 
             if (isEmpty(it.datas)) return { title: title, total: 0 };
@@ -99,7 +106,10 @@ const ProductOnlineEmergencyRate: React.FC = () => {
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white' }}>
-          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCatagory(v)} />
+          <ConditionHeader
+            initFilter={['month', 'quarter', 'year']}
+            onChange={(v) => setCatagory(v)}
+          />
           <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
           <Button
             type="text"
@@ -127,7 +137,11 @@ const ProductOnlineEmergencyRate: React.FC = () => {
               minWidth: 80,
             }}
             columnDefs={[
-              { field: 'total', headerName: 'emergency占比', aggFunc: (data) => aggFunc(data, 2) },
+              {
+                field: 'total',
+                headerName: 'emergency占比',
+                aggFunc: (data) => aggFunc(data, 2, true),
+              },
               { field: 'title', pivot: true, pivotComparator: () => 1 },
               { field: 'subTitle', pivot: true },
             ]}

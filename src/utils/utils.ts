@@ -4,8 +4,6 @@ import moment from 'moment';
 import { getMonthWeek } from '@/publicMethods/timeMethods';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import cls from 'classnames';
-import { LocalstorageKeys } from '@/namespaces';
-import { useModel } from 'umi';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
@@ -116,16 +114,21 @@ export function mergeCellsTable(data: any[], key: string, rowspan: string = 'row
     }, []);
 }
 
-const findParent = (departments: any[], dept: any, result: any) => {
+const findParent = (departments: any[], dept: any, result: any, isSpecial = false) => {
   const deptName = dept.deptName;
   departments.forEach((item: any) => {
-    if (item['deptName'] && deptName) {
+    if (isSpecial) {
+      if (dept.dept == dept.parent) {
+        result.unshift(dept.deptName);
+        findParent(departments, item, result, isSpecial);
+      }
+    } else if (item['deptName'] && deptName) {
       if (dept.dept == item.dept) {
         const parentName = item['parent']?.deptName;
         if (parentName !== '北京企企科技有限公司') {
           // 过滤 北京企企科技有限公司
           result.unshift(parentName);
-          findParent(departments, item['parent'], result);
+          findParent(departments, item['parent'], result, isSpecial);
         }
       }
     }
@@ -432,7 +435,7 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
     it.datas?.forEach((node: any) => {
       let Group = [node.deptName];
       if (node.dept != 59) {
-        findNode(it.datas, node, Group);
+        findParent(it.datas, node, Group, true);
       }
 
       result.push({
@@ -483,16 +486,7 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
   return { rowData: converseArrayToOne(result) || [], column, project: uniq(project) };
 };
 
-const findNode = (data: any[], item: any, groups: string[]) => {
-  data?.forEach((it: any) => {
-    if (it.dept == item.parent) {
-      groups.unshift(it.deptName);
-      findNode(data, it, groups);
-    }
-  });
-};
-
-export const aggFunc = (data: any, number = 0) => {
+export const aggFunc = (data: any, number = 0, avg = false) => {
   let sum = 0;
   data?.forEach(function (value: any) {
     if (value) {
@@ -500,6 +494,8 @@ export const aggFunc = (data: any, number = 0) => {
     }
   });
   if (!sum) return 0;
+  // 求平均
+  if (avg) sum = sum / data?.length;
   return number > 0 ? sum.toFixed(number) : sum;
 };
 

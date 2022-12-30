@@ -384,6 +384,9 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   },
 ];
 export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
+  // 不停服
+  const keepServer = data?.release_type?.release_way == 'keep_server';
+
   return [
     {
       headerName: '环境',
@@ -404,21 +407,21 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       headerName: '数据库版本',
       field: 'database_version',
       minWidth: 110,
-      hide: data?.release_type?.release_way == 'keep_server',
+      hide: keepServer,
     },
     {
       headerName: '数据Recovery',
       field: 'is_recovery',
       minWidth: 130,
       cellRenderer: 'select',
-      hide: data?.release_way == 'keep_server',
+      hide: keepServer,
     },
     {
       headerName: '数据update',
       field: 'is_update',
       minWidth: 130,
       cellRenderer: 'select',
-      hide: data?.release_way == 'keep_server',
+      hide: keepServer,
     },
     {
       headerName: '是否清理redis缓存',
@@ -432,7 +435,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       field: 'sql_order',
       minWidth: 130,
       cellRenderer: 'select',
-      hide: data?.release_way == 'keep_server',
+      hide: keepServer,
     },
   ];
 };

@@ -174,11 +174,12 @@ const ProcessDetail = (props: any, ref: any) => {
     // 校验是否满足锁定、解除的条件
     if (selectedRowKeys?.some((it) => it.is_sealing == (flag ? 'yes' : 'no')))
       return infoMessage(tips);
-    // 判断是否有apps、global 服务,
+    // 判断是否有apps、global 服务
     const includeAppsGlobal =
       flag && selectedRowKeys?.some((it) => ['apps', 'global'].includes(it.apps));
     const isRequired =
-      includeAppsGlobal && (branch.includes('sprint') || branch.includes('release'));
+      selectedRowKeys?.some((it) => ['apps'].includes(it.apps)) &&
+      (branch.includes('sprint') || branch.includes('release'));
 
     // 判断对应侧是否确认
     if (!isEmpty(noConfirmSide))

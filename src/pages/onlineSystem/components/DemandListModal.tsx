@@ -157,7 +157,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const data = {
       user_id: user?.userid ?? '',
       cluster: values.cluster?.join() ?? '',
-      release_env: values.release_env,
+      release_env: values.release_env ?? '',
       release_env_type: values.release_env_type,
       branch: computed.branch,
       pro_data: selected.map((o) => ({

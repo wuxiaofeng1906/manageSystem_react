@@ -12,6 +12,7 @@ import { useGqlClient } from '@/hooks';
 import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
 import { isEmpty } from 'lodash';
 import { aggFunc } from '@/utils/statistic';
+import { initGridTable } from '@/utils/utils';
 
 const ruleData: IRuleData[] = [
   {
@@ -43,19 +44,16 @@ const ruleData: IRuleData[] = [
 const ProductOnlineEmergencyRate: React.FC = () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [catagory, setCatagory] = useState<'month' | 'quarter' | 'year'>('month');
+  const [category, setCategory] = useState<'month' | 'quarter' | 'year'>('month');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
+
   const getDate = () => {
     const ends =
-      catagory == 'month'
+      category == 'month'
         ? getTwelveMonthTime(3)
-        : catagory == 'year'
+        : category == 'year'
         ? getYearsTime()
         : getFourQuarterTime(false, 6);
     return JSON.stringify(ends?.map((it) => it.end));
@@ -68,7 +66,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
       const { data } = await StatisticServices.onlineEmergency({
         client,
         params: {
-          kind: catagory == 'month' ? 2 : catagory == 'quarter' ? 3 : 4,
+          kind: category == 'month' ? 2 : category == 'quarter' ? 3 : 4,
           ends,
         },
       });
@@ -76,9 +74,9 @@ const ProductOnlineEmergencyRate: React.FC = () => {
         data
           ?.map((it: any) => {
             const title =
-              catagory == 'quarter'
+              category == 'quarter'
                 ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
-                : catagory == 'year'
+                : category == 'year'
                 ? moment(it.range.start).format('YYYY年')
                 : moment(it.range.start).format('MM月YYYY年');
 
@@ -100,7 +98,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
 
   useEffect(() => {
     getTableSource();
-  }, [catagory]);
+  }, [category]);
 
   return (
     <PageContainer>
@@ -108,7 +106,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
         <div style={{ background: 'white' }}>
           <ConditionHeader
             initFilter={['month', 'quarter', 'year']}
-            onChange={(v) => setCatagory(v)}
+            onChange={(v) => setCategory(v)}
           />
           <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
           <Button
@@ -123,19 +121,10 @@ const ProductOnlineEmergencyRate: React.FC = () => {
         </div>
         <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
           <AgGridReact
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
+            {...initGridTable({ ref: gridRef, height: 32 })}
             pivotMode={true}
             rowData={data}
             suppressAggFuncInHeader={true}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
-              flex: 1,
-              minWidth: 80,
-            }}
             columnDefs={[
               {
                 field: 'total',

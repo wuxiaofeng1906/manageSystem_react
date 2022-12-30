@@ -254,21 +254,21 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
         ? getMonthWeek(start)
         : kind == 2
         ? moment(start).format('MM月YYYY年')
-        : kind == 3
-        ? `${moment(start).format('YYYY年')}${moment(start).quarter()}季`
-        : moment(start).format('YYYY');
+        : `${moment(start).format('YYYY年')}${kind == 3 ? moment(start).quarter() + '季' : ''}`;
     column.push({
       headerName: title,
       children: [
-        { headerName: '自动化覆盖率执行完成时间', field: `execution${start}` },
+        { headerName: '自动化覆盖率执行完成时间', field: `execution${start}`, minWidth: 120 },
         {
           headerName: '结构覆盖率',
           field: `instCove${start}`,
+          minWidth: 120,
           cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
         },
         {
           headerName: '分支覆盖率',
           field: `branCove${start}`,
+          minWidth: 120,
           cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
         },
       ],
@@ -331,14 +331,19 @@ export const formatActual = (data: any[]) => {
   let result: any[] = [];
   data?.forEach((it) => {
     it.datas?.forEach((o: any) => {
+      const time = it.range.end;
+      const stage = o.stageDatas;
       result.push({
-        Group: [o.execName?.name],
-        [`total${it.range.start}`]: o.total?.kpi,
-        [`story${it.range.start}`]: o.stageDatas?.story?.kpi,
-        [`detail${it.range.start}`]: o.stageDatas?.detail?.kpi,
-        [`develop${it.range.start}`]: o.stageDatas?.develop?.kpi,
-        [`test${it.range.start}`]: o.stageDatas?.test?.kpi,
-        [`overview${it.range.start}`]: o.stageDatas?.overView?.kpi,
+        [`execName${time}`]: o.execName?.name,
+        [`total${time}`]: o.total?.kpi * 100,
+        [`story${time}`]: ((stage?.story?.numerator || 0) / (stage?.story?.denominator || 0)) * 100,
+        [`detail${time}`]:
+          ((stage?.detail?.numerator || 0) / (stage?.detail?.denominator || 0)) * 100,
+        [`develop${time}`]:
+          ((stage?.develop?.numerator || 0) / (stage?.develop?.denominator || 0)) * 100,
+        [`test${time}`]: ((stage?.test?.numerator || 0) / (stage?.test?.denominator || 0)) * 100,
+        [`overview${time}`]:
+          ((stage?.overView?.numerator || 0) / (stage?.overView?.denominator || 0)) * 100,
       });
     });
   });
@@ -350,31 +355,75 @@ export const formatActualColumn = (date: string[], type: number) => {
     date?.map((it) => {
       return {
         headerName: it,
+        groupId: 'actualGroup',
         children: [
-          { headerName: '总产出率', field: `total${it}` },
+          {
+            headerName: '项目名',
+            field: `execName${it}`,
+            columnGroupShow: 'closed',
+            type: 'actual',
+          },
+          {
+            headerName: '总产出率',
+            field: `total${it}`,
+            columnGroupShow: 'closed',
+            type: 'actual',
+            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
+          },
           {
             headerName: '需求',
             field: `story${it}`,
+            type: 'actual',
             cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
           },
           {
             headerName: '概设',
             field: `overview${it}`,
+            type: 'actual',
             cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
           },
           {
             headerName: '详设',
             field: `detail${it}`,
+            minWidth: 100,
+            type: 'actual',
             cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
           },
           {
             headerName: '开发',
             field: `develop${it}`,
+            type: 'actual',
             cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
           },
           {
             headerName: '测试',
             field: `test${it}`,
+            type: 'actual',
+            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
+          },
+        ],
+      };
+    }) ?? []
+  );
+};
+export const formatPivotColumn = (date: string[], type: number) => {
+  return (
+    date?.map((it) => {
+      return {
+        headerName: it,
+        groupId: 'actualGroup',
+        children: [
+          {
+            headerName: '项目名',
+            field: `title${it}`,
+            columnGroupShow: 'closed',
+            type: 'actual',
+          },
+          {
+            headerName: '总产出率',
+            field: `subtitle${it}`,
+            columnGroupShow: 'closed',
+            type: 'actual',
             cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
           },
         ],

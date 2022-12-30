@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import type { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -17,6 +17,8 @@ import { useStatistic } from '@/hooks/statistic';
 import { isEmpty, isString } from 'lodash';
 import type { ColumnsType } from 'antd/lib/table/interface';
 import type { IStatisticQuery } from '@/services/statistic';
+import { ColDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import { initGridTable } from '@/utils/utils';
 
 interface IStatic {
   request: (data: IStatisticQuery) => void;
@@ -30,6 +32,8 @@ interface IStatic {
   columnDefs?: any[];
   period?: Period;
   formatColumn?: boolean;
+  columnTypes?: { [key: string]: ColDef };
+  treeData?: Boolean;
 }
 
 type INode = string | React.ReactNode;
@@ -58,15 +62,12 @@ const IStaticPerformance: React.FC<IStatic> = ({
   columnDefs,
   period,
   formatColumn = true,
+  treeData = true,
+  columnTypes,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
   const [visible, setVisible] = useState(false);
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
 
   // 表格的屏幕大小自适应
   const [gridHeight, setGridHeight] = useState(getHeight());
@@ -91,6 +92,25 @@ const IStaticPerformance: React.FC<IStatic> = ({
     }
   }, [loading]);
 
+  const opsMemo = useMemo(
+    () =>
+      treeData
+        ? {
+            treeData: true,
+            groupDefaultExpanded: -1,
+            getDataPath: (source: any) => source.Group,
+            autoGroupColumnDef: {
+              minWidth: 280,
+              headerName: '部门-人员',
+              cellRendererParams: { suppressCount: true },
+              pinned: 'left',
+              suppressMenu: false,
+            },
+          }
+        : {},
+    [treeData],
+  );
+
   return (
     <PageContainer>
       <div style={{ background: 'white' }}>
@@ -111,29 +131,12 @@ const IStaticPerformance: React.FC<IStatic> = ({
           <div />
         ) : (
           <AgGridReact
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-            }}
-            autoGroupColumnDef={{
-              minWidth: 280,
-              headerName: '部门-人员',
-              cellRendererParams: { suppressCount: true },
-              pinned: 'left',
-              suppressMenu: false,
-            }}
+            {...opsMemo}
             columnDefs={columnDefs ?? columns}
             rowData={rowData}
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
-            treeData={true}
             animateRows={true}
-            groupDefaultExpanded={-1}
-            getDataPath={(source: any) => source.Group}
+            columnTypes={columnTypes}
+            {...initGridTable({ ref: gridApi, height: 32 })}
           />
         )}
       </div>

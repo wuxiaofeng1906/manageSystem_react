@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
 // 项目实际产出率
@@ -81,12 +81,19 @@ const ruleData: IRuleData[] = [
 ];
 
 const ActualOutputRate: React.FC<any> = () => {
+  const columnTypes = useMemo(
+    () => ({ actual: { minWidth: 120, columnGroupShow: 'open', filter: false } }),
+    [],
+  );
+
   return (
     <IStaticPerformance
       ruleData={ruleData}
       request={StatisticServices.actualRate}
       formatColumn={false}
       unit={'%'}
+      columnTypes={columnTypes}
+      treeData={false}
     />
   );
 };

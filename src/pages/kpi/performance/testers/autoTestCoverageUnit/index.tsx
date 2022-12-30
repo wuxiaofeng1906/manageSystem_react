@@ -6,11 +6,12 @@ import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import StatisticServices from '@/services/statistic';
 import { IStaticBy } from '@/hooks/statistic';
 import { isEmpty, intersection, difference, isEqual, uniqBy } from 'lodash';
 import { RowGroupOpenedEvent } from 'ag-grid-community/dist/lib/events';
+import { initGridTable } from '@/utils/utils';
 
 const ruleData: IRuleData[] = [
   {
@@ -58,11 +59,6 @@ export default () => {
   const [loading, setLoading] = useState(false);
   const [rowData, setRowData] = useState<any[]>([]);
   const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
 
   window.onresize = function () {
     setGridHeight(window.innerHeight - 250);
@@ -185,19 +181,10 @@ export default () => {
       </div>
       <div className={'ag-theme-alpine'} style={{ width: '100%', height: gridHeight }}>
         <AgGridReact
-          rowHeight={32}
-          headerHeight={35}
-          onGridReady={onGridReady}
+          {...initGridTable({ ref: gridRef, height: 32 })}
           rowData={rowData}
           pivotMode={true}
           suppressAggFuncInHeader={true}
-          defaultColDef={{
-            sortable: true,
-            resizable: true,
-            filter: true,
-            flex: 1,
-            minWidth: 100,
-          }}
           onRowGroupOpened={getProjectApps}
           autoGroupColumnDef={{
             minWidth: 260,

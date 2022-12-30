@@ -72,7 +72,7 @@ const ICard = (params: {
         collapsible={'header'}
         style={{ background: params.data.bg || initBg[0] }}
         className={cns({
-          testEnvCollapse: ['test', 'dev'].includes((REACT_APP_ENV ?? '') as string),
+          testEnvCollapse: !location.origin.includes('rd.q7link.com'),
         })}
         expandIcon={() => {
           return activeKey?.includes(params.data.release_num) ? (

@@ -20,6 +20,7 @@ import {
   getWeeksRange,
   getYearsTime,
 } from '@/publicMethods/timeMethods';
+import { initGridTable } from '@/utils/utils';
 
 const ruleData: IRuleData[] = [
   {
@@ -159,10 +160,8 @@ const SystemAvgRespTime = () => {
           </Button>
           <div className={'ag-theme-alpine'} style={{ width: '100%', height: gridHeight }}>
             <AgGridReact
-              rowHeight={32}
-              headerHeight={35}
+              {...initGridTable({ ref: gridRef, height: 32 })}
               rowData={gridData}
-              onGridReady={onGridReady}
               autoGroupColumnDef={{
                 minWidth: 280,
                 maxWidth: 280,
@@ -176,13 +175,6 @@ const SystemAvgRespTime = () => {
               groupDefaultExpanded={-1}
               getDataPath={(source: any) => source.cluster}
               columnDefs={columns}
-              defaultColDef={{
-                sortable: true,
-                resizable: true,
-                filter: true,
-                flex: 1,
-                minWidth: 100,
-              }}
             />
           </div>
           <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />

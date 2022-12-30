@@ -1040,22 +1040,18 @@ const StatisticServices = {
               story{
                 numerator
                 denominator
-                kpi
               }
               overview{
                 numerator
                 denominator
-                kpi
               }
               develop{
                 numerator
                 denominator
-                kpi
               }
               test{
                 numerator
                 denominator
-                kpi
               }
             }
           }
@@ -1063,8 +1059,8 @@ const StatisticServices = {
       }
   `);
     return {
-      data: formatActual(data.data),
       loading,
+      data: formatActual(data.data),
       column: formatActualColumn(JSON.parse(condition.ends), condition.typeFlag),
     };
   },

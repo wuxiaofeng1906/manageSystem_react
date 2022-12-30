@@ -5,10 +5,11 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { IStaticBy, useStatistic } from '@/hooks/statistic';
 import { useGqlClient } from '@/hooks';
 import { isEmpty } from 'lodash';
+import { initGridTable } from '@/utils/utils';
 
 // 运维 系统可用性
 const ruleData: IRuleData[] = [
@@ -69,10 +70,6 @@ const SystemAvailable: React.FC<any> = () => {
   const [gridData, setGridData] = useState<any[]>();
   const [visible, setVisible] = useState(false);
 
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
   useEffect(() => {
     renderColumn({ type: category, len: 2 });
     getDetail();
@@ -126,18 +123,9 @@ const SystemAvailable: React.FC<any> = () => {
                 </h4>
                 <div className={'ag-theme-alpine'} style={{ width: '100%', height: 100 }}>
                   <AgGridReact
-                    rowHeight={32}
-                    headerHeight={35}
+                    {...initGridTable({ ref: gridRef, height: 32 })}
                     rowData={isEmpty(gridData?.[k]) ? [] : [gridData?.[k]]}
-                    onGridReady={onGridReady}
                     columnDefs={columns}
-                    defaultColDef={{
-                      sortable: true,
-                      resizable: true,
-                      filter: true,
-                      flex: 1,
-                      minWidth: 80,
-                    }}
                   />
                 </div>
               </div>

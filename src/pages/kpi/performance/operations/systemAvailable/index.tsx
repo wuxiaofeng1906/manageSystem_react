@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticPerformance';
+import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';

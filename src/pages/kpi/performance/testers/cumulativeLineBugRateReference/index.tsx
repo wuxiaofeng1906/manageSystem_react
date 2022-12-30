@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 // 累计线上千行bug率参考
 const ruleData: IRuleData[] = [
@@ -26,14 +26,14 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-const CumulativeLineBugRateReference: React.FC<any> = () => {
+const CumulativeLineBugRateReference: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.newPeriodBugThousTestDept}
       identity={'REFER'}
-      len={3}
       unit={'个/Kloc'}
+      len={3}
     />
   );
 };

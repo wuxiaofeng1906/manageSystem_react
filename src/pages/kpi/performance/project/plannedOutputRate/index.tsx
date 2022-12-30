@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 // 项目实际产出率
 const ruleData: IRuleData[] = [
@@ -49,7 +49,7 @@ const ruleData: IRuleData[] = [
 ];
 const PlannedOutputRate: React.FC<any> = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.patch}
       identity={'DEVELOPER'}

@@ -1,6 +1,6 @@
 import React from 'react';
-import type { IRuleData } from '@/components/IStaticPerformance';
-import IStaticPerformance from '@/components/IStaticPerformance';
+import type { IRuleData } from '@/components/IStaticAgTable';
+import IStaticAgTable from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 const ruleData: IRuleData[] = [
   {
@@ -24,9 +24,9 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-const BlockingTimes: React.FC<any> = () => {
+const BlockingTimes: React.FC = () => {
   return (
-    <IStaticPerformance ruleData={ruleData} request={StatisticServices.blockingTimes} unit={'次'} />
+    <IStaticAgTable ruleData={ruleData} request={StatisticServices.blockingTimes} unit={'次'} />
   );
 };
 

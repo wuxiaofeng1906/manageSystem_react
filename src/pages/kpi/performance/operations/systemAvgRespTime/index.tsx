@@ -1,6 +1,6 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
-import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticPerformance';
+import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticAgTable';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useRef, useState, useEffect } from 'react';

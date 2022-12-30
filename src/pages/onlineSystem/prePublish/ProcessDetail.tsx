@@ -48,11 +48,13 @@ import { OnlineSystemServices } from '@/services/onlineSystem';
 import usePermission from '@/hooks/permission';
 
 const color = { yes: '#2BF541', no: '#faad14' };
+const pickKey = ['release_name', 'release_env', 'plan_release_time'];
 let agEdit = '';
 const ProcessDetail = (props: any, ref: any) => {
   const { release_num, branch } = useParams() as { release_num: string; branch: string };
   const { subTab, tab } = useLocation()?.query as { tab: string; subTab: string };
 
+  const { onlineSystemPermission } = usePermission();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const {
     globalState,
@@ -69,6 +71,7 @@ const ProcessDetail = (props: any, ref: any) => {
     updateServerConfirm,
     getServerConfirm,
   } = useModel('onlineSystem');
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const [checked, setChecked] = useState(false); // 服务项
   const [loading, setLoading] = useState(false);
@@ -81,7 +84,6 @@ const ProcessDetail = (props: any, ref: any) => {
     data: null,
   }); // 需求列表
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
-  const { onlineSystemPermission } = usePermission();
 
   const confirmRef = useRef<GridApi>();
   const interfaceRef = useRef<GridApi>();
@@ -160,9 +162,9 @@ const ProcessDetail = (props: any, ref: any) => {
   }, [basic, repair]);
 
   const onSeal = async (flag = true) => {
-    let tips = '请选择未封版服务进行分支锁定';
-    if (!flag) tips = '请选择已封版服务进行解除分支锁定';
-    if (isEmpty(selectedRowKeys)) return infoMessage(`请先选择需${flag ? '' : '解除'}封版服务`);
+    let tips = '请选择未锁定服务进行分支锁定';
+    if (!flag) tips = '请选择已锁定服务进行解除分支锁定';
+    if (isEmpty(selectedRowKeys)) return infoMessage(`请先选择需${flag ? '' : '解除'}锁定服务`);
     const confirmSide = serverConfirm.flatMap((it) =>
       it.confirm_result == 'yes' ? [it.confirm_type] : [],
     );
@@ -301,7 +303,7 @@ const ProcessDetail = (props: any, ref: any) => {
         : selectedRowKeys;
     if (isEmpty(gridSelected)) return infoMessage('请先勾选移除项！');
     if (type == 'server' && gridSelected?.some((it) => it.is_sealing == 'yes'))
-      return infoMessage('已封版服务不能移除！');
+      return infoMessage('已锁定服务不能移除！');
     Modal.confirm({
       centered: true,
       title: '移除提示',
@@ -382,9 +384,9 @@ const ProcessDetail = (props: any, ref: any) => {
         ...values,
         plan_release_time: moment(values.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
       },
-      ['release_name', 'release_env', 'plan_release_time'],
+      pickKey,
     );
-    const init = pick(basic, ['release_name', 'release_env', 'plan_release_time']);
+    const init = pick(basic, pickKey);
     if (!isEqual(init, updateData)) {
       Modal.confirm({
         centered: true,

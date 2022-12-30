@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 const ruleData: IRuleData[] = [
   {
@@ -13,9 +13,9 @@ const ruleData: IRuleData[] = [
     child: ['该周期该部门超范围bug数 = SUM(该部门所有超范围bug数)'],
   },
 ];
-const SprintOverRangeBug: React.FC<any> = () => {
+const SprintOverRangeBug: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.sprintOverRangeBug}
       unit={'个'}

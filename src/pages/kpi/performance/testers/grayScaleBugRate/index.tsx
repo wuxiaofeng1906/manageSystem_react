@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import type { IRuleData } from '@/components/IStaticPerformance';
-import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
+import type { IRuleData } from '@/components/IStaticAgTable';
+import { ConditionHeader, IDrawer } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 import { Button, Spin } from 'antd';
 import { QuestionCircleTwoTone } from '@ant-design/icons';

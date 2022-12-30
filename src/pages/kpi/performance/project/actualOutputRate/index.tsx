@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 // 项目实际产出率
 const ruleData: IRuleData[] = [
@@ -87,10 +87,10 @@ const ActualOutputRate: React.FC<any> = () => {
   );
 
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.actualRate}
-      initColumn={false}
+      defaultColumn={false}
       unit={'%'}
       columnTypes={columnTypes}
       treeData={false}

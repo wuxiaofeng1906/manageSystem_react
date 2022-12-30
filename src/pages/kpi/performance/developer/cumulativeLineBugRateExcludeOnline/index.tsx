@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 // 累计千行bug率（不含线上）
 const ruleData: IRuleData[] = [
@@ -26,14 +26,14 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-const CumulativeLineBugRateExcludeOnline: React.FC<any> = () => {
+const CumulativeLineBugRateExcludeOnline: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.bugThousPeriodDept}
       identity={'EXCLUDE_ONLINE'}
-      len={2}
       unit={'个/Kloc'}
+      len={2}
     />
   );
 };

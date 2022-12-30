@@ -29,7 +29,7 @@ interface IStatic {
   unit?: string; // 指标单位
   initFilter?: IStaticBy[]; // 查询方式
   columnDefs?: any[]; // 列
-  initColumn?: boolean; // 以默认列方式展示
+  defaultColumn?: boolean; // 以默认列方式展示
   columnTypes?: { [key: string]: ColDef }; // 自定义列类型的对象映射
   treeData?: Boolean; // 是否为树形结构
 }
@@ -48,19 +48,20 @@ const condition: { icon: React.ReactNode; title: string; type: IStaticBy }[] = [
   { icon: <FundTwoTone />, title: '按半年', type: 'halfYear' },
   { icon: <AppstoreTwoTone />, title: '按年', type: 'year' },
 ];
-const IStaticPerformance: React.FC<IStatic> = ({
+// 指标表格组件
+const IStaticAgTable: React.FC<IStatic> = ({
+  initFilter,
   request,
   ruleData,
-  identity,
-  showDenominator = false,
   len,
-  unit = '%',
-  initFilter,
-  columnDefs,
+  identity,
   period,
-  initColumn = true,
-  treeData = true,
+  columnDefs,
   columnTypes,
+  unit = '%',
+  showDenominator = false,
+  defaultColumn = true,
+  treeData = true,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -74,7 +75,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showDenominator, len, period, initColumn });
+    await handleStaticBy({ request, type, identity, showDenominator, len, period, defaultColumn });
   };
 
   useEffect(() => {
@@ -141,7 +142,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   );
 };
 
-export default IStaticPerformance;
+export default IStaticAgTable;
 
 // 规则
 export const IDrawer = ({

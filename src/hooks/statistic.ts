@@ -26,13 +26,13 @@ export type IIdentity =
 export type Period = 'period' | 'uptoperiod';
 
 export interface IRequest {
-  request: (data: IStatisticQuery) => void;
   type: IStaticBy;
   identity?: IIdentity;
+  len?: number;
   period?: Period;
   showDenominator?: boolean;
-  len?: number;
-  initColumn?: boolean;
+  defaultColumn?: boolean;
+  request: (data: IStatisticQuery) => void;
 }
 
 export const useStatistic = () => {
@@ -48,10 +48,10 @@ export const useStatistic = () => {
     showDenominator = false,
     len,
     period,
-    initColumn = true,
+    defaultColumn = true,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    if (initColumn) {
+    if (defaultColumn) {
       renderColumn({ type, showSplit: showDenominator, len });
     }
     setRowData([]);
@@ -101,18 +101,18 @@ export const useStatistic = () => {
         const startTime = data[index].from;
         const weekName = getMonthWeek(startTime);
         component.push({
+          minWidth: 100,
           headerName: weekName,
           field: startTime?.toString(),
           cellRenderer: (p) => renderFormat({ params: p, showSplit, len }),
-          minWidth: 100,
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => renderFormat({ params: p, showSplit, len }),
               headerName: data[index].title,
               field: data[index].start?.toString(),
+              cellRenderer: (p: any) => renderFormat({ params: p, showSplit, len }),
             },
             type == 'month' ? { minWidth: 110 } : {},
           ),

@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 const ruleData: IRuleData[] = [
   {
@@ -22,13 +22,9 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-const RoundsTestRate: React.FC<any> = () => {
+const RoundsTestRate: React.FC = () => {
   return (
-    <IStaticPerformance
-      ruleData={ruleData}
-      request={StatisticServices.roundsTestRate}
-      unit={'分'}
-    />
+    <IStaticAgTable ruleData={ruleData} request={StatisticServices.roundsTestRate} unit={'分'} />
   );
 };
 

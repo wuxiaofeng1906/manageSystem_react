@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 const ruleData: IRuleData[] = [
   {
@@ -23,15 +23,15 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-const HumanEffect: React.FC<any> = () => {
+const HumanEffect: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.humanEffect}
       identity={'DEVELOPER'}
       showDenominator={true}
-      len={4}
       unit={'FP/人天'}
+      len={4}
     />
   );
 };

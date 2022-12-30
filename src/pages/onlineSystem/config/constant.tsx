@@ -307,7 +307,7 @@ export const checkInfo = [
     end: 'check_end_time',
     open: false,
     open_pm: '',
-    open_time: '',
+    open_time: 'action_time',
     disabled: false,
     log: '',
     rowKey: 'auto_h5_web_data',
@@ -323,7 +323,7 @@ export const checkInfo = [
     end: '',
     open: false,
     open_pm: '',
-    open_time: '',
+    open_time: 'action_time',
     log: '',
     disabled: true,
     rowKey: 'auto_obj_data', // 数组结构

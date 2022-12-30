@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
-import type { GridApi, GridReadyEvent } from 'ag-grid-community';
+import type { GridApi } from 'ag-grid-community';
 import { Button, Drawer, Table } from 'antd';
 import {
   ScheduleTwoTone,
@@ -11,7 +11,6 @@ import {
   AppstoreTwoTone,
   FundTwoTone,
 } from '@ant-design/icons';
-import { getHeight } from '@/publicMethods/pageSet';
 import type { IStaticBy, IIdentity, Period } from '@/hooks/statistic';
 import { useStatistic } from '@/hooks/statistic';
 import { isEmpty, isString } from 'lodash';
@@ -23,17 +22,16 @@ import { initGridTable } from '@/utils/utils';
 interface IStatic {
   request: (data: IStatisticQuery) => void;
   showDenominator?: boolean; // 以分子、分母展示
-  showHalfYear?: boolean; // 按半年
-  ruleData: IRuleData[];
-  identity?: IIdentity;
-  len?: number;
-  unit?: string;
-  initFilter?: IStaticBy[];
-  columnDefs?: any[];
-  period?: Period;
-  formatColumn?: boolean;
-  columnTypes?: { [key: string]: ColDef };
-  treeData?: Boolean;
+  ruleData: IRuleData[]; // 规则描述
+  identity?: IIdentity; // 接口参数类型
+  period?: Period; // 接口参数类型
+  len?: number; // 保留小数位数
+  unit?: string; // 指标单位
+  initFilter?: IStaticBy[]; // 查询方式
+  columnDefs?: any[]; // 列
+  initColumn?: boolean; // 以默认列方式展示
+  columnTypes?: { [key: string]: ColDef }; // 自定义列类型的对象映射
+  treeData?: Boolean; // 是否为树形结构
 }
 
 type INode = string | React.ReactNode;
@@ -55,13 +53,12 @@ const IStaticPerformance: React.FC<IStatic> = ({
   ruleData,
   identity,
   showDenominator = false,
-  showHalfYear = false,
   len,
   unit = '%',
   initFilter,
   columnDefs,
   period,
-  formatColumn = true,
+  initColumn = true,
   treeData = true,
   columnTypes,
 }) => {
@@ -69,16 +66,15 @@ const IStaticPerformance: React.FC<IStatic> = ({
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
   const [visible, setVisible] = useState(false);
 
-  // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(getHeight());
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 230);
 
   window.onresize = function () {
-    setGridHeight(getHeight());
+    setGridHeight(window.innerHeight - 230);
     gridApi.current?.sizeColumnsToFit();
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showDenominator, len, period, formatColumn });
+    await handleStaticBy({ request, type, identity, showDenominator, len, period, initColumn });
   };
 
   useEffect(() => {
@@ -147,6 +143,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
 
 export default IStaticPerformance;
 
+// 规则
 export const IDrawer = ({
   visible,
   setVisible,
@@ -192,6 +189,8 @@ export const IDrawer = ({
     </Drawer>
   );
 };
+
+// 查询方式
 export const ConditionHeader = ({
   initFilter = ['week', 'month', 'quarter', 'year'],
   onChange,

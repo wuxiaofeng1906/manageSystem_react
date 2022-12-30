@@ -32,8 +32,9 @@ export interface IRequest {
   period?: Period;
   showDenominator?: boolean;
   len?: number;
-  formatColumn?: boolean;
+  initColumn?: boolean;
 }
+
 export const useStatistic = () => {
   const gqlClient = useGqlClient();
   const [columns, setColumns] = useState<(ColDef | ColGroupDef)[]>([]);
@@ -47,10 +48,10 @@ export const useStatistic = () => {
     showDenominator = false,
     len,
     period,
-    formatColumn = true,
+    initColumn = true,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    if (formatColumn) {
+    if (initColumn) {
       renderColumn({ type, showSplit: showDenominator, len });
     }
     setRowData([]);

@@ -90,7 +90,7 @@ const ActualOutputRate: React.FC<any> = () => {
     <IStaticPerformance
       ruleData={ruleData}
       request={StatisticServices.actualRate}
-      formatColumn={false}
+      initColumn={false}
       unit={'%'}
       columnTypes={columnTypes}
       treeData={false}

@@ -39,12 +39,10 @@ const managers = [
   '胡敬华',
   '何羽',
 ];
-const side = {
-  1: '前端',
-  2: '后端',
-};
+const side = { 1: '前端', 2: '后端' };
+const developCenter = '研发中心';
 
-export const converseArrayToOne = (origin: any) => {
+export const mergeArray = (origin: any) => {
   const source: any[] = [];
   for (let index = 0; index < origin.length; index += 1) {
     let repeat = false;
@@ -72,12 +70,12 @@ export const converseArrayToOne = (origin: any) => {
   return source;
 };
 interface Iparam {
-  origin: any[];
-  showDenominator?: boolean;
-  percent?: number;
-  showSide?: boolean;
-  isMulti?: boolean;
-  isTest?: boolean;
+  origin: any[]; // 原数据
+  showDenominator?: boolean; // 展示分子，分母
+  percent?: number; // 格式化数据
+  showSide?: boolean; // 显示前后端
+  isMulti?: boolean; // 默认为乘以
+  isTest?: boolean; // 测试-指标模块
 }
 
 export const formatTreeData = ({
@@ -85,15 +83,15 @@ export const formatTreeData = ({
   showDenominator = false,
   percent = 1,
   showSide = false,
-  isMulti = true, // 默认为乘以
-  isTest = false, // 测试-指标模块
+  isMulti = true,
+  isTest = false,
 }: Iparam) => {
   if (!origin) return null;
   const result: any = [];
   origin.forEach((elements: any) => {
     const startTime = elements.range.start;
     result.push({
-      Group: ['研发中心'],
+      Group: [developCenter],
       isDept: true,
       [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent,
       ...(showDenominator
@@ -107,7 +105,7 @@ export const formatTreeData = ({
     if (showSide) {
       result.push(
         {
-          Group: ['研发中心', '前端'],
+          Group: [developCenter, side['1']],
           isDept: true,
           ...(showDenominator
             ? {
@@ -117,7 +115,7 @@ export const formatTreeData = ({
             : { [startTime]: elements.side.front }),
         },
         {
-          Group: ['研发中心', '后端'],
+          Group: [developCenter, side['2']],
           isDept: true,
           ...(showDenominator
             ? {
@@ -151,7 +149,7 @@ export const formatTreeData = ({
       // 判断部门有没有前后端：
       if (!['供应链后端', '应用架构部'].includes(dept.deptName) && showSide) {
         const frontGroup: any = JSON.parse(JSON.stringify(groups));
-        frontGroup.push('前端');
+        frontGroup.push(side['1']);
         result.push({
           Group: frontGroup,
           [startTime]: dept.side.front,
@@ -162,7 +160,7 @@ export const formatTreeData = ({
 
       if (!['前端应用平台', '基础技术', '供应链前端'].includes(dept.deptName) && showSide) {
         const backendGroup: any = JSON.parse(JSON.stringify(groups));
-        backendGroup.push('后端');
+        backendGroup.push(side['2']);
         result.push({
           Group: backendGroup,
           [startTime]: dept.side.backend,
@@ -200,9 +198,10 @@ export const formatTreeData = ({
     });
   });
 
-  return converseArrayToOne(result);
+  return mergeArray(result);
 };
 
+// 上线后emergency占比
 export const formatPivotMode = (origin: any[], kind: number) => {
   let result: any[] = [];
   if (isEmpty(origin)) return result;
@@ -214,14 +213,14 @@ export const formatPivotMode = (origin: any[], kind: number) => {
         : `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`;
 
     if (isEmpty(data)) {
-      result.push({ Group: ['研发中心'], total: 0, title });
+      result.push({ Group: [developCenter], total: 0, title });
     } else
       data?.forEach((obj: any) => {
         const startTime = obj.range.start;
         const departments = obj.datas;
         result.push({
           title,
-          Group: ['研发中心'],
+          Group: [developCenter],
           isDept: true,
           total: obj.total.kpi,
           subTitle: moment(startTime).format('YYYYMMDD'),
@@ -292,7 +291,7 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
       if (!isEmpty(node.tech)) {
         node.tech.forEach((tech: any) => {
           result.push({
-            Group: [...Group, tech.name == '1' ? '前端' : '后端'],
+            Group: [...Group, side[tech.name]],
             branch: tech?.branch,
             isDept: false,
             [`branCove${start}`]:
@@ -324,7 +323,7 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
       }
     });
   });
-  return { rowData: converseArrayToOne(result) || [], column, project: uniq(project) };
+  return { rowData: mergeArray(result) || [], column, project: uniq(project) };
 };
 
 export const formatActual = (data: any[]) => {
@@ -406,6 +405,7 @@ export const formatActualColumn = (date: string[], type: number) => {
     }) ?? []
   );
 };
+
 export const formatPivotColumn = (date: string[], type: number) => {
   return (
     date?.map((it) => {
@@ -432,6 +432,7 @@ export const formatPivotColumn = (date: string[], type: number) => {
   );
 };
 
+// pivot fun
 export const aggFunc = (data: any, number = 0, avg = false) => {
   let sum = 0;
   data?.forEach(function (value: any) {
@@ -445,6 +446,7 @@ export const aggFunc = (data: any, number = 0, avg = false) => {
   return number > 0 ? sum.toFixed(number) : sum;
 };
 
+// 数据格式化组件
 export const renderFormat = ({
   params,
   showSplit = false,

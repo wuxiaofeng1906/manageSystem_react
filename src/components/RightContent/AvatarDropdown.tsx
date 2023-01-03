@@ -49,6 +49,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
       const { key } = event;
       if (key === 'logout' && initialState) {
         setInitialState({ ...initialState, currentUser: undefined });
+        localStorage.setItem('accessId', '');
         loginOut();
         return;
       }
@@ -73,6 +74,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
       style={{ color: 'white', fontSize: 14, cursor: 'pointer' }}
       onClick={() => {
         setInitialState({ ...initialState, currentUser: undefined });
+        localStorage.setItem('accessId', '');
         history.replace('/user/myLogin');
       }}
     >
@@ -81,13 +83,13 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     </strong>
   );
 
-  if (!initialState) {
+  if (!initialState && !localStorage.getItem('accessId')) {
     return renderLogin;
   }
 
   const { currentUser } = initialState;
 
-  if (!currentUser || !currentUser.name) {
+  if (!currentUser || !currentUser.name || !localStorage.getItem('accessId')) {
     return renderLogin;
   }
 

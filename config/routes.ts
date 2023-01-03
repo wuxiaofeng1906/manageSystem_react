@@ -143,6 +143,7 @@ export default [
         icon: 'table',
         path: 'dutyPlan',
         component: './onDuty/dutyPlan',
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '值班列表',

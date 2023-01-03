@@ -114,9 +114,9 @@ export function mergeCellsTable(data: any[], key: string, rowspan: string = 'row
 }
 
 export const checkLogin = () => {
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const token = localStorage.getItem('accessId');
-  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
-  if (token && !isEmpty(user)) return { flag: true, redirect: '' };
+  if (token && !isEmpty(user?.userid)) return { flag: true, redirect: '' };
   const href = location.pathname + location.search;
   return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
 };

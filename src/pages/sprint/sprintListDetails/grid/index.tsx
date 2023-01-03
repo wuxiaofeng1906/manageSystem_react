@@ -28,7 +28,7 @@ import {
 
 import { history } from '@@/core/history';
 // 定义列名
-const getColums = (prjNames: any, hide = true) => {
+const getColums = (prjNames: any, show = true) => {
   // 获取缓存的字段
   const fields = localStorage.getItem('sp_details_filed');
   const oraFields: any = [
@@ -114,7 +114,7 @@ const getColums = (prjNames: any, hide = true) => {
       cellRenderer: textDecorateRender,
       tooltipField: 'nobaseDesc',
       filter: false,
-      hide: !hide,
+      hide: !show,
     },
     {
       headerName: '应用服务',
@@ -397,7 +397,8 @@ const getColums = (prjNames: any, hide = true) => {
 
   oraFields.forEach((ele: any) => {
     const newElement = ele;
-    if (myFields.includes(ele.headerName)) {
+    // 未基线原因：无数据不展示
+    if (myFields.includes(ele.headerName) || (show && ele.headerName == '未基线原因')) {
       newElement.hide = false;
     } else {
       newElement.hide = true;

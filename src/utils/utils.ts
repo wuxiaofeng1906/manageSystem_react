@@ -4,6 +4,7 @@ import moment from 'moment';
 import { getMonthWeek } from '@/publicMethods/timeMethods';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import cls from 'classnames';
+import { useModel } from 'umi';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
@@ -311,8 +312,9 @@ export const formatTreeData = ({
 };
 
 export const checkLogin = () => {
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const token = localStorage.getItem('accessId');
-  if (token) return { flag: true, redirect: '' };
+  if (token && !isEmpty(user)) return { flag: true, redirect: '' };
   const href = location.pathname + location.search;
   return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
 };

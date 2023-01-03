@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SettingOutlined, UserOutlined, LoginOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
 import { history, useModel } from 'umi';
-import { outLogin } from '@/services/login';
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
@@ -69,15 +68,27 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
       />
     </span>
   );
+  const renderLogin = (
+    <strong
+      style={{ color: 'white', fontSize: 14, cursor: 'pointer' }}
+      onClick={() => {
+        setInitialState({ ...initialState, currentUser: undefined });
+        history.replace('/user/myLogin');
+      }}
+    >
+      <LoginOutlined style={{ marginRight: 8 }} />
+      去登录
+    </strong>
+  );
 
   if (!initialState) {
-    return loading;
+    return renderLogin;
   }
 
   const { currentUser } = initialState;
 
   if (!currentUser || !currentUser.name) {
-    return loading;
+    return renderLogin;
   }
 
   const menuHeaderDropdown = (
@@ -108,7 +119,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
         <span className={`${styles.name} anticon`}>
           {currentUser.name} ({currentUser.group})
-        </span>{' '}
+        </span>
         {/* 可以修改登录名显示 */}
       </span>
     </HeaderDropdown>

@@ -1296,6 +1296,7 @@ const SprintList: React.FC<any> = () => {
     '来源',
     '创建人',
     '是否延期',
+    '应用服务',
   ];
 
   const onSetFieldsChange = (checkedValues: any) => {
@@ -1515,7 +1516,6 @@ const SprintList: React.FC<any> = () => {
       </div>
     );
   }, [prjNames]);
-  const memoColumn = useMemo(() => getColums(prjNames, showReason), [showReason]);
   return (
     <div style={{ width: '100%', marginTop: '-30px' }} className={styles.sprintListDetails}>
       <Spin spinning={refreshItem || loading} tip="项目详情同步中..." size={'large'}>
@@ -1806,7 +1806,7 @@ const SprintList: React.FC<any> = () => {
         {/* ag-grid 表格定义 */}
         <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
           <AgGridReact
-            columnDefs={memoColumn} // 定义列
+            columnDefs={getColums(prjNames, showReason)} // 定义列
             rowData={data?.result} // 数据绑定
             defaultColDef={{
               resizable: true,
@@ -3330,6 +3330,9 @@ const SprintList: React.FC<any> = () => {
                 </Col>
                 <Col span={4}>
                   <Checkbox value="是否延期">是否延期</Checkbox>
+                </Col>
+                <Col span={4}>
+                  <Checkbox value="应用服务">应用服务</Checkbox>
                 </Col>
               </Row>
             </Checkbox.Group>

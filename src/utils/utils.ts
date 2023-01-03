@@ -314,7 +314,6 @@ export const formatTreeData = ({
 export const checkLogin = () => {
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const token = localStorage.getItem('accessId');
-  console.log(user);
   if (token && !isEmpty(user?.userid)) return { flag: true, redirect: '' };
   const href = location.pathname + location.search;
   return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };

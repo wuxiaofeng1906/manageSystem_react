@@ -306,7 +306,7 @@ export const checkInfo = [
     start: 'check_start_time',
     end: 'check_end_time',
     open: false,
-    open_pm: '',
+    open_pm: 'action_user',
     open_time: 'action_time',
     disabled: false,
     log: '',

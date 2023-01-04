@@ -1,4 +1,4 @@
-import { intersection, isEmpty, isEqual, isNumber, uniq } from 'lodash';
+import { intersection, isEmpty, isEqual, uniq, isArray } from 'lodash';
 import moment from 'moment';
 import { getMonthWeek } from '@/publicMethods/timeMethods';
 
@@ -90,17 +90,29 @@ export const formatTreeData = ({
   const result: any = [];
   origin.forEach((elements: any) => {
     const startTime = elements.range.start;
-    result.push({
-      Group: [developCenter],
-      isDept: true,
-      [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent,
-      ...(showDenominator
-        ? {
-            [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
-            [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
-          }
-        : {}),
-    });
+    if (isArray(elements.total)) {
+      elements.total?.forEach((o: any) => {
+        result.push({
+          Group: o.deptName.includes('全部') ? [developCenter] : [developCenter, o.deptName],
+          isDept: true,
+          dept: o.dept,
+          [startTime]: isMulti ? o.kpi * percent : o?.kpi / percent,
+        });
+      });
+    } else {
+      result.push({
+        Group: [developCenter],
+        isDept: true,
+        dept: elements.total.dept,
+        [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent,
+        ...(showDenominator
+          ? {
+              [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+              [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+            }
+          : {}),
+      });
+    }
     // 显示前后端
     if (showSide) {
       result.push(
@@ -143,6 +155,7 @@ export const formatTreeData = ({
       result.push({
         Group: groups,
         isDept: true,
+        dept: dept.dept,
         [startTime]: isMulti ? dept.kpi * percent : dept.kpi / percent,
         ...denominator,
       });
@@ -154,6 +167,7 @@ export const formatTreeData = ({
           Group: frontGroup,
           [startTime]: dept.side.front,
           isDept: true,
+          dept: dept.dept,
           ...denominator,
         });
       }
@@ -165,6 +179,7 @@ export const formatTreeData = ({
           Group: backendGroup,
           [startTime]: dept.side.backend,
           isDept: true,
+          dept: dept.dept,
           ...denominator,
         });
       }
@@ -184,6 +199,7 @@ export const formatTreeData = ({
             result.push({
               Group: usersGroup,
               isDept: false,
+              dept: dept.dept,
               [startTime]: user.kpi * percent,
               ...(showDenominator
                 ? {
@@ -262,13 +278,13 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
           headerName: '结构覆盖率',
           field: `instCove${start}`,
           minWidth: 120,
-          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+          cellRenderer: 'wrapperkpi',
         },
         {
           headerName: '分支覆盖率',
           field: `branCove${start}`,
           minWidth: 120,
-          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+          cellRenderer: 'wrapperkpi',
         },
       ],
     });
@@ -349,89 +365,6 @@ export const formatActual = (data: any[]) => {
   return result;
 };
 
-export const formatActualColumn = (date: string[], type: number) => {
-  return (
-    date?.map((it) => {
-      return {
-        headerName: it,
-        groupId: 'actualGroup',
-        children: [
-          {
-            headerName: '项目名',
-            field: `execName${it}`,
-            columnGroupShow: 'closed',
-            type: 'actual',
-          },
-          {
-            headerName: '总产出率',
-            field: `total${it}`,
-            columnGroupShow: 'closed',
-            type: 'actual',
-            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
-          },
-          {
-            headerName: '需求',
-            field: `story${it}`,
-            type: 'actual',
-            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
-          },
-          {
-            headerName: '概设',
-            field: `overview${it}`,
-            type: 'actual',
-            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
-          },
-          {
-            headerName: '详设',
-            field: `detail${it}`,
-            minWidth: 100,
-            type: 'actual',
-            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
-          },
-          {
-            headerName: '开发',
-            field: `develop${it}`,
-            type: 'actual',
-            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
-          },
-          {
-            headerName: '测试',
-            field: `test${it}`,
-            type: 'actual',
-            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
-          },
-        ],
-      };
-    }) ?? []
-  );
-};
-
-export const formatPivotColumn = (date: string[], type: number) => {
-  return (
-    date?.map((it) => {
-      return {
-        headerName: it,
-        groupId: 'actualGroup',
-        children: [
-          {
-            headerName: '项目名',
-            field: `title${it}`,
-            columnGroupShow: 'closed',
-            type: 'actual',
-          },
-          {
-            headerName: '总产出率',
-            field: `subtitle${it}`,
-            columnGroupShow: 'closed',
-            type: 'actual',
-            cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
-          },
-        ],
-      };
-    }) ?? []
-  );
-};
-
 // pivot fun
 export const aggFunc = (data: any, number = 0, avg = false) => {
   let sum = 0;
@@ -444,38 +377,4 @@ export const aggFunc = (data: any, number = 0, avg = false) => {
   // 求平均
   if (avg) sum = sum / data?.length;
   return number > 0 ? sum.toFixed(number) : sum;
-};
-
-// 数据格式化组件
-export const renderFormat = ({
-  params,
-  showSplit = false,
-  len,
-}: {
-  params: any;
-  showSplit?: boolean;
-  len?: number;
-}) => {
-  const node = params.data;
-  const result = params.value;
-  let numerator = 0; // 分子
-  let denominator = 0; // 分母
-  if (showSplit) {
-    const currentTime = params.column?.colId;
-    numerator = node[`${currentTime}_numerator`] ?? 0; // 分子
-    denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
-  }
-  const weight = node?.isDept ? 'bold' : 'initial';
-  const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
-  if (isNumber(result)) {
-    if (showSplit)
-      return `<span>
-                <label style="font-weight: ${weight}">${data}</label>
-                <label style="color: gray"> (${numerator},${denominator})</label>
-            </span>`;
-    return `<span style="font-weight: ${weight}">${data}</span>`;
-  }
-  return `<span style="font-weight: ${weight};color: ${
-    node?.isDept ? 'initial' : 'silver'
-  }"> 0</span>`;
 };

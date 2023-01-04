@@ -6,12 +6,13 @@ import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { GridApi } from 'ag-grid-community';
+import { CellClickedEvent, GridApi } from 'ag-grid-community';
 import StatisticServices from '@/services/statistic';
 import { IStaticBy } from '@/hooks/statistic';
 import { isEmpty, intersection, difference, isEqual, uniqBy } from 'lodash';
 import { RowGroupOpenedEvent } from 'ag-grid-community/dist/lib/events';
 import { initGridTable } from '@/utils/utils';
+import WrapperKpi from '@/components/wrapperKpi';
 
 const ruleData: IRuleData[] = [
   {
@@ -193,6 +194,9 @@ export default () => {
             cellRendererParams: { suppressCount: true },
             pinned: 'left',
             suppressMenu: false,
+          }}
+          frameworkComponents={{
+            wrapperkpi: (p: CellClickedEvent) => WrapperKpi({ params: p, len: 2 }),
           }}
           treeData={true}
           groupDefaultExpanded={-1}

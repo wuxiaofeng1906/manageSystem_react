@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
-import type { GridApi } from 'ag-grid-community';
+import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { Button, Drawer, Table } from 'antd';
 import {
   ScheduleTwoTone,
@@ -18,6 +18,7 @@ import type { ColumnsType } from 'antd/lib/table/interface';
 import type { IStatisticQuery } from '@/services/statistic';
 import { ColDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import { initGridTable } from '@/utils/utils';
+import WrapperKpi from '@/components/wrapperKpi';
 
 interface IStatic {
   request: (data: IStatisticQuery) => void;
@@ -31,7 +32,9 @@ interface IStatic {
   columnDefs?: any[]; // 列
   defaultColumn?: boolean; // 以默认列方式展示
   columnTypes?: { [key: string]: ColDef }; // 自定义列类型的对象映射
-  treeData?: Boolean; // 是否为树形结构
+  treeData?: boolean; // 是否为树形结构
+  normalQuarter?: boolean; // 正常季度显示
+  onClick?: (data: any) => void; // 事件
 }
 
 type INode = string | React.ReactNode;
@@ -62,6 +65,8 @@ const IStaticAgTable: React.FC<IStatic> = ({
   showDenominator = false,
   defaultColumn = true,
   treeData = true,
+  normalQuarter = false,
+  onClick,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -75,7 +80,17 @@ const IStaticAgTable: React.FC<IStatic> = ({
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showDenominator, len, period, defaultColumn });
+    await handleStaticBy({
+      request,
+      type,
+      identity,
+      showDenominator,
+      len,
+      period,
+      defaultColumn,
+      normalQuarter,
+      onClick,
+    });
   };
 
   useEffect(() => {
@@ -107,7 +122,6 @@ const IStaticAgTable: React.FC<IStatic> = ({
         : {},
     [treeData],
   );
-
   return (
     <PageContainer>
       <div style={{ background: 'white' }}>
@@ -134,6 +148,10 @@ const IStaticAgTable: React.FC<IStatic> = ({
             animateRows={true}
             columnTypes={columnTypes}
             {...initGridTable({ ref: gridApi, height: 32 })}
+            frameworkComponents={{
+              wrapperkpi: (p: CellClickedEvent) =>
+                WrapperKpi({ params: p, showSplit: showDenominator, len, onClick }),
+            }}
           />
         )}
       </div>

@@ -1,12 +1,6 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import {
-  formatActual,
-  formatActualColumn,
-  formatAutoTestCover,
-  formatPivotMode,
-  formatTreeData,
-} from '@/utils/statistic';
+import { formatAutoTestCover, formatPivotMode, formatTreeData } from '@/utils/statistic';
 import { IIdentity, IStaticBy, Period } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
@@ -14,6 +8,7 @@ export interface IStatisticQuery {
   params: IStaticBy;
   identity?: IIdentity;
   showDenominator?: boolean;
+  normalQuarter?: boolean;
   period?: Period;
 }
 interface StaticOther {
@@ -1015,54 +1010,88 @@ const StatisticServices = {
   },
 
   // 项目实际产出率
-  async actualRate({ client, params }: IStatisticQuery) {
-    const condition = getParamsByType(params);
+  async actualRate({ client, params, normalQuarter }: IStatisticQuery) {
+    const condition = getParamsByType(params, normalQuarter);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`
       {
-         data:devProjActualProdProp(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+         data:projActualProdPropDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
           range{
             start
             end
           }
+          total {
+            dept
+            deptName
+            kpi
+          }
           datas{
-            closedAt
-            execName{
-              id
-              name
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
             }
-            total{
+            users{
+              userId
+              userName
               kpi
-              numerator
-              denominator
-            }
-            stageDatas{
-              story{
-                numerator
-                denominator
-              }
-              overview{
-                numerator
-                denominator
-              }
-              develop{
-                numerator
-                denominator
-              }
-              test{
-                numerator
-                denominator
-              }
+              hired
             }
           }
         }
       }
   `);
-    return {
-      loading,
-      data: formatActual(data.data),
-      column: formatActualColumn(JSON.parse(condition.ends), condition.typeFlag),
-    };
+    return { loading, data: formatTreeData({ origin: data.data, isTest: false, percent: 100 }) };
+  },
+
+  // 项目实际产出率-明细
+  async actualRateDetail({ client, params }: any) {
+    const condition = getParamsByType(params.type);
+    const date: string[] = JSON.parse(condition.ends);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:singleProjActualProdProp(dept: "${params.dept}", start: ${date[0]},end:${date.at(
+      -1,
+    )}) {
+          closedAt
+          execName{
+            id
+            name
+          }
+          total{
+            kpi
+            numerator
+            denominator
+          }
+          stageDatas {
+            story {
+              numerator
+              denominator
+            }
+            overview {
+              numerator
+              denominator
+            }
+            detail {
+              numerator
+              denominator
+            }
+            develop {
+              numerator
+              denominator
+            }
+            test {
+              numerator
+              denominator
+            }
+          }
+        }
+      }
+  `);
+    return { loading, data: formatTreeData({ origin: data.data, isTest: false, percent: 100 }) };
   },
 };
 export default StatisticServices;

@@ -10,7 +10,6 @@ import {
 } from '@/publicMethods/timeMethods';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { IStatisticQuery } from '@/services/statistic';
-import { renderFormat } from '@/utils/statistic';
 import { isEmpty } from 'lodash';
 
 // 统计
@@ -32,6 +31,8 @@ export interface IRequest {
   period?: Period;
   showDenominator?: boolean;
   defaultColumn?: boolean;
+  normalQuarter?: boolean;
+  onClick?: (data: any) => void;
   request: (data: IStatisticQuery) => void;
 }
 
@@ -49,10 +50,12 @@ export const useStatistic = () => {
     len,
     period,
     defaultColumn = true,
+    normalQuarter = false,
+    onClick,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     if (defaultColumn) {
-      renderColumn({ type, showSplit: showDenominator, len });
+      renderColumn({ type, showSplit: showDenominator, len, normalQuarter, onClick });
     }
     setRowData([]);
     setLoading(true);
@@ -63,6 +66,7 @@ export const useStatistic = () => {
         params: type,
         identity,
         showDenominator,
+        normalQuarter,
         period,
       });
       setRowData(data);
@@ -80,11 +84,15 @@ export const useStatistic = () => {
   const renderColumn = ({
     type,
     showSplit = false,
+    normalQuarter = false,
     len,
+    onClick,
   }: {
     type: IStaticBy;
     showSplit?: boolean;
+    normalQuarter?: boolean;
     len?: number;
+    onClick?: Function;
   }) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
@@ -93,7 +101,7 @@ export const useStatistic = () => {
       quarter: getFourQuarterTime,
       month: getTwelveMonthTime,
     };
-    const ranges = typeMap[type]?.();
+    const ranges = typeMap[type]?.(type == 'quarter' ? normalQuarter : undefined);
     const weekRanges = type == 'week' ? getWeeksRange(8) : [];
     const data = type == 'week' ? weekRanges?.reverse() : ranges;
     for (let index = 0; index < data?.length; index += 1) {
@@ -104,7 +112,7 @@ export const useStatistic = () => {
           minWidth: 100,
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => renderFormat({ params: p, showSplit, len }),
+          cellRenderer: 'wrapperkpi',
         });
       } else
         component.push(
@@ -112,7 +120,7 @@ export const useStatistic = () => {
             {
               headerName: data[index].title,
               field: data[index].start?.toString(),
-              cellRenderer: (p: any) => renderFormat({ params: p, showSplit, len }),
+              cellRenderer: 'wrapperkpi',
             },
             type == 'month' ? { minWidth: 110 } : {},
           ),

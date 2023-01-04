@@ -5,9 +5,8 @@ import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useRef, useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { renderFormat } from '@/utils/statistic';
 import { useGqlClient } from '@/hooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { IStaticBy } from '@/hooks/statistic';
 import StatisticServices from '@/services/statistic';
 import { sortBy } from 'lodash';
@@ -21,6 +20,7 @@ import {
   getYearsTime,
 } from '@/publicMethods/timeMethods';
 import { initGridTable } from '@/utils/utils';
+import WrapperKpi from '@/components/wrapperKpi';
 
 const ruleData: IRuleData[] = [
   {
@@ -115,21 +115,21 @@ const SystemAvgRespTime = () => {
         component.push({
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+          cellRenderer: 'wrapperkpi',
           minWidth: 100,
         });
       } else if (type == 'day') {
         component.push({
           headerName: dayjs(data[index]).format('MM月DD日YYYY年'),
           field: data[index],
-          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+          cellRenderer: 'wrapperkpi',
           minWidth: 100,
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
+              cellRenderer: 'wrapperkpi',
               headerName: data[index].title,
               field: data[index].start?.toString(),
             },
@@ -169,6 +169,9 @@ const SystemAvgRespTime = () => {
                 cellRendererParams: { suppressCount: true },
                 pinned: 'left',
                 suppressMenu: false,
+              }}
+              frameworkComponents={{
+                wrapperkpi: (p: CellClickedEvent) => WrapperKpi({ params: p, len: 2 }),
               }}
               treeData={true}
               animateRows={true}

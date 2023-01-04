@@ -22,7 +22,7 @@ const OnlineOwnThouBugRate: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.roundsP0P1TestRate}
       identity={'OWN'}
-      period={'uptoperiod'}
+      period={'period'}
       len={2}
       unit={'%'}
     />

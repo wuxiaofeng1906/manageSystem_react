@@ -22,7 +22,7 @@ const CumulativeTestLineBugRate: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.roundsP0P1TestRate}
       identity={'TEST'}
-      period={'period'}
+      period={'uptoperiod'}
       len={2}
       unit={'%'}
     />

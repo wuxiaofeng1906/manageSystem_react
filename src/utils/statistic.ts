@@ -96,6 +96,7 @@ export const formatTreeData = ({
           Group: o.deptName.includes('全部') ? [developCenter] : [developCenter, o.deptName],
           isDept: true,
           dept: o.dept,
+          extra: o.deptName.includes('全部') ? 1 : o.deptName.includes('班车') ? 2 : 0,
           [`${startTime}range`]: elements.range,
           [startTime]: isMulti ? o.kpi * percent : o?.kpi / percent,
         });

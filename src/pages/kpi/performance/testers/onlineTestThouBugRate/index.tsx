@@ -22,9 +22,9 @@ const OnlineThouBugTestRate: React.FC = () => {
       ruleData={ruleData}
       request={StatisticServices.roundsP0P1TestRate}
       identity={'TEST'}
-      period={'uptoperiod'}
-      unit={'%'}
+      period={'period'}
       len={2}
+      unit={'%'}
     />
   );
 };

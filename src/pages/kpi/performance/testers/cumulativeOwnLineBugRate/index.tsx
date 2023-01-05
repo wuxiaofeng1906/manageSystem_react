@@ -22,7 +22,7 @@ const CumulativeOwnLineBugRate: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.roundsP0P1TestRate}
       identity={'OWN'}
-      period={'period'}
+      period={'uptoperiod'}
       len={2}
       unit={'%'}
     />

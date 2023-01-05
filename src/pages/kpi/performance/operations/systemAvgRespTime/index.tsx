@@ -9,7 +9,7 @@ import { useGqlClient } from '@/hooks';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { IStaticBy } from '@/hooks/statistic';
 import StatisticServices from '@/services/statistic';
-import { sortBy } from 'lodash';
+import { isEqual, omit, sortBy, groupBy } from 'lodash';
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import {
   getAllDate,
@@ -60,13 +60,15 @@ const SystemAvgRespTime = () => {
         params: category,
       });
       let result: any[] = [];
+      let format: any[] = [];
       data?.datas?.forEach((it: any) => {
-        result.push({ [it.range.start]: it.total.duration, cluster: [it.total.cluster] });
+        const parent = it.total?.cluster ?? '研发中心';
+        result.push({ [it.range.start]: it.total?.duration, cluster: [parent] });
         sortBy(it.datas, 'cluster')?.forEach((o) => {
           result.push({
             [it.range.start]: o.duration,
             cluster: [
-              it.total.cluster,
+              parent,
               o.cluster
                 ?.replace('cn-northwest-', '集群')
                 ?.replaceAll('cn-apnorthbj-', '腾讯生产集群'),
@@ -74,9 +76,17 @@ const SystemAvgRespTime = () => {
           });
         });
       });
-      setGridData(result);
+      Object.entries(groupBy(result, 'cluster') ?? {})?.forEach(([k, v]) => {
+        let date = {};
+        v?.forEach((it) => {
+          date = { ...date, ...omit(it, ['cluster']) };
+        });
+        format.push({ ...date, cluster: k?.split(',') });
+      });
+      setGridData(sortBy(format, ['cluster']));
       setLoading(false);
     } catch (e) {
+      console.log(e);
       setLoading(false);
     }
   };

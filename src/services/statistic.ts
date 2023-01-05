@@ -1048,9 +1048,10 @@ const StatisticServices = {
 
   // 项目实际产出率-明细
   async actualRateDetail({ client, params }: any) {
+    // extra  0-特性项目；1-全部项目，2-班车项目"
     const { data } = await client.query(`
       {
-         data:singleProjActualProdProp(dept: ${params.dept}, start: "${params?.range?.start}",end:"${params?.range?.end}") {
+         data:singleProjActualProdProp(dept: ${params.dept}, start: "${params?.range?.start}",end:"${params?.range?.end}",extra:${params.extra}) {
           closedAt
           execName{
             id

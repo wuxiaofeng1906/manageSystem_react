@@ -22,7 +22,7 @@ const CumulativeReferLineBugRate: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.roundsP0P1TestRate}
       identity={'REFER'}
-      period={'period'}
+      period={'uptoperiod'}
       len={2}
       unit={'%'}
     />

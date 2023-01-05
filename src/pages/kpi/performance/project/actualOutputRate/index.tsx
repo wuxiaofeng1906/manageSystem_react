@@ -106,7 +106,11 @@ const ActualOutputRate: React.FC<any> = () => {
         onClick={(p: CellClickedEvent) =>
           setActiveItem({
             visible: true,
-            data: { dept: +p?.data.dept, range: p.data[`${p.column?.colId}range`] },
+            data: {
+              dept: +p?.data.dept,
+              range: p.data[`${p.column?.colId}range`],
+              extra: p.data.extra || 0,
+            },
           })
         }
       />
@@ -187,7 +191,7 @@ const ActualDetailModal = (props: ModalFuncProps & { data: { dept: number; range
             rowData={detail}
             columnDefs={[
               { headerName: '项目名称', field: 'name', minWidth: 220 },
-              { headerName: '关闭时间', field: 'time', minWidth: 220 },
+              { headerName: '关闭时间', field: 'time', minWidth: 120 },
               { headerName: '实际产出率', field: 'total', minWidth: 120 },
               { headerName: '需求阶段产出率', field: 'story', minWidth: 120 },
               { headerName: '概设阶段产出率', field: 'overview', minWidth: 120 },

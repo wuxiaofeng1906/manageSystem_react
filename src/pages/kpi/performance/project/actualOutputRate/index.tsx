@@ -173,6 +173,8 @@ const ActualDetailModal = (props: ModalFuncProps & { data: { dept: number; range
       } catch (e) {
         setLoading(false);
       }
+    } else {
+      setDetail([]);
     }
   }, [props.visible]);
 
@@ -180,13 +182,14 @@ const ActualDetailModal = (props: ModalFuncProps & { data: { dept: number; range
     <Modal
       visible={props.visible}
       closable={false}
+      width={1200}
       title={'项目-实际产出率明细'}
+      destroyOnClose={true}
       footer={[
         <Button onClick={props?.onCancel} type={'primary'}>
           取消
         </Button>,
       ]}
-      width={1200}
     >
       <Spin spinning={loading} tip={'数据加载中，请稍等...'}>
         <div style={{ height: 300, width: '100%' }}>

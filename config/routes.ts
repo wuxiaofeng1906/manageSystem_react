@@ -487,6 +487,7 @@ export default [
                 path: 'actualRate',
                 component: './kpi/performance/developer/actualRate',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true, // 接口未开发
               },
             ],
           },
@@ -775,6 +776,7 @@ export default [
                 path: 'actualRate',
                 component: './kpi/performance/testers/actualRate',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true, // 接口未开发
               },
             ],
           },
@@ -816,28 +818,28 @@ export default [
                 path: 'standardOutputRate',
                 component: './kpi/performance/project/standardOutputRate',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true,
+                hideInMenu: true, // 接口未开发
               },
               {
                 name: '计划产出率',
                 path: 'plannedOutputRate',
                 component: './kpi/performance/project/plannedOutputRate',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true,
+                hideInMenu: true, // 接口未开发
               },
               {
                 name: '产出计划偏差率',
                 path: 'deviationOutputRate',
                 component: './kpi/performance/project/deviationOutputRate',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true,
+                hideInMenu: true, // 接口未开发
               },
               {
                 name: '效能偏差率',
                 path: 'efficiencyRate',
                 component: './kpi/performance/project/efficiencyRate',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true,
+                hideInMenu: true, // 接口未开发
               },
             ],
           },

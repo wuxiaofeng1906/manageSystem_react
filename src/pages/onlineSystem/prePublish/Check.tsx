@@ -69,7 +69,7 @@ const Check = (props: any, ref: any) => {
       onRefreshCheck: () => init(true),
       onSetting: () => setShow({ visible: true, data: release_num }),
     }),
-    [selected, ref, globalState, basic, list],
+    [selected, ref, globalState, basic, list, subTab, tab],
   );
 
   const onCheck = async () => {
@@ -313,18 +313,18 @@ const Check = (props: any, ref: any) => {
     let timer: any;
     if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
-      init();
+      isEmpty(dutyPerson) && init();
       timer = setInterval(() => {
         init(false, false);
       }, 15000);
       if ((globalState.locked || globalState.finished) && timer) {
         clearInterval(timer);
       }
-    }
+    } else setDutyPerson(undefined);
     return () => {
       clearInterval(timer);
     };
-  }, [subTab, tab, release_num, globalState]);
+  }, [subTab, tab, release_num, globalState, dutyPerson]);
 
   const hasEdit = useMemo(
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,

@@ -198,14 +198,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       list
         .filter((it) => !['stagepatch', 'emergency', 'sprint'].includes(it.sprinttype))
         .forEach((o) => {
-          const flag =
-            intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0;
           const nothing = isEmpty(
             selectedData?.find(
               (checked: any) => checked.story == o.story && checked.pro_id == o.pro_id,
             ),
           );
-          flag && nothing && selectedData.push(o);
+          nothing && selectedData.push(o);
         });
     }
 
@@ -217,8 +215,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           ? ['cn-northwest-0']
           : selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : [])),
     });
-    setSelected(selectedData);
-
+    setSelected(
+      selectedData?.filter(
+        (o) => intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0,
+      ),
+    );
     if (isEmpty(appServers?.[v])) return;
     setList(
       list?.map((it: any) => ({
@@ -269,7 +270,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const memoColumn = useMemo(() => {
-    const isSprint = list?.some((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
+    const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
 
     return {
       isSprint,
@@ -297,7 +298,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               width: 400,
               ellipsis: { showTitle: false },
               render: (v: string) => (
-                <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'} />
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
               ),
             },
           ]

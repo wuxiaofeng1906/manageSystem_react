@@ -666,6 +666,13 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
+                name: '千行bug率收敛', // 实际是累计千行bug率收敛
+                icon: 'table',
+                path: 'convergenceBugRate',
+                component: './kpi/performance/testers/convergenceBugRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
                 name: '线上千行bug率',
                 icon: 'table',
                 path: 'cumulativeLineBugRate',
@@ -678,6 +685,7 @@ export default [
                 path: 'cumulativeLineBugRateReference',
                 component: './kpi/performance/testers/cumulativeLineBugRateReference',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '线上千行bug率（含测试）',
@@ -687,32 +695,28 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '累计千行bug率收敛',
-                icon: 'table',
-                path: 'convergenceBugRate',
-                component: './kpi/performance/testers/convergenceBugRate',
-                wrappers: ['../wrappers/auth'],
-              },
-              {
                 name: '线上千行bug率P0P1占比',
                 path: 'onlineTestThouBugRate',
                 component: './kpi/performance/testers/onlineTestThouBugRate',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '线上千行bug率P0P1占比(参考)',
                 path: 'onlineReferThouBugRate',
                 component: './kpi/performance/testers/onlineReferThouBugRate',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '线上千行bug率P0P1占比(含测试)',
                 path: 'onlineOwnThouBugRate',
                 component: './kpi/performance/testers/onlineOwnThouBugRate',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
-                name: '累计线上千行bug率P0P1占比',
+                name: '线上千行bug率P0P1占比', // 实际是累计线上bug率p0p1占比
                 icon: 'table',
                 path: 'cumulativeTestLineBugRate',
                 component: './kpi/performance/testers/cumulativeTestLineBugRate',
@@ -723,9 +727,10 @@ export default [
                 path: 'cumulativeReferLineBugRate',
                 component: './kpi/performance/testers/cumulativeReferLineBugRate',
                 wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
-                name: '累计线上千行bug率P0P1占比（含测试）',
+                name: '线上千行bug率P0P1占比（含测试）', // 实际是累计线上bug率p0p1占比（含测试）
                 icon: 'table',
                 path: 'cumulativeOwnLineBugRate',
                 component: './kpi/performance/testers/cumulativeOwnLineBugRate',

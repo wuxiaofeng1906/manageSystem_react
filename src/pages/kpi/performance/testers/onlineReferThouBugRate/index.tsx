@@ -22,7 +22,7 @@ const OnlineReferThouBugRate: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.roundsP0P1TestRate}
       identity={'REFER'}
-      period={'uptoperiod'}
+      period={'period'}
       len={2}
       unit={'%'}
     />

@@ -36,10 +36,13 @@ const WrapperKpi = ({
       <span
         style={{
           fontWeight: weight,
-          color: onClick ? 'blue' : '#181d1f',
-          cursor: onClick ? 'pointer' : 'initial',
+          color: onClick && params.value ? '#1890ff' : '#181d1f',
+          cursor: onClick && params.value ? 'pointer' : 'initial',
         }}
-        onClick={() => onClick?.(params.data)}
+        onClick={() => {
+          if (!params.value) return;
+          onClick?.(params);
+        }}
       >
         {data}
       </span>

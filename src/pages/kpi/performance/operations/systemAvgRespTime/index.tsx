@@ -47,11 +47,6 @@ const SystemAvgRespTime = () => {
   const [visible, setVisible] = useState(false);
   const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
 
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
   window.onresize = function () {
     setGridHeight(window.innerHeight - 250);
     gridRef.current?.sizeColumnsToFit();

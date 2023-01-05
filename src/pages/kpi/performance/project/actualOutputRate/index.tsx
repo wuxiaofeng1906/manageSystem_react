@@ -1,6 +1,15 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal, Button, Spin } from 'antd';
 import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
+import { ModalFuncProps } from 'antd/lib/modal/Modal';
+import { useGqlClient } from '@/hooks';
+import { AgGridReact } from 'ag-grid-react';
+import { initGridTable } from '@/utils/utils';
+import { CellClickedEvent, GridApi } from 'ag-grid-community';
+import { isEmpty, orderBy } from 'lodash';
+import dayjs from 'dayjs';
+
 // 项目实际产出率
 const ruleData: IRuleData[] = [
   {
@@ -81,18 +90,113 @@ const ruleData: IRuleData[] = [
 ];
 
 const ActualOutputRate: React.FC<any> = () => {
+  const [activeItem, setActiveItem] = useState<{ visible: boolean; data: any }>({
+    visible: false,
+    data: null,
+  });
+
   return (
-    <IStaticAgTable
-      ruleData={ruleData}
-      request={StatisticServices.actualRate}
-      onClick={(p) => {
-        console.log(p);
-      }}
-      normalQuarter={true}
-      unit={'%'}
-      len={2}
-    />
+    <div>
+      <IStaticAgTable
+        ruleData={ruleData}
+        request={StatisticServices.actualRate}
+        normalQuarter={true}
+        unit={'%'}
+        len={2}
+        onClick={(p: CellClickedEvent) =>
+          setActiveItem({
+            visible: true,
+            data: { dept: +p?.data.dept, range: p.data[`${p.column?.colId}range`] },
+          })
+        }
+      />
+      <ActualDetailModal
+        visible={activeItem.visible}
+        data={activeItem.data}
+        onCancel={() => setActiveItem({ visible: false, data: null })}
+      />
+    </div>
   );
 };
 
 export default ActualOutputRate;
+
+const ActualDetailModal = (props: ModalFuncProps & { data: { dept: number; range: any } }) => {
+  const gqlClient = useGqlClient();
+  const gridApi = useRef<GridApi>();
+  const [loading, setLoading] = useState(false);
+  const [detail, setDetail] = useState<any[]>([]);
+
+  const formatNum = (data: any, key: string, len = 2) => {
+    const num = data[key]?.numerator;
+    const den = data[key]?.denominator;
+    if (!num || !den) return 0;
+    return ((num / den) * 100).toFixed(len);
+  };
+
+  useEffect(() => {
+    if (props.visible && !isEmpty(props.data)) {
+      setLoading(true);
+      try {
+        StatisticServices.actualRateDetail({ client: gqlClient, params: props.data }).then(
+          (res: any) => {
+            setDetail(
+              orderBy(
+                res?.map((it: any) => {
+                  const stage = it.stageDatas;
+                  return {
+                    name: it.execName?.name,
+                    time: it.closedAt ? dayjs(it.closedAt).format('YYYY-MM-DD') : '',
+                    total: +((it.total?.kpi || 0) * 100).toFixed(2),
+                    story: formatNum(stage, 'story'),
+                    overview: formatNum(stage, 'overview'),
+                    detail: formatNum(stage, 'detail'),
+                    develop: formatNum(stage, 'develop'),
+                    test: formatNum(stage, 'test'),
+                  };
+                }) ?? [],
+                ['total'],
+                'desc',
+              ),
+            );
+            setLoading(false);
+          },
+        );
+      } catch (e) {
+        setLoading(false);
+      }
+    }
+  }, [props.visible]);
+
+  return (
+    <Modal
+      visible={props.visible}
+      closable={false}
+      title={'项目-实际产出率明细'}
+      footer={[
+        <Button onClick={props?.onCancel} type={'primary'}>
+          取消
+        </Button>,
+      ]}
+      width={1200}
+    >
+      <Spin spinning={loading} tip={'数据加载中，请稍等...'}>
+        <div style={{ height: 300, width: '100%' }}>
+          <AgGridReact
+            {...initGridTable({ ref: gridApi, height: 32 })}
+            rowData={detail}
+            columnDefs={[
+              { headerName: '项目名称', field: 'name', minWidth: 220 },
+              { headerName: '关闭时间', field: 'time', minWidth: 220 },
+              { headerName: '实际产出率', field: 'total', minWidth: 120 },
+              { headerName: '需求阶段产出率', field: 'story', minWidth: 120 },
+              { headerName: '概设阶段产出率', field: 'overview', minWidth: 120 },
+              { headerName: '开发阶段产出率', field: 'develop', minWidth: 120 },
+              { headerName: '测试阶段产出率', field: 'test', minWidth: 120 },
+            ]}
+          />
+        </div>
+      </Spin>
+    </Modal>
+  );
+};

@@ -1048,14 +1048,9 @@ const StatisticServices = {
 
   // 项目实际产出率-明细
   async actualRateDetail({ client, params }: any) {
-    const condition = getParamsByType(params.type);
-    const date: string[] = JSON.parse(condition.ends);
-    if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const { data } = await client.query(`
       {
-         data:singleProjActualProdProp(dept: "${params.dept}", start: ${date[0]},end:${date.at(
-      -1,
-    )}) {
+         data:singleProjActualProdProp(dept: ${params.dept}, start: "${params?.range?.start}",end:"${params?.range?.end}") {
           closedAt
           execName{
             id
@@ -1091,7 +1086,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { loading, data: formatTreeData({ origin: data.data, isTest: false, percent: 100 }) };
+    return data.data;
   },
 };
 export default StatisticServices;

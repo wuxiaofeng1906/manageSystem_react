@@ -96,6 +96,7 @@ export const formatTreeData = ({
           Group: o.deptName.includes('全部') ? [developCenter] : [developCenter, o.deptName],
           isDept: true,
           dept: o.dept,
+          [`${startTime}range`]: elements.range,
           [startTime]: isMulti ? o.kpi * percent : o?.kpi / percent,
         });
       });
@@ -104,6 +105,7 @@ export const formatTreeData = ({
         Group: [developCenter],
         isDept: true,
         dept: elements.total.dept,
+        [`${startTime}range`]: elements.range,
         [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent,
         ...(showDenominator
           ? {
@@ -119,6 +121,8 @@ export const formatTreeData = ({
         {
           Group: [developCenter, side['1']],
           isDept: true,
+          dept: elements.total?.dept,
+          [`${startTime}range`]: elements.range,
           ...(showDenominator
             ? {
                 [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
@@ -129,6 +133,8 @@ export const formatTreeData = ({
         {
           Group: [developCenter, side['2']],
           isDept: true,
+          dept: elements.total?.dept,
+          [`${startTime}range`]: elements.range,
           ...(showDenominator
             ? {
                 [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
@@ -156,6 +162,7 @@ export const formatTreeData = ({
         Group: groups,
         isDept: true,
         dept: dept.dept,
+        [`${startTime}range`]: elements.range,
         [startTime]: isMulti ? dept.kpi * percent : dept.kpi / percent,
         ...denominator,
       });
@@ -168,6 +175,7 @@ export const formatTreeData = ({
           [startTime]: dept.side.front,
           isDept: true,
           dept: dept.dept,
+          [`${startTime}range`]: elements.range,
           ...denominator,
         });
       }
@@ -180,6 +188,7 @@ export const formatTreeData = ({
           [startTime]: dept.side.backend,
           isDept: true,
           dept: dept.dept,
+          [`${startTime}range`]: elements.range,
           ...denominator,
         });
       }
@@ -200,6 +209,7 @@ export const formatTreeData = ({
               Group: usersGroup,
               isDept: false,
               dept: dept.dept,
+              [`${startTime}range`]: elements.range,
               [startTime]: user.kpi * percent,
               ...(showDenominator
                 ? {

@@ -137,7 +137,7 @@ const IStaticAgTable: React.FC<IStatic> = ({
           计算规则
         </Button>
       </div>
-      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
+      <div style={{ height: gridHeight, width: '100%' }}>
         {isEmpty(columns) ? (
           <div />
         ) : (

@@ -139,7 +139,7 @@ const Check = (props: any, ref: any) => {
     }
   };
 
-  const init = async (isFresh = false) => {
+  const init = async (isFresh = false, showLoading = true) => {
     const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
     const to = from.endOf('w');
 
@@ -147,7 +147,7 @@ const Check = (props: any, ref: any) => {
       start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
       end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
     };
-    setSpin(true);
+    setSpin(showLoading);
     setSelected([]);
     try {
       if (isFresh) {
@@ -166,12 +166,12 @@ const Check = (props: any, ref: any) => {
           );
         }
       }
+      let orignDuty = dutyPerson;
       const [checkItem, firstDuty] = await Promise.all([
         OnlineSystemServices.getCheckInfo({ release_num }),
-        isEmpty(dutyPerson) ? DutyListServices.getFirstDutyPerson(range) : null,
+        isEmpty(orignDuty) || isFresh ? DutyListServices.getFirstDutyPerson(range) : null,
       ]);
-      let orignDuty = dutyPerson;
-      if (isEmpty(orignDuty)) {
+      if (isEmpty(orignDuty) || isFresh) {
         const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
         duty?.forEach((it: any) => {
           orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
@@ -310,11 +310,21 @@ const Check = (props: any, ref: any) => {
   };
 
   useEffect(() => {
+    let timer: any;
     if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
       init();
+      timer = setInterval(() => {
+        init(false, false);
+      }, 15000);
+      if ((globalState.locked || globalState.finished) && timer) {
+        clearInterval(timer);
+      }
     }
-  }, [subTab, tab, release_num]);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [subTab, tab, release_num, globalState]);
 
   const hasEdit = useMemo(
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,

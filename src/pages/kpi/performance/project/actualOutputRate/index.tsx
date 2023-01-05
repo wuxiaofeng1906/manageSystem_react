@@ -49,7 +49,9 @@ const ruleData: IRuleData[] = [
     child: [
       <div style={{ marginTop: 10 }}>
         各阶段自然消耗工时
-        <a href={'https://shimo.im/docs/B1Aw1eVreRfZvXqm#anchor-dhHB'}>取值规则</a>
+        <a href={'https://shimo.im/docs/B1Aw1eVreRfZvXqm#anchor-dhHB'} target={'_blank'}>
+          取值规则
+        </a>
       </div>,
     ],
   },
@@ -58,7 +60,9 @@ const ruleData: IRuleData[] = [
     child: [
       <div style={{ marginBottom: 10 }}>
         各阶段实际工时
-        <a href={'https://shimo.im/sheets/1d3aVdBVEmS6mrqg/MODOC'}>取值规则</a>
+        <a href={'https://shimo.im/sheets/1d3aVdBVEmS6mrqg/MODOC'} target={'_blank'}>
+          取值规则
+        </a>
       </div>,
     ],
     table: {

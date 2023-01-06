@@ -358,14 +358,6 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '项目计划偏差率',
-                icon: 'table',
-                path: 'projectPlanDeviationRate',
-                component: './kpi/performance/developer/projectPlanDeviationRate',
-                wrappers: ['../wrappers/auth'],
-                // hideInMenu: true,
-              },
-              {
                 name: '管理事务计划偏差率',
                 icon: 'table',
                 path: 'manWorkPlanDevRate',
@@ -478,10 +470,16 @@ export default [
               },
               {
                 name: '上线后emergency占比',
-                icon: 'table',
                 path: 'productOnlineEmergencyRate',
                 component: './kpi/performance/developer/productOnlineEmergencyRate',
                 wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '实际产出率',
+                path: 'actualRate',
+                component: './kpi/performance/developer/actualRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true, // 接口未开发
               },
             ],
           },
@@ -765,6 +763,13 @@ export default [
                 wrappers: ['../wrappers/auth'],
                 hideInMenu: true,
               },
+              {
+                name: '实际产出率',
+                path: 'actualRate',
+                component: './kpi/performance/testers/actualRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true, // 接口未开发
+              },
             ],
           },
           {
@@ -789,7 +794,54 @@ export default [
               },
             ],
           },
-          ...ProjectKpiRoute,
+          // ...ProjectKpiRoute,
+          {
+            name: '项目',
+            path: '/kpi/performance/project',
+            routes: [
+              {
+                name: '项目计划偏差率',
+                icon: 'table',
+                path: 'projectPlanDeviationRate',
+                component: './kpi/performance/developer/projectPlanDeviationRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '项目实际产出率',
+                path: 'actualOutputRate',
+                component: './kpi/performance/project/actualOutputRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '标准产出率',
+                path: 'standardOutputRate',
+                component: './kpi/performance/project/standardOutputRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true, // 接口未开发
+              },
+              {
+                name: '计划产出率',
+                path: 'plannedOutputRate',
+                component: './kpi/performance/project/plannedOutputRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true, // 接口未开发
+              },
+              {
+                name: '产出计划偏差率',
+                path: 'deviationOutputRate',
+                component: './kpi/performance/project/deviationOutputRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true, // 接口未开发
+              },
+              {
+                name: '效能偏差率',
+                path: 'efficiencyRate',
+                component: './kpi/performance/project/efficiencyRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true, // 接口未开发
+              },
+            ],
+          },
           {
             name: '服务',
             icon: 'table',

@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
-import type { GridApi, GridReadyEvent } from 'ag-grid-community';
+import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { Button, Drawer, Table } from 'antd';
 import {
   ScheduleTwoTone,
@@ -11,24 +11,30 @@ import {
   AppstoreTwoTone,
   FundTwoTone,
 } from '@ant-design/icons';
-import { getHeight } from '@/publicMethods/pageSet';
 import type { IStaticBy, IIdentity, Period } from '@/hooks/statistic';
 import { useStatistic } from '@/hooks/statistic';
 import { isEmpty, isString } from 'lodash';
 import type { ColumnsType } from 'antd/lib/table/interface';
 import type { IStatisticQuery } from '@/services/statistic';
+import { ColDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import { initGridTable } from '@/utils/utils';
+import WrapperKpi from '@/components/wrapperKpi';
 
 interface IStatic {
   request: (data: IStatisticQuery) => void;
   showDenominator?: boolean; // 以分子、分母展示
-  showHalfYear?: boolean; // 按半年
-  ruleData: IRuleData[];
-  identity?: IIdentity;
-  len?: number;
-  unit?: string;
-  initFilter?: IStaticBy[];
-  columnDefs?: any[];
-  period?: Period;
+  ruleData: IRuleData[]; // 规则描述
+  identity?: IIdentity; // 接口参数类型
+  period?: Period; // 接口参数类型
+  len?: number; // 保留小数位数
+  unit?: string; // 指标单位
+  initFilter?: IStaticBy[]; // 查询方式
+  columnDefs?: any[]; // 列
+  defaultColumn?: boolean; // 以默认列方式展示
+  columnTypes?: { [key: string]: ColDef }; // 自定义列类型的对象映射
+  treeData?: boolean; // 是否为树形结构
+  normalQuarter?: boolean; // 正常季度显示
+  onClick?: (data: any) => void; // 事件
 }
 
 type INode = string | React.ReactNode;
@@ -45,37 +51,44 @@ const condition: { icon: React.ReactNode; title: string; type: IStaticBy }[] = [
   { icon: <FundTwoTone />, title: '按半年', type: 'halfYear' },
   { icon: <AppstoreTwoTone />, title: '按年', type: 'year' },
 ];
-const IStaticPerformance: React.FC<IStatic> = ({
+// 指标表格组件
+const IStaticAgTable: React.FC<IStatic> = ({
+  initFilter,
   request,
   ruleData,
-  identity,
-  showDenominator = false,
-  showHalfYear = false,
   len,
-  unit = '%',
-  initFilter,
-  columnDefs,
+  identity,
   period,
+  columnDefs,
+  columnTypes,
+  unit = '%',
+  showDenominator = false,
+  defaultColumn = true,
+  treeData = true,
+  normalQuarter = false,
+  onClick,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
   const [visible, setVisible] = useState(false);
 
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
-  // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(getHeight());
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 230);
 
   window.onresize = function () {
-    setGridHeight(getHeight());
+    setGridHeight(window.innerHeight - 230);
     gridApi.current?.sizeColumnsToFit();
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showDenominator, len, period });
+    await handleStaticBy({
+      request,
+      type,
+      identity,
+      showDenominator,
+      period,
+      defaultColumn,
+      normalQuarter,
+    });
   };
 
   useEffect(() => {
@@ -89,6 +102,24 @@ const IStaticPerformance: React.FC<IStatic> = ({
     }
   }, [loading]);
 
+  const opsMemo = useMemo(
+    () =>
+      treeData
+        ? {
+            treeData: true,
+            groupDefaultExpanded: -1,
+            getDataPath: (source: any) => source.Group,
+            autoGroupColumnDef: {
+              minWidth: 280,
+              headerName: '部门-人员',
+              cellRendererParams: { suppressCount: true },
+              pinned: 'left',
+              suppressMenu: false,
+            },
+          }
+        : {},
+    [treeData],
+  );
   return (
     <PageContainer>
       <div style={{ background: 'white' }}>
@@ -104,34 +135,21 @@ const IStaticPerformance: React.FC<IStatic> = ({
           计算规则
         </Button>
       </div>
-      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
+      <div style={{ height: gridHeight, width: '100%' }}>
         {isEmpty(columns) ? (
           <div />
         ) : (
           <AgGridReact
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-            }}
-            autoGroupColumnDef={{
-              minWidth: 280,
-              headerName: '部门-人员',
-              cellRendererParams: { suppressCount: true },
-              pinned: 'left',
-              suppressMenu: false,
-            }}
+            {...opsMemo}
             columnDefs={columnDefs ?? columns}
             rowData={rowData}
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
-            treeData={true}
             animateRows={true}
-            groupDefaultExpanded={-1}
-            getDataPath={(source: any) => source.Group}
+            columnTypes={columnTypes}
+            {...initGridTable({ ref: gridApi, height: 32 })}
+            frameworkComponents={{
+              wrapperkpi: (p: CellClickedEvent) =>
+                WrapperKpi({ params: p, showSplit: showDenominator, len, onClick }),
+            }}
           />
         )}
       </div>
@@ -140,8 +158,9 @@ const IStaticPerformance: React.FC<IStatic> = ({
   );
 };
 
-export default IStaticPerformance;
+export default IStaticAgTable;
 
+// 规则
 export const IDrawer = ({
   visible,
   setVisible,
@@ -187,6 +206,8 @@ export const IDrawer = ({
     </Drawer>
   );
 };
+
+// 查询方式
 export const ConditionHeader = ({
   initFilter = ['week', 'month', 'quarter', 'year'],
   onChange,
@@ -199,6 +220,7 @@ export const ConditionHeader = ({
       {condition.map((it) => {
         return (
           <Button
+            key={it.type}
             type="text"
             style={{ color: 'black' }}
             icon={it.icon}

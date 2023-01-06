@@ -10,7 +10,7 @@ import {
 } from '@/publicMethods/timeMethods';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { IStatisticQuery } from '@/services/statistic';
-import { renderFormat } from '@/utils/utils';
+import { isEmpty } from 'lodash';
 
 // 统计
 export type IStaticBy = 'year' | 'halfYear' | 'quarter' | 'month' | 'week' | 'day';
@@ -25,13 +25,15 @@ export type IIdentity =
 export type Period = 'period' | 'uptoperiod';
 
 export interface IRequest {
-  request: (data: IStatisticQuery) => void;
   type: IStaticBy;
   identity?: IIdentity;
   period?: Period;
   showDenominator?: boolean;
-  len?: number;
+  defaultColumn?: boolean;
+  normalQuarter?: boolean;
+  request: (data: IStatisticQuery) => void;
 }
+
 export const useStatistic = () => {
   const gqlClient = useGqlClient();
   const [columns, setColumns] = useState<(ColDef | ColGroupDef)[]>([]);
@@ -43,23 +45,30 @@ export const useStatistic = () => {
     type = 'week',
     identity,
     showDenominator = false,
-    len,
     period,
+    defaultColumn = true,
+    normalQuarter = false,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    renderColumn({ type, showSplit: showDenominator, len });
+    if (defaultColumn) {
+      renderColumn({ type, normalQuarter });
+    }
     setRowData([]);
     setLoading(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-shadow
-      const { data, loading }: any = await request({
+      const { data, loading, column }: any = await request({
         client: gqlClient,
         params: type,
         identity,
         showDenominator,
+        normalQuarter,
         period,
       });
       setRowData(data);
+      if (!isEmpty(column)) {
+        setColumns(column);
+      }
       setLoading(loading);
     } catch (e) {
       setLoading(false);
@@ -70,12 +79,10 @@ export const useStatistic = () => {
   // column
   const renderColumn = ({
     type,
-    showSplit = false,
-    len,
+    normalQuarter = false,
   }: {
     type: IStaticBy;
-    showSplit?: boolean;
-    len?: number;
+    normalQuarter?: boolean;
   }) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
@@ -84,7 +91,7 @@ export const useStatistic = () => {
       quarter: getFourQuarterTime,
       month: getTwelveMonthTime,
     };
-    const ranges = typeMap[type]?.();
+    const ranges = typeMap[type]?.(type == 'quarter' ? normalQuarter : undefined);
     const weekRanges = type == 'week' ? getWeeksRange(8) : [];
     const data = type == 'week' ? weekRanges?.reverse() : ranges;
     for (let index = 0; index < data?.length; index += 1) {
@@ -92,18 +99,18 @@ export const useStatistic = () => {
         const startTime = data[index].from;
         const weekName = getMonthWeek(startTime);
         component.push({
+          minWidth: 100,
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => renderFormat({ params: p, showSplit, len }),
-          minWidth: 100,
+          cellRenderer: 'wrapperkpi',
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => renderFormat({ params: p, showSplit, len }),
               headerName: data[index].title,
               field: data[index].start?.toString(),
+              cellRenderer: 'wrapperkpi',
             },
             type == 'month' ? { minWidth: 110 } : {},
           ),

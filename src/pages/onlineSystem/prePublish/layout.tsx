@@ -19,15 +19,15 @@ const tabs = [
 ];
 const Layout = () => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
+  const { onlineSystemPermission } = usePermission();
   const { release_num } = useParams() as { release_num: string };
   const [draft, globalState, setGlobalState] = useModel('onlineSystem', (online) => [
     online.draft,
     online.globalState,
     online.setGlobalState,
   ]);
-  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
-
-  const { onlineSystemPermission } = usePermission();
 
   const [touched, setTouched] = useState(false);
   const ref = useRef() as React.MutableRefObject<{
@@ -41,6 +41,7 @@ const Layout = () => {
     onSave: Function;
     onPushCheckFailMsg: Function;
   }>;
+
   useEffect(() => {
     if (!release_num) return;
     const status = ['success', 'failure'];

@@ -166,11 +166,11 @@ const Check = (props: any, ref: any) => {
           );
         }
       }
-      let orignDuty = dutyPerson;
       const [checkItem, firstDuty] = await Promise.all([
         OnlineSystemServices.getCheckInfo({ release_num }),
-        isEmpty(orignDuty) || isFresh ? DutyListServices.getFirstDutyPerson(range) : null,
+        isEmpty(dutyPerson) || isFresh ? DutyListServices.getFirstDutyPerson(range) : null,
       ]);
+      let orignDuty = dutyPerson;
       if (isEmpty(orignDuty) || isFresh) {
         const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
         duty?.forEach((it: any) => {

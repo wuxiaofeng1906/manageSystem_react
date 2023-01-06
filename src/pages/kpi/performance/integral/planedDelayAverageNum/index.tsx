@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 const ruleData: IRuleData[] = [
   {
@@ -22,9 +22,9 @@ const ruleData: IRuleData[] = [
     child: [],
   },
 ];
-const PlanedDelayAverageNum: React.FC<any> = () => {
+const PlanedDelayAverageNum: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.planedDelayAverageNum}
       unit={'次'}

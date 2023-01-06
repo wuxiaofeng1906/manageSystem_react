@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 // 自动化提效比
 const ruleData: IRuleData[] = [
@@ -22,9 +22,9 @@ const ruleData: IRuleData[] = [
     child: ['测试-自动化提效比 = AVG(所有单个项目的自动化提效比)'],
   },
 ];
-const AutoEffectRate: React.FC<any> = () => {
+const AutoEffectRate: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.autoEffectRate}
       unit={'%'}

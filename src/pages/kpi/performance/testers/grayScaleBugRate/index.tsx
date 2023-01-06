@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import type { IRuleData } from '@/components/IStaticPerformance';
-import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
+import type { IRuleData } from '@/components/IStaticAgTable';
+import { ConditionHeader, IDrawer } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 import { Button, Spin } from 'antd';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
-import { aggFunc } from '@/utils/utils';
+import { aggFunc } from '@/utils/statistic';
+import { initGridTable } from '@/utils/utils';
 
 const ruleData: IRuleData[] = [
   {
@@ -54,16 +55,13 @@ const ruleData: IRuleData[] = [
 const GrayScaleBugRate: React.FC = () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [catagory, setCatagory] = useState<'month' | 'quarter'>('month');
+  const [category, setCategory] = useState<'month' | 'quarter'>('month');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
+
   const getDate = () => {
-    const ends = catagory == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
+    const ends = category == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
     return JSON.stringify(ends?.map((it) => it.end));
   };
 
@@ -74,7 +72,7 @@ const GrayScaleBugRate: React.FC = () => {
       const { data } = await StatisticServices.grayThousBugRate({
         client,
         params: {
-          kind: catagory == 'month' ? 2 : 3,
+          kind: category == 'month' ? 2 : 3,
           ends,
         },
       });
@@ -82,7 +80,7 @@ const GrayScaleBugRate: React.FC = () => {
         data
           ?.map((it: any) => {
             const title =
-              catagory == 'quarter'
+              category == 'quarter'
                 ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
                 : moment(it.range.start).format('MM月YYYY年');
 
@@ -106,13 +104,13 @@ const GrayScaleBugRate: React.FC = () => {
 
   useEffect(() => {
     getTableSource();
-  }, [catagory]);
+  }, [category]);
 
   return (
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white' }}>
-          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCatagory(v)} />
+          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCategory(v)} />
           <label style={{ fontWeight: 'bold' }}>(统计单位：个/Kloc)</label>
           <Button
             type="text"
@@ -126,11 +124,9 @@ const GrayScaleBugRate: React.FC = () => {
         </div>
         <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
           <AgGridReact
-            rowHeight={32}
-            headerHeight={35}
+            {...initGridTable({ ref: gridRef, height: 32 })}
             pivotMode={true}
             rowData={data}
-            onGridReady={onGridReady}
             suppressAggFuncInHeader={true}
             columnDefs={[
               { field: 'total', headerName: 'bug率', aggFunc: (data) => aggFunc(data, 3) },
@@ -139,13 +135,6 @@ const GrayScaleBugRate: React.FC = () => {
               { field: 'title', pivot: true, pivotComparator: () => 1 },
               { field: 'subTitle', pivot: true },
             ]}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
-              flex: 1,
-              minWidth: 80,
-            }}
           />
         </div>
         <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />

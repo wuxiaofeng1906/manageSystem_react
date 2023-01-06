@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 const ruleData: IRuleData[] = [
   {
@@ -11,9 +11,9 @@ const ruleData: IRuleData[] = [
     child: ['该周期该部门已发布未关闭需求数 = SUM(该部门所有已发布需求)'],
   },
 ];
-const PublishedAndUnclosedNumber: React.FC<any> = () => {
+const PublishedAndUnclosedNumber: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.publishedAndUnclosedNumber}
       unit={'个'}

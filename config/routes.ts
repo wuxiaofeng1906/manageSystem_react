@@ -358,14 +358,6 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '项目计划偏差率',
-                icon: 'table',
-                path: 'projectPlanDeviationRate',
-                component: './kpi/performance/developer/projectPlanDeviationRate',
-                wrappers: ['../wrappers/auth'],
-                // hideInMenu: true,
-              },
-              {
                 name: '管理事务计划偏差率',
                 icon: 'table',
                 path: 'manWorkPlanDevRate',
@@ -769,7 +761,7 @@ export default [
                 path: 'autoTestCoverageUnit',
                 component: './kpi/performance/testers/autoTestCoverageUnit',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true,
+                hideInMenu: true,
               },
               {
                 name: '实际产出率',
@@ -808,7 +800,14 @@ export default [
             path: '/kpi/performance/project',
             routes: [
               {
-                name: '实际产出率',
+                name: '项目计划偏差率',
+                icon: 'table',
+                path: 'projectPlanDeviationRate',
+                component: './kpi/performance/developer/projectPlanDeviationRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '项目实际产出率',
                 path: 'actualOutputRate',
                 component: './kpi/performance/project/actualOutputRate',
                 wrappers: ['../wrappers/auth'],

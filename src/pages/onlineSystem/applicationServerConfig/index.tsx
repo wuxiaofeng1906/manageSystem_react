@@ -22,7 +22,7 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 
 const ApplicationServerConfig = () => {
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
-  const [gridHeight, setGridHeight] = useState((getHeight() ?? 0) - 60);
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
   const [list, setList] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -45,10 +45,7 @@ const ApplicationServerConfig = () => {
       },
     });
   };
-  window.onresize = function () {
-    setGridHeight(Number(getHeight()) - 60);
-    gridRef.current?.sizeColumnsToFit();
-  };
+
   const getConfigList = async () => {
     setSpinning(true);
     try {
@@ -62,6 +59,13 @@ const ApplicationServerConfig = () => {
 
   useEffect(() => {
     getConfigList();
+    window.onresize = function () {
+      setGridHeight(window.innerHeight - 250);
+      gridRef.current?.sizeColumnsToFit();
+    };
+    return () => {
+      window.onresize = null;
+    };
   }, []);
 
   const hasPermission = useMemo(() => {

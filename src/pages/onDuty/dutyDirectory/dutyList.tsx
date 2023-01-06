@@ -10,7 +10,6 @@ import moment from 'moment';
 import DutyListServices from '@/services/dutyList';
 import dutyColumn from '@/pages/onDuty/dutyDirectory/column';
 import useLock from '@/hooks/lock';
-import { getHeight } from '@/publicMethods/pageSet';
 import { infoMessage } from '@/publicMethods/showMessages';
 import styles from './index.less';
 
@@ -22,7 +21,7 @@ const DutyList = () => {
   const [form] = Form.useForm();
   const [modifyDutyForm] = Form.useForm();
   const gridRef = useRef<GridApi>();
-  const [gridHeight, setGridHeight] = useState(getHeight() - 20);
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
@@ -190,7 +189,12 @@ const DutyList = () => {
     const timer = setInterval(() => {
       getAllLock('duty');
     }, 3000);
+    window.onresize = function () {
+      setGridHeight(window.innerHeight - 250);
+      gridRef.current?.sizeColumnsToFit();
+    };
     return () => {
+      window.onresize = null;
       clearInterval(timer);
     };
   }, []);
@@ -208,11 +212,6 @@ const DutyList = () => {
     background: p.data.bg ? '#FFF6F6' : 'white',
     lineHeight: '30px',
   });
-
-  window.onresize = function () {
-    setGridHeight(Number(getHeight()) - 20);
-    gridRef.current?.sizeColumnsToFit();
-  };
 
   return (
     <PageContainer>

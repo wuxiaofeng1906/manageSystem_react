@@ -52,6 +52,7 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
+
 const GrayScaleBugRate: React.FC = () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();

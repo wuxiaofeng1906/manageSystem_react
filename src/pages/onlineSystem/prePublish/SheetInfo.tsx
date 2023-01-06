@@ -507,7 +507,7 @@ const SheetInfo = (props: any, ref: any) => {
   }, [globalState?.finished]);
 
   useEffect(() => {
-    setTableHeight((props?.style?.height - 70) / 2);
+    setTableHeight((props?.style?.height - 200) / 2);
   }, [props?.style?.height]);
 
   return (

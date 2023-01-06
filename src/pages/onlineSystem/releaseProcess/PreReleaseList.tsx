@@ -4,7 +4,6 @@ import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
 import { releaseListColumn } from '@/pages/onlineSystem/releaseProcess/column';
-import { getHeight } from '@/publicMethods/pageSet';
 import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, orderBy } from 'lodash';
@@ -12,21 +11,17 @@ import { history, useLocation } from 'umi';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import { WarningOutlined } from '@ant-design/icons';
 
-const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
+const PreReleaseList = ({ disabled, height }: { disabled?: boolean; height: number }) => {
   const gridRef = useRef<GridApi>();
   const query = useLocation()?.query;
   const [rowData, setRowData] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
-  const [gridHeight, setGridHeight] = useState(getHeight() - 80);
   const [spinning, setSpinning] = useState(false);
   const [warnTip, setWarnTip] = useState(false);
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
-  };
-  window.onresize = function () {
-    setGridHeight(Number(getHeight()) - 80);
   };
 
   const onDrag = async () => {
@@ -78,7 +73,9 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
   };
 
   useEffect(() => {
-    if (query.key == 'pre') getTableList();
+    if (query.key == 'pre') {
+      getTableList();
+    }
   }, [query.key]);
 
   return (
@@ -102,7 +99,7 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
             </div>
           )}
         </div>
-        <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
+        <div className="ag-theme-alpine" style={{ height: height - 80, width: '100%' }}>
           <AgGridReact
             columnDefs={releaseListColumn('pre')}
             rowData={rowData}

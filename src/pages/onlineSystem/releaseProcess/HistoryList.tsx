@@ -4,14 +4,13 @@ import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { releaseListColumn } from '@/pages/onlineSystem/releaseProcess/column';
 import IPagination from '@/components/IPagination';
-import { getHeight } from '@/publicMethods/pageSet';
 import PreReleaseServices from '@/services/preRelease';
 import { useLocation } from 'umi';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
 import { history } from '@@/core/history';
 
-const HistoryList = () => {
+const HistoryList = ({ height }: { height: number }) => {
   const gridRef = useRef<GridApi>();
   const query = useLocation()?.query;
 
@@ -20,7 +19,6 @@ const HistoryList = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
-  const [gridHeight, setGridHeight] = useState(getHeight() - 140);
 
   const [pages, setPages] = useState({
     page_size: 20,
@@ -42,10 +40,6 @@ const HistoryList = () => {
       })),
     );
     setOrders(order?.flatMap((num: string) => (num ? [{ label: num, value: num, key: num }] : [])));
-  };
-
-  window.onresize = function () {
-    setGridHeight(Number(getHeight()) - 140);
   };
 
   const getTableList = async (page = 1, page_size = pages.page_size) => {
@@ -117,7 +111,10 @@ const HistoryList = () => {
           </Col>
         </Row>
       </Form>
-      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%', marginTop: 8 }}>
+      <div
+        className="ag-theme-alpine"
+        style={{ height: height - 150, width: '100%', marginTop: 8 }}
+      >
         <AgGridReact
           columnDefs={releaseListColumn('history')}
           rowData={rowData}

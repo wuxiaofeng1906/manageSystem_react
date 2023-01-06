@@ -45,12 +45,7 @@ const SystemAvgRespTime = () => {
   const [gridData, setGridData] = useState<any[]>();
   const [columns, setColumns] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
-  const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
-
-  window.onresize = function () {
-    setGridHeight(window.innerHeight - 250);
-    gridRef.current?.sizeColumnsToFit();
-  };
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 230);
 
   const getDetail = async () => {
     setLoading(true);
@@ -95,6 +90,16 @@ const SystemAvgRespTime = () => {
     renderColumn(category);
     getDetail();
   }, [category]);
+
+  useEffect(() => {
+    window.onresize = function () {
+      setGridHeight(window.innerHeight - 230);
+      gridRef.current?.sizeColumnsToFit();
+    };
+    return () => {
+      window.onresize = null;
+    };
+  }, []);
 
   const renderColumn = (type: IStaticBy) => {
     const component: (ColDef | ColGroupDef)[] = new Array();

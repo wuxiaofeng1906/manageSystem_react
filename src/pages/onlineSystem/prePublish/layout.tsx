@@ -221,7 +221,7 @@ const Layout = () => {
             <Tabs.TabPane
               key={it.key}
               tab={it.name}
-              // disabled={(globalState.step || 1) < index || touched}
+              disabled={(globalState.step || 1) < index || touched}
             >
               <it.comp ref={ref} style={{ height: height, overflow: 'auto' }} />
             </Tabs.TabPane>

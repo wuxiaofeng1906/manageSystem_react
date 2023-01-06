@@ -179,7 +179,7 @@ const EditModal = (props: ModalFuncProps & { data: any; disabled: boolean }) => 
       width={950}
     >
       <Spin spinning={loading || touched} tip={`数据${touched ? '保存' : '加载'}中...`}>
-        <Form form={form} autoComplete={'off'} disabled={props.disabled}>
+        <Form form={form} autoComplete={'off'} disabled={props.disabled} className={'no-wrap-form'}>
           <Row gutter={6}>
             <Col span={12}>
               <Form.Item

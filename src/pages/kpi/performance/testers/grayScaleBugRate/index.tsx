@@ -7,7 +7,7 @@ import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
 import moment from 'moment';
 import { isEmpty } from 'lodash';

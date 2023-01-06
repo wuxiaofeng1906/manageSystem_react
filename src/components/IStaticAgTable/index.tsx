@@ -85,11 +85,9 @@ const IStaticAgTable: React.FC<IStatic> = ({
       type,
       identity,
       showDenominator,
-      len,
       period,
       defaultColumn,
       normalQuarter,
-      onClick,
     });
   };
 

@@ -6,10 +6,10 @@ import { AgGridReact } from 'ag-grid-react';
 import React, { useRef, useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { useGqlClient } from '@/hooks';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { IStaticBy } from '@/hooks/statistic';
 import StatisticServices from '@/services/statistic';
-import { isEqual, omit, sortBy, groupBy } from 'lodash';
+import { omit, sortBy, groupBy } from 'lodash';
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import {
   getAllDate,
@@ -92,11 +92,11 @@ const SystemAvgRespTime = () => {
   };
 
   useEffect(() => {
-    renderColumn(category, 2);
+    renderColumn(category);
     getDetail();
   }, [category]);
 
-  const renderColumn = (type: IStaticBy, len?: number) => {
+  const renderColumn = (type: IStaticBy) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
       year: getYearsTime,

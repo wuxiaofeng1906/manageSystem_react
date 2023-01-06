@@ -4,7 +4,7 @@ import StatisticServices from '@/services/statistic';
 import { AgGridReact } from 'ag-grid-react';
 import { getFourQuarterTime, getTwelveMonthTime, getYearsTime } from '@/publicMethods/timeMethods';
 import moment from 'moment';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { Button, Spin } from 'antd';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';

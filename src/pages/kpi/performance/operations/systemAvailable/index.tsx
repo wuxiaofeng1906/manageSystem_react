@@ -71,7 +71,7 @@ const SystemAvailable: React.FC<any> = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    renderColumn({ type: category, len: 2 });
+    renderColumn({ type: category });
     getDetail();
   }, [category]);
 

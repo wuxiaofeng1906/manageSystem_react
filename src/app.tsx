@@ -1,6 +1,6 @@
 import React from 'react';
 import { Settings as LayoutSettings, PageLoading } from '@ant-design/pro-layout';
-import { notification } from 'antd';
+import { notification, message } from 'antd';
 import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 // import Footer from '@/components/Footer';
@@ -82,7 +82,7 @@ export async function getInitialState(): Promise<{
     gqlClient,
   };
 }
-
+message.config({ maxCount: 1 });
 export const layout = ({ initialState }: any) => {
   return {
     rightContentRender: () => <RightContent />,

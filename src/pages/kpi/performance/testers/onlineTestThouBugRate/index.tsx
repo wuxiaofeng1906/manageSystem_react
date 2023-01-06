@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 // 线上千行bug率 -p0p1占比
 const ruleData: IRuleData[] = [
@@ -16,9 +16,9 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-const OnlineThouBugTestRate: React.FC<any> = () => {
+const OnlineThouBugTestRate: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.roundsP0P1TestRate}
       identity={'TEST'}

@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 const ruleData: IRuleData[] = [
   {
@@ -21,9 +21,9 @@ const ruleData: IRuleData[] = [
     child: [],
   },
 ];
-const TaskCumulativeDelayNum: React.FC<any> = () => {
+const TaskCumulativeDelayNum: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.taskCumulativeDelayNum}
       unit={'次'}

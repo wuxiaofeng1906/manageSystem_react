@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import type { IRuleData } from '@/components/IStaticPerformance';
+import type { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 import { AgGridReact } from 'ag-grid-react';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { Button, Spin } from 'antd';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
-import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
-import { aggFunc } from '@/utils/utils';
-import { getHeight } from '@/publicMethods/pageSet';
+import { ConditionHeader, IDrawer } from '@/components/IStaticAgTable';
+import { aggFunc } from '@/utils/statistic';
+import { initGridTable } from '@/utils/utils';
 
 const ruleData: IRuleData[] = [
   {
@@ -53,16 +53,11 @@ const ruleData: IRuleData[] = [
 const ProductOnlineEmergencyRate: React.FC = () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [catagory, setCatagory] = useState<'month' | 'quarter'>('month');
+  const [category, setCategory] = useState<'month' | 'quarter'>('month');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>();
   const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
 
   window.onresize = function () {
     setGridHeight(window.innerHeight - 250);
@@ -70,7 +65,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   };
 
   const getDate = () => {
-    const ends = catagory == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
+    const ends = category == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
     return JSON.stringify(ends?.map((it) => it.end));
   };
 
@@ -81,7 +76,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
       const { data } = await StatisticServices.onlineTestOnlineEmergency({
         client,
         params: {
-          kind: catagory == 'month' ? 2 : 3,
+          kind: category == 'month' ? 2 : 3,
           ends,
         },
         identity: 'TESTER',
@@ -95,13 +90,13 @@ const ProductOnlineEmergencyRate: React.FC = () => {
 
   useEffect(() => {
     getTableSource();
-  }, [catagory]);
+  }, [category]);
 
   return (
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white' }}>
-          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCatagory(v)} />
+          <ConditionHeader initFilter={['month', 'quarter']} onChange={(v) => setCategory(v)} />
           <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
           <Button
             type="text"
@@ -115,27 +110,18 @@ const ProductOnlineEmergencyRate: React.FC = () => {
         </div>
         <div className={'ag-theme-alpine'} style={{ width: '100%', height: gridHeight }}>
           <AgGridReact
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
             pivotMode={true}
             rowData={data ?? []}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
-              flex: 1,
-              minWidth: 100,
-            }}
+            suppressAggFuncInHeader={true}
+            {...initGridTable({ ref: gridRef, height: 32 })}
             autoGroupColumnDef={{
               minWidth: 150,
               maxWidth: 180,
-              headerName: '部门-人员',
+              headerName: '部门',
               cellRendererParams: { suppressCount: true },
               pinned: 'left',
               suppressMenu: false,
             }}
-            suppressAggFuncInHeader={true}
             columnDefs={[
               { field: 'Group', rowGroup: true },
               { field: 'total', headerName: 'emergency占比', aggFunc: (data) => aggFunc(data, 2) },

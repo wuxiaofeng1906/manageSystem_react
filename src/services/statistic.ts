@@ -1,6 +1,6 @@
 import type { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import { formatAutoTestCover, formatPivotMode, formatTreeData } from '@/utils/utils';
+import { formatAutoTestCover, formatPivotMode, formatTreeData } from '@/utils/statistic';
 import { IIdentity, IStaticBy, Period } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
@@ -8,6 +8,7 @@ export interface IStatisticQuery {
   params: IStaticBy;
   identity?: IIdentity;
   showDenominator?: boolean;
+  normalQuarter?: boolean;
   period?: Period;
 }
 interface StaticOther {
@@ -1006,6 +1007,87 @@ const StatisticServices = {
       data: formatTreeData({ origin: data.data, isTest: true, percent: 100 }),
       loading,
     };
+  },
+
+  // 项目实际产出率
+  async actualRate({ client, params, normalQuarter }: IStatisticQuery) {
+    const condition = getParamsByType(params, normalQuarter);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:projActualProdPropDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+          range{
+            start
+            end
+          }
+          total {
+            dept
+            deptName
+            kpi
+          }
+          datas{
+            dept
+            deptName
+            kpi
+            parent{
+              dept
+              deptName
+            }
+            users{
+              userId
+              userName
+              kpi
+              hired
+            }
+          }
+        }
+      }
+  `);
+    return { loading, data: formatTreeData({ origin: data.data, isTest: false, percent: 100 }) };
+  },
+
+  // 项目实际产出率-明细
+  async actualRateDetail({ client, params }: any) {
+    // extra  0-特性项目；1-全部项目，2-班车项目"
+    const { data } = await client.query(`
+      {
+         data:singleProjActualProdProp(dept: ${params.dept}, start: "${params?.range?.start}",end:"${params?.range?.end}",extra:${params.extra}) {
+          closedAt
+          execName{
+            id
+            name
+          }
+          total{
+            kpi
+            numerator
+            denominator
+          }
+          stageDatas {
+            story {
+              numerator
+              denominator
+            }
+            overview {
+              numerator
+              denominator
+            }
+            detail {
+              numerator
+              denominator
+            }
+            develop {
+              numerator
+              denominator
+            }
+            test {
+              numerator
+              denominator
+            }
+          }
+        }
+      }
+  `);
+    return data.data;
   },
 };
 export default StatisticServices;

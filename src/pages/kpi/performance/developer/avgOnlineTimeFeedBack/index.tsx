@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 const ruleData: IRuleData[] = [
   {
@@ -41,14 +41,14 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-const AvgOnlineTimeFeedBack: React.FC<any> = () => {
+const AvgOnlineTimeFeedBack: React.FC = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.feedback}
       identity={'DEVELOPER'}
-      len={2}
       unit={'天'}
+      len={2}
     />
   );
 };

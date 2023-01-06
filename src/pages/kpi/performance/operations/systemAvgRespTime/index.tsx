@@ -1,13 +1,12 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
-import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticPerformance';
+import { ConditionHeader, IDrawer, IRuleData } from '@/components/IStaticAgTable';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useRef, useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { renderFormat } from '@/utils/utils';
 import { useGqlClient } from '@/hooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { IStaticBy } from '@/hooks/statistic';
 import StatisticServices from '@/services/statistic';
 import { isEqual, omit, sortBy, groupBy } from 'lodash';
@@ -20,6 +19,8 @@ import {
   getWeeksRange,
   getYearsTime,
 } from '@/publicMethods/timeMethods';
+import { initGridTable } from '@/utils/utils';
+import WrapperKpi from '@/components/wrapperKpi';
 
 const ruleData: IRuleData[] = [
   {
@@ -45,11 +46,6 @@ const SystemAvgRespTime = () => {
   const [columns, setColumns] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
   const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
 
   window.onresize = function () {
     setGridHeight(window.innerHeight - 250);
@@ -124,21 +120,21 @@ const SystemAvgRespTime = () => {
         component.push({
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+          cellRenderer: 'wrapperkpi',
           minWidth: 100,
         });
       } else if (type == 'day') {
         component.push({
           headerName: dayjs(data[index]).format('MM月DD日YYYY年'),
           field: data[index],
-          cellRenderer: (p) => renderFormat({ params: p, len: 2 }),
+          cellRenderer: 'wrapperkpi',
           minWidth: 100,
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => renderFormat({ params: p, len: 2 }),
+              cellRenderer: 'wrapperkpi',
               headerName: data[index].title,
               field: data[index].start?.toString(),
             },
@@ -169,10 +165,8 @@ const SystemAvgRespTime = () => {
           </Button>
           <div className={'ag-theme-alpine'} style={{ width: '100%', height: gridHeight }}>
             <AgGridReact
-              rowHeight={32}
-              headerHeight={35}
+              {...initGridTable({ ref: gridRef, height: 32 })}
               rowData={gridData}
-              onGridReady={onGridReady}
               autoGroupColumnDef={{
                 minWidth: 280,
                 maxWidth: 280,
@@ -181,18 +175,14 @@ const SystemAvgRespTime = () => {
                 pinned: 'left',
                 suppressMenu: false,
               }}
+              frameworkComponents={{
+                wrapperkpi: (p: CellClickedEvent) => WrapperKpi({ params: p, len: 2 }),
+              }}
               treeData={true}
               animateRows={true}
               groupDefaultExpanded={-1}
               getDataPath={(source: any) => source.cluster}
               columnDefs={columns}
-              defaultColDef={{
-                sortable: true,
-                resizable: true,
-                filter: true,
-                flex: 1,
-                minWidth: 100,
-              }}
             />
           </div>
           <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />

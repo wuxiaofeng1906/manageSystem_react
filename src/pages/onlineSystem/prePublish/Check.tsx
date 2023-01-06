@@ -312,9 +312,9 @@ const Check = (props: any, ref: any) => {
   useEffect(() => {
     if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
-      init();
-    }
-  }, [subTab, tab, release_num]);
+      isEmpty(dutyPerson) && init();
+    } else setDutyPerson(undefined);
+  }, [subTab, tab, release_num, dutyPerson]);
 
   const hasEdit = useMemo(
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,

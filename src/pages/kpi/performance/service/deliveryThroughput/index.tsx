@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import type { IRuleData } from '@/components/IStaticPerformance';
-import { ConditionHeader, IDrawer } from '@/components/IStaticPerformance';
+import type { IRuleData } from '@/components/IStaticAgTable';
+import { ConditionHeader, IDrawer } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 import { useGqlClient } from '@/hooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -18,7 +18,8 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
-import { aggFunc } from '@/utils/utils';
+import { aggFunc } from '@/utils/statistic';
+import { initGridTable } from '@/utils/utils';
 const ruleData: IRuleData[] = [
   {
     title: '统计周期',
@@ -47,14 +48,11 @@ const ruleData: IRuleData[] = [
 const DeliveryThroughput: React.FC = () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
-  const [catagory, setCatagory] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const [category, setCategory] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
+
   const getDate = () => {
     const typeMap = {
       year: getYearsTime,
@@ -62,9 +60,9 @@ const DeliveryThroughput: React.FC = () => {
       quarter: getFourQuarterTime,
       month: getTwelveMonthTime,
     };
-    const isWeek = catagory == 'week';
-    const ranges = typeMap[catagory]?.(
-      catagory == 'month' ? 3 : catagory == 'quarter' ? 6 : undefined,
+    const isWeek = category == 'week';
+    const ranges = typeMap[category]?.(
+      category == 'month' ? 3 : category == 'quarter' ? 6 : undefined,
     );
     const weekRanges = isWeek ? getWeeksRange(8) : [];
     const data = isWeek ? weekRanges?.reverse() : ranges;
@@ -83,10 +81,7 @@ const DeliveryThroughput: React.FC = () => {
       const ends = getDate();
       const { data } = await StatisticServices.deliverThroughput({
         client,
-        params: {
-          kind: kind[catagory],
-          ends,
-        },
+        params: { kind: kind[category], ends },
       });
       setData(
         data
@@ -99,11 +94,11 @@ const DeliveryThroughput: React.FC = () => {
               month: moment(it.range.start).format('MM月YYYY年'),
               year: moment(it.range.start).format('YYYY年'),
             };
-            if (isEmpty(it.datas)) return { title: title[catagory], total: 0 };
+            if (isEmpty(it.datas)) return { title: title[category], total: 0 };
 
             return it.datas.map((child: any) => ({
               subTitle: moment(child.date).format('YYYYMMDD'),
-              title: title[catagory],
+              title: title[category],
               total: child.kpi ?? 0,
             }));
           })
@@ -117,13 +112,13 @@ const DeliveryThroughput: React.FC = () => {
 
   useEffect(() => {
     getTableSource();
-  }, [catagory]);
+  }, [category]);
 
   return (
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div style={{ background: 'white' }}>
-          <ConditionHeader onChange={(v) => setCatagory(v)} />
+          <ConditionHeader onChange={(v) => setCategory(v)} />
           <label style={{ fontWeight: 'bold' }}>(统计单位：FP)</label>
           <Button
             type="text"
@@ -137,19 +132,10 @@ const DeliveryThroughput: React.FC = () => {
         </div>
         <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
           <AgGridReact
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
+            {...initGridTable({ ref: gridRef, height: 32 })}
             pivotMode={true}
             rowData={data}
             suppressAggFuncInHeader={true}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
-              flex: 1,
-              minWidth: 80,
-            }}
             columnDefs={[
               {
                 field: 'total',

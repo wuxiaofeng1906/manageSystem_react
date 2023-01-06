@@ -374,7 +374,7 @@ const VisualView = () => {
       return (
         <tr>
           <th>
-            <span className={styles.title}>{title.split('').map((text) => `${text}\n`)}</span>
+            <span className={styles.title}>{title}</span>
           </th>
           <td />
           {dynamicColumn.map((_, index) => (
@@ -390,7 +390,7 @@ const VisualView = () => {
             <tr key={index + it.plan_release_time}>
               {index == 0 && (
                 <th rowSpan={arr.length}>
-                  <span className={styles.title}>{title.split('').map((text) => `${text}\n`)}</span>
+                  <span className={styles.title}>{title}</span>
                 </th>
               )}
               <td className={styles.time}>

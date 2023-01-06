@@ -1,5 +1,5 @@
 import React from 'react';
-import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
+import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 // 任务计划偏差率
 const ruleData: IRuleData[] = [
@@ -23,7 +23,7 @@ const ruleData: IRuleData[] = [
 ];
 const TaskScheduleRate: React.FC<any> = () => {
   return (
-    <IStaticPerformance
+    <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.taskScheduleRate}
       identity={'TESTER'}

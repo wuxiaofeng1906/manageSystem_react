@@ -72,7 +72,7 @@ const IStaticAgTable: React.FC<IStatic> = ({
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
   const [visible, setVisible] = useState(false);
 
-  const [gridHeight, setGridHeight] = useState(window.innerHeight - 230);
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 240);
 
   const changeStaticBy = async (type: IStaticBy) => {
     await handleStaticBy({
@@ -89,7 +89,7 @@ const IStaticAgTable: React.FC<IStatic> = ({
   useEffect(() => {
     changeStaticBy('quarter');
     window.onresize = function () {
-      setGridHeight(window.innerHeight - 230);
+      setGridHeight(window.innerHeight - 245);
       gridApi.current?.sizeColumnsToFit();
     };
     return () => {

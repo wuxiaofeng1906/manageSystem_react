@@ -45,7 +45,7 @@ const SystemAvgRespTime = () => {
   const [gridData, setGridData] = useState<any[]>();
   const [columns, setColumns] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
-  const [gridHeight, setGridHeight] = useState(window.innerHeight - 230);
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 240);
 
   const getDetail = async () => {
     setLoading(true);
@@ -93,7 +93,7 @@ const SystemAvgRespTime = () => {
 
   useEffect(() => {
     window.onresize = function () {
-      setGridHeight(window.innerHeight - 230);
+      setGridHeight(window.innerHeight - 240);
       gridRef.current?.sizeColumnsToFit();
     };
     return () => {

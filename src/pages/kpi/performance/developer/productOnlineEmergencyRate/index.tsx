@@ -57,7 +57,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>();
-  const [gridHeight, setGridHeight] = useState(window.innerHeight - 230);
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 240);
 
   const getDate = () => {
     const ends = category == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
@@ -86,7 +86,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
 
   useEffect(() => {
     window.onresize = function () {
-      setGridHeight(window.innerHeight - 230);
+      setGridHeight(window.innerHeight - 240);
       gridRef.current?.sizeColumnsToFit();
     };
     return () => {

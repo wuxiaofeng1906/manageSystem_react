@@ -320,10 +320,9 @@ const Check = (props: any, ref: any) => {
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,
     [globalState, user?.group],
   );
-
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
-      <div className={styles.onlineTable} style={{ height: '100%' }}>
+      <div className={styles.onlineTable} style={{ ...props?.style, overflowY: 'initial' }}>
         <Table
           size="small"
           bordered
@@ -477,7 +476,7 @@ const Check = (props: any, ref: any) => {
           ]}
           dataSource={list}
           pagination={false}
-          scroll={{ x: 'min-content' }}
+          scroll={{ x: 'min-content', y: props?.style?.height - 50 }}
           rowKey={(p) => p.rowKey}
           rowSelection={{
             selectedRowKeys: selected,
@@ -586,23 +585,23 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
   };
 
   return (
-    <Spin spinning={loading} tip={'数据加载中...'}>
-      <Modal
-        {...props}
-        centered
-        destroyOnClose
-        maskClosable={false}
-        title={'检查参数设置'}
-        onCancel={() => props?.onOk?.()}
-        visible={props.init?.visible}
-        footer={[
-          <Button onClick={showLog}>查看日志</Button>,
-          <Button onClick={() => props.onOk?.()}>取消</Button>,
-          <Button type={'primary'} disabled={disabled} onClick={onConfirm}>
-            确定
-          </Button>,
-        ]}
-      >
+    <Modal
+      {...props}
+      centered
+      destroyOnClose
+      maskClosable={false}
+      title={'检查参数设置'}
+      onCancel={() => props?.onOk?.()}
+      visible={props.init?.visible}
+      footer={[
+        <Button onClick={showLog}>查看日志</Button>,
+        <Button onClick={() => props.onOk?.()}>取消</Button>,
+        <Button type={'primary'} disabled={disabled || loading} onClick={onConfirm}>
+          确定
+        </Button>,
+      ]}
+    >
+      <Spin spinning={loading} tip={'数据加载中...'}>
         <Form form={form} labelCol={{ span: 6 }}>
           <h4>一、检查上线分支是否包含对比分支的提交</h4>
           <Form.Item
@@ -629,7 +628,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
             />
           </Form.Item>
         </Form>
-      </Modal>
-    </Spin>
+      </Spin>
+    </Modal>
   );
 };

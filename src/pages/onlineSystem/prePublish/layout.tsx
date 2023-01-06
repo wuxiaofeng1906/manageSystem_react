@@ -23,6 +23,7 @@ const Layout = () => {
 
   const { onlineSystemPermission } = usePermission();
   const { release_num } = useParams() as { release_num: string };
+  const [height, setHeight] = useState(window.innerHeight - 335);
   const [draft, globalState, setGlobalState] = useModel('onlineSystem', (online) => [
     online.draft,
     online.globalState,
@@ -193,6 +194,19 @@ const Layout = () => {
     return <Fragment />;
   }, [release_num, tab, subTab, globalState, touched, draft, user?.group]);
 
+  useEffect(() => {
+    if (tab == 'profile') {
+      window.onresize = null;
+      return;
+    }
+    window.onresize = function () {
+      setHeight(window.innerHeight - 335);
+    };
+    return () => {
+      window.onresize = null;
+    };
+  }, [tab]);
+
   return (
     <div className={styles.prePublish}>
       <Tabs
@@ -207,9 +221,9 @@ const Layout = () => {
             <Tabs.TabPane
               key={it.key}
               tab={it.name}
-              disabled={(globalState.step || 1) < index || touched}
+              // disabled={(globalState.step || 1) < index || touched}
             >
-              <it.comp ref={ref} />
+              <it.comp ref={ref} style={{ height: height, overflow: 'auto' }} />
             </Tabs.TabPane>
           );
         })}

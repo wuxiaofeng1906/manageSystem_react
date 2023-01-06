@@ -415,10 +415,6 @@ const SheetInfo = (props: any, ref: any) => {
 
   const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
 
-  window.onresize = function () {
-    setTableHeight((window.innerHeight - 460) / 2);
-  };
-
   useEffect(() => {
     const listener = (ev) => {
       ev.preventDefault();
@@ -510,13 +506,17 @@ const SheetInfo = (props: any, ref: any) => {
     }
   }, [globalState?.finished]);
 
+  useEffect(() => {
+    setTableHeight((props?.style?.height - 70) / 2);
+  }, [props?.style?.height]);
+
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <Prompt
         when={leaveShow && subTab == 'sheet'}
         message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
       />
-      <div>
+      <div style={{ ...props?.style }}>
         <Form
           size={'small'}
           form={orderForm}

@@ -484,7 +484,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
-      <div className={styles.processDetail}>
+      <div className={styles.processDetail} style={{ ...props?.style }}>
         <div className={styles.tableHeader}>
           <h4>一、基础信息</h4>
         </div>

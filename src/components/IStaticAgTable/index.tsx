@@ -222,6 +222,7 @@ export const ConditionHeader = ({
       {condition.map((it) => {
         return (
           <Button
+            key={it.type}
             type="text"
             style={{ color: 'black' }}
             icon={it.icon}

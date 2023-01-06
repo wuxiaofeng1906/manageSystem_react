@@ -105,13 +105,13 @@ export const formatTreeData = ({
       result.push({
         Group: [developCenter],
         isDept: true,
-        dept: elements.total.dept,
+        dept: elements.total?.dept,
         [`${startTime}range`]: elements.range,
-        [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent,
+        [startTime]: isMulti ? elements.total?.kpi * percent : elements.total?.kpi / percent,
         ...(showDenominator
           ? {
-              [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
-              [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+              [`${startTime}_numerator`]: elements.total?.sideKpi?.numerator,
+              [`${startTime}_denominator`]: elements.total?.sideKpi?.denominator,
             }
           : {}),
       });
@@ -224,7 +224,6 @@ export const formatTreeData = ({
       }
     });
   });
-
   return mergeArray(result);
 };
 

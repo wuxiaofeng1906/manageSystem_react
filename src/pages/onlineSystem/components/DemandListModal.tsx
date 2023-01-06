@@ -198,14 +198,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       list
         .filter((it) => !['stagepatch', 'emergency', 'sprint'].includes(it.sprinttype))
         .forEach((o) => {
-          const flag =
-            intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0;
           const nothing = isEmpty(
             selectedData?.find(
               (checked: any) => checked.story == o.story && checked.pro_id == o.pro_id,
             ),
           );
-          flag && nothing && selectedData.push(o);
+          nothing && selectedData.push(o);
         });
     }
 
@@ -217,8 +215,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           ? ['cn-northwest-0']
           : selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : [])),
     });
-    setSelected(selectedData);
-
+    setSelected(
+      selectedData?.filter(
+        (o) => intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0,
+      ),
+    );
     if (isEmpty(appServers?.[v])) return;
     setList(
       list?.map((it: any) => ({
@@ -269,89 +270,119 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const memoColumn = useMemo(() => {
+    const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
+
     return {
-      isSprint: list.some((it) => !['stagepatch', 'emergency'].includes(it.sprinttype)),
-      column: [
-        {
-          title: '序号',
-          width: 70,
-          render: (_: any, r: any, i: number) => i + 1,
-          fixed: 'left',
-        },
-        {
-          title: '禅道执行名称',
-          dataIndex: 'pro_name',
-          ellipsis: { showTitle: false },
-          width: 200,
-          fixed: 'left',
-          render: (v: string) => (
-            <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
-          ),
-        },
-        {
-          title: '需求编号',
-          dataIndex: 'story',
-          width: 90,
-        },
-        {
-          title: '需求标题',
-          dataIndex: 'title',
-          width: 150,
-          ellipsis: { showTitle: false },
-          render: (v: string) => (
-            <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
-          ),
-        },
-        {
-          title: '需求阶段',
-          dataIndex: 'status',
-          width: 90,
-          ellipsis: { showTitle: false },
-          render: (v: string) => StoryStatus[v] ?? '',
-        },
-        {
-          title: '应用服务',
-          dataIndex: 'apps',
-          width: 110,
-          ellipsis: { showTitle: false },
-          render: (v: string) => (
-            <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'} />
-          ),
-        },
-        {
-          title: '是否涉及数据update',
-          dataIndex: 'db_update',
-          // width: 150,
-          render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-        },
-        {
-          title: '是否涉及数据Recovery',
-          dataIndex: 'is_recovery',
-          render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-        },
-        {
-          title: '是否可热更',
-          dataIndex: 'is_update',
-          width: 90,
-          render: (v: string, row: any, i: number) =>
-            v == '-' ? (
-              v
-            ) : (
-              <Select
-                disabled={user?.group !== 'superGroup'}
-                value={v}
-                style={{ width: '100%' }}
-                options={Object.keys(WhetherOrNot)?.map((k) => ({
-                  value: k,
-                  label: WhetherOrNot[k],
-                }))}
-                onChange={(e) => updateStatus(row, e, i)}
-              />
-            ),
-        },
-        { title: '需求创建人', dataIndex: 'opened_by', width: 100 },
-        { title: '需求指派人', dataIndex: 'ass_to', width: 100 },
-      ],
+      isSprint,
+      column: isSprint
+        ? [
+            {
+              title: '序号',
+              width: 70,
+              render: (_: any, r: any, i: number) => i + 1,
+              fixed: 'left',
+            },
+            {
+              title: '禅道执行名称',
+              dataIndex: 'pro_name',
+              ellipsis: { showTitle: false },
+              width: 500,
+              fixed: 'left',
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '应用服务',
+              dataIndex: 'apps',
+              width: 400,
+              ellipsis: { showTitle: false },
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+          ]
+        : [
+            {
+              title: '序号',
+              width: 70,
+              render: (_: any, r: any, i: number) => i + 1,
+              fixed: 'left',
+            },
+            {
+              title: '禅道执行名称',
+              dataIndex: 'pro_name',
+              ellipsis: { showTitle: false },
+              width: 200,
+              fixed: 'left',
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '需求编号',
+              dataIndex: 'story',
+              width: 90,
+            },
+            {
+              title: '需求标题',
+              dataIndex: 'title',
+              width: 150,
+              ellipsis: { showTitle: false },
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '需求阶段',
+              dataIndex: 'status',
+              width: 90,
+              ellipsis: { showTitle: false },
+              render: (v: string) => StoryStatus[v] ?? '',
+            },
+            {
+              title: '应用服务',
+              dataIndex: 'apps',
+              width: 110,
+              ellipsis: { showTitle: false },
+              render: (v: string) => (
+                <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '是否涉及数据update',
+              dataIndex: 'db_update',
+              // width: 150,
+              render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+            },
+            {
+              title: '是否涉及数据Recovery',
+              dataIndex: 'is_recovery',
+              render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+            },
+            {
+              title: '是否可热更',
+              dataIndex: 'is_update',
+              width: 90,
+              render: (v: string, row: any, i: number) =>
+                v == '-' ? (
+                  v
+                ) : (
+                  <Select
+                    disabled={user?.group !== 'superGroup'}
+                    value={v}
+                    style={{ width: '100%' }}
+                    options={Object.keys(WhetherOrNot)?.map((k) => ({
+                      value: k,
+                      label: WhetherOrNot[k],
+                    }))}
+                    onChange={(e) => updateStatus(row, e, i)}
+                  />
+                ),
+            },
+            { title: '需求创建人', dataIndex: 'opened_by', width: 100 },
+            { title: '需求指派人', dataIndex: 'ass_to', width: 100 },
+          ],
     };
   }, [JSON.stringify(list), user?.group]);
 

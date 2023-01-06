@@ -256,8 +256,7 @@ export default [
                 icon: 'table',
                 path: 'avgCodePerWeek',
                 component: './kpi/performance/developer/avgCodePerWeek',
-                // wrappers: ['../wrappers/auth'],
-                hideInMenu: true,
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '千行Bug率',

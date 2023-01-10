@@ -14,7 +14,10 @@ const cpWhetherOrNot = { ...WhetherOrNot, unknown: '免' };
 export const formatCluster = (value: string) =>
   isEmpty(value)
     ? ''
-    : value?.replace('cn-northwest-global', 'global')?.replaceAll('cn-northwest-', '集群');
+    : value
+        ?.replace('cn-northwest-global', 'global')
+        ?.replaceAll('cn-northwest-', '集群')
+        ?.replaceAll('cn-apnorthbj-', '腾讯生产集群');
 
 export const calendarColumn: (ColDef | ColGroupDef)[] = [
   {

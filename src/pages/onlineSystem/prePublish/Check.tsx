@@ -340,7 +340,7 @@ const Check = (props: any, ref: any) => {
   );
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
-      <div className={styles.onlineTable} style={{ ...props?.style, overflowY: 'initial' }}>
+      <div className={styles.onlineTable} style={{ height: '100%' }}>
         <Table
           size="small"
           bordered
@@ -494,7 +494,7 @@ const Check = (props: any, ref: any) => {
           ]}
           dataSource={list}
           pagination={false}
-          scroll={{ x: 'min-content', y: props?.style?.height - 50 }}
+          scroll={{ x: 'min-content' }}
           rowKey={(p) => p.rowKey}
           rowSelection={{
             selectedRowKeys: selected,

@@ -428,6 +428,19 @@ const SheetInfo = (props: any, ref: any) => {
     };
   }, [leaveShow, tab, subTab]);
 
+  useEffect(() => {
+    if (tab == 'profile') {
+      window.onresize = null;
+      return;
+    }
+    window.onresize = function () {
+      setTableHeight((window.innerHeight - 460) / 2);
+    };
+    return () => {
+      window.onresize = null;
+    };
+  }, [subTab, tab]);
+
   const computedServer = useMemo(() => PublishSeverColumn(upgradeData?.basic_data), [
     upgradeData?.basic_data,
   ]);
@@ -506,17 +519,13 @@ const SheetInfo = (props: any, ref: any) => {
     }
   }, [globalState?.finished]);
 
-  useEffect(() => {
-    setTableHeight((props?.style?.height - 200) / 2);
-  }, [props?.style?.height]);
-
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <Prompt
         when={leaveShow && subTab == 'sheet'}
         message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
       />
-      <div style={{ ...props?.style }}>
+      <div>
         <Form
           size={'small'}
           form={orderForm}

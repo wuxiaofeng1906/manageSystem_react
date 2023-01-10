@@ -42,6 +42,7 @@ const Check = (props: any, ref: any) => {
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [dutyPerson, setDutyPerson] = useState<any>();
+  let [count, setCount] = useState(0);
   const [list, setList] = useState(() =>
     checkInfo.map((it) => ({
       ...it,
@@ -166,17 +167,20 @@ const Check = (props: any, ref: any) => {
           );
         }
       }
+      let orignDuty = dutyPerson;
+      // 存在值班人员为空
+      const refresh = (isEmpty(orignDuty) && count < 2) || isFresh;
       const [checkItem, firstDuty] = await Promise.all([
         OnlineSystemServices.getCheckInfo({ release_num }),
-        isEmpty(dutyPerson) || isFresh ? DutyListServices.getFirstDutyPerson(range) : null,
+        refresh ? DutyListServices.getFirstDutyPerson(range) : null,
       ]);
-      let orignDuty = dutyPerson;
-      if (isEmpty(orignDuty) || isFresh) {
+      if (refresh) {
         const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
         duty?.forEach((it: any) => {
           orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
         });
         setDutyPerson(orignDuty);
+        setCount(++count);
       }
       setList(
         checkInfo.map((it) => {
@@ -233,7 +237,8 @@ const Check = (props: any, ref: any) => {
     let width = 700;
     let content = v;
     // 链接
-    if (type == 'env_data' || data.api_url == 'version-check') return window.open(v);
+    if (['env_data', 'backend_test_unit'].includes(type) || data.api_url == 'version-check')
+      return window.open(v);
     // 特殊处理
     if (type == 'libray_data')
       content = (
@@ -320,7 +325,10 @@ const Check = (props: any, ref: any) => {
       if ((globalState.locked || globalState.finished) && timer) {
         clearInterval(timer);
       }
-    } else setDutyPerson(undefined);
+    } else {
+      setDutyPerson(undefined);
+      setCount(0);
+    }
     return () => {
       clearInterval(timer);
     };

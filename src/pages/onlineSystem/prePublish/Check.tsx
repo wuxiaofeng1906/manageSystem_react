@@ -42,6 +42,7 @@ const Check = (props: any, ref: any) => {
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [dutyPerson, setDutyPerson] = useState<any>();
+  let [count, setCount] = useState(0);
   const [list, setList] = useState(() =>
     checkInfo.map((it) => ({
       ...it,
@@ -69,7 +70,7 @@ const Check = (props: any, ref: any) => {
       onRefreshCheck: () => init(true),
       onSetting: () => setShow({ visible: true, data: release_num }),
     }),
-    [selected, ref, globalState, basic, list],
+    [selected, ref, globalState, basic, list, subTab, tab],
   );
 
   const onCheck = async () => {
@@ -139,7 +140,7 @@ const Check = (props: any, ref: any) => {
     }
   };
 
-  const init = async (isFresh = false) => {
+  const init = async (isFresh = false, showLoading = true) => {
     const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
     const to = from.endOf('w');
 
@@ -147,7 +148,7 @@ const Check = (props: any, ref: any) => {
       start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
       end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
     };
-    setSpin(true);
+    setSpin(showLoading);
     setSelected([]);
     try {
       if (isFresh) {
@@ -166,17 +167,20 @@ const Check = (props: any, ref: any) => {
           );
         }
       }
+      let orignDuty = dutyPerson;
+      // 存在值班人员为空
+      const refresh = (isEmpty(orignDuty) && count < 2) || isFresh;
       const [checkItem, firstDuty] = await Promise.all([
         OnlineSystemServices.getCheckInfo({ release_num }),
-        isEmpty(dutyPerson) ? DutyListServices.getFirstDutyPerson(range) : null,
+        refresh ? DutyListServices.getFirstDutyPerson(range) : null,
       ]);
-      let orignDuty = dutyPerson;
-      if (isEmpty(orignDuty)) {
+      if (refresh) {
         const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
         duty?.forEach((it: any) => {
           orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
         });
         setDutyPerson(orignDuty);
+        setCount(++count);
       }
       setList(
         checkInfo.map((it) => {
@@ -233,7 +237,8 @@ const Check = (props: any, ref: any) => {
     let width = 700;
     let content = v;
     // 链接
-    if (type == 'env_data' || data.api_url == 'version-check') return window.open(v);
+    if (['env_data', 'backend_test_unit'].includes(type) || data.api_url == 'version-check')
+      return window.open(v);
     // 特殊处理
     if (type == 'libray_data')
       content = (
@@ -310,17 +315,29 @@ const Check = (props: any, ref: any) => {
   };
 
   useEffect(() => {
+    let timer: any;
     if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
       isEmpty(dutyPerson) && init();
-    } else setDutyPerson(undefined);
-  }, [subTab, tab, release_num, dutyPerson]);
+      timer = setInterval(() => {
+        init(false, false);
+      }, 15000);
+      if ((globalState.locked || globalState.finished) && timer) {
+        clearInterval(timer);
+      }
+    } else {
+      setDutyPerson(undefined);
+      setCount(0);
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [subTab, tab, release_num, globalState, dutyPerson]);
 
   const hasEdit = useMemo(
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,
     [globalState, user?.group],
   );
-
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
       <div className={styles.onlineTable} style={{ height: '100%' }}>
@@ -586,23 +603,23 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
   };
 
   return (
-    <Spin spinning={loading} tip={'数据加载中...'}>
-      <Modal
-        {...props}
-        centered
-        destroyOnClose
-        maskClosable={false}
-        title={'检查参数设置'}
-        onCancel={() => props?.onOk?.()}
-        visible={props.init?.visible}
-        footer={[
-          <Button onClick={showLog}>查看日志</Button>,
-          <Button onClick={() => props.onOk?.()}>取消</Button>,
-          <Button type={'primary'} disabled={disabled} onClick={onConfirm}>
-            确定
-          </Button>,
-        ]}
-      >
+    <Modal
+      {...props}
+      centered
+      destroyOnClose
+      maskClosable={false}
+      title={'检查参数设置'}
+      onCancel={() => props?.onOk?.()}
+      visible={props.init?.visible}
+      footer={[
+        <Button onClick={showLog}>查看日志</Button>,
+        <Button onClick={() => props.onOk?.()}>取消</Button>,
+        <Button type={'primary'} disabled={disabled || loading} onClick={onConfirm}>
+          确定
+        </Button>,
+      ]}
+    >
+      <Spin spinning={loading} tip={'数据加载中...'}>
         <Form form={form} labelCol={{ span: 6 }}>
           <h4>一、检查上线分支是否包含对比分支的提交</h4>
           <Form.Item
@@ -629,7 +646,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
             />
           </Form.Item>
         </Form>
-      </Modal>
-    </Spin>
+      </Spin>
+    </Modal>
   );
 };

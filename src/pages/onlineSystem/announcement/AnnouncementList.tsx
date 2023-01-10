@@ -10,7 +10,6 @@ import DutyListServices from '@/services/dutyList';
 import AnnouncementServices from '@/services/announcement';
 import { isEmpty } from 'lodash';
 import IPagination from '@/components/IPagination';
-import { getHeight } from '@/publicMethods/pageSet';
 import { useModel, history } from 'umi';
 import moment from 'moment';
 import usePermission from '@/hooks/permission';
@@ -23,7 +22,7 @@ const announcementList = () => {
   const [list, setList] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
   const [persons, setPersons] = useState<any[]>([]);
-  const [gridHeight, setGridHeight] = useState(getHeight() - 60);
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 300);
 
   const [pages, setPages] = useState({
     page_size: 20,
@@ -117,12 +116,14 @@ const announcementList = () => {
   useEffect(() => {
     getPerson();
     getList();
+    window.onresize = function () {
+      setGridHeight(window.innerHeight - 300);
+      gridRef.current?.sizeColumnsToFit();
+    };
+    return () => {
+      window.onresize = null;
+    };
   }, []);
-
-  window.onresize = function () {
-    setGridHeight(Number(getHeight()) - 60);
-    gridRef.current?.sizeColumnsToFit();
-  };
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">

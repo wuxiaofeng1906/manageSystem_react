@@ -6,10 +6,10 @@ import { AgGridReact } from 'ag-grid-react';
 import React, { useRef, useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { useGqlClient } from '@/hooks';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { IStaticBy } from '@/hooks/statistic';
 import StatisticServices from '@/services/statistic';
-import { isEqual, omit, sortBy, groupBy } from 'lodash';
+import { omit, sortBy, groupBy } from 'lodash';
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import {
   getAllDate,
@@ -45,12 +45,7 @@ const SystemAvgRespTime = () => {
   const [gridData, setGridData] = useState<any[]>();
   const [columns, setColumns] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
-  const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
-
-  window.onresize = function () {
-    setGridHeight(window.innerHeight - 250);
-    gridRef.current?.sizeColumnsToFit();
-  };
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 240);
 
   const getDetail = async () => {
     setLoading(true);
@@ -92,11 +87,21 @@ const SystemAvgRespTime = () => {
   };
 
   useEffect(() => {
-    renderColumn(category, 2);
+    renderColumn(category);
     getDetail();
   }, [category]);
 
-  const renderColumn = (type: IStaticBy, len?: number) => {
+  useEffect(() => {
+    window.onresize = function () {
+      setGridHeight(window.innerHeight - 240);
+      gridRef.current?.sizeColumnsToFit();
+    };
+    return () => {
+      window.onresize = null;
+    };
+  }, []);
+
+  const renderColumn = (type: IStaticBy) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
       year: getYearsTime,

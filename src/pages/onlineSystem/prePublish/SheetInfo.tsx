@@ -415,10 +415,6 @@ const SheetInfo = (props: any, ref: any) => {
 
   const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
 
-  window.onresize = function () {
-    setTableHeight((window.innerHeight - 460) / 2);
-  };
-
   useEffect(() => {
     const listener = (ev) => {
       ev.preventDefault();
@@ -431,6 +427,19 @@ const SheetInfo = (props: any, ref: any) => {
       window.removeEventListener('beforeunload', listener);
     };
   }, [leaveShow, tab, subTab]);
+
+  useEffect(() => {
+    if (tab == 'profile') {
+      window.onresize = null;
+      return;
+    }
+    window.onresize = function () {
+      setTableHeight((window.innerHeight - 460) / 2);
+    };
+    return () => {
+      window.onresize = null;
+    };
+  }, [subTab, tab]);
 
   const computedServer = useMemo(() => PublishSeverColumn(upgradeData?.basic_data), [
     upgradeData?.basic_data,

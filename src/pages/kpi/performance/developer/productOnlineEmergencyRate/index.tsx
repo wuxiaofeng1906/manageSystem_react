@@ -3,7 +3,7 @@ import type { IRuleData } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 import { AgGridReact } from 'ag-grid-react';
 import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { Button, Spin } from 'antd';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -57,12 +57,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>();
-  const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
-
-  window.onresize = function () {
-    setGridHeight(window.innerHeight - 250);
-    gridRef.current?.sizeColumnsToFit();
-  };
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 240);
 
   const getDate = () => {
     const ends = category == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
@@ -88,6 +83,16 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   useEffect(() => {
     getTableSource();
   }, [category]);
+
+  useEffect(() => {
+    window.onresize = function () {
+      setGridHeight(window.innerHeight - 240);
+      gridRef.current?.sizeColumnsToFit();
+    };
+    return () => {
+      window.onresize = null;
+    };
+  }, []);
 
   return (
     <PageContainer>

@@ -27,12 +27,10 @@ export type Period = 'period' | 'uptoperiod';
 export interface IRequest {
   type: IStaticBy;
   identity?: IIdentity;
-  len?: number;
   period?: Period;
   showDenominator?: boolean;
   defaultColumn?: boolean;
   normalQuarter?: boolean;
-  onClick?: (data: any) => void;
   request: (data: IStatisticQuery) => void;
 }
 
@@ -47,15 +45,13 @@ export const useStatistic = () => {
     type = 'week',
     identity,
     showDenominator = false,
-    len,
     period,
     defaultColumn = true,
     normalQuarter = false,
-    onClick,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     if (defaultColumn) {
-      renderColumn({ type, showSplit: showDenominator, len, normalQuarter, onClick });
+      renderColumn({ type, normalQuarter });
     }
     setRowData([]);
     setLoading(true);
@@ -83,16 +79,10 @@ export const useStatistic = () => {
   // column
   const renderColumn = ({
     type,
-    showSplit = false,
     normalQuarter = false,
-    len,
-    onClick,
   }: {
     type: IStaticBy;
-    showSplit?: boolean;
     normalQuarter?: boolean;
-    len?: number;
-    onClick?: Function;
   }) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {

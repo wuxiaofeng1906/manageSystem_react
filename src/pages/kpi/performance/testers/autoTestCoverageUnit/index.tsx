@@ -59,12 +59,7 @@ export default () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rowData, setRowData] = useState<any[]>([]);
-  const [gridHeight, setGridHeight] = useState(window.innerHeight - 250);
-
-  window.onresize = function () {
-    setGridHeight(window.innerHeight - 250);
-    gridRef.current?.sizeColumnsToFit();
-  };
+  const [gridHeight, setGridHeight] = useState(window.innerHeight - 230);
 
   const getTableSource = async () => {
     setLoading(true);
@@ -164,6 +159,16 @@ export default () => {
   useEffect(() => {
     getTableSource();
   }, [category]);
+
+  useEffect(() => {
+    window.onresize = function () {
+      setGridHeight(window.innerHeight - 230);
+      gridRef.current?.sizeColumnsToFit();
+    };
+    return () => {
+      window.onresize = null;
+    };
+  }, []);
 
   return (
     <PageContainer>

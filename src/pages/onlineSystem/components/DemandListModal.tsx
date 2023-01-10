@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button } from 'antd';
 import dayjs from 'dayjs';
 import { useModel } from 'umi';
-import { isEmpty, difference, isEqual, intersection } from 'lodash';
+import { isEmpty, difference, isEqual, intersection, uniq } from 'lodash';
 import styles from './DemandListModal.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import {
@@ -156,7 +156,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         : '灰度发布';
     const data = {
       user_id: user?.userid ?? '',
-      cluster: values.cluster?.join() ?? '',
+      cluster: uniq(values.cluster || [])?.join() ?? '',
       release_env: values.release_env ?? '',
       release_env_type: values.release_env_type,
       branch: computed.branch,
@@ -213,7 +213,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           ? ['cn-northwest-global']
           : memoColumn.isSprint
           ? ['cn-northwest-0']
-          : selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : [])),
+          : uniq(selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : []))),
     });
     setSelected(
       selectedData?.filter(

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, Result } from 'antd';
 import { BarsOutlined, HistoryOutlined } from '@ant-design/icons';
 import { useLocation, history } from 'umi';
@@ -12,12 +12,19 @@ const Index = () => {
   const query = useLocation()?.query;
 
   const { prePermission } = usePermission();
+  const [height, setHeight] = useState(window.innerHeight - 250);
   const hasPermission = prePermission();
 
   useEffect(() => {
     let init = query.key;
     if (!hasPermission?.preList && hasPermission?.historyList) init = 'history';
     updateKey(init);
+    window.onresize = function () {
+      setHeight(window.innerHeight - 250);
+    };
+    return () => {
+      window.onresize = null;
+    };
   }, []);
 
   const updateKey = (key?: string) =>
@@ -38,7 +45,7 @@ const Index = () => {
                   </div>
                 }
               >
-                <PreReleaseList disabled={!hasPermission?.add} />
+                <PreReleaseList disabled={!hasPermission?.add} height={height} />
               </Tabs.TabPane>
             ) : (
               <div />
@@ -53,7 +60,7 @@ const Index = () => {
                   </div>
                 }
               >
-                <HistoryList />
+                <HistoryList height={height} />
               </Tabs.TabPane>
             ) : (
               <div />

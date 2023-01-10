@@ -3,7 +3,7 @@ import type { IRuleData } from '@/components/IStaticAgTable';
 import { ConditionHeader, IDrawer } from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 import { useGqlClient } from '@/hooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import {
   getFourQuarterTime,
   getHalfYearTime,

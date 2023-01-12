@@ -355,7 +355,7 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
 };
 
 // 使用界面：项目计划偏差率、提测计划偏差率（只显示部门数据，数据*100）
-const converseForAgGrid_projectPlanDevition = (oraDatas: any) => {
+const converseForAgGrid_projectPlanDevition = (oraDatas: any, percent = 100) => {
   if (!oraDatas) return [];
   const resultArray: any = [];
   // 解析部门数据
@@ -368,13 +368,13 @@ const converseForAgGrid_projectPlanDevition = (oraDatas: any) => {
           Group: o.deptName.includes('全部') ? ['研发中心'] : ['研发中心', o.deptName],
           isDept: true,
           dept: o.dept,
-          [starttime]: o.kpi * 100,
+          [starttime]: o.kpi * percent,
         });
       });
     } else
       resultArray.push({
         Group: ['研发中心'],
-        [starttime]: elements.total?.kpi * 100,
+        [starttime]: elements.total?.kpi * percent,
         isDept: true,
       });
 
@@ -386,7 +386,7 @@ const converseForAgGrid_projectPlanDevition = (oraDatas: any) => {
       // 新增部门
       resultArray.push({
         Group: groups,
-        [starttime]: depts?.kpi * 100,
+        [starttime]: depts?.kpi * percent,
         isDept: true,
       });
     });

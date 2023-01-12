@@ -740,13 +740,14 @@ const DutyCatalog = () => {
                   >
                     {({ getFieldValue }) => {
                       const env = getFieldValue('release_env');
-                      const ignoreEnv = env?.filter((it: string) => it !== 'cn-northwest-global');
+                      const ignoreEnv = env?.filter(
+                        (it: string) => !['cn-northwest-global'].includes(it),
+                      );
                       const limitEnv = envList.map((it: any) => ({
                         ...it,
                         disabled:
                           isEmpty(ignoreEnv) ||
                           it.label.includes('global') ||
-                          it.label.includes('cn-apnorthbj') ||
                           (intersection(ignoreEnv, otherEnv)?.length > 0 && it.type == 'other')
                             ? false
                             : !ignoreEnv.includes(it.value),

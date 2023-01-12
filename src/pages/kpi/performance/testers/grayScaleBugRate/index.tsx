@@ -52,7 +52,7 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-
+let mergeBugTotal = {};
 const GrayScaleBugRate: React.FC = () => {
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
@@ -77,26 +77,38 @@ const GrayScaleBugRate: React.FC = () => {
           ends,
         },
       });
-      setData(
-        data
-          ?.map((it: any) => {
-            const title =
-              category == 'quarter'
-                ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
-                : moment(it.range.start).format('MM月YYYY年');
 
-            if (isEmpty(it.datas)) return { title: title, total: 0 };
+      let result: any[] = [];
+      data?.forEach((it: any) => {
+        const title =
+          category == 'quarter'
+            ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
+            : moment(it.range.start).format('MM月YYYY年');
 
-            return it.datas.map((child: any) => ({
+        if (isEmpty(it.datas)) {
+          result.push({ title: title, total: 0 });
+          mergeBugTotal = { ...mergeBugTotal, [title]: 0 };
+        } else {
+          let numTotal = 0;
+          let denTotal = 0;
+          it.datas.forEach((child: any) => {
+            numTotal += child.numerator || 0;
+            denTotal += child.denominator || 0;
+            result.push({
               subTitle: moment(child.date).format('YYYYMMDD'),
               title: title,
               numerator: child.numerator,
               denominator: child.denominator,
-              total: (child.numerator / child.denominator) * 100,
-            }));
-          })
-          .flat(),
-      );
+              total: (child.numerator / child.denominator) * 1000,
+            });
+          });
+          mergeBugTotal = {
+            ...mergeBugTotal,
+            [title]: numTotal == 0 || denTotal == 0 ? 0 : ((numTotal / denTotal) * 1000).toFixed(2),
+          };
+        }
+      });
+      setData(result || []);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -104,9 +116,9 @@ const GrayScaleBugRate: React.FC = () => {
   };
 
   useEffect(() => {
+    mergeBugTotal = {};
     getTableSource();
   }, [category]);
-
   return (
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
@@ -130,9 +142,17 @@ const GrayScaleBugRate: React.FC = () => {
             rowData={data}
             suppressAggFuncInHeader={true}
             columnDefs={[
-              { field: 'total', headerName: 'bug率', aggFunc: (data) => aggFunc(data, 3) },
-              { field: 'numerator', headerName: '加权数', aggFunc: aggFunc },
-              { field: 'denominator', headerName: '代码量', aggFunc: aggFunc },
+              {
+                field: 'total',
+                headerName: 'bug率',
+                aggFunc: (p) => aggFunc(p, 2),
+                cellRenderer: (p) => {
+                  if (isEmpty(p.colDef?.pivotTotalColumnIds)) return p.value;
+                  return mergeBugTotal[p.colDef?.pivotKeys?.toString()];
+                },
+              },
+              { field: 'numerator', headerName: '加权bug数', aggFunc },
+              { field: 'denominator', headerName: '代码量', aggFunc },
               { field: 'title', pivot: true, pivotComparator: () => 1 },
               { field: 'subTitle', pivot: true },
             ]}

@@ -21,7 +21,6 @@ import {
 } from 'antd';
 import {
   preServerColumn,
-  formatCluster,
   repairColumn,
   serverConfirmColumn,
   upgradeServicesColumn,
@@ -55,6 +54,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const { subTab, tab } = useLocation()?.query as { tab: string; subTab: string };
 
   const { onlineSystemPermission } = usePermission();
+  const [globalEnv] = useModel('env', (env) => [env.globalEnv]);
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const {
     globalState,
@@ -149,7 +149,7 @@ const ProcessDetail = (props: any, ref: any) => {
       form.setFieldsValue({
         ...basic,
         plan_release_time: basic?.plan_release_time ? moment(basic?.plan_release_time) : null,
-        cluster: formatCluster(basic?.cluster),
+        cluster: basic?.cluster?.split(',') ?? [],
       });
     }
     if (!isEmpty(repair)) {
@@ -160,7 +160,6 @@ const ProcessDetail = (props: any, ref: any) => {
       });
     }
   }, [basic, repair]);
-
   const onSeal = async (flag = true) => {
     let tips = '请选择未锁定服务进行分支锁定';
     if (!flag) tips = '请选择已锁定服务进行解除分支锁定';
@@ -399,7 +398,7 @@ const ProcessDetail = (props: any, ref: any) => {
           form.setFieldsValue({
             ...init,
             plan_release_time: init?.plan_release_time ? moment(init?.plan_release_time) : null,
-            cluster: formatCluster(basic?.cluster),
+            cluster: basic?.cluster?.split(',') ?? [],
           });
         },
         onOk: async () => {
@@ -531,7 +530,7 @@ const ProcessDetail = (props: any, ref: any) => {
             </Col>
             <Col span={4}>
               <Form.Item label={'发布集群'} name={'cluster'}>
-                <Input disabled placeholder={'发布集群'} />
+                <Select disabled placeholder={'发布集群'} options={globalEnv} />
               </Form.Item>
             </Col>
             <Col span={5}>

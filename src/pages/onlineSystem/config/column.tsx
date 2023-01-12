@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { ColumnsType } from 'antd/lib/table';
-import { isEmpty, sum } from 'lodash';
+import { sum } from 'lodash';
 import {
   PublishStatus,
   ReleaseOrderStatus,
@@ -10,14 +10,6 @@ import {
 } from '@/pages/onlineSystem/config/constant';
 import Ellipsis from '@/components/Elipsis';
 const cpWhetherOrNot = { ...WhetherOrNot, unknown: '免' };
-
-export const formatCluster = (value: string) =>
-  isEmpty(value)
-    ? ''
-    : value
-        ?.replace('cn-northwest-global', 'global')
-        ?.replaceAll('cn-northwest-', '集群')
-        ?.replaceAll('cn-apnorthbj-', '腾讯生产集群');
 
 export const calendarColumn: (ColDef | ColGroupDef)[] = [
   {
@@ -53,52 +45,6 @@ export const calendarColumn: (ColDef | ColGroupDef)[] = [
     minWidth: 110,
     valueFormatter: (p) => PublishStatus[p.value] ?? '',
   },
-];
-// 发布过程列表
-export const preProcessColumn: (ColDef | ColGroupDef)[] = [
-  {
-    headerName: '序号',
-    field: 'num',
-    minWidth: 90,
-    maxWidth: 90,
-    cellRenderer: (params: any) => String(+params.node.id + 1),
-  },
-  {
-    headerName: '发布批次名',
-    field: 'release_name',
-    minWidth: 150,
-    tooltipField: 'release_name',
-    cellRenderer: 'link',
-  },
-  {
-    headerName: '项目名称',
-    field: 'project',
-    minWidth: 150,
-    tooltipField: 'project',
-  },
-  {
-    headerName: '发布集群',
-    field: 'cluster',
-    minWidth: 140,
-    tooltipField: 'cluster',
-    valueFormatter: (p) => formatCluster(p.value),
-  },
-  {
-    headerName: '上线分支',
-    field: 'branch',
-    minWidth: 130,
-    tooltipField: 'branch',
-  },
-  { headerName: '发布服务', field: 'apps', minWidth: 110 },
-  { headerName: '创建人', field: 'create_user', minWidth: 110 },
-  { headerName: '创建时间', field: 'create_time', minWidth: 110 },
-  {
-    headerName: '发布单状态',
-    field: 'release_result',
-    minWidth: 110,
-    valueFormatter: (p) => ReleaseOrderStatus[p.value] ?? '',
-  },
-  { headerName: '工单部署结束时间', field: 'repair_order_fish_time', minWidth: 110 },
 ];
 // 禅道概况
 export const zentaoStoryColumn: (ColDef | ColGroupDef)[] = [
@@ -395,7 +341,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       headerName: '环境',
       field: 'cluster',
       minWidth: 180,
-      valueFormatter: (p) => formatCluster(p.value),
+      cellRenderer: 'ICluster',
     },
     { headerName: '应用', field: 'apps', minWidth: 110 },
     { headerName: '镜像源环境', field: 'release_env', minWidth: 110 },

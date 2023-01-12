@@ -15,15 +15,7 @@ import useLock from '@/hooks/lock';
 
 const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'label' };
 const recentType = { 前端: 'front', 后端: 'backend', 测试: 'test', 运维: 'operations', SQA: 'sqa' };
-const envType = {
-  '集群0-8':
-    'cn-northwest-0,cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
-  '集群1-8':
-    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
-  '集群2-8':
-    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
-  global: 'cn-northwest-global',
-};
+let envType = {};
 const tbodyConfig = [
   { title: '前端值班', name: 'front', tech: 1 },
   { title: '后端值班', name: 'backend', tech: 2 },
@@ -148,6 +140,7 @@ const DutyCatalog = () => {
   };
 
   const getSource = async () => {
+    let result: any[] = [];
     try {
       setLoading(true);
       const [envs, methods] = await Promise.all([
@@ -155,15 +148,18 @@ const DutyCatalog = () => {
         DutyListServices.releaseMethod(),
       ]);
       setLoading(false);
-
-      setEnvList(
-        envs.map((it: any) => ({
+      envs.forEach((it: any) => {
+        if (it.env?.split(',')?.length > 1) {
+          envType = { ...envType, [it.env_name]: it.env };
+        }
+        result.push({
           value: it.env,
           label: it.env_name,
           key: it.env,
           type: envType[it.env_name] ?? 'other',
-        })),
-      );
+        });
+      });
+      setEnvList(result);
       setMethodList(
         methods.map((it: any) => ({
           value: it.method,
@@ -604,9 +600,7 @@ const DutyCatalog = () => {
     onDeleteLock();
   };
 
-  const otherEnv = envList
-    .filter((o: any) => !Object.values(envType).includes(o.value))
-    .map((it) => it.value);
+  const otherEnv = envList.filter((o: any) => o.value !== envType[o.label]).map((it) => it.value);
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
@@ -699,7 +693,7 @@ const DutyCatalog = () => {
                   </Form.Item>
                 </th>
                 <th style={{ width: 100 }}>项目负责人</th>
-                <th style={{ minWidth: 100, maxWidth: 200 }}>
+                <th style={{ minWidth: 100, maxWidth: 170 }}>
                   <Form.Item
                     noStyle
                     shouldUpdate={(pre, next) => pre.project_pm != next.project_pm}
@@ -724,7 +718,7 @@ const DutyCatalog = () => {
                   </Form.Item>
                 </th>
                 <th>值班日期</th>
-                <th style={{ width: 150, maxWidth: 170 }}>
+                <th style={{ width: 150, maxWidth: 190 }}>
                   <Form.Item name={'duty_date'}>
                     <DatePicker
                       format={'YYYY-MM-DD'}
@@ -739,22 +733,23 @@ const DutyCatalog = () => {
                   </Form.Item>
                 </th>
                 <th>发布环境</th>
-                <th style={{ width: 120, maxWidth: 170 }}>
+                <th style={{ width: 140, maxWidth: 170 }}>
                   <Form.Item
                     noStyle
                     shouldUpdate={(pre, next) => pre.release_env != next.release_env}
                   >
                     {({ getFieldValue }) => {
                       const env = getFieldValue('release_env');
+                      const ignoreEnv = env?.filter((it: string) => it !== 'cn-northwest-global');
                       const limitEnv = envList.map((it: any) => ({
                         ...it,
                         disabled:
-                          isEmpty(env) ||
-                          (it.type == 'other' && intersection(otherEnv, env).length > 0) ||
-                          it.label == 'global' ||
-                          env?.join(',') == 'cn-northwest-global'
+                          isEmpty(ignoreEnv) ||
+                          it.label.includes('global') ||
+                          it.label.includes('cn-apnorthbj') ||
+                          (intersection(ignoreEnv, otherEnv)?.length > 0 && it.type == 'other')
                             ? false
-                            : !env.includes(it.type),
+                            : !ignoreEnv.includes(it.value),
                       }));
                       return (
                         <Form.Item name={'release_env'}>
@@ -762,16 +757,17 @@ const DutyCatalog = () => {
                             options={limitEnv}
                             mode={'multiple'}
                             disabled={!hasPermission}
-                            onSelect={async () => {
-                              const title = (await updateTitle()) || '';
-                              setTitle(title);
-                            }}
-                            onDeselect={async () => {
-                              const title = (await updateTitle()) || '';
-                              setTitle(title);
-                              await onSave();
-                            }}
-                            onDropdownVisibleChange={(open) => !open && onSave()}
+                            style={{ width: '100%' }}
+                            // onSelect={async () => {
+                            //   const title = (await updateTitle()) || '';
+                            //   setTitle(title);
+                            // }}
+                            // onDeselect={async () => {
+                            //   const title = (await updateTitle()) || '';
+                            //   setTitle(title);
+                            //   await onSave();
+                            // }}
+                            // onDropdownVisibleChange={(open) => !open && onSave()}
                           />
                         </Form.Item>
                       );

@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
   Form,
   Select,
@@ -32,11 +32,13 @@ import DragIcon from '@/components/DragIcon';
 import cns from 'classnames';
 import { valueMap } from '@/utils/utils';
 import usePermission from '@/hooks/permission';
+import ICluster from '@/components/ICluster';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
   const { id } = useParams() as { id: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+  const [envList] = useModel('env', (env) => [env.globalEnv]);
   const gridRef = useRef<GridApi>();
   const gridCompareRef = useRef<GridApi>();
   const [orderForm] = Form.useForm();
@@ -49,7 +51,6 @@ const ReleaseOrder = () => {
   const [compareData, setCompareData] = useState<{ opsData: any[]; alpha: any[] }>();
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [announcementList, setAnnouncementList] = useState<any[]>([]);
-  const [envList, setEnvList] = useState<any[]>([]);
 
   const [spinning, setSpinning] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -71,11 +72,16 @@ const ReleaseOrder = () => {
       setClusters(clusterMap);
       getOrderDetail(clusterMap);
     });
+    window.onresize = function () {
+      setTableHeight((window.innerHeight - 370) / 2);
+    };
+    return () => {
+      window.onresize = null;
+    };
   }, []);
 
   const getBaseList = async () => {
     const announce = await AnnouncementServices.preAnnouncement();
-    const envs = await PreReleaseServices.environment();
     const order = await PreReleaseServices.dutyOrder();
     setDutyList(
       order?.map((it: any) => ({
@@ -83,19 +89,6 @@ const ReleaseOrder = () => {
         value: it.person_duty_num,
         key: it.person_duty_num,
       })),
-    );
-    setEnvList(
-      envs?.flatMap((it: any) =>
-        ['集群0', 'global', '集群0-8'].includes(it.online_environment_name)
-          ? []
-          : [
-              {
-                label: it.online_environment_name ?? '',
-                value: it.online_environment_id,
-                key: it.online_environment_id,
-              },
-            ],
-      ),
     );
     setAnnouncementList(
       announce.map((it: any) => ({
@@ -127,15 +120,7 @@ const ReleaseOrder = () => {
       });
       agFinished = res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
       setFinished(agFinished);
-      setOrderData(
-        res.ready_data?.map((it: any) => ({
-          ...it,
-          cluster: it.cluster
-            ?.split(',')
-            .map((o) => (o.includes('cn-northwest') ? clusterMap[o] ?? '' : o))
-            ?.join(','),
-        })),
-      );
+      setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
     } catch (e: any) {
@@ -156,15 +141,7 @@ const ReleaseOrder = () => {
         return;
       }
       const rd = await PreReleaseServices.orderList(values.cluster?.join(',') ?? '');
-      setOrderData(
-        rd?.map((it: any) => ({
-          ...it,
-          cluster: it.cluster
-            ?.split(',')
-            .map((o: string) => (o.includes('cn-northwest') ? clusters[o] ?? '' : o))
-            ?.join(','),
-        })),
-      );
+      setOrderData(rd);
       const flag = rd.some((it: any) => (it.repair_order_type ?? '').indexOf('停机') > -1);
       orderForm.setFieldsValue({
         release_way: flag ? 'stop_server' : 'keep_server',
@@ -452,10 +429,6 @@ const ReleaseOrder = () => {
     formatCompare(compareData?.opsData ?? [], sortArr);
   };
 
-  window.onresize = function () {
-    setTableHeight((window.innerHeight - 370) / 2);
-  };
-
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <PageContainer title={<div />}>
@@ -577,7 +550,11 @@ const ReleaseOrder = () => {
                   <Select
                     showSearch
                     disabled={finished}
-                    options={envList}
+                    options={envList?.filter(
+                      (it: any) =>
+                        !['cn-northwest-0', 'cn-northwest-global'].includes(it.value) &&
+                        !it.label?.includes('集群0-8'),
+                    )}
                     style={{ width: '100%' }}
                     mode={'multiple'}
                     onChange={onLinkTable}
@@ -609,6 +586,7 @@ const ReleaseOrder = () => {
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 frameworkComponents={{
+                  ICluster: (p) => <ICluster data={p.value} />,
                   link: (p: CellClickedEvent) => (
                     <div
                       style={{

@@ -4,12 +4,12 @@ import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch } from 'antd';
 import { InfoCircleOutlined, RightOutlined, DownOutlined } from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, cloneDeep, isArray, intersection, difference } from 'lodash';
+import { isEmpty, sortBy, cloneDeep, isArray, intersection, difference, pick } from 'lodash';
 import dayjs from 'dayjs';
 import { valueMap } from '@/utils/utils';
 import { history, useModel } from 'umi';
 
-const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
+let thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
 const baseColumn = [
   { name: 'offline', value: thead[1] },
@@ -222,6 +222,10 @@ const VisualView = () => {
     // getSelectData();
     PreReleaseServices.clusterGroup().then((res) => {
       const clusterMap = valueMap(res, ['name', 'value']);
+      Object.values(pick(clusterMap, ignore))?.forEach((name: any, index: number) => {
+        thead[index + 2] = name.endsWith(thead[index + 2]) ? name : thead[index + 2];
+      });
+
       setCluster(clusterMap);
       getViewData(clusterMap);
     });
@@ -503,6 +507,7 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
+  const init = useMemo(() => {}, []);
   return (
     <Card
       className={styles.card}

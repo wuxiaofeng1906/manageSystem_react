@@ -45,6 +45,7 @@ import { isEmpty, omit, isString, pick } from 'lodash';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
+import ICluster from '@/components/ICluster';
 
 let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
@@ -55,9 +56,9 @@ const SheetInfo = (props: any, ref: any) => {
   const { release_num } = useParams() as { release_num: string };
   const { onlineSystemPermission } = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+  const [envs] = useModel('env', (env) => [env.globalEnv]);
   const [
     globalState,
-    envs,
     sqlList,
     draft,
     setGlobalState,
@@ -65,7 +66,6 @@ const SheetInfo = (props: any, ref: any) => {
     setDraft,
   ] = useModel('onlineSystem', (online) => [
     online.globalState,
-    online.envs,
     online.sqlList,
     online.draft,
     online.setGlobalState,
@@ -707,7 +707,10 @@ const SheetInfo = (props: any, ref: any) => {
             columnDefs={computedServer}
             rowData={isEmpty(upgradeData?.release_app) ? [] : [upgradeData?.release_app]}
             {...initGridTable({ ref: serverRef, height: 30 })}
-            frameworkComponents={{ select: renderSelect }}
+            frameworkComponents={{
+              select: renderSelect,
+              ICluster: (p) => <ICluster data={p.value} />,
+            }}
           />
         </div>
         {upgradeData?.basic_data?.release_type?.release_way !== 'keep_server' && (

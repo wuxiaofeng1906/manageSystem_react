@@ -97,22 +97,14 @@ export default () => {
   };
 
   const getSelectList = async () => {
-    const res = await PreReleaseServices.environment();
     const sqlOrder = await OnlineSystemServices.sqlOrder();
-    setEnvs(
-      res?.map((it: any) => ({
-        label: it.online_environment_name ?? '',
-        value: it.online_environment_id,
-        key: it.online_environment_id,
-      })),
-    );
     setSqlList(sqlOrder.map((it: any) => ({ label: it.label, value: it.label })));
   };
   useEffect(() => {
     if (
       (location.pathname.includes('onlineSystem/prePublish') ||
         location.pathname.includes('onlineSystem/releaseProcess')) &&
-      isEmpty(envs)
+      isEmpty(sqlList)
     ) {
       getSelectList();
     }
@@ -123,7 +115,6 @@ export default () => {
 
   return {
     globalState,
-    envs,
     sqlList,
     basic,
     server,

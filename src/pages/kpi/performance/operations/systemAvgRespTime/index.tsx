@@ -21,6 +21,7 @@ import {
 } from '@/publicMethods/timeMethods';
 import { initGridTable } from '@/utils/utils';
 import WrapperKpi from '@/components/wrapperKpi';
+import { useModel } from '@@/plugin-model/useModel';
 
 const ruleData: IRuleData[] = [
   {
@@ -40,6 +41,7 @@ const ruleData: IRuleData[] = [
 const SystemAvgRespTime = () => {
   const gqlClient = useGqlClient();
   const gridRef = useRef<GridApi>();
+  const [mergeEnv] = useModel('env', (env) => [env.mergeEnv]);
   const [category, setCategory] = useState<IStaticBy>('quarter');
   const [loading, setLoading] = useState(false);
   const [gridData, setGridData] = useState<any[]>();
@@ -62,12 +64,7 @@ const SystemAvgRespTime = () => {
         sortBy(it.datas, 'cluster')?.forEach((o) => {
           result.push({
             [it.range.start]: o.duration,
-            cluster: [
-              parent,
-              o.cluster
-                ?.replace('cn-northwest-', '集群')
-                ?.replaceAll('cn-apnorthbj-', '腾讯生产集群'),
-            ],
+            cluster: [parent, mergeEnv?.[o.cluster] ?? o.cluster],
           });
         });
       });

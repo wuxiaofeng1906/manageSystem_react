@@ -14,13 +14,13 @@ import {
 import { errorMessage, infoMessage } from '@/publicMethods/showMessages';
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
-import PreReleaseServices from '@/services/preRelease';
 
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [form] = Form.useForm();
   const [baseForm] = Form.useForm();
   const [computed, setComputed] = useState<any>();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+  const [globalEnv] = useModel('env', (env) => [env.globalEnv]);
   const [globalState, getLogInfo] = useModel('onlineSystem', (online) => [
     online.globalState,
     online.getLogInfo,
@@ -32,7 +32,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
   const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
   const [branchs, setBranchs] = useState<any[]>();
-  const [envs, setEnvs] = useState<any[]>();
 
   useEffect(() => {
     if (!props.visible) {
@@ -67,18 +66,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       getTableList();
     }
   }, [computed?.branch]);
-
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();
     setAppServers(res);
-    const env = await PreReleaseServices.environment();
-    setEnvs(
-      env?.map((it: any) => ({
-        label: it.online_environment_name ?? '',
-        value: it.online_environment_id,
-        key: it.online_environment_id,
-      })),
-    );
   };
 
   const getRelatedStory = async () => {
@@ -494,7 +484,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                           >
                             <Select
                               mode={'multiple'}
-                              options={envs}
+                              options={globalEnv}
                               placeholder={'发布集群'}
                               disabled={
                                 // global 、班车，特性项目 不可编辑

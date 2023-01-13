@@ -125,6 +125,7 @@ export const historyOrderColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '已发布集群',
     field: 'cluster',
+    cellRenderer: 'ICluster',
   },
   {
     headerName: '操作',

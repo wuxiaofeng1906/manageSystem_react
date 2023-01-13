@@ -1,3 +1,5 @@
+import { isArray } from 'lodash';
+
 const managers = [
   '宋永强',
   '郑江',
@@ -353,28 +355,38 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
 };
 
 // 使用界面：项目计划偏差率、提测计划偏差率（只显示部门数据，数据*100）
-const converseForAgGrid_projectPlanDevition = (oraDatas: any) => {
+const converseForAgGrid_projectPlanDevition = (oraDatas: any, percent = 100) => {
   if (!oraDatas) return [];
   const resultArray: any = [];
   // 解析部门数据
   oraDatas.forEach((elements: any) => {
     const starttime = elements.range.start;
     // 新增研发中心数据
-    resultArray.push({
-      Group: ['研发中心'],
-      [starttime]: elements.total.kpi * 100,
-      isDept: true,
-    });
+    if (isArray(elements.total)) {
+      elements.total?.forEach((o: any) => {
+        resultArray.push({
+          Group: o.deptName.includes('全部') ? ['研发中心'] : ['研发中心', o.deptName],
+          isDept: true,
+          dept: o.dept,
+          [starttime]: o.kpi * percent,
+        });
+      });
+    } else
+      resultArray.push({
+        Group: ['研发中心'],
+        [starttime]: elements.total?.kpi * percent,
+        isDept: true,
+      });
 
     // 部门数据
     const departDatas = elements.datas;
-    departDatas.forEach((depts: any) => {
+    departDatas?.forEach((depts: any) => {
       const groups: any = [depts.deptName];
       findParent(departDatas, depts, groups);
       // 新增部门
       resultArray.push({
         Group: groups,
-        [starttime]: depts.kpi * 100,
+        [starttime]: depts?.kpi * percent,
         isDept: true,
       });
     });

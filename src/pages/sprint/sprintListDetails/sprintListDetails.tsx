@@ -98,6 +98,7 @@ const gird_filter_condition: any = []; // 表格自带过滤了的条件
 const { Option } = Select;
 const SprintList: React.FC<any> = () => {
   const { initialState } = useModel('@@initialState');
+  const [envs] = useModel('env', (env) => [env.globalEnv]);
   const { prjId, prjNames, prjType, showTestConfirmFlag, ztId } = getProjectInfo();
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [testSelectorDisabled, setTestSelectorDisabled] = useState(false);
@@ -2212,40 +2213,8 @@ const SprintList: React.FC<any> = () => {
                   mode="multiple"
                   optionFilterProp="children"
                   maxTagCount={'responsive'}
-                >
-                  {[
-                    <Option key={'集群0'} value={'集群0'}>
-                      集群0
-                    </Option>,
-                    <Option key={'集群1'} value={'集群1'}>
-                      集群1
-                    </Option>,
-                    <Option key={'集群2'} value={'集群2'}>
-                      集群2
-                    </Option>,
-                    <Option key={'集群3'} value={'集群3'}>
-                      集群3
-                    </Option>,
-                    <Option key={'集群4'} value={'集群4'}>
-                      集群4
-                    </Option>,
-                    <Option key={'集群5'} value={'集群5'}>
-                      集群5
-                    </Option>,
-                    <Option key={'集群6'} value={'集群6'}>
-                      集群6
-                    </Option>,
-                    <Option key={'集群7'} value={'集群7'}>
-                      集群7
-                    </Option>,
-                    <Option key={'集群8'} value={'集群8'}>
-                      集群8
-                    </Option>,
-                    <Option key={'global'} value={'global'}>
-                      global
-                    </Option>,
-                  ]}
-                </Select>
+                  options={envs?.filter((it) => it?.value.split(',')?.length == 1)}
+                />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -2585,40 +2554,8 @@ const SprintList: React.FC<any> = () => {
                   mode="multiple"
                   optionFilterProp="children"
                   maxTagCount={'responsive'}
-                >
-                  {[
-                    <Option key={'集群0'} value={'集群0'}>
-                      集群0
-                    </Option>,
-                    <Option key={'集群1'} value={'集群1'}>
-                      集群1
-                    </Option>,
-                    <Option key={'集群2'} value={'集群2'}>
-                      集群2
-                    </Option>,
-                    <Option key={'集群3'} value={'集群3'}>
-                      集群3
-                    </Option>,
-                    <Option key={'集群4'} value={'集群4'}>
-                      集群4
-                    </Option>,
-                    <Option key={'集群5'} value={'集群5'}>
-                      集群5
-                    </Option>,
-                    <Option key={'集群6'} value={'集群6'}>
-                      集群6
-                    </Option>,
-                    <Option key={'集群7'} value={'集群7'}>
-                      集群7
-                    </Option>,
-                    <Option key={'集群8'} value={'集群8'}>
-                      集群8
-                    </Option>,
-                    <Option key={'global'} value={'global'}>
-                      global
-                    </Option>,
-                  ]}
-                </Select>
+                  options={envs?.filter((it) => it?.value.split(',')?.length == 1)}
+                />
               </Form.Item>
             </Col>
           </Row>

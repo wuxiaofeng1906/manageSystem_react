@@ -359,7 +359,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
     {
       headerName: '数据库版本',
       field: 'database_version',
-      minWidth: 150,
+      minWidth: 220,
       hide: keepServer,
       autoHeight: true,
       wrapText: true,

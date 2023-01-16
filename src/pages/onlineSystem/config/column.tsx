@@ -345,8 +345,8 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       wrapText: true,
       autoHeight: true,
     },
-    { headerName: '应用', field: 'apps', minWidth: 110, wrapText: true, autoHeight: true },
-    { headerName: '镜像源环境', field: 'release_env', minWidth: 110, autoHeight: true },
+    { headerName: '应用', field: 'apps', minWidth: 130, wrapText: true, autoHeight: true },
+    { headerName: '镜像源环境', field: 'release_env', minWidth: 130, autoHeight: true },
     {
       headerName: 'batch版本',
       field: 'batch',
@@ -359,7 +359,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
     {
       headerName: '数据库版本',
       field: 'database_version',
-      minWidth: 110,
+      minWidth: 150,
       hide: keepServer,
       autoHeight: true,
       wrapText: true,

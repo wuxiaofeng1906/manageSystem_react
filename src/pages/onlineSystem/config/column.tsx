@@ -340,7 +340,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
     {
       headerName: '环境',
       field: 'cluster',
-      minWidth: 180,
+      minWidth: 350,
       cellRenderer: 'ICluster',
     },
     { headerName: '应用', field: 'apps', minWidth: 110 },

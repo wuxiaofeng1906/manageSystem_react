@@ -528,12 +528,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 />
               </Form.Item>
             </Col>
-            <Col span={4}>
-              <Form.Item label={'发布集群'} name={'cluster'}>
-                <Select disabled placeholder={'发布集群'} options={globalEnv} />
-              </Form.Item>
-            </Col>
-            <Col span={5}>
+            <Col span={7}>
               <Form.Item
                 label={'镜像环境绑定'}
                 name={'release_env'}
@@ -546,7 +541,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 />
               </Form.Item>
             </Col>
-            <Col span={5}>
+            <Col span={7}>
               <Form.Item
                 label={'发布时间'}
                 name={'plan_release_time'}
@@ -559,6 +554,13 @@ const ProcessDetail = (props: any, ref: any) => {
                   format="YYYY-MM-DD HH:mm"
                   disabled={!hasPermission.baseInfo || hasEdit}
                 />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <Form.Item label={'发布集群'} name={'cluster'}>
+                <Select disabled placeholder={'发布集群'} options={globalEnv} mode={'multiple'} />
               </Form.Item>
             </Col>
           </Row>

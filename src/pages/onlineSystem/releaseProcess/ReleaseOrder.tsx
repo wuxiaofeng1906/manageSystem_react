@@ -12,7 +12,7 @@ import {
   Checkbox,
   Row,
 } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, StopOutlined } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import {
   historyCompareColumn,
@@ -24,13 +24,13 @@ import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
 import { useModel, useParams, history } from 'umi';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit, isEqual } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 import DragIcon from '@/components/DragIcon';
 import cns from 'classnames';
-import { valueMap } from '@/utils/utils';
+import { initGridTable, valueMap } from '@/utils/utils';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 
@@ -566,7 +566,7 @@ const ReleaseOrder = () => {
           <FieldSet data={{ title: '工单-表单设置' }}>
             <div
               className="ag-theme-alpine"
-              style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}
+              style={{ height: tableHeight > 220 ? tableHeight : 220, width: '100%' }}
             >
               <AgGridReact
                 columnDefs={historyOrderColumn}
@@ -606,7 +606,7 @@ const ReleaseOrder = () => {
                       {p.data.ready_release_name}
                     </div>
                   ),
-                  deleteOrder: (p: CellClickedEvent) => (
+                  operations: (p: CellClickedEvent) => (
                     <Fragment>
                       {hasPermission.delete ? (
                         <img
@@ -614,12 +614,38 @@ const ReleaseOrder = () => {
                           width="20"
                           height="20"
                           src={require('../../../../public/delete_red.png')}
-                          style={{ marginRight: 10 }}
+                          style={{ marginRight: 10, cursor: 'pointer' }}
                           onClick={() => onRemove(p.data)}
                         />
                       ) : (
                         <div />
                       )}
+                      <StopOutlined
+                        title={'忽略本次积压工单'}
+                        style={{
+                          color: '#86a8cf',
+                          marginRight: 10,
+                          cursor: 'pointer',
+                          fontSize: 18,
+                          verticalAlign: 'middle',
+                        }}
+                        onClick={() => {
+                          Modal.confirm({
+                            centered: true,
+                            title: '忽略积压工单',
+                            content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
+                            onOk: () => {
+                              const result =
+                                gridRef.current
+                                  ?.getRenderedNodes()
+                                  ?.map((it) => it.data)
+                                  ?.filter((obj) => !isEqual(obj, p.data)) || [];
+                              formatCompare(compareData?.opsData || [], result);
+                              setOrderData(result);
+                            },
+                          });
+                        }}
+                      />
                       {DragIcon(p)}
                     </Fragment>
                   ),
@@ -627,7 +653,7 @@ const ReleaseOrder = () => {
               />
             </div>
           </FieldSet>
-          <Divider plain>
+          <Divider plain style={{ margin: '6px 0' }}>
             <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>
           </Divider>
           <div className={styles.orderTag}>
@@ -638,7 +664,7 @@ const ReleaseOrder = () => {
           </div>
           <div
             className="ag-theme-alpine"
-            style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}
+            style={{ height: tableHeight > 220 ? tableHeight : 220, width: '100%', marginTop: 8 }}
           >
             <AgGridReact
               columnDefs={historyCompareColumn}

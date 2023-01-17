@@ -154,7 +154,9 @@ const Check = (props: any, ref: any) => {
       if (isFresh) {
         // 忽略 不用跑检查
         const autoCheck = list.flatMap((it) =>
-          ['zt-check-list', 'test-unit'].includes(it.api_url) && it.open ? [it.api_url] : [],
+          ['zt-check-list', 'backend_test_unit', 'story_data'].includes(it.rowKey) && it.open
+            ? [it.api_url]
+            : [],
         );
         if (!isEmpty(uniq(autoCheck))) {
           await Promise.all(
@@ -320,7 +322,7 @@ const Check = (props: any, ref: any) => {
       Modal?.destroyAll?.();
       isEmpty(dutyPerson) && init();
       timer = setInterval(() => {
-        init(false, false);
+        init(true, false);
       }, 15000);
       if ((globalState.locked || globalState.finished) && timer) {
         clearInterval(timer);

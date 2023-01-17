@@ -141,8 +141,8 @@ export const historyOrderColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '操作',
     cellRenderer: 'operations',
-    width: 150,
-    minWidth: 150,
+    width: 130,
+    minWidth: 130,
     maxWidth: 150,
     pinned: 'right',
   },

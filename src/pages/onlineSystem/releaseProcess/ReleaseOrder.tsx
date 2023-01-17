@@ -634,14 +634,17 @@ const ReleaseOrder = () => {
                             centered: true,
                             title: '忽略积压工单',
                             content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
-                            onOk: () => {
+                            okButtonProps: { disabled: confirmDisabled },
+                            onOk: async () => {
+                              setConfirmDisabled(true);
                               const result =
                                 gridRef.current
                                   ?.getRenderedNodes()
                                   ?.map((it) => it.data)
                                   ?.filter((obj) => !isEqual(obj, p.data)) || [];
-                              formatCompare(compareData?.opsData || [], result);
+                              await formatCompare(compareData?.opsData || [], result);
                               setOrderData(result);
+                              setConfirmDisabled(false);
                             },
                           });
                         }}

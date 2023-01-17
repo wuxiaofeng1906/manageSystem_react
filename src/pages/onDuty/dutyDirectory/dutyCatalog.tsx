@@ -16,6 +16,7 @@ import useLock from '@/hooks/lock';
 const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'label' };
 const recentType = { 前端: 'front', 后端: 'backend', 测试: 'test', 运维: 'operations', SQA: 'sqa' };
 let envType = {};
+const enableEnv = ['cn-northwest-global', 'cn-apnorthbj-0'];
 const tbodyConfig = [
   { title: '前端值班', name: 'front', tech: 1 },
   { title: '后端值班', name: 'backend', tech: 2 },
@@ -740,17 +741,15 @@ const DutyCatalog = () => {
                   >
                     {({ getFieldValue }) => {
                       const env = getFieldValue('release_env');
-                      const ignoreEnv = env?.filter(
-                        (it: string) => !['cn-northwest-global'].includes(it),
-                      );
+                      const ignoreEnv = env?.filter((it: string) => !enableEnv.includes(it));
                       const limitEnv = envList.map((it: any) => ({
                         ...it,
                         disabled:
+                          enableEnv.includes(it.value) ||
                           isEmpty(ignoreEnv) ||
-                          it.label.includes('global') ||
                           (intersection(ignoreEnv, otherEnv)?.length > 0 && it.type == 'other')
                             ? false
-                            : !ignoreEnv.includes(it.value),
+                            : !(it.value?.split(',')?.length > 1 && isEqual([it.value], ignoreEnv)),
                       }));
                       return (
                         <Form.Item name={'release_env'}>
@@ -759,16 +758,16 @@ const DutyCatalog = () => {
                             mode={'multiple'}
                             disabled={!hasPermission}
                             style={{ width: '100%' }}
-                            onSelect={async () => {
-                              const title = (await updateTitle()) || '';
-                              setTitle(title);
-                            }}
-                            onDeselect={async () => {
-                              const title = (await updateTitle()) || '';
-                              setTitle(title);
-                              await onSave();
-                            }}
-                            onDropdownVisibleChange={(open) => !open && onSave()}
+                            // onSelect={async () => {
+                            //   const title = (await updateTitle()) || '';
+                            //   setTitle(title);
+                            // }}
+                            // onDeselect={async () => {
+                            //   const title = (await updateTitle()) || '';
+                            //   setTitle(title);
+                            //   await onSave();
+                            // }}
+                            // onDropdownVisibleChange={(open) => !open && onSave()}
                           />
                         </Form.Item>
                       );

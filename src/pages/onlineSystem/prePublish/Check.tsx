@@ -30,6 +30,7 @@ import DutyListServices from '@/services/dutyList';
 import usePermission from '@/hooks/permission';
 
 const Check = (props: any, ref: any) => {
+  let timer: any;
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
   const { onlineSystemPermission } = usePermission();
@@ -67,7 +68,10 @@ const Check = (props: any, ref: any) => {
       onCheck,
       onLock,
       onPushCheckFailMsg,
-      onRefreshCheck: () => init(true),
+      onRefreshCheck: () => {
+        timer && clearInterval(timer);
+        init(true);
+      },
       onSetting: () => setShow({ visible: true, data: release_num }),
     }),
     [selected, ref, globalState, basic, list, subTab, tab],
@@ -150,65 +154,67 @@ const Check = (props: any, ref: any) => {
     };
     setSpin(showLoading);
     setSelected([]);
+    let autoCheck: string[] = [];
+    let orignDuty = dutyPerson;
     try {
       if (isFresh) {
         // 忽略 不用跑检查
-        const autoCheck = list.flatMap((it) =>
-          ['zt-check-list', 'test-unit'].includes(it.api_url) && it.open ? [it.api_url] : [],
+        autoCheck = list.flatMap((it) =>
+          ['check_list_data', 'backend_test_unit', 'story_data'].includes(it.rowKey) && it.open
+            ? [it.api_url]
+            : [],
         );
-        if (!isEmpty(uniq(autoCheck))) {
-          await Promise.all(
-            uniq(autoCheck).map((type) =>
-              OnlineSystemServices.checkOpts(
-                { release_num, user_id: user?.userid, api_url: type },
-                type as ICheckType,
-              ),
-            ),
-          );
+      }
+      Promise.all(
+        uniq(autoCheck).map((type) =>
+          OnlineSystemServices.checkOpts(
+            { release_num, user_id: user?.userid, api_url: type },
+            type as ICheckType,
+          ),
+        ),
+      ).finally(async () => {
+        // 存在值班人员为空
+        const refresh = isEmpty(orignDuty) && count < 2;
+        const [checkItem, firstDuty] = await Promise.all([
+          OnlineSystemServices.getCheckInfo({ release_num }),
+          refresh ? DutyListServices.getFirstDutyPerson(range) : null,
+        ]);
+        if (refresh) {
+          const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
+          duty?.forEach((it: any) => {
+            orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
+          });
+          setDutyPerson(orignDuty);
+          setCount(++count);
         }
-      }
-      let orignDuty = dutyPerson;
-      // 存在值班人员为空
-      const refresh = (isEmpty(orignDuty) && count < 2) || isFresh;
-      const [checkItem, firstDuty] = await Promise.all([
-        OnlineSystemServices.getCheckInfo({ release_num }),
-        refresh ? DutyListServices.getFirstDutyPerson(range) : null,
-      ]);
-      if (refresh) {
-        const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
-        duty?.forEach((it: any) => {
-          orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
-        });
-        setDutyPerson(orignDuty);
-        setCount(++count);
-      }
-      setList(
-        checkInfo.map((it) => {
-          const currentKey = checkItem[it.rowKey];
-          const flag = it.rowKey == 'auto_obj_data';
-          let status = 'skip';
-          if (flag) {
-            status = isEmpty(currentKey)
-              ? ''
-              : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
-                  ?.check_result || 'yes';
-          }
-          return {
-            ...it,
-            disabled: false,
-            status: flag ? status : currentKey?.[it.status] ?? '',
-            start: flag ? (status == '' ? status : '-') : currentKey?.[it.start] || '',
-            end: flag ? (status == '' ? status : '-') : currentKey?.[it.end] || '',
-            open: flag ? status !== 'skip' : currentKey?.[it.status] !== 'skip',
-            open_pm: currentKey?.[it.open_pm] || '',
-            open_time: currentKey?.[it.open_time] || '',
-            log: currentKey?.[it.log] || '',
-            source: currentKey?.data_from || it.source,
-            contact: orignDuty?.[it.contact] || '',
-          };
-        }),
-      );
-      setSpin(false);
+        setList(
+          checkInfo.map((it) => {
+            const currentKey = checkItem[it.rowKey];
+            const flag = it.rowKey == 'auto_obj_data';
+            let status = 'skip';
+            if (flag) {
+              status = isEmpty(currentKey)
+                ? ''
+                : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
+                    ?.check_result || 'yes';
+            }
+            return {
+              ...it,
+              disabled: false,
+              status: flag ? status : currentKey?.[it.status] ?? '',
+              start: flag ? (status == '' ? status : '-') : currentKey?.[it.start] || '',
+              end: flag ? (status == '' ? status : '-') : currentKey?.[it.end] || '',
+              open: flag ? status !== 'skip' : currentKey?.[it.status] !== 'skip',
+              open_pm: currentKey?.[it.open_pm] || '',
+              open_time: currentKey?.[it.open_time] || '',
+              log: currentKey?.[it.log] || '',
+              source: currentKey?.data_from || it.source,
+              contact: orignDuty?.[it.contact] || '',
+            };
+          }),
+        );
+        setSpin(false);
+      });
     } catch (e) {
       console.log(e);
       setSpin(false);
@@ -225,9 +231,8 @@ const Check = (props: any, ref: any) => {
       },
       data.api_url,
     );
-    if (data.open) {
-      infoMessage('任务正在执行中，请稍后刷新查看');
-    } else delay(init, 500);
+    timer && clearInterval(timer);
+    delay(init, 500);
   };
 
   const showLog = (v: any, data: any) => {
@@ -315,24 +320,28 @@ const Check = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    let timer: any;
     if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
       isEmpty(dutyPerson) && init();
-      timer = setInterval(() => {
-        init(false, false);
-      }, 15000);
-      if ((globalState.locked || globalState.finished) && timer) {
-        clearInterval(timer);
-      }
     } else {
       setDutyPerson(undefined);
       setCount(0);
     }
+  }, [subTab, tab, release_num, globalState, dutyPerson]);
+
+  useEffect(() => {
+    if (globalState.locked || globalState.finished || !(subTab == 'check' && tab == 'process')) {
+      clearInterval(timer);
+    } else {
+      Modal?.destroyAll?.();
+      timer = setInterval(() => {
+        init(true, false);
+      }, 15000);
+    }
     return () => {
       clearInterval(timer);
     };
-  }, [subTab, tab, release_num, globalState, dutyPerson]);
+  }, [JSON.stringify(list), subTab, tab, globalState]);
 
   const hasEdit = useMemo(
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,

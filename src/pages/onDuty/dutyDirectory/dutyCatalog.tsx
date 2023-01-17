@@ -758,16 +758,16 @@ const DutyCatalog = () => {
                             mode={'multiple'}
                             disabled={!hasPermission}
                             style={{ width: '100%' }}
-                            // onSelect={async () => {
-                            //   const title = (await updateTitle()) || '';
-                            //   setTitle(title);
-                            // }}
-                            // onDeselect={async () => {
-                            //   const title = (await updateTitle()) || '';
-                            //   setTitle(title);
-                            //   await onSave();
-                            // }}
-                            // onDropdownVisibleChange={(open) => !open && onSave()}
+                            onSelect={async () => {
+                              const title = (await updateTitle()) || '';
+                              setTitle(title);
+                            }}
+                            onDeselect={async () => {
+                              const title = (await updateTitle()) || '';
+                              setTitle(title);
+                              await onSave();
+                            }}
+                            onDropdownVisibleChange={(open) => !open && onSave()}
                           />
                         </Form.Item>
                       );

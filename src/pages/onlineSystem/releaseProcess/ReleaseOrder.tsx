@@ -588,7 +588,7 @@ const ReleaseOrder = () => {
           <FieldSet data={{ title: '工单-表单设置' }}>
             <div
               className="ag-theme-alpine"
-              style={{ height: tableHeight > 220 ? tableHeight : 220, width: '100%' }}
+              style={{ height: tableHeight > 300 ? tableHeight + 20 : 300, width: '100%' }}
             >
               <AgGridReact
                 columnDefs={historyOrderColumn}
@@ -671,7 +671,7 @@ const ReleaseOrder = () => {
           </div>
           <div
             className="ag-theme-alpine"
-            style={{ height: tableHeight > 220 ? tableHeight : 220, width: '100%', marginTop: 8 }}
+            style={{ height: tableHeight > 300 ? tableHeight : 300, width: '100%', marginTop: 8 }}
           >
             <AgGridReact
               columnDefs={historyCompareColumn}
@@ -681,10 +681,10 @@ const ReleaseOrder = () => {
                 filter: true,
                 flex: 1,
                 suppressMenu: true,
-                cellStyle: { 'line-height': '28px' },
+                cellStyle: { 'line-height': '24px' },
               }}
-              rowHeight={28}
-              headerHeight={30}
+              rowHeight={24}
+              headerHeight={24}
               onGridReady={(r) => onGridReady(r, gridCompareRef)}
               onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
               getRowStyle={(p) => ({ background: p.data.color })}

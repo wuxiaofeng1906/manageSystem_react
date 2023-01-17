@@ -418,6 +418,28 @@ const ReleaseOrder = () => {
       },
     });
   };
+  const onIgnore = (p: any) => {
+    if (agFinished) {
+      return infoMessage('已标记发布结果不能忽略积压工单!');
+    }
+    Modal.confirm({
+      centered: true,
+      title: '忽略积压工单',
+      content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
+      okButtonProps: { disabled: confirmDisabled },
+      onOk: async () => {
+        setConfirmDisabled(true);
+        const result =
+          gridRef.current
+            ?.getRenderedNodes()
+            ?.map((it) => it.data)
+            ?.filter((obj) => !isEqual(obj, p.data)) || [];
+        await formatCompare(compareData?.opsData || [], result);
+        setOrderData(result);
+        setConfirmDisabled(false);
+      },
+    });
+  };
 
   const onDrag = async () => {
     if (finished) return infoMessage('已标记发布结果不能修改工单顺序!');
@@ -629,25 +651,7 @@ const ReleaseOrder = () => {
                           fontSize: 18,
                           verticalAlign: 'middle',
                         }}
-                        onClick={() => {
-                          Modal.confirm({
-                            centered: true,
-                            title: '忽略积压工单',
-                            content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
-                            okButtonProps: { disabled: confirmDisabled },
-                            onOk: async () => {
-                              setConfirmDisabled(true);
-                              const result =
-                                gridRef.current
-                                  ?.getRenderedNodes()
-                                  ?.map((it) => it.data)
-                                  ?.filter((obj) => !isEqual(obj, p.data)) || [];
-                              await formatCompare(compareData?.opsData || [], result);
-                              setOrderData(result);
-                              setConfirmDisabled(false);
-                            },
-                          });
-                        }}
+                        onClick={() => onIgnore(p)}
                       />
                       {DragIcon(p)}
                     </Fragment>

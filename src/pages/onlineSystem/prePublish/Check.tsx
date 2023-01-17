@@ -160,7 +160,7 @@ const Check = (props: any, ref: any) => {
       if (isFresh) {
         // 忽略 不用跑检查
         autoCheck = list.flatMap((it) =>
-          ['zt-check-list', 'backend_test_unit', 'story_data'].includes(it.rowKey) && it.open
+          ['check_list_data', 'backend_test_unit', 'story_data'].includes(it.rowKey) && it.open
             ? [it.api_url]
             : [],
         );

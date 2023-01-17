@@ -30,7 +30,7 @@ import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 import DragIcon from '@/components/DragIcon';
 import cns from 'classnames';
-import { initGridTable, valueMap } from '@/utils/utils';
+import { valueMap } from '@/utils/utils';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 

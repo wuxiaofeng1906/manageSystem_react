@@ -97,7 +97,11 @@ const SheetInfo = (props: any, ref: any) => {
   const serverRef = useRef<GridApi>();
   const upgradeRef = useRef<GridApi>();
 
-  useImperativeHandle(ref, () => ({ onSave }), [release_num, upgradeData, deployments]);
+  useImperativeHandle(ref, () => ({ onSave: onSaveBeforeCheck }), [
+    release_num,
+    upgradeData,
+    deployments,
+  ]);
 
   const onSave = async (flag = false) => {
     if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
@@ -271,7 +275,7 @@ const SheetInfo = (props: any, ref: any) => {
     if (base.need_auto == 'no') ignore.push('auto_env');
 
     let valid = false;
-    const isSuccess = order.release_result == 'success';
+    const checkResult = !['failure', 'draft'].includes(order.release_result);
     const checkObj = omit({ ...order, ...base }, ignore);
     let showErrTip = '';
     const errTip = {
@@ -290,8 +294,8 @@ const SheetInfo = (props: any, ref: any) => {
       clear_cache: '请填写是否清理应用缓存',
     };
 
-    // 发布成功-> 数据完整性校验
-    if (isSuccess) {
+    // 发布成功、unknown-> 数据完整性校验
+    if (checkResult) {
       // 基础信息
       valid = Object.values(checkObj).some((it) => isEmpty(it));
       if (valid) {
@@ -345,7 +349,7 @@ const SheetInfo = (props: any, ref: any) => {
               if (result == 'draft') {
                 await OnlineSystemServices.removeOrder({ release_num, user_id: user?.userid });
                 await getDetail();
-              } else await onSave(true); // 取消发布
+              } else await onSave(true); // 发布失败
               setConfirmDisabled(false);
             } catch (e) {
               setConfirmDisabled(false);

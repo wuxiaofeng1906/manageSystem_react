@@ -247,6 +247,7 @@ const ReleaseOrder = () => {
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
 
     const checkObj = omit({ ...order, ...base }, ['release_result']);
+    let errMsg = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -259,13 +260,14 @@ const ReleaseOrder = () => {
 
     if (valid) {
       const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
-      infoMessage(errTip[errArr?.[0]]);
-      orderForm.setFieldsValue({ release_result: null });
-      return;
+      errMsg = errTip[errArr?.[0]];
     }
     if (isEmpty(base.release_name?.trim())) {
+      errMsg = errTip.release_name;
+    }
+    if (!['failure', 'cancel'].includes(result) && errMsg) {
       orderForm.setFieldsValue({ release_result: null });
-      return infoMessage(errTip.release_name);
+      return infoMessage(errMsg);
     }
     // 发布结果为空，直接保存
     if (isEmpty(result) || result == 'unknown') {
@@ -681,10 +683,10 @@ const ReleaseOrder = () => {
                 filter: true,
                 flex: 1,
                 suppressMenu: true,
-                cellStyle: { 'line-height': '24px' },
+                cellStyle: { 'line-height': '28px' },
               }}
-              rowHeight={24}
-              headerHeight={24}
+              rowHeight={28}
+              headerHeight={30}
               onGridReady={(r) => onGridReady(r, gridCompareRef)}
               onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
               getRowStyle={(p) => ({ background: p.data.color })}

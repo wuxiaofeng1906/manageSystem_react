@@ -349,7 +349,7 @@ const SheetInfo = (props: any, ref: any) => {
               if (result == 'draft') {
                 await OnlineSystemServices.removeOrder({ release_num, user_id: user?.userid });
                 await getDetail();
-              } else await onSave(true); // 取消发布
+              } else await onSave(true); // 发布失败
               setConfirmDisabled(false);
             } catch (e) {
               setConfirmDisabled(false);

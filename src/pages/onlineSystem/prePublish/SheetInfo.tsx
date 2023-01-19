@@ -42,7 +42,7 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import moment from 'moment';
-import { isEmpty, omit, isString, pick } from 'lodash';
+import { isEmpty, omit, isString, pick, chunk, isEqual } from 'lodash';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
@@ -243,16 +243,16 @@ const SheetInfo = (props: any, ref: any) => {
     agBatch = batch?.map((it: string) => ({ label: it, value: it })) ?? [];
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
-    // const deployIds = await OnlineSystemServices.deployments({ release_num });
-    // setDeployments(
-    //   deployIds?.map((it: any) => ({
-    //     label: `${it.deployment_id}(${it.app ?? ''} ${it.check_start_time ?? ''})`,
-    //     value: String(it.deployment_id),
-    //     deployment_id: it.deployment_id,
-    //     app: it.app,
-    //     deployment_time: it.check_start_time ?? '',
-    //   })),
-    // );
+    const deployIds = await OnlineSystemServices.deployments({ release_num });
+    setDeployments(
+      deployIds?.map((it: any) => ({
+        label: `${it.deployment_id}(${it.app ?? ''} ${it.check_start_time ?? ''})`,
+        value: String(it.deployment_id),
+        deployment_id: it.deployment_id,
+        app: it.app,
+        deployment_time: it.check_start_time ?? '',
+      })),
+    );
     setDutyList(
       order?.map((it: any) => ({
         label: it.duty_name ?? '',
@@ -275,7 +275,7 @@ const SheetInfo = (props: any, ref: any) => {
     const result = order.release_result;
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
     const serverInfo = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
-    const ignore = ['release_result', 'deployment'];
+    const ignore = ['release_result'];
     if (base.need_auto == 'no') ignore.push('auto_env');
 
     let valid = false;
@@ -452,10 +452,6 @@ const SheetInfo = (props: any, ref: any) => {
   const computedServer = useMemo(() => PublishSeverColumn(upgradeData?.basic_data), [
     upgradeData?.basic_data,
   ]);
-  const displayRender = (labels: string[], selectedOptions: any[]) =>
-    labels.map((label, i) => (
-      <span key={selectedOptions[i].value}>{i === labels.length - 1 ? `(${label})` : label}</span>
-    ));
 
   const renderSelect = (p: CellClickedEvent) => {
     const field = p.column.colId as string;
@@ -468,12 +464,19 @@ const SheetInfo = (props: any, ref: any) => {
           expandTrigger="hover"
           allowClear={false}
           value={isEmpty(p.value) ? [] : p.value}
-          displayRender={displayRender as any}
+          displayRender={(labels: string[], selectedOptions: any[]) =>
+            labels?.map((label, i) => (
+              <span key={selectedOptions[i]?.value}>
+                {i === labels.length - 1 ? `(${label})` : label}
+              </span>
+            ))
+          }
           options={(agSql || sqlList)?.map((it) => ({
             ...it,
             children: Object.entries(OrderExecutionBy)?.map(([k, v]) => ({
               label: v,
               value: k,
+              key: v,
             })),
           }))}
           onChange={(v) => {
@@ -711,12 +714,10 @@ const SheetInfo = (props: any, ref: any) => {
                       ...upgradeData?.release_app,
                       sql_order: isEmpty(upgradeData?.release_app?.sql_order)
                         ? []
-                        : [
-                            upgradeData?.release_app?.sql_order?.map((it: any) => [
-                              it.sql_order,
-                              it.sql_action_time,
-                            ]),
-                          ],
+                        : upgradeData?.release_app?.sql_order?.map((it: any) => [
+                            it.sql_order,
+                            it.sql_action_time,
+                          ]),
                     },
                   ]
             }

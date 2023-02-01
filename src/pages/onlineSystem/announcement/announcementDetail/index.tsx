@@ -5,7 +5,7 @@ import {Row, Col, Input, Radio, Tabs, InputNumber, Form, DatePicker, Button, Lay
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
 
-const {Header, Footer, Sider, Content} = Layout;
+
 import {useRequest} from 'ahooks';
 import {postAnnouncement, getAnnouncement} from './axiosRequest/apiPage';
 import moment from 'moment';
@@ -16,38 +16,47 @@ import {isEmpty} from 'lodash';
 import MessageCard from "@/pages/onlineSystem/announcement/announcementDetail/MessageCard";
 import PopupCard from "@/pages/onlineSystem/announcement/announcementDetail/PopupCard";
 import {display} from "html2canvas/dist/types/css/property-descriptors/display";
+import dayjs from "dayjs";
 
+const {Header, Footer, Sider, Content} = Layout;
 const {TextArea} = Input;
 const {TabPane} = Tabs;
 
 const Announce: React.FC<any> = (props: any) => {
-  // const { id: releaseNum, status: operteStatus } = useParams() as {
-  //   id: string;
-  //   status: string;
-  //   type: 'add' | 'detail';
-  // };
   const [announcementNameForm] = Form.useForm();
-
-  const [stepShow, setStepShow] = useState({
+  const [stepShow, setStepShow] = useState<any>({
     msgCard: "inline",
     popCard: "none"
   });
+  const [carouselNumShow, setCarouselNumShow] = useState<string>("none");
+  const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+  // 设置显示哪个模板
   const cardChange = (e: RadioChangeEvent) => {
+    if (e.target.value === "msgCard") {
+      setStepShow({
+        msgCard: "inline",
+        popCard: "none"
+      });
+      return;
+    }
 
-    e.target.value === "msgCard" ? setStepShow({
-      msgCard: "inline",
-      popCard: "none"
-    }) : setStepShow({
+    setStepShow({
       msgCard: "none",
       popCard: "inline"
-    })
+    });
+    if (announcementNameForm.getFieldValue("announce_carousel") === undefined) setCarouselNumShow("inline");
   }
 
+  // 保存消息卡面数据
   const saveMsgInfo = () => {
-    const values = announcementNameForm.getFieldsValue();
-    const content = document.getElementById("content")?.innerText;
-    debugger;
-    console.log(values, content)
+    const nsg = announcementNameForm.getFieldsValue();
+    const announceMsg = document.getElementById("annCont")?.innerText;
+
+  };
+
+  // 一键发布
+  const releaseMsgInfo = () => {
+
   };
 
   // 监听删除键是否用于删除公告详情中的数据
@@ -57,6 +66,7 @@ const Announce: React.FC<any> = (props: any) => {
     }
     return true;
   }
+
   return (
     <PageContainer>
       <div style={{marginTop: -15, background: 'white', padding: 10}}>
@@ -110,12 +120,13 @@ const Announce: React.FC<any> = (props: any) => {
             name={'announce_time'}
             rules={[{required: true}]}
           >
-            <DatePicker style={{minWidth: 300, width: "50%"}}/>
+            <DatePicker defaultValue={moment()} style={{minWidth: 300, width: "50%"}} showTime
+                        onChange={(e, time) => setReleaseTime(time)}/>
           </Form.Item>
           <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-            <div id={"content"} contentEditable={"true"}
-                 style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60}}>
-              <label contentEditable={"false"} style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：</label>
+            <div id={"annCont"} contentEditable={"true"}
+                 style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>
+              <label contentEditable={"false"} style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：</label>
 
             </div>
           </Form.Item>
@@ -124,14 +135,16 @@ const Announce: React.FC<any> = (props: any) => {
             <Row>
               <Col>
                 <Form.Item label={'是否轮播'} name="announce_carousel" rules={[{required: true}]}>
-                  <Radio.Group defaultValue={1}>
+                  <Radio.Group defaultValue={1} onChange={(e: RadioChangeEvent) => {
+                    e.target?.value === 1 ? setCarouselNumShow("inline") : setCarouselNumShow("none");
+                  }}>
                     <Radio value={1}>是</Radio>
                     <Radio value={0}>否</Radio>
                   </Radio.Group>
                 </Form.Item>
               </Col>
               <Col>
-                <Form.Item name="carouselNum" rules={[{required: true}]}>
+                <Form.Item name="carouselNum" rules={[{required: true}]} style={{display: carouselNumShow}}>
                   <InputNumber defaultValue={5}></InputNumber> 张
                 </Form.Item>
               </Col>
@@ -140,7 +153,9 @@ const Announce: React.FC<any> = (props: any) => {
 
 
         </Form>
+
         <Divider/>
+
         <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
           {/* 弹窗操作 */}
           <div id={"popup"} style={{display: stepShow.popCard}}>
@@ -165,6 +180,7 @@ const Announce: React.FC<any> = (props: any) => {
             <Button
               className={style.commonBtn}
               style={{marginLeft: 10}}
+              onClick={releaseMsgInfo}
             >一键发布
             </Button>
           </div>

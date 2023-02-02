@@ -213,6 +213,13 @@ export default [
         hideInMenu: true,
         wrappers: ['../wrappers/auth'],
       },
+      {
+        name: '升级公告详情(弹窗)',
+        path: 'PopupCard/:isCarousel/:count',
+        component: './onlineSystem/announcement/announcementDetail/PopupCard',
+        hideInMenu: true,
+        wrappers: ['../wrappers/auth'],
+      },
       // {
       //   name: '上线日历',
       //   path: 'profile/:branch',

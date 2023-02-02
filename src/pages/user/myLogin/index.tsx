@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import ProForm from '@ant-design/pro-form';
-import { history } from 'umi';
+import { history, useLocation } from 'umi';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { useModel } from '@@/plugin-model/useModel';
 import styles from './index.less';
@@ -13,14 +13,6 @@ import { useUser } from '@/hooks/user';
 /**
  * 此方法会跳转到 redirect 参数所在的位置
  */
-const goto = () => {
-  if (!history) return;
-  setTimeout(() => {
-    const { query } = history.location;
-    const { redirect } = query as { redirect: string };
-    history.push(redirect || '/');
-  }, 20);
-};
 
 const wxLogin = () => {
   setTimeout(function () {
@@ -38,7 +30,9 @@ const wxLogin = () => {
       appid: 'wwcba5faed367cdeee',
       agentid: 1000021,
       // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
-      redirect_uri: encodeURIComponent('http://rd.q7link.com:8000/user/myLogin'),
+      redirect_uri: encodeURIComponent(
+        `http://rd.q7link.com:8000/user/myLogin?callback=${location.origin}`,
+      ),
       state: 'wwcba5faed367cdeee',
       href: '',
     });
@@ -55,6 +49,12 @@ const qywxScript = () => {
 };
 
 const Login: React.FC<{}> = () => {
+  const urlParams = useLocation()?.query as {
+    callback: string;
+    code: string;
+    state: string;
+    appid: string;
+  };
   const { setUser } = useUser();
   const [submitting] = useState(false);
   const [showTitle, setTitleShown] = useState(false);
@@ -102,13 +102,24 @@ const Login: React.FC<{}> = () => {
     }
   };
 
+  const goto = () => {
+    if (!history) return;
+    setTimeout(() => {
+      const { query } = history.location;
+      const { redirect } = query as { redirect: string };
+      urlParams.callback?.includes(location.origin)
+        ? history.push(redirect || '/')
+        : window.location.replace(urlParams.callback || location.origin);
+    }, 20);
+  };
   const getUsersInfo = async (windowURL: any) => {
-    let userCode = '';
+    // let userCode = '';
     if (windowURL.indexOf('?') !== -1) {
-      const firstGroup = windowURL.split('?'); // 区分问号后面的内容
-      const secondGroup = firstGroup[1].split('&'); // 区分code和其他属性
-      const thirdGroup = secondGroup[0].split('='); // 获取到=后面的值
-      userCode = thirdGroup[1].toString();
+      // const firstGroup = windowURL.split('?'); // 区分问号后面的内容
+      // const secondGroup = firstGroup[1].split('&'); // 区分code和其他属性
+      // const thirdGroup = secondGroup[0].split('='); // 获取到=后面的值
+      // userCode = thirdGroup[1].toString();
+      console.log(urlParams);
       if (!windowURL.includes('redirect')) {
         // 不是重定向的时候才禁用
         setTitleShown(true); // 设置为不可见
@@ -117,11 +128,8 @@ const Login: React.FC<{}> = () => {
 
     // console.log("usercode", userCode);
     // 如果获取到了usercode，则拿取用户信息和权限
-    if (userCode !== '' && !userCode.includes('%')) {
-      const data = {
-        username: 'users',
-        password: userCode,
-      };
+    if (urlParams.code && !urlParams.code.includes('%')) {
+      const data = { username: 'users', password: urlParams.code };
       await axios
         .post('/api/auth/login', data)
         .then(function (res) {

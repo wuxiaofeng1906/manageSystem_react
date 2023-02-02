@@ -208,7 +208,7 @@ export default [
       },
       {
         name: '升级公告详情',
-        path: 'announcementDetail/:id/:type/:status',
+        path: 'announcementDetail/:id/:type/:status/:backPage',
         component: './onlineSystem/announcement/announcementDetail',
         hideInMenu: true,
         wrappers: ['../wrappers/auth'],

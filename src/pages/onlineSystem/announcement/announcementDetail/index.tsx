@@ -4,12 +4,14 @@ import {Row, Col, Input, Radio, Tabs, InputNumber, Form, DatePicker, Button, Lay
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
 import moment from 'moment';
-import {history} from 'umi';
+import {history, useParams} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
+
+  const {backPage} = useParams() as { backPage: string; };
   const [announcementForm] = Form.useForm();
   const [stepShow, setStepShow] = useState<any>({
     msgCard: "inline",
@@ -17,7 +19,8 @@ const Announce: React.FC<any> = (props: any) => {
   });
   const [carouselNumShow, setCarouselNumShow] = useState<string>("none");
   const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
-  // 设置显示哪个模板
+
+  // 设置显示哪个模板(消息或者弹窗)
   const cardChange = (e: RadioChangeEvent) => {
     if (e.target.value === "msgCard") {
       setStepShow({
@@ -31,13 +34,13 @@ const Announce: React.FC<any> = (props: any) => {
       msgCard: "none",
       popCard: "inline"
     });
-    // if (announcementForm.getFieldValue("announce_carousel") === undefined) setCarouselNumShow("inline");
+    if (announcementForm.getFieldValue("announce_carousel") === 1) setCarouselNumShow("inline");
   }
 
   // 保存消息卡面数据
   const saveMsgInfo = () => {
-    const nsg = announcementForm.getFieldsValue();
-    const announceMsg = document.getElementById("annCont")?.innerText;
+    // const nsg = announcementForm.getFieldsValue();
+    // const announceMsg = document.getElementById("annCont")?.innerText;
 
   };
 
@@ -50,7 +53,9 @@ const Announce: React.FC<any> = (props: any) => {
   const toNextPage = () => {
     if (stepShow.popCard !== "inline") return;
     //是否轮播
-    const carInfo = announcementForm.getFieldsValue()
+    const carInfo = announcementForm.getFieldsValue();
+    // 存储值到session
+    localStorage.setItem('announceItem', JSON.stringify(carInfo));
     if (carInfo.announce_carousel === 0) {//  不是轮播
       history.push('/onlineSystem/PopupCard/false/-1');
     } else {
@@ -66,24 +71,61 @@ const Announce: React.FC<any> = (props: any) => {
     return true;
   }
 
+  // 关闭窗口
+  window.onunload = () => {
+    // 不是返回的上一页才删除缓存
+    if (backPage === "false") localStorage.removeItem("announceItem");
+  }
+  window.onerror = () => localStorage.removeItem("announceItem");
+
+
   useEffect(() => {
-    announcementForm.setFieldsValue({
-      announce_time: moment(),
-      announce_carousel: 1,
-      carouselNum: 5
-    });
-    setCarouselNumShow("inline")
+    debugger;
+    // 先判断有没有缓存，有的话则显示缓存
+    const content = localStorage.getItem("announceItem");
+    if (content && backPage === "true") {
+      const data = JSON.parse(content);
+
+      announcementForm.setFieldsValue({
+        module: data.module,
+        announce_time: moment(data.announce_time),
+        announce_carousel: data.announce_carousel,
+        carouselNum: data.carouselNum
+      });
+
+      if (data.module === "msgCard") {
+        setStepShow({
+          msgCard: "inline",
+          popCard: "none"
+        });
+
+      } else {
+        setStepShow({
+          msgCard: "none",
+          popCard: "inline"
+        });
+      }
+      setCarouselNumShow("inline");
+
+    } else {
+      announcementForm.setFieldsValue({
+        module: "popupCard",
+        announce_name: "默认的公告名称",
+        announce_time: moment(),
+        announce_carousel: 1,
+        carouselNum: 5
+      });
+      setCarouselNumShow("none");
+    }
   }, []);
   return (
     <PageContainer>
       <div style={{marginTop: -15, background: 'white', padding: 10}}>
         <Form form={announcementForm}>
-          <Form.Item label="升级模板：" name="module："
-                     rules={[{required: true}]}
-          >
+          <Form.Item label="升级模板：" name="module：" rules={[{required: true}]}>
             {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
-            <Radio.Group onChange={cardChange} defaultValue={"msgCard"}>
-              <Radio.Button value="msgCard" className={style.buttonStyle}>
+            <Radio.Group onChange={cardChange} value={"msgCard"}>
+              <Radio.Button name="msgCard" value="msgCard" className={style.buttonStyle}>
                 <img
                   src={require('../../../../../public/77Logo.png')}
                   width="100"
@@ -93,7 +135,7 @@ const Announce: React.FC<any> = (props: any) => {
                 />
                 消息卡片
               </Radio.Button>
-              <Radio.Button value="popupCard" className={style.marginStyle}>
+              <Radio.Button name="popupCard" value="popupCard" className={style.marginStyle}>
                 <img
                   src={require('../../../../../public/77Logo.png')}
                   width="100"
@@ -105,6 +147,7 @@ const Announce: React.FC<any> = (props: any) => {
               </Radio.Button>
             </Radio.Group>
           </Form.Item>
+
           <Form.Item label={'公告名称'} name={'announce_name'}
                      rules={[
                        {
@@ -119,10 +162,8 @@ const Announce: React.FC<any> = (props: any) => {
             <Input style={{minWidth: 300, width: "50%"}}/>
           </Form.Item>
 
-          <Form.Item
-            label={'升级时间'}
-            name={'announce_time'}
-            rules={[{required: true}]}
+          <Form.Item label={'升级时间'} name={'announce_time'}
+                     rules={[{required: true}]}
           >
             <DatePicker style={{minWidth: 300, width: "50%"}} showTime
                         onChange={(e, time) => setReleaseTime(time)}/>

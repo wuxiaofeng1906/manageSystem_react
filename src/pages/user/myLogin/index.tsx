@@ -31,7 +31,7 @@ const wxLogin = () => {
       agentid: 1000021,
       // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
       redirect_uri: encodeURIComponent(
-        `http://rd.q7link.com:8000/user/myLogin?callback=${location.origin}`,
+        `http://rd.q7link.com:8000/user/myLogin?prod=${location.origin?.includes('rd.q7link.com')}`,
       ),
       state: 'wwcba5faed367cdeee',
       href: '',
@@ -50,7 +50,7 @@ const qywxScript = () => {
 
 const Login: React.FC<{}> = () => {
   const urlParams = useLocation()?.query as {
-    callback: string;
+    prod: string;
     code: string;
     state: string;
     appid: string;
@@ -107,9 +107,9 @@ const Login: React.FC<{}> = () => {
     setTimeout(() => {
       const { query } = history.location;
       const { redirect } = query as { redirect: string };
-      urlParams.callback?.includes(location.origin)
+      urlParams.prod == 'true'
         ? history.push(redirect || '/')
-        : window.location.replace(urlParams.callback || location.origin);
+        : window.location.replace(`${location.protocol}//10.0.144.53:8000`);
     }, 20);
   };
   const getUsersInfo = async (windowURL: any) => {

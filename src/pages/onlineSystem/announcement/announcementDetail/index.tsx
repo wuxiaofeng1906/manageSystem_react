@@ -76,14 +76,16 @@ const Announce: React.FC<any> = (props: any) => {
     // 不是返回的上一页才删除缓存
     if (backPage === "false") localStorage.removeItem("announceItem");
   }
+
   window.onerror = () => localStorage.removeItem("announceItem");
 
 
   useEffect(() => {
-    debugger;
+
     // 先判断有没有缓存，有的话则显示缓存
     const content = localStorage.getItem("announceItem");
     if (content && backPage === "true") {
+      // 以下是下一页返回的数据
       const data = JSON.parse(content);
 
       announcementForm.setFieldsValue({
@@ -121,7 +123,7 @@ const Announce: React.FC<any> = (props: any) => {
   return (
     <PageContainer>
       <div style={{marginTop: -15, background: 'white', padding: 10}}>
-        <Form form={announcementForm}>
+        <Form form={announcementForm} autoComplete={"off"}>
           <Form.Item label="升级模板：" name="module：" rules={[{required: true}]}>
             {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
             <Radio.Group onChange={cardChange} value={"msgCard"}>

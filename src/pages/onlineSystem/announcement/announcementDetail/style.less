@@ -9,9 +9,9 @@
   height: 100px;
 }
 
-
 .commonBtn {
-  color: #1890FF
+  color: #1890FF;
+  border: 1px solid #1890FF;
 }
 
 .saveButtonStyle, .commonBtn {
@@ -33,6 +33,22 @@
   //box-shadow:1px 1px 1px #1890FF;
 
 }
+
+// 修改popForm中 formItem样式（对齐）
+.popForm {
+  background-color: white;
+  margin-top: -15px;
+  padding: 10px;
+
+  :global {
+    .ant-form-item-label > label {
+      background-color: transparent;
+      justify-content: flex-end;
+      width: 150px;
+    }
+  }
+}
+
 
 
 

@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col,
-  Radio, Tabs, Divider, Layout, RadioChangeEvent
+  Button, Form, Input, Row, Col, Space,
+  Radio, Tabs, Divider, Layout, RadioChangeEvent, FormListFieldData
 } from 'antd';
 import {useParams} from "umi";
 import {isEmpty} from "lodash";
 import {history} from "@@/core/history";
 import style from '../style.less';
-import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined} from '@ant-design/icons';
+import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
 
 const {Header, Footer} = Layout;
 const {TabPane} = Tabs;
@@ -98,10 +98,20 @@ const PopupCard: React.FC<any> = (props: any) => {
     </div>);
   });
 
+  const onFinish = (values: any) => {
+    console.log('Received values of form:', values);
+  };
+
+  useEffect(() => {
+    // 初始化表单
+    dtForm.setFieldsValue({
+      users: [{first: "", second: ""}]
+    });
+  }, [])
   return (
     <PageContainer>
       <div className={style.popForm}>
-        <Form form={dtForm} autoComplete={"off"}>
+        <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}>
           <Row>
             <Col>
               <Form.Item label={"语雀迭代版本地址："} name={"yuqueUrl"}>
@@ -125,28 +135,83 @@ const PopupCard: React.FC<any> = (props: any) => {
               <Radio value={0}>左右布局</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item>{propertyItems}</Form.Item>
+
+          <Form.List name="users">
+            {(fields: FormListFieldData[], {add, remove}) => (
+              <>
+                {fields.map(({key, name, ...restField}) => (
+                  <div key={key}>
+                    <Row>
+                      <Form.Item
+                        {...restField}
+                        label={"一级特性"}
+                        name={[name, 'first']}
+                        rules={[{required: true, message: '请输入一级特性'}]}
+                      >
+                        <Input style={{minWidth: 300}}></Input>
+                      </Form.Item>
+
+                      {/* 删除 */}
+                      <Button
+                        style={{border: 'none', color: "red", marginLeft: 5}}
+                        icon={<MinusCircleOutlined/>}
+                        onClick={() => remove(name)}
+                      />
+                    </Row>
+                    <Row>
+                      <Form.Item
+                        {...restField}
+                        label={"二级特性"}
+                        name={[name, 'second']}
+                      >
+                        <Input style={{minWidth: 300}}></Input>
+                      </Form.Item>
+
+                      {/* 删除 */}
+                      <Button
+                        style={{border: 'none', color: "#1890FF", marginLeft: 5}}
+                        icon={<PlusCircleOutlined/>}
+                        onClick={() => add()}
+                      />
+                      <Button
+                        style={{border: 'none', color: "red", marginLeft: 5}}
+                        icon={<MinusCircleOutlined/>}
+                        onClick={() => remove(name)}
+                      />
+                    </Row>
+
+                  </div>
+
+                ))}
+
+                {/* 点击一级特性 */}
+                <Form.Item>
+                  <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
+                          icon={<PlusCircleOutlined/>}
+                          onClick={() => add()}  // 直接写add函数会导致获取的参数多余
+                  > 添加一级特性 </Button>
+
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
+          <Divider/>
           <Form.Item>
-            <Button
-              style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
-              icon={<PlusCircleOutlined/>}
-              onClick={addFirstProperty}
-            > 添加一级特性 </Button>
-
-
+            <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
+              <div id={"message"}>
+                <Button className={style.saveButtonStyle} type="primary" style={{marginLeft: 10}}
+                        htmlType="submit">保存</Button>
+                <Button className={style.commonBtn} style={{marginLeft: 10}}>一键发布</Button>
+                <Button className={style.commonBtn} style={{marginLeft: 10}}>预览</Button>
+                <Button className={style.commonBtn} style={{marginLeft: 10}}
+                        onClick={() => history.push(`/onlineSystem/announcementDetail/1/1/false/true`)}>上一步</Button>
+              </div>
+            </Footer>
           </Form.Item>
+
         </Form>
 
-        <Divider/>
-        <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
-          <div id={"message"}>
-            <Button className={style.saveButtonStyle} type="primary" style={{marginLeft: 10}}>保存</Button>
-            <Button className={style.commonBtn} style={{marginLeft: 10}}>一键发布</Button>
-            <Button className={style.commonBtn} style={{marginLeft: 10}}>预览</Button>
-            <Button className={style.commonBtn} style={{marginLeft: 10}}
-                    onClick={() => history.push(`/onlineSystem/announcementDetail/1/1/false/true`)}>上一步</Button>
-          </div>
-        </Footer>
+
       </div>
     </PageContainer>
   );

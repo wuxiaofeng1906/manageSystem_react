@@ -363,6 +363,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       hide: keepServer,
       autoHeight: true,
       wrapText: true,
+      cellRenderer: 'select',
     },
     {
       headerName: '数据Recovery',

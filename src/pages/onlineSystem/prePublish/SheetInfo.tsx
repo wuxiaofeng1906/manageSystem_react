@@ -51,6 +51,7 @@ import ICluster from '@/components/ICluster';
 let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
 let agBatch: any[] = [];
+let databaseVersion: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
@@ -239,6 +240,8 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const getBaseList = async () => {
+    const database = await OnlineSystemServices.databaseVersion();
+    databaseVersion = database?.map((it: string) => ({ label: it, value: it }));
     const batch = await OnlineSystemServices.getBatchVersion({ release_num });
     agBatch = batch?.map((it: string) => ({ label: it, value: it })) ?? [];
     const announce = await AnnouncementServices.preAnnouncement();
@@ -491,9 +494,11 @@ const SheetInfo = (props: any, ref: any) => {
         value={isEmpty(p.value) ? undefined : p.value}
         style={{ width: '100%' }}
         disabled={agFinished}
-        allowClear={['batch'].includes(field)}
+        allowClear={['batch', 'database_version'].includes(field)}
         options={
-          field == 'batch'
+          field == 'database_version'
+            ? databaseVersion
+            : field == 'batch'
             ? agBatch
             : Object.keys(WhetherOrNot)?.map((k) => ({
                 value: k,

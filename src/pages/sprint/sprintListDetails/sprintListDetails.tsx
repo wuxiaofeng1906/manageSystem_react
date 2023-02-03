@@ -317,7 +317,7 @@ const SprintList: React.FC<any> = () => {
       showTestConfirmFlag,
       ztId,
     );
-    // ora_filter_data = datas?.result;
+    ora_filter_data = datas?.result;
     setData(datas);
     onSelectChanged();
   };

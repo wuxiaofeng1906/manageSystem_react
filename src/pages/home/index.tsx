@@ -10,8 +10,10 @@ import VisualView from '@/pages/home/VisualView';
 import { isEmpty, omit } from 'lodash';
 import usePermission from '@/hooks/permission';
 import { useLocation, history, useModel } from 'umi';
+import { useUser } from '@/hooks/user';
 
 const Home = () => {
+  const { setUser } = useUser();
   const [initialState, setInitialState] = useModel('@@initialState', (user) => [
     user?.initialState,
     user.setInitialState,
@@ -49,7 +51,7 @@ const Home = () => {
   useEffect(() => {
     if (urlParams?.auth) {
       localStorage.setItem('accessId', urlParams?.auth);
-      setInitialState({
+      setUser({
         ...initialState,
         currentUser: {
           ...initialState?.currentUser,

@@ -7,10 +7,8 @@ import { useModel } from '@@/plugin-model/useModel';
 import styles from './index.less';
 import axios from 'axios';
 import { useRequest } from 'ahooks';
-import { useGqlClient } from '@/hooks';
 import { useUser } from '@/hooks/user';
 import { getParameters } from '@/utils/utils';
-import { isEmpty } from 'lodash';
 
 /**
  * 此方法会跳转到 redirect 参数所在的位置
@@ -33,9 +31,7 @@ const wxLogin = () => {
       agentid: 1000021,
       // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
       redirect_uri: encodeURIComponent(
-        `http://rd.q7link.com:8000/user/myLogin?prod=${location.origin?.includes(
-          'rd.q7link.com',
-        )}&origin=${location.origin}`,
+        `http://rd.q7link.com:8000/user/myLogin?prod=${location.origin?.includes('rd.q7link.com')}`,
       ),
       state: 'wwcba5faed367cdeee',
       href: '',
@@ -60,19 +56,19 @@ const Login: React.FC<{}> = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const intl = useIntl();
 
-  const goto = async (prod = 'true', token?: string) => {
+  const goto = async (prod = 'true', userInfo: any = null) => {
     if (!history) return;
     setTimeout(() => {
       const { query } = history.location;
       const { redirect } = query as { redirect: string };
-      prod == 'true'
-        ? history.push(redirect || '/')
-        : window.location.replace(`${location.protocol}//10.0.144.53:8000`);
+      if (prod == 'true') {
+        history.push(redirect || '/');
+      } else {
+        window.location.replace(
+          `${location.protocol}//10.0.144.53:8000?auth=${userInfo?.access_token}&userId=${userInfo?.user?.userid}&userName=${userInfo?.user?.userName}`,
+        );
+      }
     }, 20);
-    if (token && prod == 'false') {
-      console.log('------', token);
-      localStorage.setItem('accessId', token);
-    }
   };
 
   const fetchUserInfo = async (userInfos: any) => {
@@ -80,22 +76,6 @@ const Login: React.FC<{}> = () => {
     // console.log("登录后的token", userInfos.access_token);
     localStorage.setItem('accessId', userInfos.access_token); // 正式环境应放开
     localStorage.setItem('authority', JSON.stringify(userInfos.authorities));
-    // console.log("myauth", JSON.stringify(userInfos.authorities));
-
-    // 权限分组：
-    // 系统管理员：拥有所有权限。
-    // sprint管理员：除了系统设置，其他权限全有
-    // 研发中心：所有除了客服和顾问的人员
-    // 还有其他用户
-
-    // 接下来需要判断用户
-
-    // let accessRole = userInfos.role.name;
-    // if (userInfos.role.name === "superGroup") {
-    //   accessRole = 'sys_admin';
-    // } else if (userInfos.role.name === "projectListMG") {
-    //   accessRole = 'sprint_admin';
-    // }
 
     const userInfo = {
       name: userInfos.user.userName,
@@ -116,21 +96,13 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
-    // let userCode = '';
     const urlParams = getParameters(windowURL);
     if (windowURL.indexOf('?') !== -1) {
-      // const firstGroup = windowURL.split('?'); // 区分问号后面的内容
-      // const secondGroup = firstGroup[1].split('&'); // 区分code和其他属性
-      // const thirdGroup = secondGroup[0].split('='); // 获取到=后面的值
-      // userCode = thirdGroup[1].toString();
-      console.log(urlParams);
       if (!windowURL.includes('redirect')) {
         // 不是重定向的时候才禁用
         setTitleShown(true); // 设置为不可见
       }
     }
-
-    // console.log("usercode", userCode);
     // 如果获取到了usercode，则拿取用户信息和权限
     if (urlParams.code && !urlParams.code.includes('%')) {
       const data = { username: 'users', password: urlParams.code };

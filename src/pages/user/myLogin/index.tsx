@@ -33,7 +33,9 @@ const wxLogin = () => {
       agentid: 1000021,
       // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
       redirect_uri: encodeURIComponent(
-        `http://rd.q7link.com:8000/user/myLogin?prod=${location.origin?.includes('rd.q7link.com')}`,
+        `http://rd.q7link.com:8000/user/myLogin?prod=${location.origin?.includes(
+          'rd.q7link.com',
+        )}&origin=${location.origin}`,
       ),
       state: 'wwcba5faed367cdeee',
       href: '',
@@ -58,11 +60,8 @@ const Login: React.FC<{}> = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const intl = useIntl();
 
-  const goto = async (prod = 'true', userInfo: any = null) => {
+  const goto = async (prod = 'true', token?: string) => {
     if (!history) return;
-    if (prod !== 'true' && !isEmpty(userInfo)) {
-      await fetchUserInfo(userInfo);
-    }
     setTimeout(() => {
       const { query } = history.location;
       const { redirect } = query as { redirect: string };
@@ -70,6 +69,10 @@ const Login: React.FC<{}> = () => {
         ? history.push(redirect || '/')
         : window.location.replace(`${location.protocol}//10.0.144.53:8000`);
     }, 20);
+    if (token && prod == 'false') {
+      console.log('------', token);
+      localStorage.setItem('accessId', token);
+    }
   };
 
   const fetchUserInfo = async (userInfos: any) => {
@@ -137,7 +140,7 @@ const Login: React.FC<{}> = () => {
           const resultData = res.data;
           if (resultData.ok === true) {
             fetchUserInfo(resultData);
-            goto(urlParams.prod, resultData);
+            goto(urlParams.prod, resultData?.access_token);
           } else {
             message.error({
               content: '您无权登录！',

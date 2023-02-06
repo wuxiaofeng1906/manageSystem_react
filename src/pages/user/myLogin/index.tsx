@@ -65,7 +65,7 @@ const Login: React.FC<{}> = () => {
         history.push(redirect || '/');
       } else {
         window.location.replace(
-          `${location.protocol}//10.0.144.53:8000?auth=${userInfo?.access_token}&userId=${userInfo?.user?.id}&userName=${userInfo?.user?.userName}`,
+          `${location.protocol}//10.0.144.53:8000/home?auth=${userInfo?.access_token}&userId=${userInfo?.user?.id}&userName=${userInfo?.user?.userName}`,
         );
       }
     }, 20);

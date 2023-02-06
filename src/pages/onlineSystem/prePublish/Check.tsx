@@ -145,17 +145,11 @@ const Check = (props: any, ref: any) => {
   };
 
   const init = async (isFresh = false, showLoading = true) => {
-    const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
-    const to = from.endOf('w');
-
-    const range = {
-      start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
-      end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
-    };
     setSpin(showLoading);
     setSelected([]);
     let autoCheck: string[] = [];
     let orignDuty = dutyPerson;
+    let formatCheckInfo: any[] = [];
     try {
       if (isFresh) {
         // 忽略 不用跑检查
@@ -175,11 +169,41 @@ const Check = (props: any, ref: any) => {
       ).finally(async () => {
         // 存在值班人员为空
         const refresh = isEmpty(orignDuty) && count < 2;
-        const [checkItem, firstDuty] = await Promise.all([
-          OnlineSystemServices.getCheckInfo({ release_num }),
-          refresh ? DutyListServices.getFirstDutyPerson(range) : null,
-        ]);
+        const checkItem = await OnlineSystemServices.getCheckInfo({ release_num });
+        formatCheckInfo = checkInfo.map((it) => {
+          const currentKey = checkItem[it.rowKey];
+          const flag = it.rowKey == 'auto_obj_data';
+          let status = 'skip';
+          if (flag) {
+            status = isEmpty(currentKey)
+              ? ''
+              : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
+                  ?.check_result || 'yes';
+          }
+          return {
+            ...it,
+            disabled: false,
+            status: flag ? status : currentKey?.[it.status] ?? '',
+            start: flag ? (status == '' ? status : '-') : currentKey?.[it.start] || '',
+            end: flag ? (status == '' ? status : '-') : currentKey?.[it.end] || '',
+            open: flag ? status !== 'skip' : currentKey?.[it.status] !== 'skip',
+            open_pm: currentKey?.[it.open_pm] || '',
+            open_time: currentKey?.[it.open_time] || '',
+            log: currentKey?.[it.log] || '',
+            source: currentKey?.data_from || it.source,
+          };
+        });
         if (refresh) {
+          // 获取当前检查周日期 默认为当周
+          const currentTime =
+            formatCheckInfo.find((it: any) => it?.start && it.start != '-')?.start || dayjs();
+          const from = dayjs(currentTime).subtract(1, 'd').startOf('w').subtract(0, 'w');
+          const to = from.endOf('w');
+          const range = {
+            start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
+            end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
+          };
+          const firstDuty = await DutyListServices.getFirstDutyPerson(range);
           const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
           duty?.forEach((it: any) => {
             orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
@@ -187,32 +211,7 @@ const Check = (props: any, ref: any) => {
           setDutyPerson(orignDuty);
           setCount(++count);
         }
-        setList(
-          checkInfo.map((it) => {
-            const currentKey = checkItem[it.rowKey];
-            const flag = it.rowKey == 'auto_obj_data';
-            let status = 'skip';
-            if (flag) {
-              status = isEmpty(currentKey)
-                ? ''
-                : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
-                    ?.check_result || 'yes';
-            }
-            return {
-              ...it,
-              disabled: false,
-              status: flag ? status : currentKey?.[it.status] ?? '',
-              start: flag ? (status == '' ? status : '-') : currentKey?.[it.start] || '',
-              end: flag ? (status == '' ? status : '-') : currentKey?.[it.end] || '',
-              open: flag ? status !== 'skip' : currentKey?.[it.status] !== 'skip',
-              open_pm: currentKey?.[it.open_pm] || '',
-              open_time: currentKey?.[it.open_time] || '',
-              log: currentKey?.[it.log] || '',
-              source: currentKey?.data_from || it.source,
-              contact: orignDuty?.[it.contact] || '',
-            };
-          }),
-        );
+        setList(formatCheckInfo?.map((it) => ({ ...it, contact: orignDuty?.[it.contact] || '' })));
         setSpin(false);
       });
     } catch (e) {
@@ -335,7 +334,7 @@ const Check = (props: any, ref: any) => {
     } else {
       Modal?.destroyAll?.();
       timer = setInterval(() => {
-        init(true, false);
+        init(false, false);
       }, 15000);
     }
     return () => {

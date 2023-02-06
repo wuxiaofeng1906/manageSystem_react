@@ -112,7 +112,7 @@ const Login: React.FC<{}> = () => {
           const resultData = res.data;
           if (resultData.ok === true) {
             fetchUserInfo(resultData);
-            goto(urlParams.prod, resultData?.access_token);
+            goto(urlParams.prod, resultData);
           } else {
             message.error({
               content: '您无权登录！',

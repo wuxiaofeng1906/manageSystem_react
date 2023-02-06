@@ -10,20 +10,11 @@ import { useRequest } from 'ahooks';
 import { useGqlClient } from '@/hooks';
 import { useUser } from '@/hooks/user';
 import { getParameters } from '@/utils/utils';
+import { isEmpty } from 'lodash';
 
 /**
  * 此方法会跳转到 redirect 参数所在的位置
  */
-const goto = (prod = 'true') => {
-  if (!history) return;
-  setTimeout(() => {
-    const { query } = history.location;
-    const { redirect } = query as { redirect: string };
-    prod == 'true'
-      ? history.push(redirect || '/')
-      : window.location.replace(`${location.protocol}//10.0.144.53:8000`);
-  }, 20);
-};
 
 const wxLogin = () => {
   setTimeout(function () {
@@ -66,6 +57,20 @@ const Login: React.FC<{}> = () => {
 
   const { initialState, setInitialState } = useModel('@@initialState');
   const intl = useIntl();
+
+  const goto = async (prod = 'true', userInfo: any = null) => {
+    if (!history) return;
+    if (prod !== 'true' && !isEmpty(userInfo)) {
+      await fetchUserInfo(userInfo);
+    }
+    setTimeout(() => {
+      const { query } = history.location;
+      const { redirect } = query as { redirect: string };
+      prod == 'true'
+        ? history.push(redirect || '/')
+        : window.location.replace(`${location.protocol}//10.0.144.53:8000`);
+    }, 20);
+  };
 
   const fetchUserInfo = async (userInfos: any) => {
     // 测试时的token
@@ -132,7 +137,7 @@ const Login: React.FC<{}> = () => {
           const resultData = res.data;
           if (resultData.ok === true) {
             fetchUserInfo(resultData);
-            goto(urlParams.prod);
+            goto(urlParams.prod, resultData);
           } else {
             message.error({
               content: '您无权登录！',

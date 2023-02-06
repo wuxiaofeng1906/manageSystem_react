@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import ProForm from '@ant-design/pro-form';
-import { history, useLocation } from 'umi';
+import { history } from 'umi';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { useModel } from '@@/plugin-model/useModel';
 import styles from './index.less';
@@ -9,10 +9,21 @@ import axios from 'axios';
 import { useRequest } from 'ahooks';
 import { useGqlClient } from '@/hooks';
 import { useUser } from '@/hooks/user';
+import { getParameters } from '@/utils/utils';
 
 /**
  * 此方法会跳转到 redirect 参数所在的位置
  */
+const goto = (prod = 'true') => {
+  if (!history) return;
+  setTimeout(() => {
+    const { query } = history.location;
+    const { redirect } = query as { redirect: string };
+    prod == 'true'
+      ? history.push(redirect || '/')
+      : window.location.replace(`${location.protocol}//10.0.144.53:8000`);
+  }, 20);
+};
 
 const wxLogin = () => {
   setTimeout(function () {
@@ -49,12 +60,6 @@ const qywxScript = () => {
 };
 
 const Login: React.FC<{}> = () => {
-  const urlParams = useLocation()?.query as {
-    prod: string;
-    code: string;
-    state: string;
-    appid: string;
-  };
   const { setUser } = useUser();
   const [submitting] = useState(false);
   const [showTitle, setTitleShown] = useState(false);
@@ -102,18 +107,9 @@ const Login: React.FC<{}> = () => {
     }
   };
 
-  const goto = () => {
-    if (!history) return;
-    setTimeout(() => {
-      const { query } = history.location;
-      const { redirect } = query as { redirect: string };
-      urlParams.prod == 'true'
-        ? history.push(redirect || '/')
-        : window.location.replace(`${location.protocol}//10.0.144.53:8000`);
-    }, 20);
-  };
   const getUsersInfo = async (windowURL: any) => {
     // let userCode = '';
+    const urlParams = getParameters(windowURL);
     if (windowURL.indexOf('?') !== -1) {
       // const firstGroup = windowURL.split('?'); // 区分问号后面的内容
       // const secondGroup = firstGroup[1].split('&'); // 区分code和其他属性
@@ -136,7 +132,7 @@ const Login: React.FC<{}> = () => {
           const resultData = res.data;
           if (resultData.ok === true) {
             fetchUserInfo(resultData);
-            goto();
+            goto(urlParams.prod);
           } else {
             message.error({
               content: '您无权登录！',

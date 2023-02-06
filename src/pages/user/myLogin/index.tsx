@@ -9,16 +9,19 @@ import axios from 'axios';
 import { useRequest } from 'ahooks';
 import { useGqlClient } from '@/hooks';
 import { useUser } from '@/hooks/user';
+import { getParameters } from '@/utils/utils';
 
 /**
  * 此方法会跳转到 redirect 参数所在的位置
  */
-const goto = () => {
+const goto = (prod = 'true') => {
   if (!history) return;
   setTimeout(() => {
     const { query } = history.location;
     const { redirect } = query as { redirect: string };
-    history.push(redirect || '/');
+    prod == 'true'
+      ? history.push(redirect || '/')
+      : window.location.replace(`${location.protocol}//10.0.144.53:8000`);
   }, 20);
 };
 
@@ -38,7 +41,9 @@ const wxLogin = () => {
       appid: 'wwcba5faed367cdeee',
       agentid: 1000021,
       // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
-      redirect_uri: encodeURIComponent('http://rd.q7link.com:8000/user/myLogin'),
+      redirect_uri: encodeURIComponent(
+        `http://rd.q7link.com:8000/user/myLogin?prod=${location.origin?.includes('rd.q7link.com')}`,
+      ),
       state: 'wwcba5faed367cdeee',
       href: '',
     });
@@ -103,12 +108,14 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
-    let userCode = '';
+    // let userCode = '';
+    const urlParams = getParameters(windowURL);
     if (windowURL.indexOf('?') !== -1) {
-      const firstGroup = windowURL.split('?'); // 区分问号后面的内容
-      const secondGroup = firstGroup[1].split('&'); // 区分code和其他属性
-      const thirdGroup = secondGroup[0].split('='); // 获取到=后面的值
-      userCode = thirdGroup[1].toString();
+      // const firstGroup = windowURL.split('?'); // 区分问号后面的内容
+      // const secondGroup = firstGroup[1].split('&'); // 区分code和其他属性
+      // const thirdGroup = secondGroup[0].split('='); // 获取到=后面的值
+      // userCode = thirdGroup[1].toString();
+      console.log(urlParams);
       if (!windowURL.includes('redirect')) {
         // 不是重定向的时候才禁用
         setTitleShown(true); // 设置为不可见
@@ -117,18 +124,15 @@ const Login: React.FC<{}> = () => {
 
     // console.log("usercode", userCode);
     // 如果获取到了usercode，则拿取用户信息和权限
-    if (userCode !== '' && !userCode.includes('%')) {
-      const data = {
-        username: 'users',
-        password: userCode,
-      };
+    if (urlParams.code && !urlParams.code.includes('%')) {
+      const data = { username: 'users', password: urlParams.code };
       await axios
         .post('/api/auth/login', data)
         .then(function (res) {
           const resultData = res.data;
           if (resultData.ok === true) {
             fetchUserInfo(resultData);
-            goto();
+            goto(urlParams.prod);
           } else {
             message.error({
               content: '您无权登录！',

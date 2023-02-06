@@ -812,14 +812,14 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
-                name: '标准产出率',
+                name: '项目标准产出率',
                 path: 'standardOutputRate',
                 component: './kpi/performance/project/standardOutputRate',
                 wrappers: ['../wrappers/auth'],
                 hideInMenu: true, // 接口未开发
               },
               {
-                name: '计划产出率',
+                name: '项目计划产出率',
                 path: 'plannedOutputRate',
                 component: './kpi/performance/project/plannedOutputRate',
                 wrappers: ['../wrappers/auth'],

@@ -334,7 +334,7 @@ const Check = (props: any, ref: any) => {
     } else {
       Modal?.destroyAll?.();
       timer = setInterval(() => {
-        init(true, false);
+        init(false, false);
       }, 15000);
     }
     return () => {

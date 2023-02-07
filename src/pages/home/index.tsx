@@ -7,10 +7,18 @@ import { dutyColumn } from '@/pages/home/column';
 import * as dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import VisualView from '@/pages/home/VisualView';
-import { isEmpty } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import usePermission from '@/hooks/permission';
+import { useLocation, history, useModel } from 'umi';
+import { useUser } from '@/hooks/user';
 
 const Home = () => {
+  const { setUser } = useUser();
+  const [initialState, setInitialState] = useModel('@@initialState', (user) => [
+    user?.initialState,
+    user.setInitialState,
+  ]);
+  const urlParams = useLocation()?.query as { auth?: string; userId: string; userName: string };
   const gridRef = useRef<GridApi>();
   const [dutyPerson, setDutyPerson] = useState<any[]>([]);
   const { prePermission } = usePermission();
@@ -39,6 +47,25 @@ const Home = () => {
   useEffect(() => {
     getFirstDuty();
   }, []);
+
+  useEffect(() => {
+    if (urlParams?.auth) {
+      localStorage.setItem('accessId', urlParams?.auth);
+      setUser({
+        ...initialState,
+        currentUser: {
+          ...initialState?.currentUser,
+          userid: urlParams?.userId,
+          name: urlParams?.userName,
+          avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+        },
+      });
+      history.replace({
+        pathname: location.pathname,
+        query: omit(urlParams, ['auth', 'userName', 'userId']),
+      });
+    }
+  }, [urlParams?.auth]);
 
   return (
     <div className={styles.homePage}>

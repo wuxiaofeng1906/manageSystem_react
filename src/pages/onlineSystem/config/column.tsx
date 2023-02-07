@@ -363,6 +363,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       hide: keepServer,
       autoHeight: true,
       wrapText: true,
+      cellRenderer: 'select',
     },
     {
       headerName: '数据Recovery',
@@ -401,7 +402,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
     {
       headerName: 'SQL工单',
       field: 'sql_order',
-      minWidth: 130,
+      minWidth: 220,
       cellRenderer: 'select',
       hide: keepServer,
       autoHeight: true,

@@ -1,16 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Space,
-  Radio, Tabs, Divider, Layout, RadioChangeEvent, FormListFieldData
+  Button, Form, Input, Row, Col,
+  Radio, Tabs, Divider, Layout
 } from 'antd';
 import {useParams} from "umi";
-import {isEmpty} from "lodash";
+// import {isEmpty} from "lodash";
 import {history} from "@@/core/history";
 import style from '../style.less';
-import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
+import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined} from '@ant-design/icons';
 
-const {Header, Footer} = Layout;
+const {Footer} = Layout;
 const {TabPane} = Tabs;
 const PopupCard: React.FC<any> = (props: any) => {
   const [dtForm] = Form.useForm();

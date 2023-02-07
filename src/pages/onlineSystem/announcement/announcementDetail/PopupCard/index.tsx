@@ -17,6 +17,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   const {isCarousel, count} = useParams() as { isCarousel: string; count: string };
 
   const onFinish = (values: any) => {
+    debugger;
     console.log('Received values of form:', values);
   };
 
@@ -51,10 +52,11 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   useEffect(() => {
-    // 初始化表单
+    // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
     dtForm.setFieldsValue({
-      users: [{first: "", second: ""}]
+      ptyGroup: [{first: "钱钱钱钱钱", seconds: [{"second": "2324234"}]}]
     });
+
   }, []);
   return (
     <PageContainer>
@@ -62,19 +64,19 @@ const PopupCard: React.FC<any> = (props: any) => {
       <div>
         <div className={style.popForm}>
           <Tabs onChange={onTabsChange} style={{display: isCarousel === "true" ? "inline" : "none"}}>
-
             {tabsData()?.map((pane: any) => (
               <TabPane tab={pane.title} key={pane.key}/>
             ))}
           </Tabs>
 
           <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}>
+            {/* 特性名称只针对轮播功能 */}
             <Row style={{display: isCarousel === "true" ? "inline-block" : "none"}}>
-              <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: true, message: '特性名称不能为空！'}]}>
+              <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>
                 <Input style={{minWidth: 300}}></Input>
               </Form.Item>
             </Row>
-
+            {/* 特性名称只针对不轮播功能 */}
             <Row style={{display: isCarousel === "true" ? "none" : "inline"}}>
               <Col>
                 <Form.Item label={"语雀迭代版本地址："} name={"yuqueUrl"}>
@@ -87,76 +89,91 @@ const PopupCard: React.FC<any> = (props: any) => {
                 </Button>
               </Col>
             </Row>
-            <Form.Item label={"上传图片"} name={"uploadPic"} rules={[{required: true, message: '图片不能为空！'}]}>
+
+            <Form.Item label={"上传图片"} name={"uploadPic"}>
               <Button type="default" icon={<UploadOutlined/>} style={{color: "#1890FF", border: "none"}}>
                 选择/上传
               </Button>
             </Form.Item>
-            <Form.Item label={"图文布局"} name={"picLayout"} required>
+            <Form.Item label={"图文布局"} name={"picLayout"} required={false}>
               <Radio.Group>
                 <Radio value={1}>上下布局</Radio>
                 <Radio value={0}>左右布局</Radio>
               </Radio.Group>
             </Form.Item>
 
-            <Form.List name="users">
-              {(fields: FormListFieldData[], {add, remove}) => (
-                <>
-                  {fields.map(({key, name, ...restField}) => (
-                    <div key={key}>
-                      <Row>
-                        <Form.Item
-                          {...restField}
-                          label={"一级特性"}
-                          name={[name, 'first']}
-                          rules={[{required: true, message: '请输入一级特性'}]}
-                        >
-                          <Input style={{minWidth: 300}}></Input>
-                        </Form.Item>
+            <Form.List name="ptyGroup" initialValue={[Object.create(null)]}>
+              {(fields, {add: addFirst, remove: removeFirst}) => {
+                return (
+                  <div>
+                    {fields.map((field, index) => (
+                      <div key={field.key}>
+                        <Row>
+                          <Form.Item
+                            {...field}
+                            label={"一级特性"}
+                            name={[field.name, 'first']}
+                            rules={[{required: false, message: '请输入一级特性'}]}
+                          >
+                            <Input style={{minWidth: 300}}></Input>
+                          </Form.Item>
 
-                        {/* 删除 */}
-                        <Button
-                          style={{border: 'none', color: "red", marginLeft: 5}}
-                          icon={<MinusCircleOutlined/>}
-                          onClick={() => remove(name)}
-                        />
-                      </Row>
-                      <Row>
-                        <Form.Item
-                          {...restField}
-                          label={"二级特性"}
-                          name={[name, 'second']}
-                        >
-                          <Input style={{minWidth: 300}}></Input>
-                        </Form.Item>
+                          {/* 删除 */}
+                          <Button
+                            style={{border: 'none', color: "red", marginLeft: 5}}
+                            icon={<MinusCircleOutlined/>}
+                            onClick={() => removeFirst(field.name)}
+                          />
+                        </Row>
+                        {/* 二级特性 */}
+                        <Form.List name={[field.name, 'seconds']} initialValue={[Object.create(null)]}>
+                          {(secondFields, {add: addSecond, remove: removeSeond}) => {
+                            return (
+                              <>
+                                {secondFields.map((secondField, index) => (
+                                  <div key={secondField.key}>
+                                    <Row>
+                                      <Form.Item
+                                        {...secondField}
+                                        label={`二级特性${index + 1}`}
+                                        name={[secondField.name, 'second']}
+                                      >
+                                        <Input style={{minWidth: 300}}></Input>
+                                      </Form.Item>
 
-                        {/* 删除 */}
-                        <Button
-                          style={{border: 'none', color: "#1890FF", marginLeft: 5}}
-                          icon={<PlusCircleOutlined/>}
-                          onClick={() => add()}
-                        />
-                        <Button
-                          style={{border: 'none', color: "red", marginLeft: 5}}
-                          icon={<MinusCircleOutlined/>}
-                          onClick={() => remove(name)}
-                        />
-                      </Row>
+                                      {/* 删除 */}
+                                      <Button
+                                        style={{border: 'none', color: "#1890FF", marginLeft: 5}}
+                                        icon={<PlusCircleOutlined/>}
+                                        onClick={() => addSecond()}
+                                      />
+                                      <Button
+                                        style={{border: 'none', color: "red", marginLeft: 5}}
+                                        icon={<MinusCircleOutlined/>}
+                                        onClick={() => removeSeond(secondField.name)}
+                                      />
+                                    </Row>
+                                  </div>
+                                ))}
+                              </>
+                            );
+                          }}
+                        </Form.List>
 
-                    </div>
 
-                  ))}
+                      </div>
+                    ))}
+                    {/* 点击一级特性 */}
+                    <Form.Item>
+                      <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
+                              icon={<PlusCircleOutlined/>}
+                              onClick={() => addFirst()}  // 直接写add函数会导致获取的参数多余
+                      > 添加一级特性 </Button>
 
-                  {/* 点击一级特性 */}
-                  <Form.Item>
-                    <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
-                            icon={<PlusCircleOutlined/>}
-                            onClick={() => add()}  // 直接写add函数会导致获取的参数多余
-                    > 添加一级特性 </Button>
-
-                  </Form.Item>
-                </>
-              )}
+                    </Form.Item>
+                  </div>
+                );
+              }}
             </Form.List>
 
             <Divider/>

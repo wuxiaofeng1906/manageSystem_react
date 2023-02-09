@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo, useState, Fragment } from 'react';
+import React, {useEffect, useMemo, useState, Fragment} from 'react';
 import styles from './index.less';
 import cns from 'classnames';
-import { Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch } from 'antd';
-import { InfoCircleOutlined, RightOutlined, DownOutlined } from '@ant-design/icons';
+import {Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch} from 'antd';
+import {InfoCircleOutlined, RightOutlined, DownOutlined} from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, cloneDeep, isArray, intersection, difference, pick } from 'lodash';
+import {isEmpty, sortBy, cloneDeep, isArray, intersection, difference, pick} from 'lodash';
 import dayjs from 'dayjs';
-import { valueMap } from '@/utils/utils';
-import { history, useModel } from 'umi';
+import {valueMap} from '@/utils/utils';
+import {history, useModel} from 'umi';
 
 let thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
 const baseColumn = [
-  { name: 'offline', value: thead[1] },
-  { name: ignore[0], value: thead[2] },
-  { name: ignore[1], value: thead[3] },
+  {name: 'offline', value: thead[1]},
+  {name: ignore[0], value: thead[2]},
+  {name: ignore[1], value: thead[3]},
 ];
 const initBg = ['#93db9326', '#e83c3c26', '#519ff224', '#e2e8f066'];
 
@@ -35,8 +35,8 @@ const ICard = (params: {
     () =>
       isArray(params.data.project)
         ? params.data.project
-            ?.flatMap((it: any) => (isEmpty(it.pro_name) ? [] : [it.pro_name]))
-            ?.join(',')
+          ?.flatMap((it: any) => (isEmpty(it.pro_name) ? [] : [it.pro_name]))
+          ?.join(',')
         : params.data.project,
     [JSON.stringify(params.data.project)],
   );
@@ -48,7 +48,7 @@ const ICard = (params: {
       okText: '确认',
       cancelText: '取消',
       content: '请确认是否删除该积压单，点确认将彻底从积压单中删除！',
-      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+      icon: <InfoCircleOutlined style={{color: 'red'}}/>,
       onOk: async () => {
         await PreReleaseServices.removeOrder({
           user_id: params.user?.userid ?? '',
@@ -66,32 +66,34 @@ const ICard = (params: {
 
   return (
     <div className={styles.stackWrapper}>
-      {params.child || <div />}
+      {params.child || <div/>}
       <Collapse
         activeKey={activeKey}
         collapsible={'header'}
-        style={{ background: params.data.bg || initBg[0] }}
+        style={{background: params.data.bg || initBg[0]}}
         className={cns({
           testEnvCollapse: !location.origin.includes('rd.q7link.com'),
         })}
         expandIcon={() => {
           return activeKey?.includes(params.data.release_num) ? (
-            <DownOutlined onClick={() => onCollapseChange('')} />
+            <DownOutlined onClick={() => onCollapseChange('')}/>
           ) : (
-            <RightOutlined onClick={() => onCollapseChange(params.data.release_num)} />
+            <RightOutlined onClick={() => onCollapseChange(params.data.release_num)}/>
           );
         }}
         onChange={() =>
           onCollapseChange(params.data.release_num == activeKey ? '' : params.data.release_num)
         }
       >
+        {/* 折叠面板标题 */}
         <Collapse.Panel
           key={params.data.release_num}
-          header={title}
+          header={<span> {title}<span
+            style={{color: "gray"}}>({params.data.apps ?? ''})</span></span>} // `${title}(${params.data.apps ?? ''})`
           extra={
             params.showLink ? (
               <img
-                style={{ cursor: 'pointer', width: 14, height: 14 }}
+                style={{cursor: 'pointer', width: 14, height: 14}}
                 title={'查看工单详情'}
                 src={require('../../../public/url.png')}
                 onClick={(e) => {
@@ -102,41 +104,39 @@ const ICard = (params: {
                   history.push(href);
                 }}
               />
-            ) : (
-              <div />
-            )
-          }
+            ) : (<div/>)}
         >
-          <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
+          {/* 折叠面板内容 */}
+          <div style={{background: params.data.bg || initBg[0]}} className={styles.icard}>
             <div className={styles.container}>
               <span className={styles.label}>发布项目:</span>
               <div className={styles.box} title={title}>
                 {isArray(params.data.project)
                   ? params.data.project?.map((it: any, i: number) => {
-                      const linkProject =
-                        it.pro_name?.startsWith('emergency') ||
-                        it.pro_name?.startsWith('stagepatch') ||
-                        it.pro_name?.startsWith('stage-patch');
-                      return (
-                        it.pro_name && (
-                          <span
-                            key={params.data.release_num + i}
-                            className={cns(
-                              baseline && linkProject ? styles.link : '',
-                              styles.value,
-                            )}
-                            onClick={() => {
-                              if (!it.pro_id || !(baseline && linkProject)) return;
-                              window.open(
-                                `http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`,
-                              );
-                            }}
-                          >
+                    const linkProject =
+                      it.pro_name?.startsWith('emergency') ||
+                      it.pro_name?.startsWith('stagepatch') ||
+                      it.pro_name?.startsWith('stage-patch');
+                    return (
+                      it.pro_name && (
+                        <span
+                          key={params.data.release_num + i}
+                          className={cns(
+                            baseline && linkProject ? styles.link : '',
+                            styles.value,
+                          )}
+                          onClick={() => {
+                            if (!it.pro_id || !(baseline && linkProject)) return;
+                            window.open(
+                              `http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`,
+                            );
+                          }}
+                        >
                             {it.pro_name ?? ''}
                           </span>
-                        )
-                      );
-                    })
+                      )
+                    );
+                  })
                   : params.data.project}
               </div>
             </div>
@@ -194,7 +194,7 @@ const ICard = (params: {
                 onClick={() => onRemove(params.data)}
               />
             ) : (
-              <div />
+              <div/>
             )}
           </div>
         </Collapse.Panel>
@@ -211,7 +211,7 @@ const VisualView = () => {
   const [branch, setBranch] = useState<any[]>([]);
   const [cluster, setCluster] = useState<any>();
   const [online, setOnline] = useState<{ name: string; value: string }[]>([
-    { name: '', value: '' },
+    {name: '', value: ''},
   ]); // 线上动态列
   const [basicSource, setBasicSource] = useState<any[]>([]); // 基准版本
   const [currentSource, setCurrentSource] = useState<any[]>([]); // 当天待发版
@@ -274,7 +274,7 @@ const VisualView = () => {
 
   const computeFn = (origin: any[], clusterMap: any) => {
     if (isEmpty(origin)) return [];
-    return origin.map((it: any) => ({ value: clusterMap[it], name: it }));
+    return origin.map((it: any) => ({value: clusterMap[it], name: it}));
   };
 
   const preData = (clusterMap = cluster) => {
@@ -329,7 +329,7 @@ const VisualView = () => {
       );
       // 排序(动态列计算)
       let formatOnline = sortBy(formatBasicCluster, ['name']);
-      if (isEmpty(formatOnline)) formatOnline = [{ name: '', value: '' }];
+      if (isEmpty(formatOnline)) formatOnline = [{name: '', value: ''}];
       const basicGroup: any[] = [];
       cloneDeep(baseColumn)
         .splice(1)
@@ -380,9 +380,9 @@ const VisualView = () => {
           <th>
             <span className={styles.title}>{title}</span>
           </th>
-          <td />
+          <td/>
           {dynamicColumn.map((_, index) => (
-            <td key={index} style={{ height: 130 }} />
+            <td key={index} style={{height: 130}}/>
           ))}
         </tr>
       );
@@ -401,7 +401,7 @@ const VisualView = () => {
                 {showStep ? (
                   <Fragment>
                     第{index + 1}步：
-                    <br />
+                    <br/>
                     {it.plan_release_time
                       ? dayjs(it.plan_release_time).format('YYYY-MM-DD HH:mm')
                       : ''}
@@ -425,7 +425,7 @@ const VisualView = () => {
       <Fragment>
         {dynamicColumn.map((it, index) => {
           return (
-            <td key={index} style={{ verticalAlign: 'middle' }}>
+            <td key={index} style={{verticalAlign: 'middle'}}>
               {data.baseline_cluster == it?.name ? (
                 <ICard
                   data={data}
@@ -471,13 +471,13 @@ const VisualView = () => {
   const onlineLen = useMemo(() => online.length, [online]);
 
   const renderBasicTd = useMemo(() => {
-    const empty = Array.from({ length: onlineLen + 2 });
-    if (isEmpty(basicSource)) return empty.map((it, i) => <td key={i} />);
+    const empty = Array.from({length: onlineLen + 2});
+    if (isEmpty(basicSource)) return empty.map((it, i) => <td key={i}/>);
     return (
       <Fragment>
         {basicSource?.map((it, index) => {
           return isEmpty(it.children) ? (
-            <td key={index} />
+            <td key={index}/>
           ) : (
             <td>
               {it.children?.map((child: any, i: number) => {
@@ -507,13 +507,14 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
-  const init = useMemo(() => {}, []);
+  const init = useMemo(() => {
+  }, []);
   return (
     <Card
       className={styles.card}
       title={
         <div className={styles.header}>
-          <span style={{ marginRight: 5, verticalAlign: 'middle' }}>待发布视图</span>
+          <span style={{marginRight: 5, verticalAlign: 'middle'}}>待发布视图</span>
           <Switch
             checkedChildren={'展开全部'}
             unCheckedChildren={'收起全部'}
@@ -533,80 +534,80 @@ const VisualView = () => {
         <div className={styles.visualView}>
           <table>
             <colgroup>
-              <col style={{ maxWidth: 50, width: 30 }} />
-              <col style={{ width: 140, maxWidth: 160 }} />
+              <col style={{maxWidth: 50, width: 30}}/>
+              <col style={{width: 140, maxWidth: 160}}/>
             </colgroup>
             <thead>
-              <tr>
-                {thead.map((title) => {
-                  const isOnline = title == '线上';
-                  const singleW = 240;
-                  return (
-                    <th
-                      key={title}
-                      rowSpan={isOnline ? 1 : 2}
-                      colSpan={isOnline ? onlineLen : title == '类别' ? 2 : 1}
-                      style={
-                        title == '类别'
-                          ? { width: 170, maxWidth: 200 }
-                          : {
-                              width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px`,
-                            }
-                      }
-                    >
-                      {title}
-                    </th>
-                  );
-                })}
-              </tr>
-              <tr>
-                {online.map((it) => (it.name == '' ? '' : <th key={it.name}>{it.value ?? ''}</th>))}
-              </tr>
+            <tr>
+              {thead.map((title) => {
+                const isOnline = title == '线上';
+                const singleW = 240;
+                return (
+                  <th
+                    key={title}
+                    rowSpan={isOnline ? 1 : 2}
+                    colSpan={isOnline ? onlineLen : title == '类别' ? 2 : 1}
+                    style={
+                      title == '类别'
+                        ? {width: 170, maxWidth: 200}
+                        : {
+                          width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px`,
+                        }
+                    }
+                  >
+                    {title}
+                  </th>
+                );
+              })}
+            </tr>
+            <tr>
+              {online.map((it) => (it.name == '' ? '' : <th key={it.name}>{it.value ?? ''}</th>))}
+            </tr>
             </thead>
             <tbody>
-              <tr>
-                <th colSpan={2}>版本基准</th>
-                <td className={styles.obliqueLine} />
-                {renderBasicTd}
-              </tr>
-              {renderTr(currentSource, '待发布过程单')}
-              {/*搜索条件*/}
-              {/*<tr>*/}
-              {/*  <td colSpan={onlineLen + 5}>*/}
-              {/*    <Form*/}
-              {/*      form={form}*/}
-              {/*      size={'small'}*/}
-              {/*      layout={'inline'}*/}
-              {/*      className={styles.condition}*/}
-              {/*      onFieldsChange={getPlanList}*/}
-              {/*    >*/}
-              {/*      <Form.Item name={'project_id'} label={'项目名称'}>*/}
-              {/*        <Select*/}
-              {/*          style={{ width: '300px' }}*/}
-              {/*          options={project}*/}
-              {/*          placeholder={'项目名称'}*/}
-              {/*          mode={'multiple'}*/}
-              {/*          showSearch*/}
-              {/*          optionFilterProp={'label'}*/}
-              {/*        />*/}
-              {/*      </Form.Item>*/}
-              {/*      <Form.Item name={'branch'} label={'分支名称'}>*/}
-              {/*        <Select*/}
-              {/*          style={{ width: '300px' }}*/}
-              {/*          options={branch}*/}
-              {/*          placeholder={'分支名称'}*/}
-              {/*          mode={'multiple'}*/}
-              {/*          showSearch*/}
-              {/*          optionFilterProp={'label'}*/}
-              {/*        />*/}
-              {/*      </Form.Item>*/}
-              {/*      <Form.Item name={'plan_time'} label={'计划上线日期'}>*/}
-              {/*        <DatePicker style={{ width: '170px' }} />*/}
-              {/*      </Form.Item>*/}
-              {/*    </Form>*/}
-              {/*  </td>*/}
-              {/*</tr>*/}
-              {renderTr(planSource, '计划上线日历', false, false, false)}
+            <tr>
+              <th colSpan={2}>版本基准</th>
+              <td className={styles.obliqueLine}/>
+              {renderBasicTd}
+            </tr>
+            {renderTr(currentSource, '待发布过程单')}
+            {/*搜索条件*/}
+            {/*<tr>*/}
+            {/*  <td colSpan={onlineLen + 5}>*/}
+            {/*    <Form*/}
+            {/*      form={form}*/}
+            {/*      size={'small'}*/}
+            {/*      layout={'inline'}*/}
+            {/*      className={styles.condition}*/}
+            {/*      onFieldsChange={getPlanList}*/}
+            {/*    >*/}
+            {/*      <Form.Item name={'project_id'} label={'项目名称'}>*/}
+            {/*        <Select*/}
+            {/*          style={{ width: '300px' }}*/}
+            {/*          options={project}*/}
+            {/*          placeholder={'项目名称'}*/}
+            {/*          mode={'multiple'}*/}
+            {/*          showSearch*/}
+            {/*          optionFilterProp={'label'}*/}
+            {/*        />*/}
+            {/*      </Form.Item>*/}
+            {/*      <Form.Item name={'branch'} label={'分支名称'}>*/}
+            {/*        <Select*/}
+            {/*          style={{ width: '300px' }}*/}
+            {/*          options={branch}*/}
+            {/*          placeholder={'分支名称'}*/}
+            {/*          mode={'multiple'}*/}
+            {/*          showSearch*/}
+            {/*          optionFilterProp={'label'}*/}
+            {/*        />*/}
+            {/*      </Form.Item>*/}
+            {/*      <Form.Item name={'plan_time'} label={'计划上线日期'}>*/}
+            {/*        <DatePicker style={{ width: '170px' }} />*/}
+            {/*      </Form.Item>*/}
+            {/*    </Form>*/}
+            {/*  </td>*/}
+            {/*</tr>*/}
+            {renderTr(planSource, '计划上线日历', false, false, false)}
             </tbody>
           </table>
         </div>

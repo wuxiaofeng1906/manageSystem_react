@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useState, forwardRef, useEffect, useMemo } from 'react';
+import React, {useImperativeHandle, useState, forwardRef, useEffect, useMemo} from 'react';
 import {
   Table,
   Switch,
@@ -20,19 +20,19 @@ import {
   onLog,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
-import { isEmpty, omit, delay, isString, uniq } from 'lodash';
-import { infoMessage } from '@/publicMethods/showMessages';
+import {isEmpty, omit, delay, isString, uniq} from 'lodash';
+import {infoMessage} from '@/publicMethods/showMessages';
 import moment from 'moment';
-import { useLocation, useModel, history, useParams } from 'umi';
-import { ICheckType, OnlineSystemServices } from '@/services/onlineSystem';
+import {useLocation, useModel, history, useParams} from 'umi';
+import {ICheckType, OnlineSystemServices} from '@/services/onlineSystem';
 import dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import usePermission from '@/hooks/permission';
 
 const Check = (props: any, ref: any) => {
-  const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
-  const { release_num } = useParams() as { release_num: string };
-  const { onlineSystemPermission } = usePermission();
+  const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
+  const {release_num} = useParams() as { release_num: string };
+  const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [globalState, setGlobalState, basic] = useModel('onlineSystem', (online) => [
     online.globalState,
@@ -68,7 +68,7 @@ const Check = (props: any, ref: any) => {
       onLock,
       onPushCheckFailMsg,
       onRefreshCheck: () => init(true),
-      onSetting: () => setShow({ visible: true, data: release_num }),
+      onSetting: () => setShow({visible: true, data: release_num}),
     }),
     [selected, ref, globalState, basic, list, subTab, tab],
   );
@@ -85,14 +85,14 @@ const Check = (props: any, ref: any) => {
       const checkList = list.flatMap((it) =>
         selected.includes(it.rowKey) && it.api_url
           ? [
-              {
-                user_id: user?.userid ?? '',
-                release_num,
-                is_ignore: it.open ? 'no' : 'yes',
-                side: it.side,
-                api_url: it.api_url as ICheckType,
-              },
-            ]
+            {
+              user_id: user?.userid ?? '',
+              release_num,
+              is_ignore: it.open ? 'no' : 'yes',
+              side: it.side,
+              api_url: it.api_url as ICheckType,
+            },
+          ]
           : [],
       );
       await Promise.all(
@@ -114,7 +114,7 @@ const Check = (props: any, ref: any) => {
      */
 
     if (!globalState.locked) {
-      await OnlineSystemServices.checkProcess({ release_num });
+      await OnlineSystemServices.checkProcess({release_num});
       const flag = list.some(
         (it) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status),
       );
@@ -135,7 +135,7 @@ const Check = (props: any, ref: any) => {
     if (!globalState.locked) {
       history.replace({
         pathname: history.location.pathname,
-        query: { tab, subTab: 'sheet' },
+        query: {tab, subTab: 'sheet'},
       });
     }
   };
@@ -160,7 +160,7 @@ const Check = (props: any, ref: any) => {
           await Promise.all(
             uniq(autoCheck).map((type) =>
               OnlineSystemServices.checkOpts(
-                { release_num, user_id: user?.userid, api_url: type },
+                {release_num, user_id: user?.userid, api_url: type},
                 type as ICheckType,
               ),
             ),
@@ -171,19 +171,20 @@ const Check = (props: any, ref: any) => {
       // 存在值班人员为空
       const refresh = (isEmpty(orignDuty) && count < 2) || isFresh;
       const [checkItem, firstDuty] = await Promise.all([
-        OnlineSystemServices.getCheckInfo({ release_num }),
+        OnlineSystemServices.getCheckInfo({release_num}),
         refresh ? DutyListServices.getFirstDutyPerson(range) : null,
       ]);
       if (refresh) {
         const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
         duty?.forEach((it: any) => {
-          orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
+          orignDuty = {...orignDuty, [it.user_tech]: it.user_name};
         });
         setDutyPerson(orignDuty);
         setCount(++count);
       }
       setList(
         checkInfo.map((it) => {
+          // checkItem 是从服务端获取的具体数据
           const currentKey = checkItem[it.rowKey];
           const flag = it.rowKey == 'auto_obj_data';
           let status = 'skip';
@@ -191,8 +192,9 @@ const Check = (props: any, ref: any) => {
             status = isEmpty(currentKey)
               ? ''
               : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
-                  ?.check_result || 'yes';
+              ?.check_result || 'yes';
           }
+
           return {
             ...it,
             disabled: false,
@@ -205,6 +207,8 @@ const Check = (props: any, ref: any) => {
             log: currentKey?.[it.log] || '',
             source: currentKey?.data_from || it.source,
             contact: orignDuty?.[it.contact] || '',
+            check_person: currentKey?.[it.check_person] || '',
+            desc: currentKey?.[it.desc] || '',
           };
         }),
       );
@@ -242,7 +246,7 @@ const Check = (props: any, ref: any) => {
     // 特殊处理
     if (type == 'libray_data')
       content = (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
           <div>
             <strong>线上：</strong>
             {Object.entries(v?.before ?? {})?.map(([k, v]) => (
@@ -260,7 +264,7 @@ const Check = (props: any, ref: any) => {
     if (type == 'hot_data') {
       width = 1000;
       content = (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
           <div>
             <strong>收集数据当前环境数据:</strong>
             <div>{v?.present_env}</div>
@@ -282,7 +286,7 @@ const Check = (props: any, ref: any) => {
           {v?.map((it: any) => (
             <div key={it.name_path}>
               <span>{`【${it.name_path}】`}</span>【
-              <span style={{ color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14' }}>
+              <span style={{color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14'}}>
                 {it.sealing_version == 'yes' ? '已封版' : '未封版'}
               </span>
               】
@@ -310,7 +314,7 @@ const Check = (props: any, ref: any) => {
       centered: true,
       title: '一键推送检查失败信息提示：',
       content: '请确认是否一键推送检查失败信息到值班群？',
-      onOk: () => OnlineSystemServices.pushFailMsg({ release_num }),
+      onOk: () => OnlineSystemServices.pushFailMsg({release_num}),
     });
   };
 
@@ -340,7 +344,7 @@ const Check = (props: any, ref: any) => {
   );
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
-      <div className={styles.onlineTable} style={{ height: '100%' }}>
+      <div className={styles.onlineTable} style={{height: '100%'}}>
         <Table
           size="small"
           bordered
@@ -391,8 +395,8 @@ const Check = (props: any, ref: any) => {
               render: (p, record) => {
                 let status = p;
                 const special = {
-                  'sealing-version-check': { yes: 'version', no: 'noVersion' },
-                  'hot-update-check': { yes: 'hot', no: 'noHot' },
+                  'sealing-version-check': {yes: 'version', no: 'noVersion'},
+                  'hot-update-check': {yes: 'hot', no: 'noHot'},
                 };
                 // 特殊处理 封板，热更 状态
                 if (
@@ -403,12 +407,18 @@ const Check = (props: any, ref: any) => {
                 }
                 return (
                   <span
-                    style={{ color: CheckStatus[status]?.color ?? '#000000d9', fontWeight: 500 }}
+                    style={{color: CheckStatus[status]?.color ?? '#000000d9', fontWeight: 500}}
                   >
                     {CheckStatus[status]?.text ?? status}
                   </span>
                 );
               },
+            },
+            {
+              title: '检查人',
+              dataIndex: 'check_person',
+              width: 100,
+              align: 'center',
             },
             {
               align: 'center',
@@ -455,12 +465,12 @@ const Check = (props: any, ref: any) => {
                     if (!e) {
                       setSelected(selected.filter((it) => it != record.rowKey));
                     }
-                    updateStatus({ ...record, open: e });
+                    updateStatus({...record, open: e});
                   }}
                 />
               ),
             },
-            { title: '启用/忽略人', dataIndex: 'open_pm', width: 100, align: 'center' },
+            {title: '启用/忽略人', dataIndex: 'open_pm', width: 100, align: 'center'},
             {
               title: '启用/忽略时间',
               dataIndex: 'open_time',
@@ -491,10 +501,16 @@ const Check = (props: any, ref: any) => {
                 />
               ),
             },
+            {
+              title: '说明',
+              dataIndex: 'desc',
+              width: 100,
+              align: 'left',
+            },
           ]}
           dataSource={list}
           pagination={false}
-          scroll={{ x: 'min-content' }}
+          scroll={{x: 'min-content'}}
           rowKey={(p) => p.rowKey}
           rowSelection={{
             selectedRowKeys: selected,
@@ -521,7 +537,7 @@ const Check = (props: any, ref: any) => {
                 ...values,
               });
             }
-            setShow({ visible: false, data: null });
+            setShow({visible: false, data: null});
           }}
         />
       </div>
@@ -562,7 +578,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
   useEffect(() => {
     if (!props.init.visible) return form.resetFields();
     OnlineSystemServices.getBranch().then((res) => {
-      setCompareBranch(res?.map((it: any) => ({ label: it.branch_name, value: it.branch_name })));
+      setCompareBranch(res?.map((it: any) => ({label: it.branch_name, value: it.branch_name})));
     });
     getDetail();
   }, [props.init.visible]);
@@ -620,21 +636,21 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
       ]}
     >
       <Spin spinning={loading} tip={'数据加载中...'}>
-        <Form form={form} labelCol={{ span: 6 }}>
+        <Form form={form} labelCol={{span: 6}}>
           <h4>一、检查上线分支是否包含对比分支的提交</h4>
           <Form.Item
             label={'被对比的主分支'}
             name={'main_branch'}
-            rules={[{ message: '请选择对比分支', required: true }]}
+            rules={[{message: '请选择对比分支', required: true}]}
           >
-            <Select options={compareBranch} allowClear showSearch mode={'multiple'} />
+            <Select options={compareBranch} allowClear showSearch mode={'multiple'}/>
           </Form.Item>
           <Form.Item
             label={'对比起始时间'}
             name={'main_since'}
-            rules={[{ message: '请选择对比起始时间', required: true }]}
+            rules={[{message: '请选择对比起始时间', required: true}]}
           >
-            <DatePicker style={{ width: '100%' }} format={'YYYY-MM-DD'} />
+            <DatePicker style={{width: '100%'}} format={'YYYY-MM-DD'}/>
           </Form.Item>
           <h4>二、升级前自动化检查是否通过</h4>
           <Form.Item name={'auto_data'}>

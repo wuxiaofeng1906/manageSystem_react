@@ -1,12 +1,12 @@
-import { isEmpty } from 'lodash';
-import { infoMessage } from '@/publicMethods/showMessages';
-import { Modal, ModalFuncProps } from 'antd';
+import {isEmpty} from 'lodash';
+import {infoMessage} from '@/publicMethods/showMessages';
+import {Modal, ModalFuncProps} from 'antd';
 import React from 'react';
 
-export const Step = { 0: 'server', 1: 'check', 2: 'sheet' };
-export const WhetherOrNot = { yes: '是', no: '否' };
-export const TechnicalSide = { backend: '后端', front: '前端', backendFront: '前后端' };
-export const CheckTechnicalSide = { backend: '后端', front: '前端', public: '公共', test: '测试' };
+export const Step = {0: 'server', 1: 'check', 2: 'sheet'};
+export const WhetherOrNot = {yes: '是', no: '否'};
+export const TechnicalSide = {backend: '后端', front: '前端', backendFront: '前后端'};
+export const CheckTechnicalSide = {backend: '后端', front: '前端', public: '公共', test: '测试'};
 // 应用服务配置 - 所属应用类型
 export const appServerSide = {
   businessFront: '前端业务应用',
@@ -26,7 +26,7 @@ export const ZentaoPhase = {
   已取消: 9,
   已关闭: 10,
 };
-export const ZentaoType = { Bug: 'bug', Story: 'story', B_Story: 'B_story', Task: 'task' };
+export const ZentaoType = {Bug: 'bug', Story: 'story', B_Story: 'B_story', Task: 'task'};
 
 export const OrderExecutionBy = {
   dbUpdateBefore: '数据库升级前',
@@ -36,20 +36,20 @@ export const OrderExecutionBy = {
   frontInterfaceAfter: '前端接口升级后',
 };
 export const CheckStatus = {
-  skip: { text: '忽略', color: '#bfbfbf' },
-  yes: { text: '通过', color: '#52c41a' },
-  no: { text: '不通过', color: '#ff4d4f' },
-  error: { text: '不通过', color: '#ff4d4f' },
-  noHot: { text: '不可热更', color: '#d46b08' },
-  hot: { text: '可热更', color: '#52c41a' },
-  noVersion: { text: '未封版', color: '#faad14' },
-  version: { text: '已封版', color: '#52c41a' },
-  wait: { text: '未开始' },
-  unknown: { text: '未知' },
-  running: { text: '执行中', color: '#1890ff' },
+  skip: {text: '忽略', color: '#bfbfbf'},
+  yes: {text: '通过', color: '#52c41a'},
+  no: {text: '不通过', color: '#ff4d4f'},
+  error: {text: '不通过', color: '#ff4d4f'},
+  noHot: {text: '不可热更', color: '#d46b08'},
+  hot: {text: '可热更', color: '#52c41a'},
+  noVersion: {text: '未封版', color: '#faad14'},
+  version: {text: '已封版', color: '#52c41a'},
+  wait: {text: '未开始'},
+  unknown: {text: '未知'},
+  running: {text: '执行中', color: '#1890ff'},
 };
-export const PublishStatus = { doing: '发布中', done: '发布成功', wait: '未开始' };
-export const ReleaseOrderStatus = { success: '发布成功', failure: '发布失败', unknown: '未发布' };
+export const PublishStatus = {doing: '发布中', done: '发布成功', wait: '未开始'};
+export const ReleaseOrderStatus = {success: '发布成功', failure: '发布失败', unknown: '未发布'};
 export const ServerConfirmType = {
   front: '前端',
   backend: '后端',
@@ -60,8 +60,8 @@ export const ServerConfirmType = {
   'openapi&qtms': 'openapi&qtms',
   emitter: 'emitter',
 };
-export const ClusterType = { global: 'global集群', tenant: '租户集群发布' };
-export const PublishWay = { stop_server: '停服', keep_server: '不停服' };
+export const ClusterType = {global: 'global集群', tenant: '租户集群发布'};
+export const PublishWay = {stop_server: '停服', keep_server: '不停服'};
 export const StoryStatus = {
   wait: '未开始',
   planned: '已计划',
@@ -74,7 +74,7 @@ export const StoryStatus = {
   released: '已发布',
   closed: '已关闭',
 };
-export const AutoCheckType = { ui: 'ui执行通过', api: '接口执行通过', applet: '小程序执行通过' };
+export const AutoCheckType = {ui: 'ui执行通过', api: '接口执行通过', applet: '小程序执行通过'};
 export const checkInfo = [
   {
     check_type: '前端单元测试运行是否通过',
@@ -91,6 +91,8 @@ export const checkInfo = [
     api_url: 'test-unit', // 批量检查接口地址
     source: '运维平台',
     contact: '前端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '前端图标一致性检查是否通过',
@@ -107,6 +109,8 @@ export const checkInfo = [
     api_url: 'icon-check',
     source: '研发管理平台',
     contact: '前端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '前端代码遗漏检查是否通过',
@@ -123,6 +127,8 @@ export const checkInfo = [
     api_url: 'version-check',
     source: '研发管理平台',
     contact: '前端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '前端服务git分支是否封版',
@@ -139,6 +145,8 @@ export const checkInfo = [
     api_url: 'sealing-version-check',
     source: '研发管理平台',
     contact: '前端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端单元测试运行是否通过',
@@ -155,6 +163,8 @@ export const checkInfo = [
     api_url: 'test-unit',
     source: '运维平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端代码遗漏检查是否通过',
@@ -171,6 +181,8 @@ export const checkInfo = [
     api_url: 'version-check',
     source: '研发管理平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '构建时间对比校验是否通过',
@@ -187,6 +199,8 @@ export const checkInfo = [
     api_url: 'create-libray',
     source: '运维平台',
     contact: '运维',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端环境一致性检查是否通过',
@@ -203,6 +217,8 @@ export const checkInfo = [
     api_url: 'env-check',
     source: '后端平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端是否可以热更新(辅助值班人员判定是否可以热更，不阻塞发版)',
@@ -219,6 +235,8 @@ export const checkInfo = [
     api_url: 'hot-update-check',
     source: '后端平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端服务git分支是否封版',
@@ -235,6 +253,8 @@ export const checkInfo = [
     api_url: 'sealing-version-check',
     source: '研发管理平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端是否为发布包(config.yaml不包含有SNAPSHOT)',
@@ -251,6 +271,8 @@ export const checkInfo = [
     api_url: 'release-package-check',
     source: '值班助手',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '上线前检查checklist是否检查完成',
@@ -267,6 +289,8 @@ export const checkInfo = [
     api_url: 'zt-check-list',
     source: '研发管理平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '需求阶段是否满足条件（需要测试需达到测试完毕/无需测试需要开发完毕）',
@@ -282,6 +306,8 @@ export const checkInfo = [
     api_url: 'story-status',
     source: '研发管理平台',
     contact: '测试',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: 'previewsql是否已执行',
@@ -298,6 +324,8 @@ export const checkInfo = [
     api_url: 'preview-sql',
     source: '运维平台',
     contact: '测试',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: 'web/h5部署时是否勾选自动化测试参数',
@@ -314,6 +342,8 @@ export const checkInfo = [
     api_url: 'web-h5-automation',
     source: '运维平台',
     contact: '测试',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '升级前自动化检查是否通过',
@@ -330,6 +360,8 @@ export const checkInfo = [
     api_url: 'auto-check',
     source: '研发管理平台',
     contact: '测试',
+    check_person: 'check_user',
+    desc: "remark"
   },
 ];
 // 日志弹窗
@@ -341,7 +373,7 @@ export const onLog = (props: ModalFuncProps & { log: string; noData: string }) =
     okText: props.okText || '取消',
     title: props.title,
     content: (
-      <div style={{ maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap' }}>
+      <div style={{maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap'}}>
         {props.content ?? props.log}
       </div>
     ),

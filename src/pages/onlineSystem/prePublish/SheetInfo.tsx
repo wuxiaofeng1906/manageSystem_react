@@ -464,6 +464,7 @@ const SheetInfo = (props: any, ref: any) => {
           multiple={true}
           size={'small'}
           style={{ width: '100%' }}
+          disabled={agFinished}
           expandTrigger="hover"
           allowClear={false}
           value={isEmpty(p.value) ? [] : p.value}

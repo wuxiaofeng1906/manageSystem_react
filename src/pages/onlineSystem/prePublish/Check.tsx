@@ -226,23 +226,24 @@ const Check = (props: any, ref: any) => {
   };
 
   const updateStatus = async (index: number, e: boolean, record: any) => {
-    debugger;
+
     list[index].disabled = true;
     setList([...list]);
     if (!e) {
       setSelected(selected.filter((it) => it != record.rowKey));
     }
 
-    // const data = {...record, open: e};
     await OnlineSystemServices.checkOpts(
       {
         user_id: user?.userid ?? '',
         release_num,
         is_ignore: e ? 'no' : 'yes',
         side: record.side,
+        remark: record.desc
       },
       record.api_url,
     );
+    setDescShow({visible: false, data: null, param: null})
     if (e) {
       infoMessage('任务正在执行中，请稍后刷新查看');
     } else delay(init, 500);
@@ -544,16 +545,16 @@ const Check = (props: any, ref: any) => {
                 record.rowKey == 'auto_obj_data', // 升级前自动化检查
             }),
           }}
-          onRow={(row) => {
-            return {
-              onDoubleClick: () => {
-                setDescShow({
-                  ...descShow,
-                  visible: true,
-                  data: row
-                });
+          onRow={(row, index) => {
+            // 历史记录不能再被编辑
+            if (!(hasEdit || row.disabled)) {
+              return {
+                onDoubleClick: () => {
+                  setDescShow({visible: true, data: row, param: {index, e: row.open}});
+                }
               }
             }
+            return {};
           }}
         />
         <CheckSettingModal
@@ -716,11 +717,10 @@ const OpenDescModal = (props: ModalFuncProps & { init: { visible: boolean; data:
       errorMessage("忽略说明不能为空！");
       return;
     }
-    debugger;
 
     const params: any = props?.init;
     // 执行 updateStatus 进行状态更新
-    props?.onOk?.(params.param.index, params.param.e, props.init?.data);
+    props?.onOk?.(params.param.index, params.param.e, {...params.data, desc: values});
   };
 
   useEffect(() => {

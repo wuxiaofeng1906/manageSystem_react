@@ -1,9 +1,9 @@
-import type { RequestOptionsInit } from 'umi-request';
-import { extend } from 'umi-request';
-import { message } from 'antd';
-import axios, { AxiosRequestConfig } from 'axios';
-import { errorMessage } from '@/publicMethods/showMessages';
-import { isString } from 'lodash';
+import type {RequestOptionsInit} from 'umi-request';
+import {extend} from 'umi-request';
+import {message} from 'antd';
+import axios, {AxiosRequestConfig} from 'axios';
+import {errorMessage} from '@/publicMethods/showMessages';
+import {isString} from 'lodash';
 
 const errorHandler = (error: { response: Response; message: any }): Response => {
   // notification.destroy();
@@ -21,13 +21,13 @@ const _request = extend({
 
 const requestHeader = (url: string, options: any) => {
   const token = localStorage.getItem('accessId');
-  let headers: any = { Accept: 'application/json' };
+  let headers: any = {Accept: 'application/json'};
   if (token) {
-    headers = { ...headers, Authorization: 'Bearer ' + token };
+    headers = {...headers, Authorization: 'Bearer ' + token};
   }
   return {
     url,
-    options: { ...options, headers: { ...options.headers, ...headers } },
+    options: {...options, headers: {...options.headers, ...headers}},
   };
 };
 
@@ -47,13 +47,14 @@ interface IOption extends RequestOptionsInit {
   localCache?: boolean; // 本地缓存
   [key: string]: any;
 }
+
 interface IAxios extends AxiosRequestConfig {
   msg?: boolean | string;
   warn?: boolean | string;
 }
 
 function request(url: string, ioptions: IOption = {}) {
-  const { dealRes = true, warn = true, forceLogin = true, msg, localCache, ...options } = ioptions;
+  const {dealRes = true, warn = true, forceLogin = true, msg, localCache, ...options} = ioptions;
   let mRequest;
   if (localCache) mRequest = localCacheWrap(url, options);
   // 统一结构接口

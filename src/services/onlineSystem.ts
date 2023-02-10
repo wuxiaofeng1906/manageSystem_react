@@ -179,6 +179,10 @@ export const OnlineSystemServices = {
   async initDataBranch(params: any) {
     return request(`${baseUrl}/online/init-data-branch`, { params });
   },
+  // 数据库版本
+  async databaseVersion() {
+    return request(`${baseUrl}/online/database-version`);
+  },
 
   async getOrgList(client: GqlClient<object>) {
     const { data } = await client.query(`

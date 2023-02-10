@@ -103,35 +103,48 @@ export const historyOrderColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '推送类型',
     field: 'repair_order_type',
+    width: 130,
+    minWidth: 130,
   },
   {
     headerName: '关联工单编号',
     field: 'repair_order',
+    width: 120,
+    minWidth: 120,
   },
   {
     headerName: '发布批次名称',
     field: 'ready_release_name',
     cellRenderer: 'link',
     tooltipField: 'ready_release_name',
+    width: 200,
+    minWidth: 200,
   },
   {
     headerName: '关联项目列表',
     field: 'project',
+    minWidth: 200,
   },
   {
     headerName: '部署结束时间',
     field: 'repair_order_fish_time',
+    width: 150,
+    minWidth: 150,
   },
   {
     headerName: '已发布集群',
     field: 'cluster',
     cellRenderer: 'ICluster',
+    width: 350,
+    minWidth: 350,
   },
   {
     headerName: '操作',
-    cellRenderer: 'deleteOrder',
-    width: 120,
-    maxWidth: 120,
+    cellRenderer: 'operations',
+    width: 130,
+    minWidth: 130,
+    maxWidth: 150,
+    pinned: 'right',
   },
 ];
 export const historyCompareColumn = [

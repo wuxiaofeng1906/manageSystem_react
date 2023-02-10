@@ -1,12 +1,12 @@
-import { isEmpty } from 'lodash';
-import { infoMessage } from '@/publicMethods/showMessages';
-import { Modal, ModalFuncProps } from 'antd';
+import {isEmpty} from 'lodash';
+import {infoMessage} from '@/publicMethods/showMessages';
+import {Modal, ModalFuncProps} from 'antd';
 import React from 'react';
 
-export const Step = { 0: 'server', 1: 'check', 2: 'sheet' };
-export const WhetherOrNot = { yes: '是', no: '否' };
-export const TechnicalSide = { backend: '后端', front: '前端', backendFront: '前后端' };
-export const CheckTechnicalSide = { backend: '后端', front: '前端', public: '公共', test: '测试' };
+export const Step = {0: 'server', 1: 'check', 2: 'sheet'};
+export const WhetherOrNot = {yes: '是', no: '否'};
+export const TechnicalSide = {backend: '后端', front: '前端', backendFront: '前后端'};
+export const CheckTechnicalSide = {backend: '后端', front: '前端', public: '公共', test: '测试'};
 // 应用服务配置 - 所属应用类型
 export const appServerSide = {
   businessFront: '前端业务应用',
@@ -26,7 +26,7 @@ export const ZentaoPhase = {
   已取消: 9,
   已关闭: 10,
 };
-export const ZentaoType = { Bug: 'bug', Story: 'story', B_Story: 'B_story', Task: 'task' };
+export const ZentaoType = {Bug: 'bug', Story: 'story', B_Story: 'B_story', Task: 'task'};
 
 export const OrderExecutionBy = {
   dbUpdateBefore: '数据库升级前',
@@ -36,20 +36,20 @@ export const OrderExecutionBy = {
   frontInterfaceAfter: '前端接口升级后',
 };
 export const CheckStatus = {
-  skip: { text: '忽略', color: '#bfbfbf' },
-  yes: { text: '通过', color: '#52c41a' },
-  no: { text: '不通过', color: '#ff4d4f' },
-  error: { text: '不通过', color: '#ff4d4f' },
-  noHot: { text: '不可热更', color: '#d46b08' },
-  hot: { text: '可热更', color: '#52c41a' },
-  noVersion: { text: '未封版', color: '#faad14' },
-  version: { text: '已封版', color: '#52c41a' },
-  wait: { text: '未开始' },
-  unknown: { text: '未知' },
-  running: { text: '执行中', color: '#1890ff' },
+  skip: {text: '忽略', color: '#bfbfbf'},
+  yes: {text: '通过', color: '#52c41a'},
+  no: {text: '不通过', color: '#ff4d4f'},
+  error: {text: '不通过', color: '#ff4d4f'},
+  noHot: {text: '不可热更', color: '#d46b08'},
+  hot: {text: '可热更', color: '#52c41a'},
+  noVersion: {text: '未封版', color: '#faad14'},
+  version: {text: '已封版', color: '#52c41a'},
+  wait: {text: '未开始'},
+  unknown: {text: '未知'},
+  running: {text: '执行中', color: '#1890ff'},
 };
-export const PublishStatus = { doing: '发布中', done: '发布成功', wait: '未开始' };
-export const ReleaseOrderStatus = { success: '发布成功', failure: '发布失败', unknown: '未发布' };
+export const PublishStatus = {doing: '发布中', done: '发布成功', wait: '未开始'};
+export const ReleaseOrderStatus = {success: '发布成功', failure: '发布失败', unknown: '未发布'};
 export const ServerConfirmType = {
   front: '前端',
   backend: '后端',
@@ -60,8 +60,8 @@ export const ServerConfirmType = {
   'openapi&qtms': 'openapi&qtms',
   emitter: 'emitter',
 };
-export const ClusterType = { global: 'global集群', tenant: '租户集群发布' };
-export const PublishWay = { stop_server: '停服', keep_server: '不停服' };
+export const ClusterType = {global: 'global集群', tenant: '租户集群发布'};
+export const PublishWay = {stop_server: '停服', keep_server: '不停服'};
 export const StoryStatus = {
   wait: '未开始',
   planned: '已计划',
@@ -74,7 +74,7 @@ export const StoryStatus = {
   released: '已发布',
   closed: '已关闭',
 };
-export const AutoCheckType = { ui: 'ui执行通过', api: '接口执行通过', applet: '小程序执行通过' };
+export const AutoCheckType = {ui: 'ui执行通过', api: '接口执行通过', applet: '小程序执行通过'};
 export const checkInfo = [
   {
     check_type: '前端单元测试运行是否通过',
@@ -337,11 +337,11 @@ export const onLog = (props: ModalFuncProps & { log: string; noData: string }) =
   if (isEmpty(props.log)) return infoMessage(props.noData || '暂无日志！');
   Modal.info({
     centered: true,
-    width: props.width || 700,
+    width: props.width || 1000,
     okText: props.okText || '取消',
     title: props.title,
     content: (
-      <div style={{ maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap' }}>
+      <div style={{maxHeight: 500, overflow: 'auto', paddingRight: 10, whiteSpace: 'pre-wrap'}}>
         {props.content ?? props.log}
       </div>
     ),

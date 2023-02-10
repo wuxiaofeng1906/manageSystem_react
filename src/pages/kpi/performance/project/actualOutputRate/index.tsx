@@ -129,7 +129,9 @@ const ActualOutputRate: React.FC<any> = () => {
 
 export default ActualOutputRate;
 
-const ActualDetailModal = (props: ModalFuncProps & { data: { dept: number; range: any } }) => {
+export const ActualDetailModal = (
+  props: ModalFuncProps & { data: { dept: number; range: any } },
+) => {
   const gqlClient = useGqlClient();
   const gridApi = useRef<GridApi>();
   const [loading, setLoading] = useState(false);

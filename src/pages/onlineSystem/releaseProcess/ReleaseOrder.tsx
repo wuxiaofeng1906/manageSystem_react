@@ -12,7 +12,7 @@ import {
   Checkbox,
   Row,
 } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, StopOutlined } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import {
   historyCompareColumn,
@@ -24,7 +24,7 @@ import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
 import { useModel, useParams, history } from 'umi';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit, isEqual } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -247,6 +247,7 @@ const ReleaseOrder = () => {
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
 
     const checkObj = omit({ ...order, ...base }, ['release_result']);
+    let errMsg = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -259,13 +260,14 @@ const ReleaseOrder = () => {
 
     if (valid) {
       const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
-      infoMessage(errTip[errArr?.[0]]);
-      orderForm.setFieldsValue({ release_result: null });
-      return;
+      errMsg = errTip[errArr?.[0]];
     }
     if (isEmpty(base.release_name?.trim())) {
+      errMsg = errTip.release_name;
+    }
+    if (!['failure', 'cancel'].includes(result) && errMsg) {
       orderForm.setFieldsValue({ release_result: null });
-      return infoMessage(errTip.release_name);
+      return infoMessage(errMsg);
     }
     // 发布结果为空，直接保存
     if (isEmpty(result) || result == 'unknown') {
@@ -418,6 +420,28 @@ const ReleaseOrder = () => {
       },
     });
   };
+  const onIgnore = (p: any) => {
+    if (agFinished) {
+      return infoMessage('已标记发布结果不能忽略积压工单!');
+    }
+    Modal.confirm({
+      centered: true,
+      title: '忽略积压工单',
+      content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
+      okButtonProps: { disabled: confirmDisabled },
+      onOk: async () => {
+        setConfirmDisabled(true);
+        const result =
+          gridRef.current
+            ?.getRenderedNodes()
+            ?.map((it) => it.data)
+            ?.filter((obj) => !isEqual(obj, p.data)) || [];
+        await formatCompare(compareData?.opsData || [], result);
+        setOrderData(result);
+        setConfirmDisabled(false);
+      },
+    });
+  };
 
   const onDrag = async () => {
     if (finished) return infoMessage('已标记发布结果不能修改工单顺序!');
@@ -566,7 +590,7 @@ const ReleaseOrder = () => {
           <FieldSet data={{ title: '工单-表单设置' }}>
             <div
               className="ag-theme-alpine"
-              style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}
+              style={{ height: tableHeight > 300 ? tableHeight + 20 : 300, width: '100%' }}
             >
               <AgGridReact
                 columnDefs={historyOrderColumn}
@@ -606,7 +630,7 @@ const ReleaseOrder = () => {
                       {p.data.ready_release_name}
                     </div>
                   ),
-                  deleteOrder: (p: CellClickedEvent) => (
+                  operations: (p: CellClickedEvent) => (
                     <Fragment>
                       {hasPermission.delete ? (
                         <img
@@ -614,12 +638,23 @@ const ReleaseOrder = () => {
                           width="20"
                           height="20"
                           src={require('../../../../public/delete_red.png')}
-                          style={{ marginRight: 10 }}
+                          style={{ marginRight: 10, cursor: 'pointer' }}
                           onClick={() => onRemove(p.data)}
                         />
                       ) : (
                         <div />
                       )}
+                      <StopOutlined
+                        title={'忽略本次积压工单'}
+                        style={{
+                          color: '#86a8cf',
+                          marginRight: 10,
+                          cursor: 'pointer',
+                          fontSize: 18,
+                          verticalAlign: 'middle',
+                        }}
+                        onClick={() => onIgnore(p)}
+                      />
                       {DragIcon(p)}
                     </Fragment>
                   ),
@@ -627,7 +662,7 @@ const ReleaseOrder = () => {
               />
             </div>
           </FieldSet>
-          <Divider plain>
+          <Divider plain style={{ margin: '6px 0' }}>
             <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>
           </Divider>
           <div className={styles.orderTag}>
@@ -638,7 +673,7 @@ const ReleaseOrder = () => {
           </div>
           <div
             className="ag-theme-alpine"
-            style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}
+            style={{ height: tableHeight > 300 ? tableHeight : 300, width: '100%', marginTop: 8 }}
           >
             <AgGridReact
               columnDefs={historyCompareColumn}

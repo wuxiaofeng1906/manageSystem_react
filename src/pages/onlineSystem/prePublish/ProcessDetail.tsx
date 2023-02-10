@@ -1,39 +1,23 @@
 import React, {
-  useRef,
-  useState,
-  useEffect,
-  useMemo,
-  forwardRef,
-  useImperativeHandle,
+  useRef, useState, useEffect,
+  useMemo, forwardRef, useImperativeHandle,
 } from 'react';
 import {
-  Form,
-  Select,
-  Checkbox,
-  Table,
-  Row,
-  Col,
-  Input,
-  DatePicker,
-  Button,
-  Modal,
-  Spin,
+  Form, Select, Checkbox, Table, Row, Col,
+  Input, DatePicker, Button, Modal, Spin,
 } from 'antd';
 import {
-  preServerColumn,
-  repairColumn,
-  serverConfirmColumn,
-  upgradeServicesColumn,
+  preServerColumn, repairColumn, devOpsOrderInfoColumn, serverConfirmColumn, upgradeServicesColumn,
 } from '@/pages/onlineSystem/config/column';
-import { groupBy, isEmpty, pick, uniq, isEqual } from 'lodash';
-import { initGridTable, mergeCellsTable } from '@/utils/utils';
-import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, GridApi } from 'ag-grid-community';
+import {groupBy, isEmpty, pick, uniq, isEqual} from 'lodash';
+import {initGridTable, mergeCellsTable} from '@/utils/utils';
+import {AgGridReact} from 'ag-grid-react';
+import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import styles from '@/pages/onlineSystem/config/common.less';
-import { infoMessage } from '@/publicMethods/showMessages';
-import { InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
-import { history, useLocation, useModel, useParams } from 'umi';
+import {infoMessage} from '@/publicMethods/showMessages';
+import {InfoCircleOutlined, WarningOutlined} from '@ant-design/icons';
+import {history, useLocation, useModel, useParams} from 'umi';
 import IPagination from '@/components/IPagination';
 import {
   ClusterType,
@@ -43,33 +27,23 @@ import {
 } from '@/pages/onlineSystem/config/constant';
 import moment from 'moment';
 import PreReleaseServices from '@/services/preRelease';
-import { OnlineSystemServices } from '@/services/onlineSystem';
+import {OnlineSystemServices} from '@/services/onlineSystem';
 import usePermission from '@/hooks/permission';
+import {display} from "html2canvas/dist/types/css/property-descriptors/display";
 
-const color = { yes: '#2BF541', no: '#faad14' };
+const color = {yes: '#2BF541', no: '#faad14'};
 const pickKey = ['release_name', 'release_env', 'plan_release_time'];
 let agEdit = '';
 const ProcessDetail = (props: any, ref: any) => {
-  const { release_num, branch } = useParams() as { release_num: string; branch: string };
-  const { subTab, tab } = useLocation()?.query as { tab: string; subTab: string };
+  const {release_num, branch} = useParams() as { release_num: string; branch: string };
+  const {subTab, tab} = useLocation()?.query as { tab: string; subTab: string };
 
-  const { onlineSystemPermission } = usePermission();
+  const {onlineSystemPermission} = usePermission();
   const [globalEnv] = useModel('env', (env) => [env.globalEnv]);
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const {
-    globalState,
-    basic,
-    server,
-    api,
-    repair,
-    serverConfirm,
-    getReleaseInfo,
-    removeRelease,
-    getRepairInfo,
-    updateBasic,
-    updateSealing,
-    updateServerConfirm,
-    getServerConfirm,
+    globalState, basic, server, api, repair, serverConfirm, devOpsOrderInfo,
+    getReleaseInfo, removeRelease, getRepairInfo, updateBasic, updateSealing, updateServerConfirm, getServerConfirm,
   } = useModel('onlineSystem');
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
@@ -88,6 +62,8 @@ const ProcessDetail = (props: any, ref: any) => {
   const confirmRef = useRef<GridApi>();
   const interfaceRef = useRef<GridApi>();
   const repairRef = useRef<GridApi>();
+  // 运维工单信息
+  const devOpsRef = useRef<GridApi>();
   const [form] = Form.useForm();
   const [sealForm] = Form.useForm();
 
@@ -103,7 +79,7 @@ const ProcessDetail = (props: any, ref: any) => {
       onCancelPublish,
       onRefresh: () => init(true),
       onShow: () => {
-        if (basic.branch) setStoryModal({ visible: true, data: { ...basic, server } });
+        if (basic.branch) setStoryModal({visible: true, data: {...basic, server}});
       },
     }),
     [release_num, basic, subTab, tab, server],
@@ -114,11 +90,11 @@ const ProcessDetail = (props: any, ref: any) => {
       setLoading(true);
       reset();
       await getReleaseInfo(
-        { release_num },
-        refresh ? { release_num, user_id: user?.userid ?? '' } : null,
+        {release_num},
+        refresh ? {release_num, user_id: user?.userid ?? ''} : null,
       );
-      await OnlineSystemServices.abnormalApi({ release_num });
-      const res = await OnlineSystemServices.initDataBranch({ branch });
+      await OnlineSystemServices.abnormalApi({release_num});
+      const res = await OnlineSystemServices.initDataBranch({branch});
       setHasBranch(res?.have_branch == 'yes');
       setLoading(false);
     } catch (e) {
@@ -139,8 +115,8 @@ const ProcessDetail = (props: any, ref: any) => {
   useEffect(() => {
     if (isEmpty(basic?.branch) || subTab !== 'server') return;
 
-    OnlineSystemServices.branchEnv({ branch: basic?.branch }).then((res) =>
-      setBranchEnv(res?.map((it: string) => ({ label: it, value: it }))),
+    OnlineSystemServices.branchEnv({branch: basic?.branch}).then((res) =>
+      setBranchEnv(res?.map((it: string) => ({label: it, value: it}))),
     );
   }, [basic?.branch, subTab]);
 
@@ -192,11 +168,11 @@ const ProcessDetail = (props: any, ref: any) => {
       okText: '确认',
       cancelText: '取消',
       title: `${flag ? '' : '解除'}锁定分支提示`,
-      okButtonProps: { disabled: confirmDisabled },
+      okButtonProps: {disabled: confirmDisabled},
       content: (
         <div>
           请确认是否将对应服务的分支
-          <strong style={{ color: flag ? '#52c41a' : '#fe7b00cf' }}>
+          <strong style={{color: flag ? '#52c41a' : '#fe7b00cf'}}>
             {flag ? '' : '解除'}锁定
           </strong>
           ？
@@ -205,13 +181,13 @@ const ProcessDetail = (props: any, ref: any) => {
             hidden={!includeAppsGlobal}
             size={'small'}
             autoComplete={'off'}
-            style={{ marginTop: 10 }}
+            style={{marginTop: 10}}
             className={styles.resetForm}
           >
             <Form.Item
               name={'is_build'}
               label={'是否构建编译'}
-              rules={[{ message: '请填写是否构建编译', required: includeAppsGlobal }]}
+              rules={[{message: '请填写是否构建编译', required: includeAppsGlobal}]}
             >
               <Select
                 placeholder={'是否构建编译'}
@@ -234,7 +210,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 },
               ]}
             >
-              <Input placeholder={'前端预制数据版本号'} />
+              <Input placeholder={'前端预制数据版本号'}/>
             </Form.Item>
           </Form>
         </div>
@@ -264,7 +240,7 @@ const ProcessDetail = (props: any, ref: any) => {
                   onOk: () =>
                     history.replace({
                       pathname: history.location.pathname,
-                      query: { tab, subTab: 'check' },
+                      query: {tab, subTab: 'check'},
                     }),
                 });
                 return;
@@ -279,7 +255,7 @@ const ProcessDetail = (props: any, ref: any) => {
               ...values,
               version: values?.version ?? '',
             },
-            { release_num },
+            {release_num},
           );
           setConfirmDisabled(false);
           setLoading(false);
@@ -309,11 +285,11 @@ const ProcessDetail = (props: any, ref: any) => {
       title: '移除提示',
       okText: '确认',
       cancelText: '取消',
-      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+      icon: <InfoCircleOutlined style={{color: 'red'}}/>,
       content: `请确认是否要移除 ${
         type == 'server' ? gridSelected?.map((it) => it.apps)?.join(',') + '服务' : ''
       }?`,
-      okButtonProps: { disabled: confirmDisabled },
+      okButtonProps: {disabled: confirmDisabled},
       onOk: async () => {
         setLoading(true);
         setConfirmDisabled(true);
@@ -324,9 +300,9 @@ const ProcessDetail = (props: any, ref: any) => {
             app_id: gridSelected?.map((it) => it._id)?.join(',') ?? '',
           },
           type,
-          { release_num },
+          {release_num},
         );
-        await getServerConfirm({ release_num });
+        await getServerConfirm({release_num});
         setConfirmDisabled(false);
         setLoading(false);
       },
@@ -335,7 +311,7 @@ const ProcessDetail = (props: any, ref: any) => {
 
   const getTableList = async (page = 1, page_size = pages.page_size) => {
     reset();
-    await getRepairInfo({ release_num }, page, page_size);
+    await getRepairInfo({release_num}, page, page_size);
   };
 
   const onCancelPublish = async () => {
@@ -345,8 +321,8 @@ const ProcessDetail = (props: any, ref: any) => {
       centered: true,
       title: '取消发布提醒',
       content: '取消发布将删除发布工单，请确认是否取消发布?',
-      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
-      okButtonProps: { disabled: confirmDisabled },
+      icon: <InfoCircleOutlined style={{color: 'red'}}/>,
+      okButtonProps: {disabled: confirmDisabled},
       onOk: async () => {
         setConfirmDisabled(true);
         try {
@@ -413,7 +389,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 release_name: values.release_name,
                 plan_release_time: moment(values.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
               },
-              { release_num },
+              {release_num},
             );
             setLoading(false);
           } catch (e) {
@@ -448,7 +424,7 @@ const ProcessDetail = (props: any, ref: any) => {
       content: `请确认是否将『${ServerConfirmType[param.data.confirm_type]} - ${
         param.column.colId.includes('is_hot_update') ? '是否可热更' : '服务确认完成'
       }』状态调整为: ${WhetherOrNot[v]}`,
-      okButtonProps: { disabled: confirmDisabled },
+      okButtonProps: {disabled: confirmDisabled},
       onOk: async () => {
         reset();
         setLoading(true);
@@ -461,7 +437,7 @@ const ProcessDetail = (props: any, ref: any) => {
             is_hot_update: param.data.is_hot_update,
             [param.column.colId]: v,
           },
-          { release_num },
+          {release_num},
         );
         setConfirmDisabled(false);
         setLoading(false);
@@ -499,21 +475,21 @@ const ProcessDetail = (props: any, ref: any) => {
               <Form.Item
                 label={'批次名称'}
                 name={'release_name'}
-                rules={[{ required: true, message: '请填写批次名称' }]}
+                rules={[{required: true, message: '请填写批次名称'}]}
               >
-                <Input placeholder={'批次名称'} disabled={!hasPermission.baseInfo || hasEdit} />
+                <Input placeholder={'批次名称'} disabled={!hasPermission.baseInfo || hasEdit}/>
               </Form.Item>
             </Col>
             <Col span={14}>
               <Form.Item label={'发布项目'} name={'project'}>
-                <Input disabled placeholder={'发布项目'} />
+                <Input disabled placeholder={'发布项目'}/>
               </Form.Item>
             </Col>
           </Row>
           <Row justify={'space-between'} gutter={8}>
             <Col span={5}>
               <Form.Item label={'上线分支'} name={'branch'}>
-                <Input disabled placeholder={'上线分支'} />
+                <Input disabled placeholder={'上线分支'}/>
               </Form.Item>
             </Col>
             <Col span={5}>
@@ -532,7 +508,7 @@ const ProcessDetail = (props: any, ref: any) => {
               <Form.Item
                 label={'镜像环境绑定'}
                 name={'release_env'}
-                rules={[{ required: true, message: '请填写镜像环境绑定' }]}
+                rules={[{required: true, message: '请填写镜像环境绑定'}]}
               >
                 <Select
                   placeholder={'镜像环境绑定'}
@@ -545,10 +521,10 @@ const ProcessDetail = (props: any, ref: any) => {
               <Form.Item
                 label={'发布时间'}
                 name={'plan_release_time'}
-                rules={[{ required: true, message: '请填写发布时间' }]}
+                rules={[{required: true, message: '请填写发布时间'}]}
               >
                 <DatePicker
-                  style={{ width: '100%' }}
+                  style={{width: '100%'}}
                   placeholder={'发布时间'}
                   showTime
                   format="YYYY-MM-DD HH:mm"
@@ -560,7 +536,7 @@ const ProcessDetail = (props: any, ref: any) => {
           <Row>
             <Col span={24}>
               <Form.Item label={'发布集群'} name={'cluster'}>
-                <Select disabled placeholder={'发布集群'} options={globalEnv} mode={'multiple'} />
+                <Select disabled placeholder={'发布集群'} options={globalEnv} mode={'multiple'}/>
               </Form.Item>
             </Col>
           </Row>
@@ -596,7 +572,7 @@ const ProcessDetail = (props: any, ref: any) => {
         <Checkbox
           disabled={hasEdit}
           checked={checked}
-          onChange={({ target }) => {
+          onChange={({target}) => {
             setSelectedRowKeys(target.checked ? server : []);
             setChecked(target.checked);
             setCheckBoxOpt(target.checked ? memoGroup.opts : []);
@@ -622,7 +598,7 @@ const ProcessDetail = (props: any, ref: any) => {
             columns={serverColumn ?? []}
             pagination={false}
             bordered
-            scroll={{ y: 400, x: 'min-content' }}
+            scroll={{y: 400, x: 'min-content'}}
             rowSelection={{
               selectedRowKeys: selectedRowKeys?.map((it) => +it._id),
               onChange: (v, arr) => {
@@ -636,7 +612,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 setChecked(arr.length == server?.length);
                 setSelectedRowKeys(arr);
               },
-              getCheckboxProps: () => ({ disabled: hasEdit }),
+              getCheckboxProps: () => ({disabled: hasEdit}),
             }}
           />
         </div>
@@ -652,29 +628,52 @@ const ProcessDetail = (props: any, ref: any) => {
             移除
           </Button>
           {!isEmpty(errorTips) && (
-            <div style={{ color: 'red' }}>
+            <div style={{color: 'red'}}>
               <WarningOutlined
-                style={{ color: 'orange', fontSize: 18, margin: '0 10px', fontWeight: 'bold' }}
+                style={{color: 'orange', fontSize: 18, margin: '0 10px', fontWeight: 'bold'}}
               />
               {errorTips}
             </div>
           )}
         </div>
         <div
-          style={{ width: '100%', maxHeight: 300, height: api?.length * 40 + 30, minHeight: 150 }}
+          style={{width: '100%', maxHeight: 300, height: api?.length * 40 + 30, minHeight: 150}}
         >
           <AgGridReact
             rowSelection={'multiple'}
             columnDefs={upgradeServicesColumn}
             rowData={api ?? []}
-            {...initGridTable({ ref: interfaceRef, height: 30 })}
+            {...initGridTable({ref: interfaceRef, height: 30})}
           />
         </div>
-        <h4 style={{ marginTop: 10 }}>
-          四、backend/apps/init-data库是否存在上线分支： {hasBranch ? '是' : '否'}
+        <div style={{display: devOpsOrderInfo.length>0 ? "inline" : "none"}}>
+          <div>
+            <h4>四、运维工单信息</h4>
+          </div>
+          <div
+            style={{
+              width: '100%',
+              maxHeight: 100,
+              minHeight: 50,
+              height: serverConfirm?.length * 40 + 30,
+            }}
+          >
+            <AgGridReact
+              columnDefs={devOpsOrderInfoColumn}
+              rowData={devOpsOrderInfo}
+              {...initGridTable({
+                ref: devOpsRef,
+                height: 30,
+              })}
+            />
+          </div>
+        </div>
+
+        <h4 style={{marginTop: 10}}>
+          五、backend/apps/init-data库是否存在上线分支： {hasBranch ? '是' : '否'}
         </h4>
         <div className={styles.tableHeader}>
-          <h4>五、数据修复/升级</h4>
+          <h4>六、数据修复/升级</h4>
           <Button
             disabled={hasEdit}
             size={'small'}
@@ -697,13 +696,13 @@ const ProcessDetail = (props: any, ref: any) => {
             rowSelection={'multiple'}
             columnDefs={repairColumn}
             rowData={repair?.data}
-            {...initGridTable({ ref: repairRef, height: 30 })}
+            {...initGridTable({ref: repairRef, height: 30})}
             frameworkComponents={{
               log: (p: CellClickedEvent) => (
                 <img
-                  style={{ width: 16, height: 16, cursor: 'pointer' }}
+                  style={{width: 16, height: 16, cursor: 'pointer'}}
                   src={require('../../../../public/logs.png')}
-                  onClick={() => onLog({ title: 'sql详情', log: p.value, noData: '暂无sql日志！' })}
+                  onClick={() => onLog({title: 'sql详情', log: p.value, noData: '暂无sql日志！'})}
                 />
               ),
             }}
@@ -716,7 +715,7 @@ const ProcessDetail = (props: any, ref: any) => {
           onShowSizeChange={(size) => getTableList(1, size)}
         />
         <div>
-          <h4>六、服务确认</h4>
+          <h4>七、服务确认</h4>
         </div>
         <div
           style={{
@@ -759,14 +758,15 @@ const ProcessDetail = (props: any, ref: any) => {
             }}
           />
         </div>
+
         <DemandListModal
           visible={storyModal.visible}
           data={storyModal.data}
           onOk={(v) => {
-            setStoryModal({ visible: false, data: null });
+            setStoryModal({visible: false, data: null});
             if (v) {
               reset();
-              getReleaseInfo({ release_num });
+              getReleaseInfo({release_num});
             }
           }}
         />

@@ -66,9 +66,11 @@ export default () => {
   };
   // 运维工单信息
   const getDevOpsOrderInfo = async (data: any) => {
+    debugger
     const res = await OnlineSystemServices.getDevOpsOrderInfo(data);
     // 有数据放到数组中，没数据就用空数组
-    (Object.keys(res)).length ? setDevOpsOrderInfo([{...res}]) : setDevOpsOrderInfo([]);
+    // (Object.keys(res)).length ? setDevOpsOrderInfo([{...res}]) : setDevOpsOrderInfo([]);
+    setDevOpsOrderInfo((Object.keys(res)).length ? [{...res}] : []);
   };
 
   const getServerConfirm = async (data: any) => {

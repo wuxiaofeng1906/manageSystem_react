@@ -24,7 +24,7 @@ const PlanDeviationRate: React.FC = () => {
     <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.planDeviationRate}
-      identity={'TESTER'}
+      identity={'DEVELOPER'}
       unit={'%'}
       len={2}
     />

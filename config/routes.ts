@@ -1,6 +1,6 @@
 ﻿// @ts-ignore
-import { MenuDataItem } from '@@/plugin-layout/runtime';
-import { ProjectKpiRoute } from './routes-tj';
+import {MenuDataItem} from '@@/plugin-layout/runtime';
+import {ProjectKpiRoute} from './routes-tj';
 
 export default [
   {
@@ -380,6 +380,13 @@ export default [
                 wrappers: ['../wrappers/auth'],
               },
               {
+                name: '计划偏差率',
+                icon: 'table',
+                path: 'planDeviationRate',
+                component: './kpi/performance/developer/planDeviationRate',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
                 name: 'A类客户服务投入比',
                 icon: 'table',
                 path: 'cusInputRate_A',
@@ -574,6 +581,7 @@ export default [
                 wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
+
               {
                 name: '任务计划偏差率',
                 icon: 'table',

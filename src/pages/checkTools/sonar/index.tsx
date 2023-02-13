@@ -201,7 +201,6 @@ const JenkinsCheck: React.FC<any> = () => {
     }
 
     // 严重bug是否生成到禅道：如果勾选了，那么后面的指派人为必填项。如果没勾选，后面指派人可以为空。
-    debugger;
     let isBugToZentao = modalData.releaseToZentao;
     let bugAssignedt = '';
     if (isBugToZentao && isBugToZentao.length > 0) {

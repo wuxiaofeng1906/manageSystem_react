@@ -287,40 +287,45 @@ export const upgradeServicesColumn: (ColDef | ColGroupDef)[] = [
 ];
 
 // 运维工单
-export const devOpsOrderInfoColumn: (ColDef | ColGroupDef)[] = [
-  {
-    headerName: '序号',
-    field: 'num',
-    minWidth: 90,
-    maxWidth: 90,
-    pinned: 'left',
-    cellRenderer: (params: any) => String(+params.node.id + 1),
-  },
-  {
-    headerName: '运维工单编号',
-    field: 'repair_order_num',
-  },
-  {
-    headerName: '运维工单名称',
-    field: 'approval_name'
-  },
-  {
-    headerName: '创建人',
-    field: 'applicant_name',
-  },
-  {
-    headerName: '工单状态',
-    field: 'repair_order_status',
-  },
-  {
-    headerName: '上一步审批人',
-    field: `before_approval_name`,
-  },
-  {
-    headerName: '当前待审批人',
-    field: `current_approval_name`,
-  },
-];
+// 灰度推线上和非积压发布字段显示有些许区别
+export const getDevOpsOrderColumn = (type: string = "") => {
+  const releaseType = type === "gray" ? "当前状态" : "工单状态";
+  return [
+    {
+      headerName: '序号',
+      field: 'num',
+      minWidth: 90,
+      maxWidth: 90,
+      pinned: 'left',
+      cellRenderer: (params: any) => String(+params.node.id + 1),
+    },
+    {
+      headerName: '运维工单编号',
+      field: 'repair_order_num',
+    },
+    {
+      headerName: '运维工单名称',
+      field: 'approval_name'
+    },
+    {
+      headerName: '创建人',
+      field: 'applicant_name',
+    },
+    {
+      headerName: releaseType,
+      field: 'repair_order_status',
+    },
+    {
+      headerName: '上一步审批人',
+      field: `before_approval_name`,
+    },
+    {
+      headerName: '当前待审批人',
+      field: `current_approval_name`,
+    },
+  ];
+
+}
 
 export const repairColumn: (ColDef | ColGroupDef)[] = [
   {

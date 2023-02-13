@@ -713,7 +713,7 @@ const OpenDescModal = (props: ModalFuncProps & { init: { visible: boolean; data:
   // 确定忽略
   const onConfirm = () => {
     const values = form.getFieldValue("ignoreDesc");
-    if (isEmpty(values)) {
+    if (isEmpty(values.trim())) {
       errorMessage("忽略说明不能为空！");
       return;
     }

@@ -8,7 +8,7 @@ import {AgGridReact} from 'ag-grid-react';
 import {
   historyCompareColumn, historyOrderColumn,
 } from '@/pages/onlineSystem/releaseProcess/column';
-import {devOpsOrderInfoColumn} from '@/pages/onlineSystem/config/column';
+import {getDevOpsOrderColumn} from '@/pages/onlineSystem/config/column';
 import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
 import FieldSet from '@/components/FieldSet';
 import styles from './index.less';
@@ -664,7 +664,7 @@ const ReleaseOrder = () => {
               className="ag-theme-alpine"
               style={{height: 100, width: '100%', marginTop: 8}}>
               <AgGridReact
-                columnDefs={devOpsOrderInfoColumn}
+                columnDefs={getDevOpsOrderColumn("gray")}
                 rowData={devOpsOrderInfo}
                 defaultColDef={{
                   resizable: true,

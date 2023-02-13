@@ -7,7 +7,7 @@ import {
   Input, DatePicker, Button, Modal, Spin,
 } from 'antd';
 import {
-  preServerColumn, repairColumn, devOpsOrderInfoColumn, serverConfirmColumn, upgradeServicesColumn,
+  preServerColumn, repairColumn, getDevOpsOrderColumn, serverConfirmColumn, upgradeServicesColumn,
 } from '@/pages/onlineSystem/config/column';
 import {groupBy, isEmpty, pick, uniq, isEqual} from 'lodash';
 import {initGridTable, mergeCellsTable} from '@/utils/utils';
@@ -659,7 +659,7 @@ const ProcessDetail = (props: any, ref: any) => {
             }}
           >
             <AgGridReact
-              columnDefs={devOpsOrderInfoColumn}
+              columnDefs={getDevOpsOrderColumn()}
               rowData={devOpsOrderInfo}
               {...initGridTable({
                 ref: devOpsRef,

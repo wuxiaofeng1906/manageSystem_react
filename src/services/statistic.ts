@@ -1,7 +1,7 @@
-import type { GqlClient } from '@/hooks';
-import { getParamsByType } from '@/publicMethods/timeMethods';
-import { formatAutoTestCover, formatPivotMode, formatTreeData } from '@/utils/statistic';
-import { IIdentity, IStaticBy, Period } from '@/hooks/statistic';
+import type {GqlClient} from '@/hooks';
+import {getParamsByType} from '@/publicMethods/timeMethods';
+import {formatAutoTestCover, formatPivotMode, formatTreeData} from '@/utils/statistic';
+import {IIdentity, IStaticBy, Period} from '@/hooks/statistic';
 
 export interface IStatisticQuery {
   client: GqlClient<object>;
@@ -11,17 +11,19 @@ export interface IStatisticQuery {
   normalQuarter?: boolean;
   period?: Period;
 }
+
 interface StaticOther {
   client: GqlClient<object>;
   params: { kind: number; ends: string };
   identity?: 'DEVELOPER' | 'TESTER';
 }
+
 const StatisticServices = {
   // patch
-  async patch({ client, params, identity }: IStatisticQuery) {
+  async patch({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devTestReleasePatchDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:${identity}) {
           total{
@@ -45,13 +47,13 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER'}), loading};
   },
   // feedback
-  async feedback({ client, params, identity }: IStatisticQuery) {
+  async feedback({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devTestOnlineFeedbackAvgrespDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
         total{
@@ -75,14 +77,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER'}), loading};
   },
 
   // 线上反馈平均上线时长
-  async onlineTime({ client, params }: IStatisticQuery) {
+  async onlineTime({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:testOnlineFeedbackAvgonlineDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -107,15 +109,15 @@ const StatisticServices = {
       }
   `);
     return {
-      data: formatTreeData({ origin: data.data, percent: 86400, isMulti: false, isTest: true }),
+      data: formatTreeData({origin: data.data, percent: 86400, isMulti: false, isTest: true}),
       loading,
     };
   },
 
-  async productScale({ client, params, identity }: IStatisticQuery) {
+  async productScale({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devTestProductionScaleDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
         total{
@@ -139,13 +141,13 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER'}), loading};
   },
 
-  async humanEffect({ client, params, identity, showDenominator }: IStatisticQuery) {
+  async humanEffect({client, params, identity, showDenominator}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devTestStaffEfficiencyDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
         total{
@@ -188,15 +190,15 @@ const StatisticServices = {
       }
   `);
     return {
-      data: formatTreeData({ origin: data.data, showDenominator, isTest: identity == 'TESTER' }),
+      data: formatTreeData({origin: data.data, showDenominator, isTest: identity == 'TESTER'}),
       loading,
     };
   },
 
-  async shuttleDelay({ client, params, identity }: IStatisticQuery) {
+  async shuttleDelay({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devTestDelayStoryDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
         total{
@@ -220,14 +222,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER'}), loading};
   },
 
   // 测试 - 累计千行bug率 3个 identity: TEST、OWN、REFER
-  async newPeriodBugThousTestDept({ client, params, identity }: IStatisticQuery) {
+  async newPeriodBugThousTestDept({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:newPeriodBugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends},thous:${identity}) {
           total{
@@ -258,14 +260,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: true}), loading};
   },
 
   // 开发- 累计千行bug率 2个 identity:ALL,EXCLUDE_ONLINE
-  async bugThousPeriodDept({ client, params, identity }: IStatisticQuery) {
+  async bugThousPeriodDept({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:bugThousPeriodDept(kind: "${condition.typeFlag}", ends: ${condition.ends},thous:${identity}) {
           total{
@@ -303,13 +305,13 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, showSide: true }), loading };
+    return {data: formatTreeData({origin: data.data, showSide: true}), loading};
   },
   // 轮次测试P0+P1占比
-  async roundsTestRate({ client, params }: IStatisticQuery) {
+  async roundsTestRate({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:testRoundP0P1ScoreDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -333,13 +335,13 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: true }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: true}), loading};
   },
   // 线上p0p1占比 (6个指标)
-  async roundsP0P1TestRate({ client, params, identity, period }: IStatisticQuery) {
+  async roundsP0P1TestRate({client, params, identity, period}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:testBugP0P1PropDept(kind: "${condition.typeFlag}", ends: ${condition.ends},thous:${identity},period:"${period}") {
         total{
@@ -371,14 +373,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: true, percent: 100 }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: true, percent: 100}), loading};
   },
 
   // 运维 -系统可用，修复，可用时间
-  async operationsAvgAvailable({ client, params }: IStatisticQuery) {
+  async operationsAvgAvailable({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data } = await client.query(`
+    const {data} = await client.query(`
       {
          data:devopsSeveralSysKpis(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         category
@@ -400,13 +402,13 @@ const StatisticServices = {
     }
   }
   `);
-    return { data: data.data };
+    return {data: data.data};
   },
 
   // 运维 - 响应时长
-  async operationsAvgRespTime({ client, params }: IStatisticQuery) {
+  async operationsAvgRespTime({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
-    const { data } = await client.query(`
+    const {data} = await client.query(`
       {
          data:devopsAvgRespDura(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
           maxsize
@@ -427,14 +429,14 @@ const StatisticServices = {
     }
   }
   `);
-    return { data: data.data };
+    return {data: data.data};
   },
 
   // 已发布需求平均关闭时长
-  async averageShutdownDuration({ client, params }: IStatisticQuery) {
+  async averageShutdownDuration({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:releStoryAvgClosedDura(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -458,13 +460,13 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return {data: formatTreeData({origin: data.data}), loading};
   },
   // 计划平均延期次数
-  async planedDelayAverageNum({ client, params }: IStatisticQuery) {
+  async planedDelayAverageNum({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:planAvDelayCount(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -488,13 +490,13 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return {data: formatTreeData({origin: data.data}), loading};
   },
   // 任务平均延期次数
-  async taskCumulativeDelayNum({ client, params }: IStatisticQuery) {
+  async taskCumulativeDelayNum({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:taskCumulativeDelayNum(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -518,14 +520,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return {data: formatTreeData({origin: data.data}), loading};
   },
 
   // 已发布未关闭需求数
-  async publishedAndUnclosedNumber({ client, params }: IStatisticQuery) {
+  async publishedAndUnclosedNumber({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:releStoryClosedNum(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -549,14 +551,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return {data: formatTreeData({origin: data.data}), loading};
   },
 
   // 班车超范围bug数
-  async sprintOverRangeBug({ client, params }: IStatisticQuery) {
+  async sprintOverRangeBug({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:sprintOverRangeBugNum(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -580,12 +582,12 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return {data: formatTreeData({origin: data.data}), loading};
   },
-  async closeNormativeRequired({ client, params }: IStatisticQuery) {
+  async closeNormativeRequired({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:abnormallyClosedStoryNum(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -609,14 +611,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return {data: formatTreeData({origin: data.data}), loading};
   },
 
   // 阻塞测试工作量
-  async blockingTestWorkload({ client, params }: IStatisticQuery) {
+  async blockingTestWorkload({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devBlockWorkloadDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -640,13 +642,13 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return {data: formatTreeData({origin: data.data}), loading};
   },
   // 阻塞次数
-  async blockingTimes({ client, params }: IStatisticQuery) {
+  async blockingTimes({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devBlockTimesDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -670,12 +672,12 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data }), loading };
+    return {data: formatTreeData({origin: data.data}), loading};
   },
-  async convergenceBugRate({ client, params }: IStatisticQuery) {
+  async convergenceBugRate({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:bugConvUpToPeriodTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
               total {
@@ -703,12 +705,12 @@ const StatisticServices = {
             }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: true, percent: 100 }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: true, percent: 100}), loading};
   },
 
   // 产品上线后引入emergency
-  async onlineEmergency({ client, params }: StaticOther) {
-    const { data } = await client.query(`
+  async onlineEmergency({client, params}: StaticOther) {
+    const {data} = await client.query(`
       {
          data:onlineEmerProportion(kind: "${params.kind}", ends: ${params.ends}) {
           range{
@@ -725,11 +727,11 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: data.data };
+    return {data: data.data};
   },
 
-  async onlineTestOnlineEmergency({ client, params, identity }: StaticOther) {
-    const { data } = await client.query(`
+  async onlineTestOnlineEmergency({client, params, identity}: StaticOther) {
+    const {data} = await client.query(`
       {
          data:devTestOnlineEmerPropOwner(kind: "${params.kind}", ends: ${params.ends},identity:${identity}) {
             range{
@@ -758,11 +760,11 @@ const StatisticServices = {
           }
       }
   `);
-    return { data: formatPivotMode(data.data, params.kind) };
+    return {data: formatPivotMode(data.data, params.kind)};
   },
   //灰度千行bug率
-  async grayThousBugRate({ client, params }: StaticOther) {
-    const { data } = await client.query(`
+  async grayThousBugRate({client, params}: StaticOther) {
+    const {data} = await client.query(`
       {
          data:stageThousBugRate(kind: "${params.kind}", ends: ${params.ends}) {
           range{
@@ -777,11 +779,11 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: data.data };
+    return {data: data.data};
   },
   // 服务 -交付吞吐量
-  async deliverThroughput({ client, params }: StaticOther) {
-    const { data } = await client.query(`
+  async deliverThroughput({client, params}: StaticOther) {
+    const {data} = await client.query(`
       {
          data:deliverThroughput(kind: "${params.kind}", ends: ${params.ends}) {
           range{
@@ -795,14 +797,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: data.data };
+    return {data: data.data};
   },
 
   // 任务计划偏差率
-  async taskScheduleRate({ client, params, identity }: IStatisticQuery) {
+  async taskScheduleRate({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devTestPlanDeviationRateDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
         total{
@@ -832,14 +834,14 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER'}), loading};
   },
 
   // 计划偏差率
-  async planDeviationRate({ client, params, identity }: IStatisticQuery) {
+  async planDeviationRate({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:devTestBiasPropDeviationDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity})
          {
@@ -847,12 +849,10 @@ const StatisticServices = {
             dept
             deptName
             kpi
-            __typename
           }
           range {
             start
             end
-            __typename
           }
           datas {
             dept
@@ -860,23 +860,20 @@ const StatisticServices = {
             parent {
               dept
               deptName
-              __typename
             }
             kpi
-            __typename
           }
-          __typename
         }
       }
   `);
 
-    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER'}), loading};
   },
 
   // 自动化单元测试覆盖率
-  async autoTestCoverageUnit({ client, params }: IStatisticQuery) {
+  async autoTestCoverageUnit({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
-    const { data } = await client.query(`
+    const {data} = await client.query(`
       {
        data:autoTestCoverPropRuntimeE(ends:${condition.ends}, kind:"${condition.typeFlag}") {
           range{
@@ -927,11 +924,11 @@ const StatisticServices = {
         }
       }
     `);
-    return { data: formatAutoTestCover(data.data, condition.typeFlag) };
+    return {data: formatAutoTestCover(data.data, condition.typeFlag)};
   },
 
-  async autoTestCoverageServer({ client, params }: any) {
-    const { data } = await client.query(`
+  async autoTestCoverageServer({client, params}: any) {
+    const {data} = await client.query(`
       {
        data:autoTestCoverPropApps(branchName:"${params.branchName}", runtimes:"${params.runtimes}") {
          runtime
@@ -967,10 +964,10 @@ const StatisticServices = {
   },
 
   // 自动化发现BUG数
-  async autoDiscoveryBugCount({ client, params }: IStatisticQuery) {
+  async autoDiscoveryBugCount({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:testAtuoFoundBugDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -1002,15 +999,15 @@ const StatisticServices = {
       }
   `);
     return {
-      data: formatTreeData({ origin: data.data, isTest: true }),
+      data: formatTreeData({origin: data.data, isTest: true}),
       loading,
     };
   },
   // 自动化提效比
-  async autoEffectRate({ client, params }: IStatisticQuery) {
+  async autoEffectRate({client, params}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:testAtuotEffectPropDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -1042,16 +1039,16 @@ const StatisticServices = {
       }
   `);
     return {
-      data: formatTreeData({ origin: data.data, isTest: true, percent: 100 }),
+      data: formatTreeData({origin: data.data, isTest: true, percent: 100}),
       loading,
     };
   },
 
   // 项目实际产出率
-  async actualRate({ client, params, normalQuarter }: IStatisticQuery) {
+  async actualRate({client, params, normalQuarter}: IStatisticQuery) {
     const condition = getParamsByType(params, normalQuarter);
     if (condition.typeFlag === 0) return [];
-    const { data, loading } = await client.query(`
+    const {data, loading} = await client.query(`
       {
          data:projActualProdPropDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
           range{
@@ -1081,13 +1078,13 @@ const StatisticServices = {
         }
       }
   `);
-    return { loading, data: formatTreeData({ origin: data.data, isTest: false, percent: 100 }) };
+    return {loading, data: formatTreeData({origin: data.data, isTest: false, percent: 100})};
   },
 
   // 项目实际产出率-明细
-  async actualRateDetail({ client, params }: any) {
+  async actualRateDetail({client, params}: any) {
     // extra  0-特性项目；1-全部项目，2-班车项目"
-    const { data } = await client.query(`
+    const {data} = await client.query(`
       {
          data:singleProjActualProdProp(dept: ${params.dept}, start: "${params?.range?.start}",end:"${params?.range?.end}",extra:${params.extra}) {
           closedAt

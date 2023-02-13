@@ -835,6 +835,44 @@ const StatisticServices = {
     return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
   },
 
+  // 计划偏差率
+  async planDeviationRate({ client, params, identity }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:devTestBiasPropDeviationDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity})
+         {
+          total {
+            dept
+            deptName
+            kpi
+            __typename
+          }
+          range {
+            start
+            end
+            __typename
+          }
+          datas {
+            dept
+            deptName
+            parent {
+              dept
+              deptName
+              __typename
+            }
+            kpi
+            __typename
+          }
+          __typename
+        }
+      }
+  `);
+
+    return { data: formatTreeData({ origin: data.data, isTest: identity == 'TESTER' }), loading };
+  },
+
   // 自动化单元测试覆盖率
   async autoTestCoverageUnit({ client, params }: IStatisticQuery) {
     const condition = getParamsByType(params);

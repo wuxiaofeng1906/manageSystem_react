@@ -42,7 +42,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const [globalEnv] = useModel('env', (env) => [env.globalEnv]);
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const {
-    globalState, basic, server, api, repair, serverConfirm, devOpsOrderInfo,
+    globalState, basic, server, api, repair, serverConfirm,
     getReleaseInfo, removeRelease, getRepairInfo, updateBasic, updateSealing, updateServerConfirm, getServerConfirm,
   } = useModel('onlineSystem');
 
@@ -62,8 +62,7 @@ const ProcessDetail = (props: any, ref: any) => {
   const confirmRef = useRef<GridApi>();
   const interfaceRef = useRef<GridApi>();
   const repairRef = useRef<GridApi>();
-  // 运维工单信息
-  const devOpsRef = useRef<GridApi>();
+
   const [form] = Form.useForm();
   const [sealForm] = Form.useForm();
 
@@ -646,34 +645,12 @@ const ProcessDetail = (props: any, ref: any) => {
             {...initGridTable({ref: interfaceRef, height: 30})}
           />
         </div>
-        <div style={{display: devOpsOrderInfo.length>0 ? "inline" : "none"}}>
-          <div>
-            <h4>四、运维工单信息</h4>
-          </div>
-          <div
-            style={{
-              width: '100%',
-              maxHeight: 100,
-              minHeight: 50,
-              height: serverConfirm?.length * 40 + 30,
-            }}
-          >
-            <AgGridReact
-              columnDefs={getDevOpsOrderColumn()}
-              rowData={devOpsOrderInfo}
-              {...initGridTable({
-                ref: devOpsRef,
-                height: 30,
-              })}
-            />
-          </div>
-        </div>
 
         <h4 style={{marginTop: 10}}>
-          五、backend/apps/init-data库是否存在上线分支： {hasBranch ? '是' : '否'}
+          四、backend/apps/init-data库是否存在上线分支： {hasBranch ? '是' : '否'}
         </h4>
         <div className={styles.tableHeader}>
-          <h4>六、数据修复/升级</h4>
+          <h4>五、数据修复/升级</h4>
           <Button
             disabled={hasEdit}
             size={'small'}
@@ -715,7 +692,7 @@ const ProcessDetail = (props: any, ref: any) => {
           onShowSizeChange={(size) => getTableList(1, size)}
         />
         <div>
-          <h4>七、服务确认</h4>
+          <h4>六、服务确认</h4>
         </div>
         <div
           style={{

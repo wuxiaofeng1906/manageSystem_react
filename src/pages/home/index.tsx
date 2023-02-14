@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styles from './index.less';
-import { Card } from 'antd';
-import { AgGridReact } from 'ag-grid-react';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { dutyColumn } from '@/pages/home/column';
+import {Card} from 'antd';
+import {AgGridReact} from 'ag-grid-react';
+import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {dutyColumn} from '@/pages/home/column';
 import * as dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import VisualView from '@/pages/home/VisualView';
@@ -21,7 +21,7 @@ const Home = () => {
   const urlParams = useLocation()?.query as { auth?: string; userId: string; userName: string };
   const gridRef = useRef<GridApi>();
   const [dutyPerson, setDutyPerson] = useState<any[]>([]);
-  const { prePermission } = usePermission();
+  const {prePermission} = usePermission();
   const hasPermission = prePermission();
   const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
   const to = from.endOf('w');
@@ -35,6 +35,7 @@ const Home = () => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
   };
+  // 获取第一值班人
   const getFirstDuty = async () => {
     const firstDuty = await DutyListServices.getFirstDutyPerson(range);
     const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
@@ -78,7 +79,7 @@ const Home = () => {
           </span>
         }
       >
-        <div className="ag-theme-alpine" style={{ height: 80, width: '100%' }}>
+        <div className="ag-theme-alpine" style={{height: 80, width: '100%'}}>
           <AgGridReact
             columnDefs={dutyColumn}
             rowData={dutyPerson}
@@ -87,7 +88,7 @@ const Home = () => {
               filter: true,
               flex: 1,
               suppressMenu: true,
-              cellStyle: { 'line-height': '28px' },
+              cellStyle: {'line-height': '28px'},
               minWidth: 100,
             }}
             rowHeight={28}
@@ -97,7 +98,8 @@ const Home = () => {
           />
         </div>
       </Card>
-      {hasPermission?.preView ? <VisualView /> : <div />}
+      {/* 有权限的话显示待发布视图 */}
+      {hasPermission?.preView ? <VisualView/> : <div/>}
     </div>
   );
 };

@@ -1,63 +1,57 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {
-  Form,
-  Select,
-  DatePicker,
-  Button,
-  Input,
-  Col,
-  Spin,
-  Divider,
-  Modal,
-  Checkbox,
-  Row,
+  Form, Select, DatePicker, Button, Input, Col,
+  Spin, Divider, Modal, Checkbox, Row,
 } from 'antd';
 import { InfoCircleOutlined, StopOutlined } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import {
-  historyCompareColumn,
-  historyOrderColumn,
+  historyCompareColumn, historyOrderColumn,
 } from '@/pages/onlineSystem/releaseProcess/column';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import {getDevOpsOrderColumn} from '@/pages/onlineSystem/config/column';
+import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
 import FieldSet from '@/components/FieldSet';
 import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
-import { useModel, useParams, history } from 'umi';
-import { isEmpty, omit, isEqual } from 'lodash';
-import { infoMessage } from '@/publicMethods/showMessages';
+import {OnlineSystemServices} from '@/services/onlineSystem';
+import {useModel, useParams, history} from 'umi';
+import {isEmpty, omit} from 'lodash';
+import {infoMessage} from '@/publicMethods/showMessages';
 import moment from 'moment';
-import { PageContainer } from '@ant-design/pro-layout';
+import {PageContainer} from '@ant-design/pro-layout';
 import DragIcon from '@/components/DragIcon';
 import cns from 'classnames';
-import { valueMap } from '@/utils/utils';
+import {valueMap} from '@/utils/utils';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
-  const { id } = useParams() as { id: string };
+  const {id} = useParams() as { id: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+
   const [envList] = useModel('env', (env) => [env.globalEnv]);
   const gridRef = useRef<GridApi>();
   const gridCompareRef = useRef<GridApi>();
+  const devOpsOrderRef = useRef<GridApi>();
   const [orderForm] = Form.useForm();
   const [baseForm] = Form.useForm();
 
-  const { prePermission } = usePermission();
+  const {prePermission} = usePermission();
   const hasPermission = prePermission();
 
   const [orderData, setOrderData] = useState<any[]>([]);
   const [compareData, setCompareData] = useState<{ opsData: any[]; alpha: any[] }>();
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [announcementList, setAnnouncementList] = useState<any[]>([]);
-
+  const [devOpsOrderInfo, setDevOpsOrderInfo] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
   const [finished, setFinished] = useState(false);
   const [visible, setVisible] = useState(false);
   const [clusters, setClusters] = useState<any>(); // 所有组合集群
   const [confirmDisabled, setConfirmDisabled] = useState(false);
-  const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
+  // const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -72,17 +66,22 @@ const ReleaseOrder = () => {
       setClusters(clusterMap);
       getOrderDetail(clusterMap);
     });
-    window.onresize = function () {
-      setTableHeight((window.innerHeight - 370) / 2);
-    };
+
+    // window.onresize = function () {
+    //   setTableHeight((window.innerHeight - 370) / 2);
+    // };
     return () => {
       window.onresize = null;
     };
   }, []);
 
+
   const getBaseList = async () => {
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
+    const devopsInfo = await OnlineSystemServices.getDevOpsOrderInfo({release_num: id});
+    setDevOpsOrderInfo((Object.keys(devopsInfo)).length ? [{...devopsInfo}] : []);
+
     setDutyList(
       order?.map((it: any) => ({
         label: it.duty_name ?? '',
@@ -102,7 +101,7 @@ const ReleaseOrder = () => {
   const getOrderDetail = async (clusterMap = clusters) => {
     try {
       setSpinning(true);
-      const res = await PreReleaseServices.orderDetail({ release_num: id });
+      const res = await PreReleaseServices.orderDetail({release_num: id});
       if (isEmpty(res)) {
         initForm();
       } else
@@ -136,7 +135,7 @@ const ReleaseOrder = () => {
       const values = baseForm.getFieldsValue();
       if (isEmpty(values.cluster)) {
         setOrderData([]);
-        setCompareData({ opsData: [], alpha: [] });
+        setCompareData({opsData: [], alpha: []});
         setSpinning(false);
         return;
       }
@@ -160,7 +159,7 @@ const ReleaseOrder = () => {
       ops = await PreReleaseServices.opsList(values.cluster?.join(',') ?? '');
     }
     if (isEmpty(ops) && isEmpty(rdOrigin)) {
-      setCompareData({ opsData: [], alpha: [] });
+      setCompareData({opsData: [], alpha: []});
       return;
     }
     let mergeArr: any[] = [];
@@ -221,12 +220,12 @@ const ReleaseOrder = () => {
         color: otherOrder
           ? 'white'
           : String(opsItem?.id) == String(rdId)
-          ? 'rgba(0, 255, 0, 0.06)'
-          : 'rgba(255, 2, 2, 0.06)',
+            ? 'rgba(0, 255, 0, 0.06)'
+            : 'rgba(255, 2, 2, 0.06)',
       });
     }
 
-    setCompareData({ opsData: ops, alpha: mergeArr });
+    setCompareData({opsData: ops, alpha: mergeArr});
   };
 
   const initForm = () => {
@@ -275,9 +274,9 @@ const ReleaseOrder = () => {
     } else {
       // 二次确认标记发布结果
       const tips = {
-        cancel: { title: '取消发布提醒', content: '取消发布将删除工单，请确认是否取消发布?' },
-        success: { title: '发布成功提醒', content: '请确认是否标记发布成功?' },
-        failure: { title: '发布失败提醒', content: '请确认是否标记发布失败?' },
+        cancel: {title: '取消发布提醒', content: '取消发布将删除工单，请确认是否取消发布?'},
+        success: {title: '发布成功提醒', content: '请确认是否标记发布成功?'},
+        failure: {title: '发布失败提醒', content: '请确认是否标记发布失败?'},
       };
       if (result == 'success') {
         setVisible(true);
@@ -288,8 +287,8 @@ const ReleaseOrder = () => {
           centered: true,
           title: tips[result].title,
           content: tips[result].content,
-          icon: <InfoCircleOutlined style={{ color: result == 'cancel' ? 'red' : '#1585ff' }} />,
-          okButtonProps: { disabled: confirmDisabled },
+          icon: <InfoCircleOutlined style={{color: result == 'cancel' ? 'red' : '#1585ff'}}/>,
+          okButtonProps: {disabled: confirmDisabled},
           onOk: async () => {
             setConfirmDisabled(true);
             try {
@@ -308,7 +307,7 @@ const ReleaseOrder = () => {
             history.replace('/onlineSystem/releaseProcess');
           },
           onCancel: () => {
-            orderForm.setFieldsValue({ release_result: null });
+            orderForm.setFieldsValue({release_result: null});
           },
         });
       }
@@ -318,7 +317,7 @@ const ReleaseOrder = () => {
   const onSave = async (jump = false) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
-    const checkObj = omit({ ...order, ...base }, ['release_result']);
+    const checkObj = omit({...order, ...base}, ['release_result']);
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -358,7 +357,7 @@ const ReleaseOrder = () => {
   const onSuccessConfirm = async (data: any) => {
     const announcement_num = orderForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
-      orderForm.setFieldsValue({ release_result: null });
+      orderForm.setFieldsValue({release_result: null});
       setVisible(false);
     } else {
       let params: any[] = [];
@@ -402,7 +401,7 @@ const ReleaseOrder = () => {
       okText: '确认',
       cancelText: '取消',
       title: '删除积压工单提醒',
-      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+      icon: <InfoCircleOutlined style={{color: 'red'}}/>,
       content: `请确认是否要永久删除【${data.repair_order ?? ''}】工单?`,
       onOk: async () => {
         await PreReleaseServices.removeOrder({
@@ -447,7 +446,7 @@ const ReleaseOrder = () => {
     if (finished) return infoMessage('已标记发布结果不能修改工单顺序!');
     const sortArr: any = [];
     gridRef.current?.forEachNode(function (node) {
-      sortArr.push({ ...node.data });
+      sortArr.push({...node.data});
     });
     setOrderData(sortArr);
     formatCompare(compareData?.opsData ?? [], sortArr);
@@ -455,7 +454,7 @@ const ReleaseOrder = () => {
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <PageContainer title={<div />}>
+      <PageContainer title={<div/>}>
         <div className={styles.releaseOrder}>
           <div className={styles.header}>
             <div className={styles.title}>工单基本信息</div>
@@ -473,10 +472,10 @@ const ReleaseOrder = () => {
                 <Form.Item name={'release_way'} label={'发布方式'}>
                   <Select
                     disabled
-                    style={{ width: '100%' }}
+                    style={{width: '100%'}}
                     options={[
-                      { label: '停服', value: 'stop_server' },
-                      { label: '不停服', value: 'keep_server' },
+                      {label: '停服', value: 'stop_server'},
+                      {label: '不停服', value: 'keep_server'},
                     ]}
                   />
                 </Form.Item>
@@ -484,7 +483,7 @@ const ReleaseOrder = () => {
               <Col span={5}>
                 <Form.Item name={'plan_release_time'} label={'发布时间'}>
                   <DatePicker
-                    style={{ width: '100%' }}
+                    style={{width: '100%'}}
                     showTime
                     format={'YYYY-MM-DD HH:mm'}
                     disabled={finished}
@@ -497,8 +496,8 @@ const ReleaseOrder = () => {
                     showSearch
                     disabled={finished}
                     optionFilterProp={'label'}
-                    options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
-                    style={{ width: '100%' }}
+                    options={[{key: '免', value: '免', label: '免'}].concat(announcementList)}
+                    style={{width: '100%'}}
                   />
                 </Form.Item>
               </Col>
@@ -508,8 +507,8 @@ const ReleaseOrder = () => {
                     showSearch
                     disabled={finished}
                     optionFilterProp={'label'}
-                    options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
-                    style={{ width: '100%' }}
+                    options={[{key: '免', value: '免', label: '免'}].concat(dutyList)}
+                    style={{width: '100%'}}
                   />
                 </Form.Item>
               </Col>
@@ -518,9 +517,9 @@ const ReleaseOrder = () => {
                   noStyle
                   shouldUpdate={(old, current) => old.release_result != current.release_result}
                 >
-                  {({ getFieldValue }) => {
+                  {({getFieldValue}) => {
                     const result = getFieldValue('release_result');
-                    const color = { success: '#2BF541', failure: 'red' };
+                    const color = {success: '#2BF541', failure: 'red'};
                     return (
                       <Form.Item name={'release_result'}>
                         <Select
@@ -529,10 +528,10 @@ const ReleaseOrder = () => {
                           className={styles.selectColor}
                           onChange={() => onSaveBeforeCheck(true)}
                           options={[
-                            { label: '发布成功', value: 'success', key: 'success' },
-                            { label: '发布失败', value: 'failure', key: 'failure' },
-                            { label: '取消发布', value: 'cancel', key: 'cancel' },
-                            { label: ' ', value: 'unknown', key: 'unknown' },
+                            {label: '发布成功', value: 'success', key: 'success'},
+                            {label: '发布失败', value: 'failure', key: 'failure'},
+                            {label: '取消发布', value: 'cancel', key: 'cancel'},
+                            {label: ' ', value: 'unknown', key: 'unknown'},
                           ]}
                           style={{
                             width: '100%',
@@ -540,7 +539,7 @@ const ReleaseOrder = () => {
                             color: color[result] ?? 'initial',
                           }}
                           placeholder={
-                            <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
+                            <span style={{color: '#00bb8f', fontWeight: 'initial'}}>
                               标记发布结果
                             </span>
                           }
@@ -553,20 +552,20 @@ const ReleaseOrder = () => {
             </Row>
           </Form>
 
-          <FieldSet data={{ title: '工单-基础设置' }}>
+          <FieldSet data={{title: '工单-基础设置'}}>
             <Form layout={'inline'} size={'small'} form={baseForm} className={styles.baseInfo}>
               <Col span={6}>
                 <Form.Item name={'release_type'} label={'工单类型选择'}>
                   <Select
-                    options={[{ label: '灰度推生产', value: 'backlog_release' }]}
-                    style={{ width: '100%' }}
+                    options={[{label: '灰度推生产', value: 'backlog_release'}]}
+                    style={{width: '100%'}}
                     disabled
                   />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item name={'release_name'} label={'工单名称'} required>
-                  <Input style={{ width: '100%' }} disabled={finished} />
+                  <Input style={{width: '100%'}} disabled={finished}/>
                 </Form.Item>
               </Col>
               <Col span={10}>
@@ -579,7 +578,7 @@ const ReleaseOrder = () => {
                         !['cn-northwest-0', 'cn-northwest-global'].includes(it.value) &&
                         !it.label?.includes('集群0-8'),
                     )}
-                    style={{ width: '100%' }}
+                    style={{width: '100%'}}
                     mode={'multiple'}
                     onChange={onLinkTable}
                   />
@@ -587,10 +586,14 @@ const ReleaseOrder = () => {
               </Col>
             </Form>
           </FieldSet>
-          <FieldSet data={{ title: '工单-表单设置' }}>
+          <FieldSet data={{title: '工单-表单设置'}}>
             <div
               className="ag-theme-alpine"
-              style={{ height: tableHeight > 300 ? tableHeight + 20 : 300, width: '100%' }}
+              style={{
+                height: orderData === undefined ? 100 : (orderData.length) * 28 + 50,
+                width: '100%',
+                marginTop: 8
+              }}
             >
               <AgGridReact
                 columnDefs={historyOrderColumn}
@@ -600,7 +603,7 @@ const ReleaseOrder = () => {
                   filter: true,
                   flex: 1,
                   suppressMenu: true,
-                  cellStyle: { 'line-height': '28px' },
+                  cellStyle: {'line-height': '28px'},
                 }}
                 rowHeight={28}
                 headerHeight={30}
@@ -610,7 +613,7 @@ const ReleaseOrder = () => {
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 frameworkComponents={{
-                  ICluster: (p) => <ICluster data={p.value} />,
+                  ICluster: (p: any) => <ICluster data={p.value}/>,
                   link: (p: CellClickedEvent) => (
                     <div
                       style={{
@@ -638,11 +641,11 @@ const ReleaseOrder = () => {
                           width="20"
                           height="20"
                           src={require('../../../../public/delete_red.png')}
-                          style={{ marginRight: 10, cursor: 'pointer' }}
+                          style={{marginRight: 10}}
                           onClick={() => onRemove(p.data)}
                         />
                       ) : (
-                        <div />
+                        <div/>
                       )}
                       <StopOutlined
                         title={'忽略本次积压工单'}
@@ -673,7 +676,11 @@ const ReleaseOrder = () => {
           </div>
           <div
             className="ag-theme-alpine"
-            style={{ height: tableHeight > 300 ? tableHeight : 300, width: '100%', marginTop: 8 }}
+            style={{
+              height: compareData?.alpha === undefined ? 100 : (compareData?.alpha)?.length * 28 + 50,
+              width: '100%',
+              marginTop: 8
+            }}
           >
             <AgGridReact
               columnDefs={historyCompareColumn}
@@ -683,15 +690,40 @@ const ReleaseOrder = () => {
                 filter: true,
                 flex: 1,
                 suppressMenu: true,
-                cellStyle: { 'line-height': '28px' },
+                cellStyle: {'line-height': '28px'},
               }}
               rowHeight={28}
               headerHeight={30}
               onGridReady={(r) => onGridReady(r, gridCompareRef)}
               onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
-              getRowStyle={(p) => ({ background: p.data.color })}
+              getRowStyle={(p) => ({background: p.data.color})}
             />
           </div>
+
+          {/* 运维工单信息 */}
+          <div style={{display: devOpsOrderInfo.length ? "inline" : "none"}}>
+            <h4 style={{marginTop: 20}}> 运维工单信息 </h4>
+            <div
+              className="ag-theme-alpine"
+              style={{height: 100, width: '100%', marginTop: 8}}>
+              <AgGridReact
+                columnDefs={getDevOpsOrderColumn("gray")}
+                rowData={devOpsOrderInfo}
+                defaultColDef={{
+                  resizable: true,
+                  filter: true,
+                  flex: 1,
+                  suppressMenu: true,
+                  cellStyle: {'line-height': '28px'},
+                }}
+                rowHeight={28}
+                headerHeight={30}
+                onGridReady={(r) => onGridReady(r, devOpsOrderRef)}
+                onGridSizeChanged={(r) => onGridReady(r, devOpsOrderRef)}
+              />
+            </div>
+          </div>
+
           <ModalSuccessCheck
             visible={visible}
             onOk={(v?: any) => onSuccessConfirm(v)}
@@ -705,10 +737,10 @@ const ReleaseOrder = () => {
 export default ReleaseOrder;
 
 export const ModalSuccessCheck = ({
-  visible,
-  onOk,
-  announce,
-}: {
+                                    visible,
+                                    onOk,
+                                    announce,
+                                  }: {
   visible: boolean;
   announce: string;
   onOk: (v?: any) => void;
@@ -740,13 +772,13 @@ export const ModalSuccessCheck = ({
       onCancel={() => onOk()}
       className={styles.modalSuccessCheck}
       destroyOnClose
-      okButtonProps={{ disabled: loading }}
+      okButtonProps={{disabled: loading}}
     >
       <div>请确认是否标记发布成功？</div>
       <div>如有自动化也执行通过！确认通过，会自动开放所有租户。</div>
       <Form form={form} layout={'inline'}>
         <Form.Item noStyle shouldUpdate={(old, next) => old.checkResult != next.checkResult}>
-          {({ getFieldValue }) => {
+          {({getFieldValue}) => {
             return (
               <Form.Item
                 label="是否忽略发布成功后自动化检查"
@@ -756,7 +788,7 @@ export const ModalSuccessCheck = ({
                 <Checkbox
                   value="yes"
                   disabled={!isEmpty(getFieldValue('checkResult'))}
-                  onChange={({ target }) => form.validateFields(['checkResult'])}
+                  onChange={({target}) => form.validateFields(['checkResult'])}
                 >
                   忽略检查
                 </Checkbox>
@@ -766,16 +798,16 @@ export const ModalSuccessCheck = ({
         </Form.Item>
 
         <Form.Item noStyle shouldUpdate={(old, next) => old.ignoreCheck != next.ignoreCheck}>
-          {({ getFieldValue }) => {
+          {({getFieldValue}) => {
             const afterCheck = getFieldValue('ignoreCheck');
             return (
               <Form.Item
                 label="检查结果"
                 name="checkResult"
                 required={true}
-                rules={[{ required: afterCheck !== true, message: '请选择检查结果' }]}
+                rules={[{required: afterCheck !== true, message: '请选择检查结果'}]}
               >
-                <Checkbox.Group style={{ width: '100%' }} disabled={afterCheck == true}>
+                <Checkbox.Group style={{width: '100%'}} disabled={afterCheck == true}>
                   <Checkbox value="ui">UI执行通过</Checkbox>
                   <Checkbox value="applet">小程序执行通过</Checkbox>
                 </Checkbox.Group>

@@ -91,6 +91,8 @@ export const checkInfo = [
     api_url: 'test-unit', // 批量检查接口地址
     source: '运维平台',
     contact: '前端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '前端图标一致性检查是否通过',
@@ -107,6 +109,8 @@ export const checkInfo = [
     api_url: 'icon-check',
     source: '研发管理平台',
     contact: '前端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '前端代码遗漏检查是否通过',
@@ -123,6 +127,8 @@ export const checkInfo = [
     api_url: 'version-check',
     source: '研发管理平台',
     contact: '前端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '前端服务git分支是否封版',
@@ -139,6 +145,8 @@ export const checkInfo = [
     api_url: 'sealing-version-check',
     source: '研发管理平台',
     contact: '前端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端单元测试运行是否通过',
@@ -155,6 +163,8 @@ export const checkInfo = [
     api_url: 'test-unit',
     source: '运维平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端代码遗漏检查是否通过',
@@ -171,6 +181,8 @@ export const checkInfo = [
     api_url: 'version-check',
     source: '研发管理平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '构建时间对比校验是否通过',
@@ -187,6 +199,8 @@ export const checkInfo = [
     api_url: 'create-libray',
     source: '运维平台',
     contact: '运维',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端环境一致性检查是否通过',
@@ -203,6 +217,8 @@ export const checkInfo = [
     api_url: 'env-check',
     source: '后端平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端是否可以热更新(辅助值班人员判定是否可以热更，不阻塞发版)',
@@ -219,6 +235,8 @@ export const checkInfo = [
     api_url: 'hot-update-check',
     source: '后端平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端服务git分支是否封版',
@@ -235,6 +253,8 @@ export const checkInfo = [
     api_url: 'sealing-version-check',
     source: '研发管理平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '后端是否为发布包(config.yaml不包含有SNAPSHOT)',
@@ -251,6 +271,8 @@ export const checkInfo = [
     api_url: 'release-package-check',
     source: '值班助手',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '上线前检查checklist是否检查完成',
@@ -267,6 +289,8 @@ export const checkInfo = [
     api_url: 'zt-check-list',
     source: '研发管理平台',
     contact: '后端',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '需求阶段是否满足条件（需要测试需达到测试完毕/无需测试需要开发完毕）',
@@ -282,6 +306,8 @@ export const checkInfo = [
     api_url: 'story-status',
     source: '研发管理平台',
     contact: '测试',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: 'previewsql是否已执行',
@@ -298,6 +324,8 @@ export const checkInfo = [
     api_url: 'preview-sql',
     source: '运维平台',
     contact: '测试',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: 'web/h5部署时是否勾选自动化测试参数',
@@ -314,6 +342,8 @@ export const checkInfo = [
     api_url: 'web-h5-automation',
     source: '运维平台',
     contact: '测试',
+    check_person: 'check_user',
+    desc: "remark"
   },
   {
     check_type: '升级前自动化检查是否通过',
@@ -330,6 +360,8 @@ export const checkInfo = [
     api_url: 'auto-check',
     source: '研发管理平台',
     contact: '测试',
+    check_person: 'check_user',
+    desc: "remark"
   },
 ];
 // 日志弹窗

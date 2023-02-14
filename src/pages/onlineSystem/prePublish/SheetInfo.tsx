@@ -21,12 +21,12 @@ import {
   ModalFuncProps,
   Cascader,
 } from 'antd';
-import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, GridApi } from 'ag-grid-community';
+import {AgGridReact} from 'ag-grid-react';
+import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
-import { infoMessage } from '@/publicMethods/showMessages';
-import { useModel } from '@@/plugin-model/useModel';
-import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/config/column';
+import {infoMessage} from '@/publicMethods/showMessages';
+import {useModel} from '@@/plugin-model/useModel';
+import {getDevOpsOrderColumn, PublishSeverColumn, PublishUpgradeColumn} from '@/pages/onlineSystem/config/column';
 import {
   AutoCheckType,
   ClusterType,
@@ -35,12 +35,12 @@ import {
   PublishWay,
   WhetherOrNot,
 } from '@/pages/onlineSystem/config/constant';
-import { history, useLocation, useParams } from 'umi';
-import { Prompt } from 'react-router-dom';
-import { initGridTable } from '@/utils/utils';
+import {history, useLocation, useParams} from 'umi';
+import {Prompt} from 'react-router-dom';
+import {initGridTable} from '@/utils/utils';
 import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
-import { OnlineSystemServices } from '@/services/onlineSystem';
+import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
 import { isEmpty, omit, isString, pick, chunk, isEqual } from 'lodash';
 import { InfoCircleOutlined } from '@ant-design/icons';
@@ -54,30 +54,19 @@ let agBatch: any[] = [];
 let databaseVersion: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
-  const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
-  const { release_num } = useParams() as { release_num: string };
-  const { onlineSystemPermission } = usePermission();
+  const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
+  const {release_num} = useParams() as { release_num: string };
+  const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [envs] = useModel('env', (env) => [env.globalEnv]);
-  const [
-    globalState,
-    sqlList,
-    draft,
-    setGlobalState,
-    getLogInfo,
-    setDraft,
-  ] = useModel('onlineSystem', (online) => [
-    online.globalState,
-    online.sqlList,
-    online.draft,
-    online.setGlobalState,
-    online.getLogInfo,
-    online.setDraft,
-  ]);
+  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft,] = useModel('onlineSystem', (online) => [
+    online.globalState, online.sqlList, online.draft, online.setGlobalState, online.getLogInfo, online.setDraft,]);
+  const {devOpsOrderInfo, getDevOpsOrderInfo} = useModel('onlineSystem');
+
 
   const [spinning, setSpinning] = useState(false);
   const [confirmDisabled, setConfirmDisabled] = useState(false);
-  const [tableHeight, setTableHeight] = useState((window.innerHeight - 460) / 2);
+  // const [tableHeight, setTableHeight] = useState((window.innerHeight - 460) / 2);
   const [baseForm] = Form.useForm(); // 工单基础
   const [orderForm] = Form.useForm();
   const [sqlForm] = Form.useForm();
@@ -98,6 +87,8 @@ const SheetInfo = (props: any, ref: any) => {
 
   const serverRef = useRef<GridApi>();
   const upgradeRef = useRef<GridApi>();
+  // 运维工单信息
+  const devOpsRef = useRef<GridApi>();
 
   useImperativeHandle(ref, () => ({ onSave: onSaveBeforeCheck }), [
     release_num,
@@ -127,12 +118,12 @@ const SheetInfo = (props: any, ref: any) => {
       deployment: deployments?.flatMap((it) =>
         baseValues.deployment.includes(String(it.value))
           ? [
-              {
-                deployment_id: it.deployment_id,
-                app: it.app,
-                deployment_time: it.deployment_time,
-              },
-            ]
+            {
+              deployment_id: it.deployment_id,
+              app: it.app,
+              deployment_time: it.deployment_time,
+            },
+          ]
           : [],
       ),
       basic_data: {
@@ -175,10 +166,12 @@ const SheetInfo = (props: any, ref: any) => {
     if (!leaveShow) setLeaveShow(true);
   };
 
+
   useEffect(() => {
     if (subTab == 'sheet' && tab == 'process' && release_num) {
       getBaseList();
       getDetail();
+      getDevOpsOrderInfo({release_num}); // 获取运维工单信息
     }
   }, [subTab, tab, release_num]);
 
@@ -191,7 +184,7 @@ const SheetInfo = (props: any, ref: any) => {
   const getDetail = async () => {
     setSpinning(true);
     try {
-      let res = await OnlineSystemServices.getOrderDetail({ release_num });
+      let res = await OnlineSystemServices.getOrderDetail({release_num});
       const basicInfo = res?.basic_data;
       orderForm.setFieldsValue({
         ...basicInfo,
@@ -209,8 +202,8 @@ const SheetInfo = (props: any, ref: any) => {
         ...res?.basic_data,
         release_type: basicInfo?.release_type
           ? `${PublishWay[basicInfo?.release_type?.release_way]}:${
-              ClusterType[basicInfo?.release_type?.release_type]
-            }`
+            ClusterType[basicInfo?.release_type?.release_type]
+          }`
           : '',
         deployment: res?.deployment?.map((it: any) => String(it.deployment_id)),
         auto_env:
@@ -246,7 +239,7 @@ const SheetInfo = (props: any, ref: any) => {
     agBatch = batch?.map((it: string) => ({ label: it, value: it })) ?? [];
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
-    const deployIds = await OnlineSystemServices.deployments({ release_num });
+    const deployIds = await OnlineSystemServices.deployments({release_num});
     setDeployments(
       deployIds?.map((it: any) => ({
         label: `${it.deployment_id}(${it.app ?? ''} ${it.check_start_time ?? ''})`,
@@ -322,7 +315,7 @@ const SheetInfo = (props: any, ref: any) => {
       }
     }
     if (showErrTip) {
-      orderForm.setFieldsValue({ release_result: null });
+      orderForm.setFieldsValue({release_result: null});
       return infoMessage(showErrTip);
     }
     // 发布结果为空，直接保存
@@ -335,8 +328,8 @@ const SheetInfo = (props: any, ref: any) => {
           title: '置为草稿提醒',
           content: '置为草稿将还原到初始生成工单信息,请确认是否置为草稿?',
         },
-        success: { title: '发布成功提醒', content: '请确认是否标记发布成功?' },
-        failure: { title: '发布失败提醒', content: '请确认是否标记发布失败?' },
+        success: {title: '发布成功提醒', content: '请确认是否标记发布成功?'},
+        failure: {title: '发布失败提醒', content: '请确认是否标记发布失败?'},
       };
       if (result == 'success') {
         setSuccessModal(true);
@@ -348,13 +341,13 @@ const SheetInfo = (props: any, ref: any) => {
           centered: true,
           title: tips[result].title,
           content: tips[result].content,
-          icon: <InfoCircleOutlined style={{ color: result == 'cancel' ? 'red' : '#1585ff' }} />,
-          okButtonProps: { disabled: confirmDisabled },
+          icon: <InfoCircleOutlined style={{color: result == 'cancel' ? 'red' : '#1585ff'}}/>,
+          okButtonProps: {disabled: confirmDisabled},
           onOk: async () => {
             setConfirmDisabled(true);
             try {
               if (result == 'draft') {
-                await OnlineSystemServices.removeOrder({ release_num, user_id: user?.userid });
+                await OnlineSystemServices.removeOrder({release_num, user_id: user?.userid});
                 await getDetail();
               } else await onSave(true); // 发布失败
               setConfirmDisabled(false);
@@ -364,7 +357,7 @@ const SheetInfo = (props: any, ref: any) => {
             result !== 'draft' && history.replace(`/onlineSystem/releaseProcess`);
           },
           onCancel: () => {
-            orderForm.setFieldsValue({ release_result: null });
+            orderForm.setFieldsValue({release_result: null});
           },
         });
       }
@@ -374,7 +367,7 @@ const SheetInfo = (props: any, ref: any) => {
   const onSuccessConfirm = async (data: any) => {
     const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
-      orderForm.setFieldsValue({ release_result: null });
+      orderForm.setFieldsValue({release_result: null});
       setSuccessModal(false);
     } else {
       let params: any[] = [];
@@ -406,7 +399,7 @@ const SheetInfo = (props: any, ref: any) => {
     }
   };
   const showLog = async () => {
-    const res = await getLogInfo({ release_num, options_model: 'online_system_manage_rd_repair' });
+    const res = await getLogInfo({release_num, options_model: 'online_system_manage_rd_repair'});
     onLog({
       title: '工单接口日志',
       log: isEmpty(res) ? '' : '工单',
@@ -427,7 +420,7 @@ const SheetInfo = (props: any, ref: any) => {
   const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
 
   useEffect(() => {
-    const listener = (ev) => {
+    const listener = (ev: any) => {
       ev.preventDefault();
       ev.returnValue = '离开提示';
     };
@@ -444,9 +437,9 @@ const SheetInfo = (props: any, ref: any) => {
       window.onresize = null;
       return;
     }
-    window.onresize = function () {
-      setTableHeight((window.innerHeight - 460) / 2);
-    };
+    // window.onresize = function () {
+    //   setTableHeight((window.innerHeight - 460) / 2);
+    // };
     return () => {
       window.onresize = null;
     };
@@ -493,7 +486,7 @@ const SheetInfo = (props: any, ref: any) => {
       <Select
         size={'small'}
         value={isEmpty(p.value) ? undefined : p.value}
-        style={{ width: '100%' }}
+        style={{width: '100%'}}
         disabled={agFinished}
         allowClear={['batch', 'database_version'].includes(field)}
         options={
@@ -502,9 +495,9 @@ const SheetInfo = (props: any, ref: any) => {
             : field == 'batch'
             ? agBatch
             : Object.keys(WhetherOrNot)?.map((k) => ({
-                value: k,
-                label: WhetherOrNot[k],
-              }))
+              value: k,
+              label: WhetherOrNot[k],
+            }))
         }
         onChange={(v) => {
           updateFieldValue(p, v);
@@ -516,7 +509,7 @@ const SheetInfo = (props: any, ref: any) => {
 
   const updateFieldValue = (p: CellClickedEvent, v?: string) => {
     const rowNode = serverRef.current?.getRowNode(String(p.rowIndex));
-    rowNode?.setData({ ...p.data, [p.column.colId]: v });
+    rowNode?.setData({...p.data, [p.column.colId]: v});
   };
 
   useEffect(() => {
@@ -546,7 +539,7 @@ const SheetInfo = (props: any, ref: any) => {
               <Form.Item name={'release_way'} label={'发布方式'}>
                 <Select
                   disabled
-                  style={{ width: '100%' }}
+                  style={{width: '100%'}}
                   options={Object.keys(PublishWay)?.map((it) => ({
                     label: PublishWay[it],
                     value: it,
@@ -557,7 +550,7 @@ const SheetInfo = (props: any, ref: any) => {
             <Col span={5}>
               <Form.Item name={'plan_release_time'} label={'发布时间'}>
                 <DatePicker
-                  style={{ width: '100%' }}
+                  style={{width: '100%'}}
                   format={'YYYY-MM-DD HH:mm'}
                   allowClear={false}
                   showTime
@@ -571,8 +564,8 @@ const SheetInfo = (props: any, ref: any) => {
                   showSearch
                   disabled={finished}
                   optionFilterProp={'label'}
-                  options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
-                  style={{ width: '100%' }}
+                  options={[{key: '免', value: '免', label: '免'}].concat(announcementList)}
+                  style={{width: '100%'}}
                 />
               </Form.Item>
             </Col>
@@ -582,8 +575,8 @@ const SheetInfo = (props: any, ref: any) => {
                   showSearch
                   disabled={finished}
                   optionFilterProp={'label'}
-                  options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
-                  style={{ width: '100%' }}
+                  options={[{key: '免', value: '免', label: '免'}].concat(dutyList)}
+                  style={{width: '100%'}}
                 />
               </Form.Item>
             </Col>
@@ -592,9 +585,9 @@ const SheetInfo = (props: any, ref: any) => {
                 noStyle
                 shouldUpdate={(old, current) => old.release_result != current.release_result}
               >
-                {({ getFieldValue }) => {
+                {({getFieldValue}) => {
                   const result = getFieldValue('release_result');
-                  const color = { success: '#2BF541', failure: 'red' };
+                  const color = {success: '#2BF541', failure: 'red'};
                   return (
                     <Form.Item name={'release_result'}>
                       <Select
@@ -603,10 +596,10 @@ const SheetInfo = (props: any, ref: any) => {
                         className={styles.selectColor}
                         onChange={() => onSaveBeforeCheck(true)}
                         options={[
-                          { label: '发布成功', value: 'success', key: 'success' },
-                          { label: '发布失败', value: 'failure', key: 'failure' },
-                          { label: '置为草稿', value: 'draft', key: 'draft' },
-                          { label: ' ', value: 'unknown', key: 'unknown' },
+                          {label: '发布成功', value: 'success', key: 'success'},
+                          {label: '发布失败', value: 'failure', key: 'failure'},
+                          {label: '置为草稿', value: 'draft', key: 'draft'},
+                          {label: ' ', value: 'unknown', key: 'unknown'},
                         ]}
                         style={{
                           width: '100%',
@@ -614,7 +607,7 @@ const SheetInfo = (props: any, ref: any) => {
                           color: color[result] ?? 'initial',
                         }}
                         placeholder={
-                          <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
+                          <span style={{color: '#00bb8f', fontWeight: 'initial'}}>
                             标记发布结果
                           </span>
                         }
@@ -626,7 +619,7 @@ const SheetInfo = (props: any, ref: any) => {
             </Col>
           </Row>
         </Form>
-        <h4 style={{ margin: '16px 0' }}>一、工单-基础设置</h4>
+        <h4 style={{margin: '16px 0'}}>一、工单-基础设置</h4>
         <Form
           size={'small'}
           form={baseForm}
@@ -638,12 +631,12 @@ const SheetInfo = (props: any, ref: any) => {
           <Row gutter={8}>
             <Col span={6}>
               <Form.Item name={'branch'} label={'预发布分支'}>
-                <Input style={{ width: '100%' }} disabled />
+                <Input style={{width: '100%'}} disabled/>
               </Form.Item>
             </Col>
             <Col span={18}>
               <Form.Item name={'project'} label={'预发布项目'}>
-                <Input style={{ width: '100%' }} disabled />
+                <Input style={{width: '100%'}} disabled/>
               </Form.Item>
             </Col>
           </Row>
@@ -657,27 +650,27 @@ const SheetInfo = (props: any, ref: any) => {
                     label: ClusterType[k],
                     value: k,
                   }))}
-                  style={{ width: '100%' }}
+                  style={{width: '100%'}}
                 />
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item name={'ready_release_name'} label={'工单名称'} required>
-                <Input style={{ width: '100%' }} disabled={finished} />
+                <Input style={{width: '100%'}} disabled={finished}/>
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item name={'need_auto'} label={'是否需要跑升级后自动化'}>
                 <Select
                   disabled={finished}
-                  style={{ width: '100%' }}
+                  style={{width: '100%'}}
                   options={Object.keys(WhetherOrNot).map((it) => ({
                     label: WhetherOrNot[it],
                     value: it,
                   }))}
                   onChange={(v) => {
                     if (v == 'no') {
-                      baseForm.setFieldsValue({ auto_env: undefined });
+                      baseForm.setFieldsValue({auto_env: undefined});
                     }
                   }}
                 />
@@ -685,11 +678,11 @@ const SheetInfo = (props: any, ref: any) => {
             </Col>
             <Col span={6}>
               <Form.Item noStyle shouldUpdate={(pre, next) => pre.need_auto != next.need_auto}>
-                {({ getFieldValue }) => {
+                {({getFieldValue}) => {
                   const needAuto = getFieldValue('need_auto') == 'yes';
                   return (
                     <Form.Item name={'auto_env'} label={'跑升级后自动化环境'} required={needAuto}>
-                      <Select disabled={finished || !needAuto} options={envs} mode={'multiple'} />
+                      <Select disabled={finished || !needAuto} options={envs} mode={'multiple'}/>
                     </Form.Item>
                   );
                 }}
@@ -708,8 +701,11 @@ const SheetInfo = (props: any, ref: any) => {
             </Form.Item>
           </Col>
         </Form>
-        <h4 style={{ margin: '16px 0' }}>二、发布服务</h4>
-        <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}>
+        <h4 style={{margin: '16px 0'}}>二、发布服务</h4>
+        <div style={{
+          height: isEmpty(upgradeData?.release_app) ? 100 : (upgradeData?.release_app).length * 28 + 50,
+          width: '100%', marginTop: 8
+        }}>
           <AgGridReact
             columnDefs={computedServer}
             rowData={
@@ -730,13 +726,13 @@ const SheetInfo = (props: any, ref: any) => {
             {...initGridTable({ ref: serverRef, height: 30 })}
             frameworkComponents={{
               select: renderSelect,
-              ICluster: (p) => <ICluster data={p.value} />,
+              ICluster: (p: any) => <ICluster data={p.value}/>,
             }}
           />
         </div>
         {upgradeData?.basic_data?.release_type?.release_way !== 'keep_server' && (
           <>
-            <h4 style={{ margin: '16px 0' }}>
+            <h4 style={{margin: '16px 0'}}>
               三、升级接口
               <img
                 title={'日志'}
@@ -749,14 +745,17 @@ const SheetInfo = (props: any, ref: any) => {
                 onClick={showLog}
               />
             </h4>
-            <div style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}>
+            <div style={{
+              height: upgradeData?.upgrade_api === undefined ? 100 : (upgradeData?.upgrade_api)?.length * 28 + 50,
+              width: '100%'
+            }}>
               <AgGridReact
                 rowDragManaged={!finished}
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 columnDefs={PublishUpgradeColumn}
                 rowData={upgradeData?.upgrade_api ?? []}
-                {...initGridTable({ ref: upgradeRef, height: 30 })}
+                {...initGridTable({ref: upgradeRef, height: 30})}
                 frameworkComponents={{
                   operation: (p: CellClickedEvent) => (
                     <Space size={8}>
@@ -770,7 +769,7 @@ const SheetInfo = (props: any, ref: any) => {
                         }}
                         onClick={() => {
                           setVisible(true);
-                          setActiveItem({ ...p.data, rowIndex: String(p.rowIndex) });
+                          setActiveItem({...p.data, rowIndex: String(p.rowIndex)});
                         }}
                       />
                       {DragIcon(p)}
@@ -782,13 +781,36 @@ const SheetInfo = (props: any, ref: any) => {
           </>
         )}
 
+        <div style={{display: devOpsOrderInfo.length > 0 ? "inline" : "none"}}>
+          <div style={{marginTop: 20,}}>
+            <h4>四、运维工单信息</h4>
+          </div>
+          <div
+            style={{
+              width: '100%',
+              maxHeight: 100,
+              minHeight: 50,
+              height: devOpsOrderInfo?.length * 40 + 30,
+            }}
+          >
+            <AgGridReact
+              columnDefs={getDevOpsOrderColumn()}
+              rowData={devOpsOrderInfo}
+              {...initGridTable({
+                ref: devOpsRef,
+                height: 30,
+              })}
+            />
+          </div>
+        </div>
+
         <EditModal
           visible={visible}
           data={activeItem}
           onOk={(v) => {
             if (v) {
               const rowNode = upgradeRef.current?.getRowNode(activeItem.rowIndex);
-              rowNode?.setData({ ...activeItem, concurrent: v.concurrent });
+              rowNode?.setData({...activeItem, concurrent: v.concurrent});
               if (!leaveShow) setLeaveShow(true);
             }
             setVisible(false);
@@ -831,22 +853,22 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
       onOk={onConfirm}
       maskClosable={false}
       destroyOnClose
-      okButtonProps={{ disabled: globalState.finished }}
+      okButtonProps={{disabled: globalState.finished}}
     >
-      <Form form={form} labelCol={{ span: 6 }}>
+      <Form form={form} labelCol={{span: 6}}>
         <Form.Item label={'接口服务'} name={'api_server'}>
-          <Input disabled />
+          <Input disabled/>
         </Form.Item>
         <Form.Item label={'接口URL'} name={'api_url'}>
-          <Input disabled />
+          <Input disabled/>
         </Form.Item>
         <Form.Item
           label={'并发数'}
           name={'concurrent'}
-          rules={[{ message: '请填写并发数', required: true }]}
+          rules={[{message: '请填写并发数', required: true}]}
         >
           <InputNumber
-            style={{ width: '100%' }}
+            style={{width: '100%'}}
             min={0}
             max={999999}
             disabled={globalState.finished}

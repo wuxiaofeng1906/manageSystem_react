@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { OnlineSystemServices } from '@/services/onlineSystem';
+import {useEffect, useState} from 'react';
+import {OnlineSystemServices} from '@/services/onlineSystem';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty } from 'lodash';
+import {isEmpty} from 'lodash';
 
 export type LogType =
   | 'online_system_manage_release_basic' // 上线系统发布过程单基础信息
@@ -21,7 +21,9 @@ export default () => {
   const [basic, setBasic] = useState<any>();
   const [server, setServer] = useState<any[]>([]);
   const [api, setApi] = useState<any[]>([]);
-  const [repair, setRepair] = useState<any>({ count: 0, page: 1, page_size: 20, data: [] });
+  const [repair, setRepair] = useState<any>({count: 0, page: 1, page_size: 20, data: []});
+  // 运维工单数据
+  const [devOpsOrderInfo, setDevOpsOrderInfo] = useState<any[]>([]);
   const [serverConfirm, setServerConfirm] = useState<any[]>([]);
   const [envs, setEnvs] = useState<any[]>([]);
   const [sqlList, setSqlList] = useState<any[]>([]);
@@ -61,6 +63,14 @@ export default () => {
     const res = await OnlineSystemServices.getUpgradeInfo(data);
     setApi(res);
   };
+  // 运维工单信息
+  const getDevOpsOrderInfo = async (data: any) => {
+    const res = await OnlineSystemServices.getDevOpsOrderInfo(data);
+    // 有数据放到数组中，没数据就用空数组
+    // (Object.keys(res)).length ? setDevOpsOrderInfo([{...res}]) : setDevOpsOrderInfo([]);
+    setDevOpsOrderInfo((Object.keys(res)).length ? [{...res}] : []);
+  };
+
   const getServerConfirm = async (data: any) => {
     const res = await OnlineSystemServices.getServerConfirm(data);
     setServerConfirm(res);
@@ -98,7 +108,7 @@ export default () => {
 
   const getSelectList = async () => {
     const sqlOrder = await OnlineSystemServices.sqlOrder();
-    setSqlList(sqlOrder.map((it: any) => ({ label: it.label, value: it.label })));
+    setSqlList(sqlOrder.map((it: any) => ({label: it.label, value: it.label})));
   };
   useEffect(() => {
     if (
@@ -120,12 +130,14 @@ export default () => {
     server,
     api,
     repair,
+    devOpsOrderInfo,
     serverConfirm,
     draft,
     setDraft,
     setGlobalState,
     getReleaseInfo,
     getRepairInfo,
+    getDevOpsOrderInfo,
     getServerConfirm,
     getLogInfo,
     removeRelease,

@@ -1,16 +1,7 @@
 import React, {useImperativeHandle, useState, forwardRef, useEffect, useMemo} from 'react';
 import {
-  Table,
-  Switch,
-  Spin,
-  Modal,
-  Checkbox,
-  Select,
-  Form,
-  DatePicker,
-  ModalFuncProps,
-  Button,
-  Tooltip,
+  Table, Switch, Spin, Modal, Checkbox, Select,
+  Form, DatePicker, ModalFuncProps, Button, Tooltip, Input
 } from 'antd';
 import {
   AutoCheckType,
@@ -21,13 +12,16 @@ import {
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
 import {isEmpty, omit, delay, isString, uniq} from 'lodash';
-import {infoMessage} from '@/publicMethods/showMessages';
+import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
 import moment from 'moment';
 import {useLocation, useModel, history, useParams} from 'umi';
 import {ICheckType, OnlineSystemServices} from '@/services/onlineSystem';
 import dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import usePermission from '@/hooks/permission';
+
+const {TextArea} = Input;
+
 
 const Check = (props: any, ref: any) => {
   let timer: any;
@@ -40,6 +34,7 @@ const Check = (props: any, ref: any) => {
     online.setGlobalState,
     online.basic,
   ]);
+
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [dutyPerson, setDutyPerson] = useState<any>();
@@ -55,11 +50,21 @@ const Check = (props: any, ref: any) => {
       open_time: '',
       log: '',
       contact: '',
+      check_person: '',
+      desc: ""
     })),
   );
+  // 检查参数设置是否可见
   const [show, setShow] = useState<{ visible: boolean; data: any }>({
     visible: false,
     data: null,
+  });
+
+  // 是否启用关闭说明弹窗是否可见
+  const [descShow, setDescShow] = useState<{ visible: boolean; data: any; param: any }>({
+    visible: false,
+    data: null,
+    param: null
   });
 
   useImperativeHandle(
@@ -78,6 +83,7 @@ const Check = (props: any, ref: any) => {
   );
 
   const onCheck = async () => {
+
     if (isEmpty(selected)) return infoMessage('请先选择检查项！');
     // [前端、后端代码遗漏]检查 判断是否设置检查参数
     // if (selected.some((key) => key.includes('version_data'))) {
@@ -194,6 +200,7 @@ const Check = (props: any, ref: any) => {
               }
             }
           }
+
           return {
             ...it,
             disabled: false,
@@ -205,6 +212,9 @@ const Check = (props: any, ref: any) => {
             open_time: currentKey?.[it.open_time] || '',
             log: currentKey?.[it.log] || '',
             source: currentKey?.data_from || it.source,
+            contact: orignDuty?.[it.contact] || '',
+            check_person: currentKey?.[it.check_person] || '',
+            desc: currentKey?.[it.desc] || '',
           };
         });
         if (refresh) {
@@ -234,18 +244,28 @@ const Check = (props: any, ref: any) => {
     }
   };
 
-  const updateStatus = async (data: any) => {
+  const updateStatus = async (index: number, e: boolean, record: any) => {
+
+    list[index].disabled = true;
+    setList([...list]);
+    if (!e) {
+      setSelected(selected.filter((it) => it != record.rowKey));
+    }
+
     await OnlineSystemServices.checkOpts(
       {
         user_id: user?.userid ?? '',
         release_num,
-        is_ignore: data.open ? 'no' : 'yes',
-        side: data.side,
+        is_ignore: e ? 'no' : 'yes',
+        side: record.side,
+        remark: record.desc
       },
-      data.api_url,
+      record.api_url,
     );
-    timer && clearInterval(timer);
-    delay(init, 500);
+    setDescShow({visible: false, data: null, param: null})
+    if (e) {
+      infoMessage('任务正在执行中，请稍后刷新查看');
+    } else delay(init, 500);
   };
 
   const showLog = (v: any, data: any) => {
@@ -433,8 +453,14 @@ const Check = (props: any, ref: any) => {
               },
             },
             {
+              title: '检查人',
+              dataIndex: 'check_person',
+              width: 100,
               align: 'center',
+            },
+            {
               title: '检查开始时间',
+              align: 'center',
               dataIndex: 'start',
               width: 180,
               render: (v, record) =>
@@ -447,8 +473,8 @@ const Check = (props: any, ref: any) => {
                 ),
             },
             {
-              align: 'center',
               title: '检查结束时间',
+              align: 'center',
               dataIndex: 'end',
               width: 180,
               render: (v, record) =>
@@ -472,12 +498,16 @@ const Check = (props: any, ref: any) => {
                   disabled={hasEdit || record.disabled}
                   checked={v}
                   onChange={(e) => {
-                    list[index].disabled = true;
-                    setList([...list]);
-                    if (!e) {
-                      setSelected(selected.filter((it) => it != record.rowKey));
-                    }
-                    updateStatus({...record, open: e});
+                    // 开启变成忽略时需要弹出说明框写说明
+                    if (!e) return setDescShow({visible: true, data: record, param: {index, e}});
+
+                    // list[index].disabled = true;
+                    // setList([...list]);
+                    // if (!e) {
+                    //   setSelected(selected.filter((it) => it != record.rowKey));
+                    // }
+                    // 忽略变成开启不需要写说明
+                    updateStatus(index, e, record);
                   }}
                 />
               ),
@@ -513,6 +543,12 @@ const Check = (props: any, ref: any) => {
                 />
               ),
             },
+            {
+              title: '说明',
+              dataIndex: 'desc',
+              width: 100,
+              align: 'left',
+            },
           ]}
           dataSource={list}
           pagination={false}
@@ -532,6 +568,17 @@ const Check = (props: any, ref: any) => {
                 record.rowKey == 'auto_obj_data', // 升级前自动化检查
             }),
           }}
+          onRow={(row, index) => {
+            // 历史记录不能再被编辑
+            if (!(hasEdit || row.disabled)) {
+              return {
+                onDoubleClick: () => {
+                  setDescShow({visible: true, data: row, param: {index, e: row.open}});
+                }
+              }
+            }
+            return {};
+          }}
         />
         <CheckSettingModal
           init={show}
@@ -546,12 +593,21 @@ const Check = (props: any, ref: any) => {
             setShow({visible: false, data: null});
           }}
         />
+
+        {/* 说明弹窗 */}
+        <OpenDescModal init={descShow}
+                       onCancel={async () => setDescShow({visible: false, data: null, param: null})}
+                       onOk={updateStatus}
+
+        />
+
       </div>
     </Spin>
   );
 };
 export default forwardRef(Check);
 
+// 检查参数弹窗
 const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
   const [form] = Form.useForm();
   const [getLogInfo] = useModel('onlineSystem', (online) => [online.getLogInfo]);
@@ -672,3 +728,59 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
     </Modal>
   );
 };
+
+// 忽略说明弹窗
+const OpenDescModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
+  const [form] = Form.useForm();
+
+  // 确定忽略
+  const onConfirm = () => {
+    const values = form.getFieldValue("ignoreDesc");
+    if (isEmpty(values.trim())) {
+      errorMessage("忽略说明不能为空！");
+      return;
+    }
+
+    const params: any = props?.init;
+    // 执行 updateStatus 进行状态更新
+    props?.onOk?.(params.param.index, params.param.e, {...params.data, desc: values});
+  };
+
+  useEffect(() => {
+    if (!props.init.visible) return form.resetFields();
+    form.setFieldsValue({
+      ignoreDesc: props.init?.data?.desc
+    });
+
+  }, [props.init.visible]);
+
+
+  return (
+    <Modal
+      {...props}
+      centered
+      destroyOnClose
+      maskClosable={false}
+      title={'是否启用忽略说明'}
+      onCancel={() => props?.onCancel?.()}
+      visible={props.init?.visible}
+      footer={[
+        <Button onClick={() => props.onCancel?.()}>取消</Button>,
+        <Button type={'primary'} onClick={onConfirm}>
+          确定
+        </Button>,
+      ]}
+    >
+      <Form form={form}>
+        <Form.Item
+          label={'忽略说明'}
+          name={'ignoreDesc'}
+          rules={[{message: '忽略说明不能为空！', required: true}]}
+        >
+          <TextArea rows={4}/>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
+

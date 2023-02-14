@@ -24,9 +24,10 @@ const {TextArea} = Input;
 
 
 const Check = (props: any, ref: any) => {
-  const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
-  const {release_num} = useParams() as { release_num: string };
-  const {onlineSystemPermission} = usePermission();
+  let timer: any;
+  const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
+  const { release_num } = useParams() as { release_num: string };
+  const { onlineSystemPermission } = usePermission();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [globalState, setGlobalState, basic] = useModel('onlineSystem', (online) => [
     online.globalState,
@@ -72,8 +73,11 @@ const Check = (props: any, ref: any) => {
       onCheck,
       onLock,
       onPushCheckFailMsg,
-      onRefreshCheck: () => init(true),
-      onSetting: () => setShow({visible: true, data: release_num}),
+      onRefreshCheck: () => {
+        timer && clearInterval(timer);
+        init(true);
+      },
+      onSetting: () => setShow({ visible: true, data: release_num }),
     }),
     [selected, ref, globalState, basic, list, subTab, tab],
   );
@@ -147,58 +151,54 @@ const Check = (props: any, ref: any) => {
   };
 
   const init = async (isFresh = false, showLoading = true) => {
-    const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
-    const to = from.endOf('w');
-
-    const range = {
-      start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
-      end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
-    };
     setSpin(showLoading);
     setSelected([]);
+    let autoCheck: string[] = [];
+    let orignDuty = dutyPerson;
+    let formatCheckInfo: any[] = [];
     try {
       if (isFresh) {
         // 忽略 不用跑检查
-        const autoCheck = list.flatMap((it) =>
-          ['zt-check-list', 'test-unit'].includes(it.api_url) && it.open ? [it.api_url] : [],
+        autoCheck = list.flatMap((it) =>
+          ['check_list_data', 'backend_test_unit', 'story_data'].includes(it.rowKey) && it.open
+            ? [it.api_url]
+            : [],
         );
-        if (!isEmpty(uniq(autoCheck))) {
-          await Promise.all(
-            uniq(autoCheck).map((type) =>
-              OnlineSystemServices.checkOpts(
-                {release_num, user_id: user?.userid, api_url: type},
-                type as ICheckType,
-              ),
-            ),
-          );
-        }
       }
-      let orignDuty = dutyPerson;
-      // 存在值班人员为空
-      const refresh = (isEmpty(orignDuty) && count < 2) || isFresh;
-      const [checkItem, firstDuty] = await Promise.all([
-        OnlineSystemServices.getCheckInfo({release_num}),
-        refresh ? DutyListServices.getFirstDutyPerson(range) : null,
-      ]);
-      if (refresh) {
-        const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
-        duty?.forEach((it: any) => {
-          orignDuty = {...orignDuty, [it.user_tech]: it.user_name};
-        });
-        setDutyPerson(orignDuty);
-        setCount(++count);
-      }
-      setList(
-        checkInfo.map((it) => {
-          // checkItem 是从服务端获取的具体数据
+      Promise.all(
+        uniq(autoCheck).map((type) =>
+          OnlineSystemServices.checkOpts(
+            { release_num, user_id: user?.userid, api_url: type },
+            type as ICheckType,
+          ),
+        ),
+      ).finally(async () => {
+        // 存在值班人员为空
+        const refresh = isEmpty(orignDuty) && count < 2;
+        const checkItem = await OnlineSystemServices.getCheckInfo({ release_num });
+        formatCheckInfo = checkInfo.map((it) => {
           const currentKey = checkItem[it.rowKey];
+          //升级前自动化检查是否通过 的状态要特殊处理
           const flag = it.rowKey == 'auto_obj_data';
           let status = 'skip';
           if (flag) {
-            status = isEmpty(currentKey)
-              ? ''
-              : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
-              ?.check_result || 'yes';
+            if (isEmpty(currentKey)) {
+              status = '';
+            } else {
+              //  如果包含wait就显示未开始（优先级最高），如果包含no就显示不通过(优先级第二)（yes和skip优先级一样）
+              for (let i = 0; i < currentKey.length; i++) {
+                const rowStatus = currentKey[i].check_result;
+                if (rowStatus === "wait") {
+                  status = rowStatus;
+                  break;
+                } else if (rowStatus === "no") {
+                  status = rowStatus;
+                  break;
+                } else {
+                  status = rowStatus;
+                }
+              }
+            }
           }
 
           return {
@@ -216,9 +216,28 @@ const Check = (props: any, ref: any) => {
             check_person: currentKey?.[it.check_person] || '',
             desc: currentKey?.[it.desc] || '',
           };
-        }),
-      );
-      setSpin(false);
+        });
+        if (refresh) {
+          // 获取当前检查周日期 默认为当周
+          const currentTime =
+            formatCheckInfo.find((it: any) => it?.start && it.start != '-')?.start || dayjs();
+          const from = dayjs(currentTime).subtract(1, 'd').startOf('w').subtract(0, 'w');
+          const to = from.endOf('w');
+          const range = {
+            start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
+            end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
+          };
+          const firstDuty = await DutyListServices.getFirstDutyPerson(range);
+          const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
+          duty?.forEach((it: any) => {
+            orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
+          });
+          setDutyPerson(orignDuty);
+          setCount(++count);
+        }
+        setList(formatCheckInfo?.map((it) => ({ ...it, contact: orignDuty?.[it.contact] || '' })));
+        setSpin(false);
+      });
     } catch (e) {
       console.log(e);
       setSpin(false);
@@ -334,24 +353,28 @@ const Check = (props: any, ref: any) => {
   };
 
   useEffect(() => {
-    let timer: any;
     if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
       isEmpty(dutyPerson) && init();
-      timer = setInterval(() => {
-        init(false, false);
-      }, 15000);
-      if ((globalState.locked || globalState.finished) && timer) {
-        clearInterval(timer);
-      }
     } else {
       setDutyPerson(undefined);
       setCount(0);
     }
+  }, [subTab, tab, release_num, globalState, dutyPerson]);
+
+  useEffect(() => {
+    if (globalState.locked || globalState.finished || !(subTab == 'check' && tab == 'process')) {
+      clearInterval(timer);
+    } else {
+      Modal?.destroyAll?.();
+      timer = setInterval(() => {
+        init(false, false);
+      }, 15000);
+    }
     return () => {
       clearInterval(timer);
     };
-  }, [subTab, tab, release_num, globalState, dutyPerson]);
+  }, [JSON.stringify(list), subTab, tab, globalState]);
 
   const hasEdit = useMemo(
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,

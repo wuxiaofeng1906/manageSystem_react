@@ -369,7 +369,7 @@ export const onLog = (props: ModalFuncProps & { log: string; noData: string }) =
   if (isEmpty(props.log)) return infoMessage(props.noData || '暂无日志！');
   Modal.info({
     centered: true,
-    width: props.width || 700,
+    width: props.width || 1000,
     okText: props.okText || '取消',
     title: props.title,
     content: (

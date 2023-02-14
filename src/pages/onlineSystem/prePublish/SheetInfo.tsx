@@ -19,6 +19,7 @@ import {
   Modal,
   InputNumber,
   ModalFuncProps,
+  Cascader,
 } from 'antd';
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
@@ -41,15 +42,16 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
-import {isEmpty, omit, isString, pick} from 'lodash';
-import {InfoCircleOutlined} from '@ant-design/icons';
-import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
+import { isEmpty, omit, isString, pick, chunk, isEqual } from 'lodash';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 
 let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
 let agBatch: any[] = [];
+let databaseVersion: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
@@ -88,7 +90,11 @@ const SheetInfo = (props: any, ref: any) => {
   // 运维工单信息
   const devOpsRef = useRef<GridApi>();
 
-  useImperativeHandle(ref, () => ({onSave}), [release_num, upgradeData, deployments]);
+  useImperativeHandle(ref, () => ({ onSave: onSaveBeforeCheck }), [
+    release_num,
+    upgradeData,
+    deployments,
+  ]);
 
   const onSave = async (flag = false) => {
     if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
@@ -141,9 +147,12 @@ const SheetInfo = (props: any, ref: any) => {
           ? release_app?.[0]?.cluster
           : release_app?.[0]?.cluster?.join(','),
         database_version: release_app?.[0]?.database_version ?? '',
-        sql_action_time: sqlValues?.sql_action_time || '',
         batch: release_app?.[0]?.batch ?? '',
-        sql_order: release_app?.[0]?.sql_order ?? '',
+        sql_order:
+          release_app?.[0]?.sql_order?.map(([sql_order, sql_action_time]: string[]) => ({
+            sql_order,
+            sql_action_time,
+          })) ?? [],
       },
     });
     setLeaveShow(false);
@@ -224,8 +233,10 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const getBaseList = async () => {
-    const batch = await OnlineSystemServices.getBatchVersion({release_num});
-    agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
+    const database = await OnlineSystemServices.databaseVersion();
+    databaseVersion = database?.map((it: string) => ({ label: it, value: it }));
+    const batch = await OnlineSystemServices.getBatchVersion({ release_num });
+    agBatch = batch?.map((it: string) => ({ label: it, value: it })) ?? [];
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
     const deployIds = await OnlineSystemServices.deployments({release_num});
@@ -264,9 +275,9 @@ const SheetInfo = (props: any, ref: any) => {
     if (base.need_auto == 'no') ignore.push('auto_env');
 
     let valid = false;
-    const isSuccess = order.release_result == 'success';
-    const checkObj = omit({...order, ...base}, ignore);
-    let showErrTip: any = '';
+    const checkResult = !['failure', 'draft'].includes(order.release_result);
+    const checkObj = omit({ ...order, ...base }, ignore);
+    let showErrTip = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -283,8 +294,8 @@ const SheetInfo = (props: any, ref: any) => {
       clear_cache: '请填写是否清理应用缓存',
     };
 
-    // 发布成功-> 数据完整性校验
-    if (isSuccess) {
+    // 发布成功、unknown-> 数据完整性校验
+    if (checkResult) {
       // 基础信息
       valid = Object.values(checkObj).some((it) => isEmpty(it));
       if (valid) {
@@ -338,7 +349,7 @@ const SheetInfo = (props: any, ref: any) => {
               if (result == 'draft') {
                 await OnlineSystemServices.removeOrder({release_num, user_id: user?.userid});
                 await getDetail();
-              } else await onSave(true); // 取消发布
+              } else await onSave(true); // 发布失败
               setConfirmDisabled(false);
             } catch (e) {
               setConfirmDisabled(false);
@@ -439,17 +450,48 @@ const SheetInfo = (props: any, ref: any) => {
   ]);
 
   const renderSelect = (p: CellClickedEvent) => {
-    const field = p.column.colId;
+    const field = p.column.colId as string;
+    if (field == 'sql_order')
+      return (
+        <Cascader
+          multiple={true}
+          size={'small'}
+          style={{ width: '100%' }}
+          disabled={agFinished}
+          expandTrigger="hover"
+          allowClear={false}
+          value={isEmpty(p.value) ? [] : p.value}
+          displayRender={(labels: string[], selectedOptions: any[]) =>
+            labels?.map((label, i) => (
+              <span key={selectedOptions[i]?.value}>
+                {i === labels.length - 1 ? `(${label})` : label}
+              </span>
+            ))
+          }
+          options={(agSql || sqlList)?.map((it) => ({
+            ...it,
+            children: Object.entries(OrderExecutionBy)?.map(([k, v]) => ({
+              label: v,
+              value: k,
+              key: v,
+            })),
+          }))}
+          onChange={(v) => {
+            updateFieldValue(p, v);
+            if (!leaveShow) setLeaveShow(true);
+          }}
+        />
+      );
     return (
       <Select
         size={'small'}
         value={isEmpty(p.value) ? undefined : p.value}
         style={{width: '100%'}}
         disabled={agFinished}
-        allowClear={['batch', 'sql_order'].includes(field)}
+        allowClear={['batch', 'database_version'].includes(field)}
         options={
-          field == 'sql_order'
-            ? agSql || sqlList
+          field == 'database_version'
+            ? databaseVersion
             : field == 'batch'
             ? agBatch
             : Object.keys(WhetherOrNot)?.map((k) => ({
@@ -458,42 +500,7 @@ const SheetInfo = (props: any, ref: any) => {
             }))
         }
         onChange={(v) => {
-          let flag = field == 'sql_order' && !isEmpty(v);
-          if (flag) {
-            sqlForm.resetFields();
-            Modal.confirm({
-              centered: true,
-              title: 'SQL工单执行时间填写',
-              okText: '确认',
-              cancelText: '取消',
-              content: (
-                <Form form={sqlForm}>
-                  <Form.Item
-                    name={'sql_action_time'}
-                    label={'SQL工单执行时间'}
-                    rules={[{message: '请填写SQL工单执行顺序', required: true}]}
-                  >
-                    <Select
-                      style={{width: '100%'}}
-                      options={Object.entries(OrderExecutionBy)?.map(([k, v]) => ({
-                        label: v,
-                        value: k,
-                      }))}
-                    />
-                  </Form.Item>
-                </Form>
-              ),
-              onOk: async () => {
-                await sqlForm.validateFields();
-                updateFieldValue(p, v);
-              },
-              onCancel: () => {
-                updateFieldValue(p, undefined);
-              },
-            });
-          } else {
-            updateFieldValue(p, v);
-          }
+          updateFieldValue(p, v);
           if (!leaveShow) setLeaveShow(true);
         }}
       />
@@ -701,8 +708,22 @@ const SheetInfo = (props: any, ref: any) => {
         }}>
           <AgGridReact
             columnDefs={computedServer}
-            rowData={isEmpty(upgradeData?.release_app) ? [] : [upgradeData?.release_app]}
-            {...initGridTable({ref: serverRef, height: 30})}
+            rowData={
+              isEmpty(upgradeData?.release_app)
+                ? []
+                : [
+                    {
+                      ...upgradeData?.release_app,
+                      sql_order: isEmpty(upgradeData?.release_app?.sql_order)
+                        ? []
+                        : upgradeData?.release_app?.sql_order?.map((it: any) => [
+                            it.sql_order,
+                            it.sql_action_time,
+                          ]),
+                    },
+                  ]
+            }
+            {...initGridTable({ ref: serverRef, height: 30 })}
             frameworkComponents={{
               select: renderSelect,
               ICluster: (p: any) => <ICluster data={p.value}/>,

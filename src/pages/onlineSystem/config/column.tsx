@@ -343,12 +343,12 @@ export const repairColumn: (ColDef | ColGroupDef)[] = [
     pinned: 'left',
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
-  {headerName: '数据修复内容', field: 'title', tooltipField: 'title'},
-  {headerName: '涉及租户', field: 'tenant', minWidth: 100, maxWidth: 100},
-  {headerName: '类型', field: 'recovery_type', minWidth: 100, maxWidth: 100},
-  {headerName: '修复提交人', field: 'author', minWidth: 110, maxWidth: 110},
-  {headerName: '分支', field: 'branch', minWidth: 110, maxWidth: 180},
-  {headerName: 'sql详情', field: 'sql_detail', width: 90, maxWidth: 100, cellRenderer: 'log'},
+  { headerName: '数据修复内容', field: 'title', tooltipField: 'title' },
+  { headerName: '涉及租户', field: 'tenant', minWidth: 100, maxWidth: 100 },
+  { headerName: '类型', field: 'recovery_type', minWidth: 100, maxWidth: 100 },
+  { headerName: '修复提交人', field: 'author', minWidth: 110, maxWidth: 110,hide:true },
+  { headerName: '分支', field: 'branch', minWidth: 110, maxWidth: 180 },
+  { headerName: 'sql详情', field: 'sql_detail', width: 90, maxWidth: 100, cellRenderer: 'log' },
 ];
 export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   {
@@ -406,6 +406,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       hide: keepServer,
       autoHeight: true,
       wrapText: true,
+      cellRenderer: 'select',
     },
     {
       headerName: '数据Recovery',
@@ -445,7 +446,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
     {
       headerName: 'SQL工单',
       field: 'sql_order',
-      minWidth: 130,
+      minWidth: 220,
       cellRenderer: 'select',
       hide: keepServer,
       autoHeight: true,

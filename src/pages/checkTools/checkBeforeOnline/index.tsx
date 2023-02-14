@@ -496,7 +496,6 @@ const JenkinsCheck: React.FC<any> = () => {
       user_id: currentUser.user_id,
       job_parm: params,
     };
-
     setLoadSate(true);
     // axios.post('/api/verify/job/build', datas).then(async function (res) {
     axios

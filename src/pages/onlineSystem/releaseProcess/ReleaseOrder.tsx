@@ -3,8 +3,8 @@ import {
   Form, Select, DatePicker, Button, Input, Col,
   Spin, Divider, Modal, Checkbox, Row,
 } from 'antd';
-import {InfoCircleOutlined} from '@ant-design/icons';
-import {AgGridReact} from 'ag-grid-react';
+import { InfoCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { AgGridReact } from 'ag-grid-react';
 import {
   historyCompareColumn, historyOrderColumn,
 } from '@/pages/onlineSystem/releaseProcess/column';
@@ -245,7 +245,8 @@ const ReleaseOrder = () => {
     const result = order.release_result;
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
 
-    const checkObj = omit({...order, ...base}, ['release_result']);
+    const checkObj = omit({ ...order, ...base }, ['release_result']);
+    let errMsg = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -258,13 +259,14 @@ const ReleaseOrder = () => {
 
     if (valid) {
       const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
-      infoMessage(errTip[errArr?.[0]]);
-      orderForm.setFieldsValue({release_result: null});
-      return;
+      errMsg = errTip[errArr?.[0]];
     }
     if (isEmpty(base.release_name?.trim())) {
-      orderForm.setFieldsValue({release_result: null});
-      return infoMessage(errTip.release_name);
+      errMsg = errTip.release_name;
+    }
+    if (!['failure', 'cancel'].includes(result) && errMsg) {
+      orderForm.setFieldsValue({ release_result: null });
+      return infoMessage(errMsg);
     }
     // 发布结果为空，直接保存
     if (isEmpty(result) || result == 'unknown') {
@@ -414,6 +416,28 @@ const ReleaseOrder = () => {
           rd_repair_data: rd ?? [],
         });
         getOrderDetail();
+      },
+    });
+  };
+  const onIgnore = (p: any) => {
+    if (agFinished) {
+      return infoMessage('已标记发布结果不能忽略积压工单!');
+    }
+    Modal.confirm({
+      centered: true,
+      title: '忽略积压工单',
+      content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
+      okButtonProps: { disabled: confirmDisabled },
+      onOk: async () => {
+        setConfirmDisabled(true);
+        const result =
+          gridRef.current
+            ?.getRenderedNodes()
+            ?.map((it) => it.data)
+            ?.filter((obj) => !isEqual(obj, p.data)) || [];
+        await formatCompare(compareData?.opsData || [], result);
+        setOrderData(result);
+        setConfirmDisabled(false);
       },
     });
   };
@@ -609,7 +633,7 @@ const ReleaseOrder = () => {
                       {p.data.ready_release_name}
                     </div>
                   ),
-                  deleteOrder: (p: CellClickedEvent) => (
+                  operations: (p: CellClickedEvent) => (
                     <Fragment>
                       {hasPermission.delete ? (
                         <img
@@ -623,6 +647,17 @@ const ReleaseOrder = () => {
                       ) : (
                         <div/>
                       )}
+                      <StopOutlined
+                        title={'忽略本次积压工单'}
+                        style={{
+                          color: '#86a8cf',
+                          marginRight: 10,
+                          cursor: 'pointer',
+                          fontSize: 18,
+                          verticalAlign: 'middle',
+                        }}
+                        onClick={() => onIgnore(p)}
+                      />
                       {DragIcon(p)}
                     </Fragment>
                   ),
@@ -630,7 +665,7 @@ const ReleaseOrder = () => {
               />
             </div>
           </FieldSet>
-          <Divider plain>
+          <Divider plain style={{ margin: '6px 0' }}>
             <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>
           </Divider>
           <div className={styles.orderTag}>

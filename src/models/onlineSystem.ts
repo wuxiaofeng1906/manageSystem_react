@@ -39,7 +39,6 @@ export default () => {
         getUpgradeInfo(data),
         getRepairInfo(data),
         getServerConfirm(data),
-        getDevOpsOrderInfo(data)
       ]);
     }
   };

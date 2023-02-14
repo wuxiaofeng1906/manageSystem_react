@@ -59,7 +59,7 @@ const SheetInfo = (props: any, ref: any) => {
   const [envs] = useModel('env', (env) => [env.globalEnv]);
   const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft,] = useModel('onlineSystem', (online) => [
     online.globalState, online.sqlList, online.draft, online.setGlobalState, online.getLogInfo, online.setDraft,]);
-  const {devOpsOrderInfo} = useModel('onlineSystem');
+  const {devOpsOrderInfo, getDevOpsOrderInfo} = useModel('onlineSystem');
 
 
   const [spinning, setSpinning] = useState(false);
@@ -157,10 +157,12 @@ const SheetInfo = (props: any, ref: any) => {
     if (!leaveShow) setLeaveShow(true);
   };
 
+
   useEffect(() => {
     if (subTab == 'sheet' && tab == 'process' && release_num) {
       getBaseList();
       getDetail();
+      getDevOpsOrderInfo({release_num}); // 获取运维工单信息
     }
   }, [subTab, tab, release_num]);
 

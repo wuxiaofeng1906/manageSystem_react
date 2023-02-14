@@ -51,7 +51,7 @@ const ReleaseOrder = () => {
   const [visible, setVisible] = useState(false);
   const [clusters, setClusters] = useState<any>(); // 所有组合集群
   const [confirmDisabled, setConfirmDisabled] = useState(false);
-  const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
+  // const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -67,9 +67,9 @@ const ReleaseOrder = () => {
       getOrderDetail(clusterMap);
     });
 
-    window.onresize = function () {
-      setTableHeight((window.innerHeight - 370) / 2);
-    };
+    // window.onresize = function () {
+    //   setTableHeight((window.innerHeight - 370) / 2);
+    // };
     return () => {
       window.onresize = null;
     };
@@ -565,7 +565,11 @@ const ReleaseOrder = () => {
           <FieldSet data={{title: '工单-表单设置'}}>
             <div
               className="ag-theme-alpine"
-              style={{height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8}}
+              style={{
+                height: orderData === undefined ? 100 : (orderData.length) * 28 + 50,
+                width: '100%',
+                marginTop: 8
+              }}
             >
               <AgGridReact
                 columnDefs={historyOrderColumn}
@@ -585,7 +589,7 @@ const ReleaseOrder = () => {
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 frameworkComponents={{
-                  ICluster: (p) => <ICluster data={p.value}/>,
+                  ICluster: (p: any) => <ICluster data={p.value}/>,
                   link: (p: CellClickedEvent) => (
                     <div
                       style={{
@@ -637,7 +641,11 @@ const ReleaseOrder = () => {
           </div>
           <div
             className="ag-theme-alpine"
-            style={{height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8}}
+            style={{
+              height: compareData?.alpha === undefined ? 100 : (compareData?.alpha)?.length * 28 + 50,
+              width: '100%',
+              marginTop: 8
+            }}
           >
             <AgGridReact
               columnDefs={historyCompareColumn}
@@ -659,7 +667,7 @@ const ReleaseOrder = () => {
 
           {/* 运维工单信息 */}
           <div style={{display: devOpsOrderInfo.length ? "inline" : "none"}}>
-            <h4> 运维工单信息 </h4>
+            <h4 style={{marginTop: 20}}> 运维工单信息 </h4>
             <div
               className="ag-theme-alpine"
               style={{height: 100, width: '100%', marginTop: 8}}>

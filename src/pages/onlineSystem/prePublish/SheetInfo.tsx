@@ -64,7 +64,7 @@ const SheetInfo = (props: any, ref: any) => {
 
   const [spinning, setSpinning] = useState(false);
   const [confirmDisabled, setConfirmDisabled] = useState(false);
-  const [tableHeight, setTableHeight] = useState((window.innerHeight - 460) / 2);
+  // const [tableHeight, setTableHeight] = useState((window.innerHeight - 460) / 2);
   const [baseForm] = Form.useForm(); // 工单基础
   const [orderForm] = Form.useForm();
   const [sqlForm] = Form.useForm();
@@ -266,7 +266,7 @@ const SheetInfo = (props: any, ref: any) => {
     let valid = false;
     const isSuccess = order.release_result == 'success';
     const checkObj = omit({...order, ...base}, ignore);
-    let showErrTip = '';
+    let showErrTip: any = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -409,7 +409,7 @@ const SheetInfo = (props: any, ref: any) => {
   const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
 
   useEffect(() => {
-    const listener = (ev) => {
+    const listener = (ev: any) => {
       ev.preventDefault();
       ev.returnValue = '离开提示';
     };
@@ -426,9 +426,9 @@ const SheetInfo = (props: any, ref: any) => {
       window.onresize = null;
       return;
     }
-    window.onresize = function () {
-      setTableHeight((window.innerHeight - 460) / 2);
-    };
+    // window.onresize = function () {
+    //   setTableHeight((window.innerHeight - 460) / 2);
+    // };
     return () => {
       window.onresize = null;
     };
@@ -695,14 +695,17 @@ const SheetInfo = (props: any, ref: any) => {
           </Col>
         </Form>
         <h4 style={{margin: '16px 0'}}>二、发布服务</h4>
-        <div style={{height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8}}>
+        <div style={{
+          height: isEmpty(upgradeData?.release_app) ? 100 : (upgradeData?.release_app).length * 28 + 50,
+          width: '100%', marginTop: 8
+        }}>
           <AgGridReact
             columnDefs={computedServer}
             rowData={isEmpty(upgradeData?.release_app) ? [] : [upgradeData?.release_app]}
             {...initGridTable({ref: serverRef, height: 30})}
             frameworkComponents={{
               select: renderSelect,
-              ICluster: (p) => <ICluster data={p.value}/>,
+              ICluster: (p: any) => <ICluster data={p.value}/>,
             }}
           />
         </div>
@@ -721,7 +724,10 @@ const SheetInfo = (props: any, ref: any) => {
                 onClick={showLog}
               />
             </h4>
-            <div style={{height: tableHeight > 180 ? tableHeight : 180, width: '100%'}}>
+            <div style={{
+              height: upgradeData?.upgrade_api === undefined ? 100 : (upgradeData?.upgrade_api)?.length * 28 + 50,
+              width: '100%'
+            }}>
               <AgGridReact
                 rowDragManaged={!finished}
                 animateRows={true}
@@ -755,7 +761,7 @@ const SheetInfo = (props: any, ref: any) => {
         )}
 
         <div style={{display: devOpsOrderInfo.length > 0 ? "inline" : "none"}}>
-          <div>
+          <div style={{marginTop: 20,}}>
             <h4>四、运维工单信息</h4>
           </div>
           <div

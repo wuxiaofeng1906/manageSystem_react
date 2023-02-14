@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col,
+  Button, Form, Input, Row, Col, Modal,
   Radio, Tabs, Divider, Layout
 } from 'antd';
 import {useParams} from "umi";
@@ -15,9 +15,11 @@ const {TabPane} = Tabs;
 const PopupCard: React.FC<any> = (props: any) => {
   const [dtForm] = Form.useForm();
   const {isCarousel, count} = useParams() as { isCarousel: string; count: string };
+  const [picModalState, setPicModalState] = useState({
+    visible: false
+  });
 
   const onFinish = (values: any) => {
-    debugger;
     console.log('Received values of form:', values);
   };
 
@@ -194,6 +196,14 @@ const PopupCard: React.FC<any> = (props: any) => {
 
         </div>
       </div>
+
+      {/* 图片上传弹出框 */}
+      <Modal title="上传图片" visible={picModalState.visible}
+             onOk={() => setPicModalState({visible: false})}
+             onCancel={() => setPicModalState({visible: false})}>
+        <p>图片上传弹出框</p>
+
+      </Modal>
     </PageContainer>
   );
 };

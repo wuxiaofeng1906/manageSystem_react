@@ -30,7 +30,7 @@ const Index = () => {
   const updateKey = (key?: string) =>
     history.replace({ pathname: history.location.pathname, query: { key: key ?? 'pre' } });
 
-  console.log("测试git上传")
+  // console.log("测试git上传")
 
   return (
     <PageContainer>

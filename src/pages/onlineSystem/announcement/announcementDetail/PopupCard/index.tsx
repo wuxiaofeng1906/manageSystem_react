@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal,
+  Button, Form, Input, Row, Col, Modal, Upload, Image,
   Radio, Tabs, Divider, Layout
 } from 'antd';
 import {useParams} from "umi";
-// import {isEmpty} from "lodash";
 import {history} from "@@/core/history";
 import style from '../style.less';
-import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined} from '@ant-design/icons';
+import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
+import type {UploadFile} from 'antd/es/upload/interface';
+
 
 const {Footer} = Layout;
 const {TabPane} = Tabs;
@@ -60,6 +61,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     });
 
   }, []);
+
+
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -93,7 +96,8 @@ const PopupCard: React.FC<any> = (props: any) => {
             </Row>
 
             <Form.Item label={"上传图片"} name={"uploadPic"}>
-              <Button type="default" icon={<UploadOutlined/>} style={{color: "#1890FF", border: "none"}}>
+              <Button type="default" icon={<UploadOutlined/>} style={{color: "#1890FF", border: "none"}}
+                      onClick={() => setPicModalState({visible: true})}>
                 选择/上传
               </Button>
             </Form.Item>
@@ -198,10 +202,55 @@ const PopupCard: React.FC<any> = (props: any) => {
       </div>
 
       {/* 图片上传弹出框 */}
-      <Modal title="上传图片" visible={picModalState.visible}
+      <Modal title="上传图片" visible={true} centered={true} maskClosable={false}
              onOk={() => setPicModalState({visible: false})}
-             onCancel={() => setPicModalState({visible: false})}>
-        <p>图片上传弹出框</p>
+             onCancel={() => setPicModalState({visible: false})}
+             width={700}>
+        {/* title */}
+        <Row>
+          <Col span={12}>
+            <h4 style={{fontWeight: "bold"}}>选择默认图片</h4>
+          </Col>
+          <Col span={12}>
+            <h4 style={{fontWeight: "bold"}}>从本地上传</h4>
+          </Col>
+        </Row>
+        {/* 图片展示和上传 */}
+        <Row>
+
+          <Col span={12}>
+            <div>
+              <Image
+                height={150} width={'90%'}
+                src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+              />
+            </div>
+            <div style={{marginTop: 10}}>
+              <Image
+                height={150} width={'90%'}
+                src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+              />
+            </div>
+            <div style={{marginTop: 10}}>
+              <Image
+                height={150} width={'90%'}
+                src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+              />
+            </div>
+
+          </Col>
+          <Col span={12}>
+
+            <Upload
+              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              listType="picture-circle"
+
+            >
+              {fileList.length < 5 && '+ Upload'}
+            </Upload>
+
+          </Col>
+        </Row>
 
       </Modal>
     </PageContainer>

@@ -9,7 +9,7 @@ import {
   historyCompareColumn, historyOrderColumn,
 } from '@/pages/onlineSystem/releaseProcess/column';
 import {getDevOpsOrderColumn} from '@/pages/onlineSystem/config/column';
-import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
+import {CellClickedEvent, GridApi, GridReadyEvent, RowNode} from 'ag-grid-community';
 import FieldSet from '@/components/FieldSet';
 import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
@@ -28,6 +28,10 @@ import ICluster from '@/components/ICluster';
 import {pushType} from "@/pages/onlineSystem/config/constant";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
+let releateOrderInfo: any = {
+  SQL: [],
+  INTER: []
+}; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
 const ReleaseOrder = () => {
   const {id} = useParams() as { id: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -53,7 +57,6 @@ const ReleaseOrder = () => {
   const [clusters, setClusters] = useState<any>(); // 所有组合集群
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   // const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
-  const [releateOrderName, setReleateOrderName] = useState([]);
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -98,6 +101,12 @@ const ReleaseOrder = () => {
         key: it.announcement_num,
       })),
     );
+
+    /* 注意：ag-grid中，列的渲染是没法用usestate中的数据来进行动态渲染的，解决方案：需要定义一个全局变量来动态记录需要改变的数据，渲染中使用这个全局变量 */
+    releateOrderInfo.SQL = await PreReleaseServices.getRelatedInfo({order_type: "SQL"});
+    releateOrderInfo.INTER = await PreReleaseServices.getRelatedInfo({order_type: "DeployApi"});
+
+
   };
 
   const getOrderDetail = async (clusterMap = clusters) => {
@@ -456,29 +465,62 @@ const ReleaseOrder = () => {
 
   // 手动添加一行空行
   const addNewOrderRow = () => {
-    const newRow = [{addID: orderData.length + 1}];
+
+    // repair_order_type：  // 推送类型
+    // repair_order // 关联工单编号
+    // ready_release_name // 发布批次名称
+    // project // 关联项目列表
+    // repair_order_fish_time // 部署结束时间
+    // cluster // 已发布集群
+    // apps
+    // branch
+    // cluster
+    // create_time
+    // create_user
+    // plan_release_time
+    // project
+    // ready_release_name
+    // release_env
+    // release_env_type
+    // release_name
+    // release_num
+    // release_result
+    // release_sealing
+    // release_time
+    // repair_order
+    // repair_order_fish_time
+    // repair_order_type
+
+    const newRow = [{
+      addID: orderData.length + 1,
+      repair_order_type: "",
+      ready_release_name: "",
+      // repair_order: "",
+      // project: "",
+      // repair_order_fish_time: "",
+      // cluster: ""
+    }];
     setOrderData(orderData.concat(newRow));
   };
 
-  // 获取发布批次名称
-  const getReleasePatchName = async (p: any, v: any) => {
+  // 获取发布批次名称和发布批次名称选择后的保存
+  const getReleasePatchName = async (p: any, value: any, getPatchName: boolean) => {
+    // 获取表格所有的数据
 
-    const rowNode = gridRef.current?.getRowNode(String(p.rowIndex));
-    rowNode?.setData({...p.data, [p.column.colId]: v});
-    setOrderData([{...p.data, [p.column.colId]: v}])
+    const dt: any = [];
+    gridRef.current?.forEachNode((node, index) => {
+      const rowDatas = node.data;
+      // 如果是同一行，则将原数据对应的值修改为下拉框的值
+      if (p.rowIndex === index) {
+        rowDatas[p.column.colId] = value;
+      }
+      dt.push(rowDatas);
+    });
 
-
-    // console.log(orderData)
-    // debugger;
-    // const rowData = orderData[rowIndex];
-    //
-    // setOrderData(...orderData);
-    // const releateInfo = await PreReleaseServices.getRelatedInfo({order_type: pushType});
-    //
-    // console.log(releateInfo);
-    // setReleateOrderName(releateInfo);
-
+    gridRef.current?.setRowData(dt);
+    setOrderData(dt);
   };
+
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
@@ -641,38 +683,46 @@ const ReleaseOrder = () => {
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 frameworkComponents={{
-                  pushType: (p: CellClickedEvent) => {
-                    return (
-                      <Select
-                        style={{
-                          width: '100%',
-                        }}
-                        size={'small'}
-                        options={Object.keys(pushType)?.map((k) => ({
-                          value: k,
-                          label: pushType[k],
-                        }))}
-
-                        onChange={(v) => getReleasePatchName(p, v)}
-                      />
-                    );
-                  },
-                  ICluster: (p: any) => <ICluster data={p.value}/>,
-                  linkOrSelect: (p: CellClickedEvent) => {
-                    debugger;
-                    if (p.data?.repair_order_type === "DeployApi" || p.data?.repair_order_type === "SQL") {
+                  pushType: (params: CellClickedEvent) => {
+                    // debugger;
+                    // 只有是SQL工单、接口工单或者新增行时
+                    if (params.value === "DeployApi" || params.value === "SQL" || params.data?.addID) {
                       return (
                         <Select
                           style={{
                             width: '100%',
                           }}
                           size={'small'}
-                          options={releateOrderName.map((k: any) => ({
-                            value: k.id,
+                          value={params.value}
+                          options={Object.keys(pushType)?.map((k) => ({
+                            value: k,
+                            label: pushType[k],
+                          }))}
+                          onChange={(value) => getReleasePatchName(params, value, true)}
+                        />
+                      );
+                    }
+                    return params.value;
+                  },
+                  ICluster: (p: any) => <ICluster data={p.value}/>,
+                  linkOrSelect: (p: CellClickedEvent) => {
+                    if (p.data?.repair_order_type === "DeployApi" || p.data?.repair_order_type === "SQL") {
+                      const releateOrderInfos = p.data?.repair_order_type === "SQL" ? releateOrderInfo.SQL : releateOrderInfo.INTER;
+                      // 根据类型获取名称
+                      debugger;
+                      return (
+                        <Select
+                          style={{
+                            width: '100%',
+                          }}
+                          size={'small'}
+                          value={p.value}
+                          options={releateOrderInfos.map((k: any) => ({
+                            value: JSON.stringify(k.id),
                             label: k.label,
                           }))}
 
-                          // onChange={(e) => getReleasePatchName(e)}
+                          onChange={(value) => getReleasePatchName(p, value, false)}
                         />
                       );
                     }
@@ -726,14 +776,13 @@ const ReleaseOrder = () => {
                 }}
               />
             </div>
-
+            {/* 行的添加 */}
             <div>
-
               <Button type="dashed" block icon={<PlusOutlined/>} onClick={addNewOrderRow}>
                 新增一行
               </Button>
-
             </div>
+
           </FieldSet>
           <Divider plain style={{margin: '6px 0'}}>
             <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>

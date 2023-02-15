@@ -42,9 +42,9 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
-import { isEmpty, omit, isString, pick, chunk, isEqual } from 'lodash';
-import { InfoCircleOutlined } from '@ant-design/icons';
-import { ModalSuccessCheck } from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
+import {isEmpty, omit, isString, pick, chunk, isEqual} from 'lodash';
+import {InfoCircleOutlined} from '@ant-design/icons';
+import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 
@@ -90,7 +90,7 @@ const SheetInfo = (props: any, ref: any) => {
   // 运维工单信息
   const devOpsRef = useRef<GridApi>();
 
-  useImperativeHandle(ref, () => ({ onSave: onSaveBeforeCheck }), [
+  useImperativeHandle(ref, () => ({onSave: onSaveBeforeCheck}), [
     release_num,
     upgradeData,
     deployments,
@@ -234,9 +234,9 @@ const SheetInfo = (props: any, ref: any) => {
 
   const getBaseList = async () => {
     const database = await OnlineSystemServices.databaseVersion();
-    databaseVersion = database?.map((it: string) => ({ label: it, value: it }));
-    const batch = await OnlineSystemServices.getBatchVersion({ release_num });
-    agBatch = batch?.map((it: string) => ({ label: it, value: it })) ?? [];
+    databaseVersion = database?.map((it: string) => ({label: it, value: it}));
+    const batch = await OnlineSystemServices.getBatchVersion({release_num});
+    agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
     const deployIds = await OnlineSystemServices.deployments({release_num});
@@ -276,7 +276,7 @@ const SheetInfo = (props: any, ref: any) => {
 
     let valid = false;
     const checkResult = !['failure', 'draft'].includes(order.release_result);
-    const checkObj = omit({ ...order, ...base }, ignore);
+    const checkObj = omit({...order, ...base}, ignore);
     let showErrTip = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
@@ -456,7 +456,7 @@ const SheetInfo = (props: any, ref: any) => {
         <Cascader
           multiple={true}
           size={'small'}
-          style={{ width: '100%' }}
+          style={{width: '100%'}}
           disabled={agFinished}
           expandTrigger="hover"
           allowClear={false}
@@ -703,27 +703,25 @@ const SheetInfo = (props: any, ref: any) => {
         </Form>
         <h4 style={{margin: '16px 0'}}>二、发布服务</h4>
         <div style={{
-          height: isEmpty(upgradeData?.release_app) ? 100 : (upgradeData?.release_app).length * 28 + 50,
+          height: 150,
           width: '100%', marginTop: 8
         }}>
           <AgGridReact
             columnDefs={computedServer}
-            rowData={
-              isEmpty(upgradeData?.release_app)
-                ? []
-                : [
-                    {
-                      ...upgradeData?.release_app,
-                      sql_order: isEmpty(upgradeData?.release_app?.sql_order)
-                        ? []
-                        : upgradeData?.release_app?.sql_order?.map((it: any) => [
-                            it.sql_order,
-                            it.sql_action_time,
-                          ]),
-                    },
-                  ]
+            rowData={ // 发布服务 表格数据只有1行，可以定死表格高度
+              isEmpty(upgradeData?.release_app) ? [] : [
+                {
+                  ...upgradeData?.release_app,
+                  sql_order: isEmpty(upgradeData?.release_app?.sql_order)
+                    ? []
+                    : upgradeData?.release_app?.sql_order?.map((it: any) => [
+                      it.sql_order,
+                      it.sql_action_time,
+                    ]),
+                },
+              ]
             }
-            {...initGridTable({ ref: serverRef, height: 30 })}
+            {...initGridTable({ref: serverRef, height: 30})}
             frameworkComponents={{
               select: renderSelect,
               ICluster: (p: any) => <ICluster data={p.value}/>,
@@ -746,7 +744,7 @@ const SheetInfo = (props: any, ref: any) => {
               />
             </h4>
             <div style={{
-              height: upgradeData?.upgrade_api === undefined ? 100 : (upgradeData?.upgrade_api)?.length * 28 + 50,
+              height: upgradeData?.upgrade_api === undefined ? 100 : (upgradeData?.upgrade_api)?.length * 28 + 80,
               width: '100%'
             }}>
               <AgGridReact

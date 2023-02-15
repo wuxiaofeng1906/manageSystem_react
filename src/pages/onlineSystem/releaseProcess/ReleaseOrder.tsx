@@ -590,7 +590,7 @@ const ReleaseOrder = () => {
             <div
               className="ag-theme-alpine"
               style={{
-                height: orderData === undefined ? 100 : (orderData.length) * 28 + 50,
+                height: orderData === undefined ? 100 : (orderData.length) * 28 + 80,
                 width: '100%',
                 marginTop: 8
               }}
@@ -677,7 +677,7 @@ const ReleaseOrder = () => {
           <div
             className="ag-theme-alpine"
             style={{
-              height: compareData?.alpha === undefined ? 100 : (compareData?.alpha)?.length * 28 + 50,
+              height: compareData?.alpha === undefined ? 100 : (compareData?.alpha)?.length * 28 + 100,
               width: '100%',
               marginTop: 8
             }}

@@ -212,7 +212,7 @@ const Check = (props: any, ref: any) => {
             open_time: currentKey?.[it.open_time] || '',
             log: currentKey?.[it.log] || '',
             source: currentKey?.data_from || it.source,
-            contact: orignDuty?.[it.contact] || '',
+            // contact: orignDuty?.[it.contact] || '',
             check_person: currentKey?.[it.check_person] || '',
             desc: currentKey?.[it.desc] || '',
           };

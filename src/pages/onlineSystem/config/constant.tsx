@@ -48,6 +48,7 @@ export const CheckStatus = {
   unknown: {text: '未知'},
   running: {text: '执行中', color: '#1890ff'},
 };
+export const pushType = {SQL:"sql工单",DeployApi:"接口工单",}
 export const PublishStatus = {doing: '发布中', done: '发布成功', wait: '未开始'};
 export const ReleaseOrderStatus = {success: '发布成功', failure: '发布失败', unknown: '未发布'};
 export const ServerConfirmType = {

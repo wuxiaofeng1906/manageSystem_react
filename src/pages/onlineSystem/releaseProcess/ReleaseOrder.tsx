@@ -1,10 +1,10 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {
-  Form, Select, DatePicker, Button, Input, Col,
+  Form, Select, DatePicker, Button, Input, Col, Space,
   Spin, Divider, Modal, Checkbox, Row,
 } from 'antd';
-import { InfoCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { AgGridReact } from 'ag-grid-react';
+import {InfoCircleOutlined, StopOutlined, PlusOutlined} from '@ant-design/icons';
+import {AgGridReact} from 'ag-grid-react';
 import {
   historyCompareColumn, historyOrderColumn,
 } from '@/pages/onlineSystem/releaseProcess/column';
@@ -25,6 +25,7 @@ import cns from 'classnames';
 import {valueMap} from '@/utils/utils';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
+import {pushType} from "@/pages/onlineSystem/config/constant";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
@@ -52,6 +53,7 @@ const ReleaseOrder = () => {
   const [clusters, setClusters] = useState<any>(); // 所有组合集群
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   // const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
+  const [releateOrderName, setReleateOrderName] = useState([]);
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -245,7 +247,7 @@ const ReleaseOrder = () => {
     const result = order.release_result;
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
 
-    const checkObj = omit({ ...order, ...base }, ['release_result']);
+    const checkObj = omit({...order, ...base}, ['release_result']);
     let errMsg = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
@@ -265,7 +267,7 @@ const ReleaseOrder = () => {
       errMsg = errTip.release_name;
     }
     if (!['failure', 'cancel'].includes(result) && errMsg) {
-      orderForm.setFieldsValue({ release_result: null });
+      orderForm.setFieldsValue({release_result: null});
       return infoMessage(errMsg);
     }
     // 发布结果为空，直接保存
@@ -427,7 +429,7 @@ const ReleaseOrder = () => {
       centered: true,
       title: '忽略积压工单',
       content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
-      okButtonProps: { disabled: confirmDisabled },
+      okButtonProps: {disabled: confirmDisabled},
       onOk: async () => {
         setConfirmDisabled(true);
         const result =
@@ -450,6 +452,32 @@ const ReleaseOrder = () => {
     });
     setOrderData(sortArr);
     formatCompare(compareData?.opsData ?? [], sortArr);
+  };
+
+  // 手动添加一行空行
+  const addNewOrderRow = () => {
+    const newRow = [{addID: orderData.length + 1}];
+    setOrderData(orderData.concat(newRow));
+  };
+
+  // 获取发布批次名称
+  const getReleasePatchName = async (p: any, v: any) => {
+
+    const rowNode = gridRef.current?.getRowNode(String(p.rowIndex));
+    rowNode?.setData({...p.data, [p.column.colId]: v});
+    setOrderData([{...p.data, [p.column.colId]: v}])
+
+
+    // console.log(orderData)
+    // debugger;
+    // const rowData = orderData[rowIndex];
+    //
+    // setOrderData(...orderData);
+    // const releateInfo = await PreReleaseServices.getRelatedInfo({order_type: pushType});
+    //
+    // console.log(releateInfo);
+    // setReleateOrderName(releateInfo);
+
   };
 
   return (
@@ -613,9 +641,43 @@ const ReleaseOrder = () => {
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 frameworkComponents={{
+                  pushType: (p: CellClickedEvent) => {
+                    return (
+                      <Select
+                        style={{
+                          width: '100%',
+                        }}
+                        size={'small'}
+                        options={Object.keys(pushType)?.map((k) => ({
+                          value: k,
+                          label: pushType[k],
+                        }))}
+
+                        onChange={(v) => getReleasePatchName(p, v)}
+                      />
+                    );
+                  },
                   ICluster: (p: any) => <ICluster data={p.value}/>,
-                  link: (p: CellClickedEvent) => (
-                    <div
+                  linkOrSelect: (p: CellClickedEvent) => {
+                    debugger;
+                    if (p.data?.repair_order_type === "DeployApi" || p.data?.repair_order_type === "SQL") {
+                      return (
+                        <Select
+                          style={{
+                            width: '100%',
+                          }}
+                          size={'small'}
+                          options={releateOrderName.map((k: any) => ({
+                            value: k.id,
+                            label: k.label,
+                          }))}
+
+                          // onChange={(e) => getReleasePatchName(e)}
+                        />
+                      );
+                    }
+                    // 如果是SQL工单和接口工单，则显示下拉框，否则显示链接
+                    return <div
                       style={{
                         color: '#1890ff',
                         cursor: 'pointer',
@@ -632,7 +694,7 @@ const ReleaseOrder = () => {
                     >
                       {p.data.ready_release_name}
                     </div>
-                  ),
+                  },
                   operations: (p: CellClickedEvent) => (
                     <Fragment>
                       {hasPermission.delete ? (
@@ -664,8 +726,16 @@ const ReleaseOrder = () => {
                 }}
               />
             </div>
+
+            <div>
+
+              <Button type="dashed" block icon={<PlusOutlined/>} onClick={addNewOrderRow}>
+                新增一行
+              </Button>
+
+            </div>
           </FieldSet>
-          <Divider plain style={{ margin: '6px 0' }}>
+          <Divider plain style={{margin: '6px 0'}}>
             <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>
           </Divider>
           <div className={styles.orderTag}>

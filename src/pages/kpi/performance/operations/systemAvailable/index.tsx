@@ -87,7 +87,7 @@ const SystemAvailable: React.FC<any> = () => {
       data?.forEach((it: any) => {
         let data: any;
         it.datas?.forEach((o: any) => {
-          // avgusable 不再乘以100
+          // avgusable 不再乘以100（以前的需求）
           const kpi = o.depts?.kpi;
           data = {
             ...data,

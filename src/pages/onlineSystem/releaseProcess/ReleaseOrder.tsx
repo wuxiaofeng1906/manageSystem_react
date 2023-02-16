@@ -162,7 +162,14 @@ const ReleaseOrder = () => {
     }
   };
 
-  const formatCompare = async (opsOrigin: any[], rdOrigin: any[]) => {
+  // 工单信息和表单设置里面的信息做对比
+  const formatCompare = async (opsOrigin: any[], rdOriginDt: any[]) => {
+    // 手动在表单里面加的数据不进行对比。这里要进行过滤
+    let rdOrigin: any = [];
+    rdOriginDt.forEach((e: any) => {
+      if (e.repair_order_type !== "DeployApi") rdOrigin.push(e);
+    })
+
     let ops = opsOrigin;
     if (isEmpty(ops)) {
       const values = baseForm.getFieldsValue();
@@ -176,10 +183,7 @@ const ReleaseOrder = () => {
     let rdArr: any[] = [];
     const len = ops?.length > rdOrigin?.length ? ops.length : rdOrigin?.length;
 
-    Array.from(
-      {
-        length: len,
-      },
+    Array.from({length: len,},
       (it, i) => {
         const rdItem = rdOrigin[i];
         const opsItem = ops[i];
@@ -534,7 +538,6 @@ const ReleaseOrder = () => {
   // 获取发布批次名称和发布批次名称选择后的保存
   const getReleasePatchName = async (p: any, v2: any, getPatchName: boolean) => {
     // 获取表格所有的数据
-    debugger;
     const dt: any = [];
     gridRef.current?.forEachNode((node, index) => {
       const rowDatas = node.data;
@@ -548,7 +551,6 @@ const ReleaseOrder = () => {
           rowDatas["id"] = JSON.parse(v2.value)
           // id:SQL工单传整形，接口工单传数组 （SQL工单ID一直只会有一个）
           p.data?.repair_order_type === "SQL" ? rowDatas["id"] = Number(v2.value) : JSON.parse(v2.value);
-          debugger;
         }
       }
       dt.push(rowDatas);

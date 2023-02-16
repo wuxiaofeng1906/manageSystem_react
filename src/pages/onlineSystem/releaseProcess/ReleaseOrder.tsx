@@ -816,7 +816,7 @@ const ReleaseOrder = () => {
             </div>
             {/* 行的添加 */}
             <div>
-              <Button type="dashed" block icon={<PlusOutlined/>} onClick={addNewOrderRow}>
+              <Button type="dashed" block icon={<PlusOutlined/>} onClick={addNewOrderRow} disabled={finished}>
                 新增一行
               </Button>
             </div>

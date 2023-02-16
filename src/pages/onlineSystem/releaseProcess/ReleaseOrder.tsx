@@ -16,7 +16,7 @@ import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import {useModel, useParams, history} from 'umi';
-import {isEmpty, omit} from 'lodash';
+import {isEmpty, omit, isEqual} from 'lodash';
 import {infoMessage} from '@/publicMethods/showMessages';
 import moment from 'moment';
 import {PageContainer} from '@ant-design/pro-layout';
@@ -250,7 +250,6 @@ const ReleaseOrder = () => {
   };
 
   const onSaveBeforeCheck = (isAuto = false) => {
-    debugger;
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
@@ -344,6 +343,7 @@ const ReleaseOrder = () => {
       return;
     }
     if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
+
     await PreReleaseServices.saveOrder({
       release_num: id, // 发布编号
       user_id: user?.userid ?? '',
@@ -401,56 +401,84 @@ const ReleaseOrder = () => {
     }
   };
 
-  const onRemove = (data: any) => {
+  const deleteAddPatchName = (p: any) => {
+    const newDt: any = [];
+    gridRef.current?.forEachNode((node, index) => {
+      if (p.rowIndex !== index) {
+        newDt.push(node.data);
+      }
+    });
+
+    setOrderData(newDt);
+    gridRef.current?.setRowData(newDt)
+  };
+
+  // 永久删除积压工单
+  const onRemove = (p: any) => {
     const cluster = baseForm.getFieldValue('cluster');
     if (agFinished || !hasPermission.delete) {
       return infoMessage(agFinished ? '已标记发布结果不能删除积压工单!' : '您无删除积压工单权限!');
     }
 
-    Modal.confirm({
-      centered: true,
-      okText: '确认',
-      cancelText: '取消',
-      title: '删除积压工单提醒',
-      icon: <InfoCircleOutlined style={{color: 'red'}}/>,
-      content: `请确认是否要永久删除【${data.repair_order ?? ''}】工单?`,
-      onOk: async () => {
-        await PreReleaseServices.removeOrder({
-          release_num: data.release_num,
-          user_id: user?.userid ?? '',
-        });
-        const rd = await PreReleaseServices.orderList(cluster?.join(',') ?? '');
-        const ops = await PreReleaseServices.opsList(cluster?.join(',') ?? '');
-        await PreReleaseServices.separateSaveOrder({
-          release_num: id,
-          ops_repair_data: ops ?? [],
-          rd_repair_data: rd ?? [],
-        });
-        getOrderDetail();
-      },
-    });
+    // 如果是接口工单和sql工单,则之间删除，不请求其他接口
+    if (p.data?.repair_order_type === "SQL" || p.data?.repair_order_type === "DeployApi") {
+      deleteAddPatchName(p);
+    } else {
+      Modal.confirm({
+        centered: true,
+        okText: '确认',
+        cancelText: '取消',
+        title: '删除积压工单提醒',
+        icon: <InfoCircleOutlined style={{color: 'red'}}/>,
+        content: `请确认是否要永久删除【${p.data?.repair_order ?? ''}】工单?`,
+        onOk: async () => {
+          await PreReleaseServices.removeOrder({
+            release_num: p.data?.release_num,
+            user_id: user?.userid ?? '',
+          });
+          const rd = await PreReleaseServices.orderList(cluster?.join(',') ?? '');
+          const ops = await PreReleaseServices.opsList(cluster?.join(',') ?? '');
+          await PreReleaseServices.separateSaveOrder({
+            release_num: id,
+            ops_repair_data: ops ?? [],
+            rd_repair_data: rd ?? [],
+          });
+          getOrderDetail();
+        },
+      });
+    }
+
   };
+
+  //忽略本次积压工单
   const onIgnore = (p: any) => {
     if (agFinished) {
       return infoMessage('已标记发布结果不能忽略积压工单!');
     }
-    Modal.confirm({
-      centered: true,
-      title: '忽略积压工单',
-      content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
-      okButtonProps: {disabled: confirmDisabled},
-      onOk: async () => {
-        setConfirmDisabled(true);
-        const result =
-          gridRef.current
-            ?.getRenderedNodes()
-            ?.map((it) => it.data)
-            ?.filter((obj) => !isEqual(obj, p.data)) || [];
-        await formatCompare(compareData?.opsData || [], result);
-        setOrderData(result);
-        setConfirmDisabled(false);
-      },
-    });
+
+    // 如果是接口工单和sql工单,则之间删除，不请求其他接口
+    if (p.data?.repair_order_type === "SQL" || p.data?.repair_order_type === "DeployApi") {
+      deleteAddPatchName(p);
+    } else {
+      Modal.confirm({
+        centered: true,
+        title: '忽略积压工单',
+        content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
+        okButtonProps: {disabled: confirmDisabled},
+        onOk: async () => {
+          setConfirmDisabled(true);
+          const result =
+            gridRef.current
+              ?.getRenderedNodes()
+              ?.map((it) => it.data)
+              ?.filter((obj) => !isEqual(obj, p.data)) || [];
+          await formatCompare(compareData?.opsData || [], result);
+          setOrderData(result);
+          setConfirmDisabled(false);
+        },
+      });
+    }
+
   };
 
   const onDrag = async () => {
@@ -504,15 +532,24 @@ const ReleaseOrder = () => {
   };
 
   // 获取发布批次名称和发布批次名称选择后的保存
-  const getReleasePatchName = async (p: any, value: any, getPatchName: boolean) => {
+  const getReleasePatchName = async (p: any, v2: any, getPatchName: boolean) => {
     // 获取表格所有的数据
-
+    debugger;
     const dt: any = [];
     gridRef.current?.forEachNode((node, index) => {
       const rowDatas = node.data;
       // 如果是同一行，则将原数据对应的值修改为下拉框的值
       if (p.rowIndex === index) {
-        rowDatas[p.column.colId] = value;
+        rowDatas[p.column.colId] = v2.value;
+        // 如果是选择发布批次名称，则需要包含id,lable,repair_order_type
+        if (!getPatchName) {
+          rowDatas["label"] = v2.label;
+          rowDatas["repair_order_type"] = p.data?.repair_order_type;
+          rowDatas["id"] = JSON.parse(v2.value)
+          // id:SQL工单传整形，接口工单传数组 （SQL工单ID一直只会有一个）
+          p.data?.repair_order_type === "SQL" ? rowDatas["id"] = Number(v2.value) : JSON.parse(v2.value);
+          debugger;
+        }
       }
       dt.push(rowDatas);
     });
@@ -684,7 +721,6 @@ const ReleaseOrder = () => {
                 onRowDragEnd={onDrag}
                 frameworkComponents={{
                   pushType: (params: CellClickedEvent) => {
-                    // debugger;
                     // 只有是SQL工单、接口工单或者新增行时
                     if (params.value === "DeployApi" || params.value === "SQL" || params.data?.addID) {
                       return (
@@ -698,7 +734,7 @@ const ReleaseOrder = () => {
                             value: k,
                             label: pushType[k],
                           }))}
-                          onChange={(value) => getReleasePatchName(params, value, true)}
+                          onChange={(v1, v2) => getReleasePatchName(params, v2, true)}
                         />
                       );
                     }
@@ -706,7 +742,6 @@ const ReleaseOrder = () => {
                   },
                   ICluster: (p: any) => <ICluster data={p.value}/>,
                   linkOrSelect: (p: CellClickedEvent) => {
-                    debugger
                     if (p.data?.repair_order_type === "DeployApi" || p.data?.repair_order_type === "SQL") {
                       const releateOrderInfos = p.data?.repair_order_type === "SQL" ? releateOrderInfo.SQL : releateOrderInfo.INTER;
                       // 根据类型获取名称
@@ -722,7 +757,7 @@ const ReleaseOrder = () => {
                             label: k.label,
                           }))}
 
-                          onChange={(value) => getReleasePatchName(p, value, false)}
+                          onChange={(v1, v2) => getReleasePatchName(p, v2, false)}
                         />
                       );
                     }
@@ -754,7 +789,7 @@ const ReleaseOrder = () => {
                           height="20"
                           src={require('../../../../public/delete_red.png')}
                           style={{marginRight: 10}}
-                          onClick={() => onRemove(p.data)}
+                          onClick={() => onRemove(p)}
                         />
                       ) : (
                         <div/>

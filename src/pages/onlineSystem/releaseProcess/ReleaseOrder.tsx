@@ -740,6 +740,7 @@ const ReleaseOrder = () => {
                         />
                       );
                     }
+                    if (isEmpty(params.value)) return (<div></div>);
                     return params.value;
                   },
                   ICluster: (p: any) => <ICluster data={p.value}/>,

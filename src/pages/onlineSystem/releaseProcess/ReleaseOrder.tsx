@@ -63,6 +63,7 @@ const ReleaseOrder = () => {
     params.api.sizeColumnsToFit();
   };
   useEffect(() => {
+
     agFinished = false;
     Modal.destroyAll();
     getBaseList();
@@ -82,6 +83,10 @@ const ReleaseOrder = () => {
 
 
   const getBaseList = async () => {
+    /* 注意：ag-grid中，列的渲染是没法用usestate中的数据来进行动态渲染的，解决方案：需要定义一个全局变量来动态记录需要改变的数据，渲染中使用这个全局变量 */
+    releateOrderInfo.SQL = await PreReleaseServices.getRelatedInfo({order_type: "SQL"});
+    releateOrderInfo.INTER = await PreReleaseServices.getRelatedInfo({order_type: "DeployApi"});
+
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
     const devopsInfo = await OnlineSystemServices.getDevOpsOrderInfo({release_num: id});
@@ -101,12 +106,6 @@ const ReleaseOrder = () => {
         key: it.announcement_num,
       })),
     );
-
-    /* 注意：ag-grid中，列的渲染是没法用usestate中的数据来进行动态渲染的，解决方案：需要定义一个全局变量来动态记录需要改变的数据，渲染中使用这个全局变量 */
-    releateOrderInfo.SQL = await PreReleaseServices.getRelatedInfo({order_type: "SQL"});
-    releateOrderInfo.INTER = await PreReleaseServices.getRelatedInfo({order_type: "DeployApi"});
-
-
   };
 
   const getOrderDetail = async (clusterMap = clusters) => {
@@ -251,6 +250,7 @@ const ReleaseOrder = () => {
   };
 
   const onSaveBeforeCheck = (isAuto = false) => {
+    debugger;
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
@@ -706,10 +706,10 @@ const ReleaseOrder = () => {
                   },
                   ICluster: (p: any) => <ICluster data={p.value}/>,
                   linkOrSelect: (p: CellClickedEvent) => {
+                    debugger
                     if (p.data?.repair_order_type === "DeployApi" || p.data?.repair_order_type === "SQL") {
                       const releateOrderInfos = p.data?.repair_order_type === "SQL" ? releateOrderInfo.SQL : releateOrderInfo.INTER;
                       // 根据类型获取名称
-                      debugger;
                       return (
                         <Select
                           style={{

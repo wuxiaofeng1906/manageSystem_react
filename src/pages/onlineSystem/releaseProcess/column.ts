@@ -1,4 +1,4 @@
-import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import type {ColDef, ColGroupDef} from 'ag-grid-community/dist/lib/entities/colDef';
 
 export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDef)[] => [
   {
@@ -79,7 +79,7 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     field: 'plan_release_time',
     minWidth: 190,
     tooltipField: 'plan_release_time',
-    cellStyle: (p) => ({ color: p.data?.tip ? 'red' : 'initial', lineHeight: '28px' }),
+    cellStyle: (p) => ({color: p.data?.tip ? 'red' : 'initial', lineHeight: '28px'}),
   },
   {
     headerName: '操作',
@@ -105,6 +105,7 @@ export const historyOrderColumn: (ColDef | ColGroupDef)[] = [
     field: 'repair_order_type',
     width: 130,
     minWidth: 130,
+    cellRenderer: 'pushType',
   },
   {
     headerName: '关联工单编号',
@@ -115,7 +116,7 @@ export const historyOrderColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '发布批次名称',
     field: 'ready_release_name',
-    cellRenderer: 'link',
+    cellRenderer: 'linkOrSelect',
     tooltipField: 'ready_release_name',
     width: 200,
     minWidth: 200,

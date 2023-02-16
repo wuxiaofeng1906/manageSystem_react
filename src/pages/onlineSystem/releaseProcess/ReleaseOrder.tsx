@@ -1,22 +1,22 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {
-  Form, Select, DatePicker, Button, Input, Col,
+  Form, Select, DatePicker, Button, Input, Col, Space,
   Spin, Divider, Modal, Checkbox, Row,
 } from 'antd';
-import { InfoCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { AgGridReact } from 'ag-grid-react';
+import {InfoCircleOutlined, StopOutlined, PlusOutlined} from '@ant-design/icons';
+import {AgGridReact} from 'ag-grid-react';
 import {
   historyCompareColumn, historyOrderColumn,
 } from '@/pages/onlineSystem/releaseProcess/column';
 import {getDevOpsOrderColumn} from '@/pages/onlineSystem/config/column';
-import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
+import {CellClickedEvent, GridApi, GridReadyEvent, RowNode} from 'ag-grid-community';
 import FieldSet from '@/components/FieldSet';
 import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import {useModel, useParams, history} from 'umi';
-import {isEmpty, omit} from 'lodash';
+import {isEmpty, omit, isEqual} from 'lodash';
 import {infoMessage} from '@/publicMethods/showMessages';
 import moment from 'moment';
 import {PageContainer} from '@ant-design/pro-layout';
@@ -25,8 +25,13 @@ import cns from 'classnames';
 import {valueMap} from '@/utils/utils';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
+import {pushType} from "@/pages/onlineSystem/config/constant";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
+let releateOrderInfo: any = {
+  SQL: [],
+  INTER: []
+}; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
 const ReleaseOrder = () => {
   const {id} = useParams() as { id: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -58,6 +63,7 @@ const ReleaseOrder = () => {
     params.api.sizeColumnsToFit();
   };
   useEffect(() => {
+
     agFinished = false;
     Modal.destroyAll();
     getBaseList();
@@ -77,6 +83,10 @@ const ReleaseOrder = () => {
 
 
   const getBaseList = async () => {
+    /* 注意：ag-grid中，列的渲染是没法用usestate中的数据来进行动态渲染的，解决方案：需要定义一个全局变量来动态记录需要改变的数据，渲染中使用这个全局变量 */
+    releateOrderInfo.SQL = await PreReleaseServices.getRelatedInfo({order_type: "SQL"});
+    releateOrderInfo.INTER = await PreReleaseServices.getRelatedInfo({order_type: "DeployApi"});
+
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
     const devopsInfo = await OnlineSystemServices.getDevOpsOrderInfo({release_num: id});
@@ -152,7 +162,14 @@ const ReleaseOrder = () => {
     }
   };
 
-  const formatCompare = async (opsOrigin: any[], rdOrigin: any[]) => {
+  // 工单信息和表单设置里面的信息做对比
+  const formatCompare = async (opsOrigin: any[], rdOriginDt: any[]) => {
+    // 手动在表单里面加的数据不进行对比。这里要进行过滤
+    let rdOrigin: any = [];
+    rdOriginDt.forEach((e: any) => {
+      if (e.repair_order_type !== "DeployApi" && e.repair_order_type !== "SQL") rdOrigin.push(e);
+    })
+
     let ops = opsOrigin;
     if (isEmpty(ops)) {
       const values = baseForm.getFieldsValue();
@@ -166,10 +183,7 @@ const ReleaseOrder = () => {
     let rdArr: any[] = [];
     const len = ops?.length > rdOrigin?.length ? ops.length : rdOrigin?.length;
 
-    Array.from(
-      {
-        length: len,
-      },
+    Array.from({length: len,},
       (it, i) => {
         const rdItem = rdOrigin[i];
         const opsItem = ops[i];
@@ -245,7 +259,7 @@ const ReleaseOrder = () => {
     const result = order.release_result;
     if (isAuto && (isEmpty(result) || result == 'unknown')) return;
 
-    const checkObj = omit({ ...order, ...base }, ['release_result']);
+    const checkObj = omit({...order, ...base}, ['release_result']);
     let errMsg = '';
     const errTip = {
       plan_release_time: '请填写发布时间!',
@@ -265,7 +279,7 @@ const ReleaseOrder = () => {
       errMsg = errTip.release_name;
     }
     if (!['failure', 'cancel'].includes(result) && errMsg) {
-      orderForm.setFieldsValue({ release_result: null });
+      orderForm.setFieldsValue({release_result: null});
       return infoMessage(errMsg);
     }
     // 发布结果为空，直接保存
@@ -333,6 +347,7 @@ const ReleaseOrder = () => {
       return;
     }
     if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
+
     await PreReleaseServices.saveOrder({
       release_num: id, // 发布编号
       user_id: user?.userid ?? '',
@@ -390,56 +405,84 @@ const ReleaseOrder = () => {
     }
   };
 
-  const onRemove = (data: any) => {
+  const deleteAddPatchName = (p: any) => {
+    const newDt: any = [];
+    gridRef.current?.forEachNode((node, index) => {
+      if (p.rowIndex !== index) {
+        newDt.push(node.data);
+      }
+    });
+
+    setOrderData(newDt);
+    gridRef.current?.setRowData(newDt)
+  };
+
+  // 永久删除积压工单
+  const onRemove = (p: any) => {
     const cluster = baseForm.getFieldValue('cluster');
     if (agFinished || !hasPermission.delete) {
       return infoMessage(agFinished ? '已标记发布结果不能删除积压工单!' : '您无删除积压工单权限!');
     }
 
-    Modal.confirm({
-      centered: true,
-      okText: '确认',
-      cancelText: '取消',
-      title: '删除积压工单提醒',
-      icon: <InfoCircleOutlined style={{color: 'red'}}/>,
-      content: `请确认是否要永久删除【${data.repair_order ?? ''}】工单?`,
-      onOk: async () => {
-        await PreReleaseServices.removeOrder({
-          release_num: data.release_num,
-          user_id: user?.userid ?? '',
-        });
-        const rd = await PreReleaseServices.orderList(cluster?.join(',') ?? '');
-        const ops = await PreReleaseServices.opsList(cluster?.join(',') ?? '');
-        await PreReleaseServices.separateSaveOrder({
-          release_num: id,
-          ops_repair_data: ops ?? [],
-          rd_repair_data: rd ?? [],
-        });
-        getOrderDetail();
-      },
-    });
+    // 如果是接口工单和sql工单,则之间删除，不请求其他接口
+    if (p.data?.repair_order_type === "SQL" || p.data?.repair_order_type === "DeployApi") {
+      deleteAddPatchName(p);
+    } else {
+      Modal.confirm({
+        centered: true,
+        okText: '确认',
+        cancelText: '取消',
+        title: '删除积压工单提醒',
+        icon: <InfoCircleOutlined style={{color: 'red'}}/>,
+        content: `请确认是否要永久删除【${p.data?.repair_order ?? ''}】工单?`,
+        onOk: async () => {
+          await PreReleaseServices.removeOrder({
+            release_num: p.data?.release_num,
+            user_id: user?.userid ?? '',
+          });
+          const rd = await PreReleaseServices.orderList(cluster?.join(',') ?? '');
+          const ops = await PreReleaseServices.opsList(cluster?.join(',') ?? '');
+          await PreReleaseServices.separateSaveOrder({
+            release_num: id,
+            ops_repair_data: ops ?? [],
+            rd_repair_data: rd ?? [],
+          });
+          getOrderDetail();
+        },
+      });
+    }
+
   };
+
+  //忽略本次积压工单
   const onIgnore = (p: any) => {
     if (agFinished) {
       return infoMessage('已标记发布结果不能忽略积压工单!');
     }
-    Modal.confirm({
-      centered: true,
-      title: '忽略积压工单',
-      content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
-      okButtonProps: { disabled: confirmDisabled },
-      onOk: async () => {
-        setConfirmDisabled(true);
-        const result =
-          gridRef.current
-            ?.getRenderedNodes()
-            ?.map((it) => it.data)
-            ?.filter((obj) => !isEqual(obj, p.data)) || [];
-        await formatCompare(compareData?.opsData || [], result);
-        setOrderData(result);
-        setConfirmDisabled(false);
-      },
-    });
+
+    // 如果是接口工单和sql工单,则之间删除，不请求其他接口
+    if (p.data?.repair_order_type === "SQL" || p.data?.repair_order_type === "DeployApi") {
+      deleteAddPatchName(p);
+    } else {
+      Modal.confirm({
+        centered: true,
+        title: '忽略积压工单',
+        content: `请确认是否忽略【${p.data.ready_release_name}】积压工单？`,
+        okButtonProps: {disabled: confirmDisabled},
+        onOk: async () => {
+          setConfirmDisabled(true);
+          const result =
+            gridRef.current
+              ?.getRenderedNodes()
+              ?.map((it) => it.data)
+              ?.filter((obj) => !isEqual(obj, p.data)) || [];
+          await formatCompare(compareData?.opsData || [], result);
+          setOrderData(result);
+          setConfirmDisabled(false);
+        },
+      });
+    }
+
   };
 
   const onDrag = async () => {
@@ -451,6 +494,72 @@ const ReleaseOrder = () => {
     setOrderData(sortArr);
     formatCompare(compareData?.opsData ?? [], sortArr);
   };
+
+  // 手动添加一行空行
+  const addNewOrderRow = () => {
+
+    // repair_order_type：  // 推送类型
+    // repair_order // 关联工单编号
+    // ready_release_name // 发布批次名称
+    // project // 关联项目列表
+    // repair_order_fish_time // 部署结束时间
+    // cluster // 已发布集群
+    // apps
+    // branch
+    // cluster
+    // create_time
+    // create_user
+    // plan_release_time
+    // project
+    // ready_release_name
+    // release_env
+    // release_env_type
+    // release_name
+    // release_num
+    // release_result
+    // release_sealing
+    // release_time
+    // repair_order
+    // repair_order_fish_time
+    // repair_order_type
+
+    const newRow = [{
+      addID: orderData.length + 1,
+      repair_order_type: "",
+      ready_release_name: "",
+      // repair_order: "",
+      // project: "",
+      // repair_order_fish_time: "",
+      // cluster: ""
+    }];
+    setOrderData(orderData.concat(newRow));
+  };
+
+  // 获取发布批次名称和发布批次名称选择后的保存
+  const getReleasePatchName = async (p: any, v2: any, getPatchName: boolean) => {
+    // 获取表格所有的数据
+    const dt: any = [];
+    gridRef.current?.forEachNode((node, index) => {
+      const rowDatas = node.data;
+      // 如果是同一行，则将原数据对应的值修改为下拉框的值
+      if (p.rowIndex === index) {
+        rowDatas[p.column.colId] = v2.value;
+        // 如果是选择发布批次名称，则需要包含id,lable,repair_order_type
+        if (!getPatchName) {
+          rowDatas["label"] = v2.label;
+          rowDatas["repair_order_type"] = p.data?.repair_order_type;
+          rowDatas["id"] = JSON.parse(v2.value)
+          // id:SQL工单传整形，接口工单传数组 （SQL工单ID一直只会有一个）
+          p.data?.repair_order_type === "SQL" ? rowDatas["id"] = Number(v2.value) : JSON.parse(v2.value);
+        }
+      }
+      dt.push(rowDatas);
+    });
+
+    gridRef.current?.setRowData(dt);
+    setOrderData(dt);
+  };
+
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
@@ -613,9 +722,50 @@ const ReleaseOrder = () => {
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 frameworkComponents={{
+                  pushType: (params: CellClickedEvent) => {
+                    // 只有是SQL工单、接口工单或者新增行时
+                    if (params.value === "DeployApi" || params.value === "SQL" || params.data?.addID) {
+                      return (
+                        <Select
+                          style={{
+                            width: '100%',
+                          }}
+                          size={'small'}
+                          value={params.value}
+                          options={Object.keys(pushType)?.map((k) => ({
+                            value: k,
+                            label: pushType[k],
+                          }))}
+                          onChange={(v1, v2) => getReleasePatchName(params, v2, true)}
+                        />
+                      );
+                    }
+                    if (isEmpty(params.value)) return (<div></div>);
+                    return params.value;
+                  },
                   ICluster: (p: any) => <ICluster data={p.value}/>,
-                  link: (p: CellClickedEvent) => (
-                    <div
+                  linkOrSelect: (p: CellClickedEvent) => {
+                    if (p.data?.repair_order_type === "DeployApi" || p.data?.repair_order_type === "SQL") {
+                      const releateOrderInfos = p.data?.repair_order_type === "SQL" ? releateOrderInfo.SQL : releateOrderInfo.INTER;
+                      // 根据类型获取名称
+                      return (
+                        <Select
+                          style={{
+                            width: '100%',
+                          }}
+                          size={'small'}
+                          value={p.value}
+                          options={releateOrderInfos.map((k: any) => ({
+                            value: JSON.stringify(k.id),
+                            label: k.label,
+                          }))}
+
+                          onChange={(v1, v2) => getReleasePatchName(p, v2, false)}
+                        />
+                      );
+                    }
+                    // 如果是SQL工单和接口工单，则显示下拉框，否则显示链接
+                    return <div
                       style={{
                         color: '#1890ff',
                         cursor: 'pointer',
@@ -632,7 +782,7 @@ const ReleaseOrder = () => {
                     >
                       {p.data.ready_release_name}
                     </div>
-                  ),
+                  },
                   operations: (p: CellClickedEvent) => (
                     <Fragment>
                       {hasPermission.delete ? (
@@ -642,7 +792,7 @@ const ReleaseOrder = () => {
                           height="20"
                           src={require('../../../../public/delete_red.png')}
                           style={{marginRight: 10}}
-                          onClick={() => onRemove(p.data)}
+                          onClick={() => onRemove(p)}
                         />
                       ) : (
                         <div/>
@@ -664,8 +814,15 @@ const ReleaseOrder = () => {
                 }}
               />
             </div>
+            {/* 行的添加 */}
+            <div>
+              <Button type="dashed" block icon={<PlusOutlined/>} onClick={addNewOrderRow}>
+                新增一行
+              </Button>
+            </div>
+
           </FieldSet>
-          <Divider plain style={{ margin: '6px 0' }}>
+          <Divider plain style={{margin: '6px 0'}}>
             <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>
           </Divider>
           <div className={styles.orderTag}>

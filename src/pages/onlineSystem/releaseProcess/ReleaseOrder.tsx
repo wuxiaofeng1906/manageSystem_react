@@ -167,7 +167,7 @@ const ReleaseOrder = () => {
     // 手动在表单里面加的数据不进行对比。这里要进行过滤
     let rdOrigin: any = [];
     rdOriginDt.forEach((e: any) => {
-      if (e.repair_order_type !== "DeployApi") rdOrigin.push(e);
+      if (e.repair_order_type !== "DeployApi" && e.repair_order_type !== "SQL") rdOrigin.push(e);
     })
 
     let ops = opsOrigin;

@@ -40,7 +40,7 @@ const PrePublish = () => {
                 style={{color: '#0079ff', fontSize: 16}}
               />
             ) : (
-              <a href={"http://ops.q7link.com:8080/#/qqservice/opsticket"} target={"_blank"}> 点击进入运维平台 </a>
+              <span></span>
             )
           }
         >

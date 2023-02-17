@@ -1,10 +1,10 @@
-import React, { Fragment, useEffect, useRef } from 'react';
-import { Tabs } from 'antd';
-import { useLocation, history } from 'umi';
-import { PageContainer } from '@ant-design/pro-layout';
+import React, {Fragment, useEffect, useRef} from 'react';
+import {Tabs} from 'antd';
+import {useLocation, history, Link} from 'umi';
+import {PageContainer} from '@ant-design/pro-layout';
 import styles from '../config/common.less';
 import ZentaoDetail from './ZentaoDetail';
-import { SyncOutlined } from '@ant-design/icons';
+import {SyncOutlined} from '@ant-design/icons';
 import ProcessLayout from './layout';
 
 const PrePublish = () => {
@@ -19,12 +19,14 @@ const PrePublish = () => {
   const updateHref = (key?: string) =>
     history.replace({
       pathname: history.location.pathname,
-      query: { tab: key ?? 'process', subTab: query?.subTab },
+      query: {tab: key ?? 'process', subTab: query?.subTab},
     });
 
   return (
     <PageContainer title={query.tab == 'profile' ? '禅道概况' : '发布过程单'}>
+
       <div className={styles.profileAndProcess}>
+
         <Tabs
           activeKey={query.tab}
           onChange={updateHref}
@@ -35,20 +37,22 @@ const PrePublish = () => {
               <SyncOutlined
                 onClick={() => refreshRef.current?.onRefresh()}
                 title={'刷新'}
-                style={{ color: '#0079ff', fontSize: 16 }}
+                style={{color: '#0079ff', fontSize: 16}}
               />
             ) : (
-              <Fragment />
+              <a href={"http://ops.q7link.com:8080/#/qqservice/opsticket"} target={"_blank"}> 点击进入运维平台 </a>
             )
           }
         >
           <Tabs.TabPane key={'process'} tab={'发布过程单'}>
-            <ProcessLayout />
+            <ProcessLayout/>
           </Tabs.TabPane>
           <Tabs.TabPane key={'profile'} tab={'禅道概况'}>
-            <ZentaoDetail ref={refreshRef} />
+            <ZentaoDetail ref={refreshRef}/>
           </Tabs.TabPane>
+
         </Tabs>
+
       </div>
     </PageContainer>
   );

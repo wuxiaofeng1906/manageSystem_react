@@ -567,13 +567,18 @@ const ReleaseOrder = () => {
         <div className={styles.releaseOrder}>
           <div className={styles.header}>
             <div className={styles.title}>工单基本信息</div>
-            <Button
-              size={'small'}
-              onClick={() => onSaveBeforeCheck()}
-              disabled={!hasPermission?.save || finished}
-            >
-              保存
-            </Button>
+
+            <div>
+              <a href={"http://ops.q7link.com:8080/#/qqservice/opsticket"} target={"_blank"}> 点击进入运维平台 </a>
+              <Button
+                size={'small'}
+                onClick={() => onSaveBeforeCheck()}
+                disabled={!hasPermission?.save || finished}
+              >
+                保存
+              </Button>
+            </div>
+
           </div>
           <Form size={'small'} form={orderForm} className={cns(styles.baseInfo, styles.bgForm)}>
             <Row gutter={3}>

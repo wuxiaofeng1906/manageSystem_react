@@ -473,7 +473,7 @@ const SheetInfo = (props: any, ref: any) => {
             children: Object.entries(OrderExecutionBy)?.map(([k, v]) => ({
               label: v,
               value: k,
-              key: v,
+              // key: v,  key会影响选择数据
             })),
           }))}
           onChange={(v) => {

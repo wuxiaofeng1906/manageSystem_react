@@ -171,6 +171,7 @@ const Layout = () => {
       return (
         <div>
           {draft && <strong style={{ color: '#fe7b00cf', marginRight: 16 }}>状态：草稿态</strong>}
+          <a href={"http://ops.q7link.com:8080/#/qqservice/opsticket"} target={"_blank"} style={{marginRight:20}}> 点击进入运维平台 </a>
           <Button
             hidden={!hasPermission.orderSave}
             size={'small'}
@@ -208,6 +209,7 @@ const Layout = () => {
               key={it.key}
               tab={it.name}
               disabled={(globalState.step || 1) < index || touched}
+
             >
               <it.comp ref={ref} />
             </Tabs.TabPane>

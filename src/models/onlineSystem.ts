@@ -108,7 +108,7 @@ export default () => {
 
   const getSelectList = async () => {
     const sqlOrder = await OnlineSystemServices.sqlOrder();
-    setSqlList(sqlOrder.map((it: any) => ({label: it.label, value: it.label})));
+    setSqlList(sqlOrder.map((it: any) => ({label: it.label, value: it.id})));
   };
   useEffect(() => {
     if (

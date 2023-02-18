@@ -439,7 +439,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       field: 'clear_cache',
       minWidth: 150,
       cellRenderer: 'select',
-      hide: keepServer,
+      hide: !keepServer,
       autoHeight: true,
       wrapText: true,
     },

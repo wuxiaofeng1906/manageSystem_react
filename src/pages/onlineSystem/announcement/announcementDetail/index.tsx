@@ -19,6 +19,11 @@ const Announce: React.FC<any> = (props: any) => {
   });
   const [carouselNumShow, setCarouselNumShow] = useState<string>("none");
   const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+  const {id: releaseNum, status: operteStatus} = useParams() as {
+    id: string;
+    status: string;
+    type: 'add' | 'detail';
+  };
 
   // 设置显示哪个模板(消息或者弹窗)
   const cardChange = (e: RadioChangeEvent) => {
@@ -79,6 +84,9 @@ const Announce: React.FC<any> = (props: any) => {
 
   window.onerror = () => localStorage.removeItem("announceItem");
 
+  const [formValue, setValue] = useState({
+    module: 1
+  })
 
   useEffect(() => {
 
@@ -111,8 +119,8 @@ const Announce: React.FC<any> = (props: any) => {
 
     } else {
       announcementForm.setFieldsValue({
-        module: "popupCard",
-        announce_name: "默认的公告名称",
+        // module: "popupCard",
+        announce_name: `${releaseNum}升级公告`,
         announce_time: moment(),
         announce_carousel: 1,
         carouselNum: 5
@@ -126,27 +134,27 @@ const Announce: React.FC<any> = (props: any) => {
         <Form form={announcementForm} autoComplete={"off"}>
           <Form.Item label="升级模板：" name="module：" rules={[{required: true}]}>
             {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
-            <Radio.Group onChange={cardChange} value={"msgCard"}>
-              <Radio.Button name="msgCard" value="msgCard" className={style.buttonStyle}>
+            <Radio.Group onChange={cardChange} value={formValue.module}>
+              <Radio value={1} className={style.buttonStyle}>
                 <img
-                  src={require('../../../../../public/77Logo.png')}
+                  src={require('../../../../../public/msgCard.png')}
                   width="100"
                   height="100"
                   alt="消息卡片"
                   title="消息卡片"
                 />
                 消息卡片
-              </Radio.Button>
-              <Radio.Button name="popupCard" value="popupCard" className={style.marginStyle}>
+              </Radio>
+              <Radio value={2} className={style.marginStyle}>
                 <img
-                  src={require('../../../../../public/77Logo.png')}
+                  src={require('../../../../../public/popCard.png')}
                   width="100"
                   height="100"
                   alt="弹窗"
                   title="弹窗"
                 />
                 弹窗
-              </Radio.Button>
+              </Radio>
             </Radio.Group>
           </Form.Item>
 

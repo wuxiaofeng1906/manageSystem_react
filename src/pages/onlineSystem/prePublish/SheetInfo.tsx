@@ -738,6 +738,7 @@ const SheetInfo = (props: any, ref: any) => {
                 onRowDragEnd={onDrag}
                 columnDefs={PublishUpgradeColumn}
                 rowData={upgradeData?.upgrade_api ?? []}
+                 // 超出范围换行显示
                 {...initGridTable({ref: upgradeRef, height: 30, otherDefault: {wrapText: true, autoHeight: true}})}
                 frameworkComponents={{
                   operation: (p: CellClickedEvent) => (

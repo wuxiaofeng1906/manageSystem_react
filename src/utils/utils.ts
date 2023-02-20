@@ -163,3 +163,11 @@ export const getkeyFromvalue = (object: Record<any, any>, value: any): any => {
     }
   }
 };
+// 获取url 参数
+export const getParameters = (url: string) =>
+  JSON.parse(
+    `{"${decodeURI(url.split('?')[1])
+      .replace(/"/g, '\\"')
+      .replace(/&/g, '","')
+      .replace(/=/g, '":"')}"}`,
+  );

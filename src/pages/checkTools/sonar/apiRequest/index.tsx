@@ -35,7 +35,6 @@ export const queryDevelopViews = async (pages: Number, pageSize: Number) => {
         }
         const serverDatas = res.data.data.data;
         serverDatas.forEach((ele: any, index: any) => {
-          // debugger;
           datas.push({
             NO: startId - index,
             ID: ele.number,

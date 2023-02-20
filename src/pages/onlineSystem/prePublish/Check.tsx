@@ -1,16 +1,7 @@
-import React, { useImperativeHandle, useState, forwardRef, useEffect, useMemo } from 'react';
+import React, {useImperativeHandle, useState, forwardRef, useEffect, useMemo} from 'react';
 import {
-  Table,
-  Switch,
-  Spin,
-  Modal,
-  Checkbox,
-  Select,
-  Form,
-  DatePicker,
-  ModalFuncProps,
-  Button,
-  Tooltip,
+  Table, Switch, Spin, Modal, Checkbox, Select,
+  Form, DatePicker, ModalFuncProps, Button, Tooltip, Input
 } from 'antd';
 import {
   AutoCheckType,
@@ -20,16 +11,20 @@ import {
   onLog,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
-import { isEmpty, omit, delay, isString, uniq } from 'lodash';
-import { infoMessage } from '@/publicMethods/showMessages';
+import {isEmpty, omit, delay, isString, uniq} from 'lodash';
+import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
 import moment from 'moment';
-import { useLocation, useModel, history, useParams } from 'umi';
-import { ICheckType, OnlineSystemServices } from '@/services/onlineSystem';
+import {useLocation, useModel, history, useParams} from 'umi';
+import {ICheckType, OnlineSystemServices} from '@/services/onlineSystem';
 import dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import usePermission from '@/hooks/permission';
 
+const {TextArea} = Input;
+
+
 const Check = (props: any, ref: any) => {
+  let timer: any;
   const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
   const { release_num } = useParams() as { release_num: string };
   const { onlineSystemPermission } = usePermission();
@@ -39,6 +34,7 @@ const Check = (props: any, ref: any) => {
     online.setGlobalState,
     online.basic,
   ]);
+
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [dutyPerson, setDutyPerson] = useState<any>();
@@ -54,11 +50,21 @@ const Check = (props: any, ref: any) => {
       open_time: '',
       log: '',
       contact: '',
+      check_person: '',
+      desc: ""
     })),
   );
+  // 检查参数设置是否可见
   const [show, setShow] = useState<{ visible: boolean; data: any }>({
     visible: false,
     data: null,
+  });
+
+  // 是否启用关闭说明弹窗是否可见
+  const [descShow, setDescShow] = useState<{ visible: boolean; data: any; param: any }>({
+    visible: false,
+    data: null,
+    param: null
   });
 
   useImperativeHandle(
@@ -67,13 +73,17 @@ const Check = (props: any, ref: any) => {
       onCheck,
       onLock,
       onPushCheckFailMsg,
-      onRefreshCheck: () => init(true),
+      onRefreshCheck: () => {
+        timer && clearInterval(timer);
+        init(true);
+      },
       onSetting: () => setShow({ visible: true, data: release_num }),
     }),
     [selected, ref, globalState, basic, list, subTab, tab],
   );
 
   const onCheck = async () => {
+
     if (isEmpty(selected)) return infoMessage('请先选择检查项！');
     // [前端、后端代码遗漏]检查 判断是否设置检查参数
     // if (selected.some((key) => key.includes('version_data'))) {
@@ -85,14 +95,14 @@ const Check = (props: any, ref: any) => {
       const checkList = list.flatMap((it) =>
         selected.includes(it.rowKey) && it.api_url
           ? [
-              {
-                user_id: user?.userid ?? '',
-                release_num,
-                is_ignore: it.open ? 'no' : 'yes',
-                side: it.side,
-                api_url: it.api_url as ICheckType,
-              },
-            ]
+            {
+              user_id: user?.userid ?? '',
+              release_num,
+              is_ignore: it.open ? 'no' : 'yes',
+              side: it.side,
+              api_url: it.api_url as ICheckType,
+            },
+          ]
           : [],
       );
       await Promise.all(
@@ -114,7 +124,7 @@ const Check = (props: any, ref: any) => {
      */
 
     if (!globalState.locked) {
-      await OnlineSystemServices.checkProcess({ release_num });
+      await OnlineSystemServices.checkProcess({release_num});
       const flag = list.some(
         (it) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status),
       );
@@ -135,64 +145,62 @@ const Check = (props: any, ref: any) => {
     if (!globalState.locked) {
       history.replace({
         pathname: history.location.pathname,
-        query: { tab, subTab: 'sheet' },
+        query: {tab, subTab: 'sheet'},
       });
     }
   };
 
   const init = async (isFresh = false, showLoading = true) => {
-    const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
-    const to = from.endOf('w');
-
-    const range = {
-      start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
-      end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
-    };
     setSpin(showLoading);
     setSelected([]);
+    let autoCheck: string[] = [];
+    let orignDuty = dutyPerson;
+    let formatCheckInfo: any[] = [];
     try {
       if (isFresh) {
         // 忽略 不用跑检查
-        const autoCheck = list.flatMap((it) =>
-          ['zt-check-list', 'test-unit'].includes(it.api_url) && it.open ? [it.api_url] : [],
+        autoCheck = list.flatMap((it) =>
+          ['check_list_data', 'backend_test_unit', 'story_data'].includes(it.rowKey) && it.open
+            ? [it.api_url]
+            : [],
         );
-        if (!isEmpty(uniq(autoCheck))) {
-          await Promise.all(
-            uniq(autoCheck).map((type) =>
-              OnlineSystemServices.checkOpts(
-                { release_num, user_id: user?.userid, api_url: type },
-                type as ICheckType,
-              ),
-            ),
-          );
-        }
       }
-      let orignDuty = dutyPerson;
-      // 存在值班人员为空
-      const refresh = (isEmpty(orignDuty) && count < 2) || isFresh;
-      const [checkItem, firstDuty] = await Promise.all([
-        OnlineSystemServices.getCheckInfo({ release_num }),
-        refresh ? DutyListServices.getFirstDutyPerson(range) : null,
-      ]);
-      if (refresh) {
-        const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
-        duty?.forEach((it: any) => {
-          orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
-        });
-        setDutyPerson(orignDuty);
-        setCount(++count);
-      }
-      setList(
-        checkInfo.map((it) => {
+      Promise.all(
+        uniq(autoCheck).map((type) =>
+          OnlineSystemServices.checkOpts(
+            { release_num, user_id: user?.userid, api_url: type },
+            type as ICheckType,
+          ),
+        ),
+      ).finally(async () => {
+        // 存在值班人员为空
+        const refresh = isEmpty(orignDuty) && count < 2;
+        const checkItem = await OnlineSystemServices.getCheckInfo({ release_num });
+        formatCheckInfo = checkInfo.map((it) => {
           const currentKey = checkItem[it.rowKey];
+          //升级前自动化检查是否通过 的状态要特殊处理
           const flag = it.rowKey == 'auto_obj_data';
           let status = 'skip';
           if (flag) {
-            status = isEmpty(currentKey)
-              ? ''
-              : currentKey?.find((it: any) => ['no', 'skip'].includes(it?.check_result))
-                  ?.check_result || 'yes';
+            if (isEmpty(currentKey)) {
+              status = '';
+            } else {
+              //  如果包含wait就显示未开始（优先级最高），如果包含no就显示不通过(优先级第二)（yes和skip优先级一样）
+              for (let i = 0; i < currentKey.length; i++) {
+                const rowStatus = currentKey[i].check_result;
+                if (rowStatus === "wait") {
+                  status = rowStatus;
+                  break;
+                } else if (rowStatus === "no") {
+                  status = rowStatus;
+                  break;
+                } else {
+                  status = rowStatus;
+                }
+              }
+            }
           }
+
           return {
             ...it,
             disabled: false,
@@ -204,28 +212,58 @@ const Check = (props: any, ref: any) => {
             open_time: currentKey?.[it.open_time] || '',
             log: currentKey?.[it.log] || '',
             source: currentKey?.data_from || it.source,
-            contact: orignDuty?.[it.contact] || '',
+            // contact: orignDuty?.[it.contact] || '',
+            check_person: currentKey?.[it.check_person] || '',
+            desc: currentKey?.[it.desc] || '',
           };
-        }),
-      );
-      setSpin(false);
+        });
+        if (refresh) {
+          // 获取当前检查周日期 默认为当周
+          const currentTime =
+            formatCheckInfo.find((it: any) => it?.start && it.start != '-')?.start || dayjs();
+          const from = dayjs(currentTime).subtract(1, 'd').startOf('w').subtract(0, 'w');
+          const to = from.endOf('w');
+          const range = {
+            start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
+            end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
+          };
+          const firstDuty = await DutyListServices.getFirstDutyPerson(range);
+          const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
+          duty?.forEach((it: any) => {
+            orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
+          });
+          setDutyPerson(orignDuty);
+          setCount(++count);
+        }
+        setList(formatCheckInfo?.map((it) => ({ ...it, contact: orignDuty?.[it.contact] || '' })));
+        setSpin(false);
+      });
     } catch (e) {
       console.log(e);
       setSpin(false);
     }
   };
 
-  const updateStatus = async (data: any) => {
+  const updateStatus = async (index: number, e: boolean, record: any) => {
+
+    list[index].disabled = true;
+    setList([...list]);
+    if (!e) {
+      setSelected(selected.filter((it) => it != record.rowKey));
+    }
+
     await OnlineSystemServices.checkOpts(
       {
         user_id: user?.userid ?? '',
         release_num,
-        is_ignore: data.open ? 'no' : 'yes',
-        side: data.side,
+        is_ignore: e ? 'no' : 'yes',
+        side: record.side,
+        remark: record.desc
       },
-      data.api_url,
+      record.api_url,
     );
-    if (data.open) {
+    setDescShow({visible: false, data: null, param: null})
+    if (e) {
       infoMessage('任务正在执行中，请稍后刷新查看');
     } else delay(init, 500);
   };
@@ -242,7 +280,7 @@ const Check = (props: any, ref: any) => {
     // 特殊处理
     if (type == 'libray_data')
       content = (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
           <div>
             <strong>线上：</strong>
             {Object.entries(v?.before ?? {})?.map(([k, v]) => (
@@ -260,7 +298,7 @@ const Check = (props: any, ref: any) => {
     if (type == 'hot_data') {
       width = 1000;
       content = (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
           <div>
             <strong>收集数据当前环境数据:</strong>
             <div>{v?.present_env}</div>
@@ -282,7 +320,7 @@ const Check = (props: any, ref: any) => {
           {v?.map((it: any) => (
             <div key={it.name_path}>
               <span>{`【${it.name_path}】`}</span>【
-              <span style={{ color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14' }}>
+              <span style={{color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14'}}>
                 {it.sealing_version == 'yes' ? '已封版' : '未封版'}
               </span>
               】
@@ -310,29 +348,33 @@ const Check = (props: any, ref: any) => {
       centered: true,
       title: '一键推送检查失败信息提示：',
       content: '请确认是否一键推送检查失败信息到值班群？',
-      onOk: () => OnlineSystemServices.pushFailMsg({ release_num }),
+      onOk: () => OnlineSystemServices.pushFailMsg({release_num}),
     });
   };
 
   useEffect(() => {
-    let timer: any;
     if (subTab == 'check' && release_num && tab == 'process') {
       Modal?.destroyAll?.();
       isEmpty(dutyPerson) && init();
-      timer = setInterval(() => {
-        init(false, false);
-      }, 15000);
-      if ((globalState.locked || globalState.finished) && timer) {
-        clearInterval(timer);
-      }
     } else {
       setDutyPerson(undefined);
       setCount(0);
     }
+  }, [subTab, tab, release_num, globalState, dutyPerson]);
+
+  useEffect(() => {
+    if (globalState.locked || globalState.finished || !(subTab == 'check' && tab == 'process')) {
+      clearInterval(timer);
+    } else {
+      Modal?.destroyAll?.();
+      timer = setInterval(() => {
+        init(false, false);
+      }, 15000);
+    }
     return () => {
       clearInterval(timer);
     };
-  }, [subTab, tab, release_num, globalState, dutyPerson]);
+  }, [JSON.stringify(list), subTab, tab, globalState]);
 
   const hasEdit = useMemo(
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,
@@ -340,7 +382,7 @@ const Check = (props: any, ref: any) => {
   );
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
-      <div className={styles.onlineTable} style={{ height: '100%' }}>
+      <div className={styles.onlineTable} style={{height: '100%'}}>
         <Table
           size="small"
           bordered
@@ -391,8 +433,8 @@ const Check = (props: any, ref: any) => {
               render: (p, record) => {
                 let status = p;
                 const special = {
-                  'sealing-version-check': { yes: 'version', no: 'noVersion' },
-                  'hot-update-check': { yes: 'hot', no: 'noHot' },
+                  'sealing-version-check': {yes: 'version', no: 'noVersion'},
+                  'hot-update-check': {yes: 'hot', no: 'noHot'},
                 };
                 // 特殊处理 封板，热更 状态
                 if (
@@ -403,7 +445,7 @@ const Check = (props: any, ref: any) => {
                 }
                 return (
                   <span
-                    style={{ color: CheckStatus[status]?.color ?? '#000000d9', fontWeight: 500 }}
+                    style={{color: CheckStatus[status]?.color ?? '#000000d9', fontWeight: 500}}
                   >
                     {CheckStatus[status]?.text ?? status}
                   </span>
@@ -411,8 +453,14 @@ const Check = (props: any, ref: any) => {
               },
             },
             {
+              title: '检查人',
+              dataIndex: 'check_person',
+              width: 100,
               align: 'center',
+            },
+            {
               title: '检查开始时间',
+              align: 'center',
               dataIndex: 'start',
               width: 180,
               render: (v, record) =>
@@ -425,8 +473,8 @@ const Check = (props: any, ref: any) => {
                 ),
             },
             {
-              align: 'center',
               title: '检查结束时间',
+              align: 'center',
               dataIndex: 'end',
               width: 180,
               render: (v, record) =>
@@ -450,17 +498,21 @@ const Check = (props: any, ref: any) => {
                   disabled={hasEdit || record.disabled}
                   checked={v}
                   onChange={(e) => {
-                    list[index].disabled = true;
-                    setList([...list]);
-                    if (!e) {
-                      setSelected(selected.filter((it) => it != record.rowKey));
-                    }
-                    updateStatus({ ...record, open: e });
+                    // 开启变成忽略时需要弹出说明框写说明
+                    if (!e) return setDescShow({visible: true, data: record, param: {index, e}});
+
+                    // list[index].disabled = true;
+                    // setList([...list]);
+                    // if (!e) {
+                    //   setSelected(selected.filter((it) => it != record.rowKey));
+                    // }
+                    // 忽略变成开启不需要写说明
+                    updateStatus(index, e, record);
                   }}
                 />
               ),
             },
-            { title: '启用/忽略人', dataIndex: 'open_pm', width: 100, align: 'center' },
+            {title: '启用/忽略人', dataIndex: 'open_pm', width: 100, align: 'center'},
             {
               title: '启用/忽略时间',
               dataIndex: 'open_time',
@@ -491,10 +543,16 @@ const Check = (props: any, ref: any) => {
                 />
               ),
             },
+            {
+              title: '说明',
+              dataIndex: 'desc',
+              width: 100,
+              align: 'left',
+            },
           ]}
           dataSource={list}
           pagination={false}
-          scroll={{ x: 'min-content' }}
+          scroll={{x: 'min-content'}}
           rowKey={(p) => p.rowKey}
           rowSelection={{
             selectedRowKeys: selected,
@@ -510,6 +568,17 @@ const Check = (props: any, ref: any) => {
                 record.rowKey == 'auto_obj_data', // 升级前自动化检查
             }),
           }}
+          onRow={(row, index) => {
+            // 历史记录不能再被编辑
+            if (!(hasEdit || row.disabled)) {
+              return {
+                onDoubleClick: () => {
+                  setDescShow({visible: true, data: row, param: {index, e: row.open}});
+                }
+              }
+            }
+            return {};
+          }}
         />
         <CheckSettingModal
           init={show}
@@ -521,15 +590,24 @@ const Check = (props: any, ref: any) => {
                 ...values,
               });
             }
-            setShow({ visible: false, data: null });
+            setShow({visible: false, data: null});
           }}
         />
+
+        {/* 说明弹窗 */}
+        <OpenDescModal init={descShow}
+                       onCancel={async () => setDescShow({visible: false, data: null, param: null})}
+                       onOk={updateStatus}
+
+        />
+
       </div>
     </Spin>
   );
 };
 export default forwardRef(Check);
 
+// 检查参数弹窗
 const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
   const [form] = Form.useForm();
   const [getLogInfo] = useModel('onlineSystem', (online) => [online.getLogInfo]);
@@ -562,7 +640,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
   useEffect(() => {
     if (!props.init.visible) return form.resetFields();
     OnlineSystemServices.getBranch().then((res) => {
-      setCompareBranch(res?.map((it: any) => ({ label: it.branch_name, value: it.branch_name })));
+      setCompareBranch(res?.map((it: any) => ({label: it.branch_name, value: it.branch_name})));
     });
     getDetail();
   }, [props.init.visible]);
@@ -620,21 +698,21 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
       ]}
     >
       <Spin spinning={loading} tip={'数据加载中...'}>
-        <Form form={form} labelCol={{ span: 6 }}>
+        <Form form={form} labelCol={{span: 6}}>
           <h4>一、检查上线分支是否包含对比分支的提交</h4>
           <Form.Item
             label={'被对比的主分支'}
             name={'main_branch'}
-            rules={[{ message: '请选择对比分支', required: true }]}
+            rules={[{message: '请选择对比分支', required: true}]}
           >
-            <Select options={compareBranch} allowClear showSearch mode={'multiple'} />
+            <Select options={compareBranch} allowClear showSearch mode={'multiple'}/>
           </Form.Item>
           <Form.Item
             label={'对比起始时间'}
             name={'main_since'}
-            rules={[{ message: '请选择对比起始时间', required: true }]}
+            rules={[{message: '请选择对比起始时间', required: true}]}
           >
-            <DatePicker style={{ width: '100%' }} format={'YYYY-MM-DD'} />
+            <DatePicker style={{width: '100%'}} format={'YYYY-MM-DD'}/>
           </Form.Item>
           <h4>二、升级前自动化检查是否通过</h4>
           <Form.Item name={'auto_data'}>
@@ -650,3 +728,59 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
     </Modal>
   );
 };
+
+// 忽略说明弹窗
+const OpenDescModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
+  const [form] = Form.useForm();
+
+  // 确定忽略
+  const onConfirm = () => {
+    const values = form.getFieldValue("ignoreDesc");
+    if (isEmpty(values.trim())) {
+      errorMessage("忽略说明不能为空！");
+      return;
+    }
+
+    const params: any = props?.init;
+    // 执行 updateStatus 进行状态更新
+    props?.onOk?.(params.param.index, params.param.e, {...params.data, desc: values});
+  };
+
+  useEffect(() => {
+    if (!props.init.visible) return form.resetFields();
+    form.setFieldsValue({
+      ignoreDesc: props.init?.data?.desc
+    });
+
+  }, [props.init.visible]);
+
+
+  return (
+    <Modal
+      {...props}
+      centered
+      destroyOnClose
+      maskClosable={false}
+      title={'是否启用忽略说明'}
+      onCancel={() => props?.onCancel?.()}
+      visible={props.init?.visible}
+      footer={[
+        <Button onClick={() => props.onCancel?.()}>取消</Button>,
+        <Button type={'primary'} onClick={onConfirm}>
+          确定
+        </Button>,
+      ]}
+    >
+      <Form form={form}>
+        <Form.Item
+          label={'忽略说明'}
+          name={'ignoreDesc'}
+          rules={[{message: '忽略说明不能为空！', required: true}]}
+        >
+          <TextArea rows={4}/>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
+

@@ -91,6 +91,11 @@ export const OnlineSystemServices = {
   async getServerConfirm(params: any) {
     return request(`${baseUrl}/online/server-confirm`, { params });
   },
+  // 运维工单信息
+  async getDevOpsOrderInfo(params: any) {
+    return request(`${baseUrl}/online/repair_order`, { params });
+  },
+
   async updateServerConfirm(data: any) {
     return request(`${baseUrl}/online/server-confirm`, { data, method: 'put' });
   },
@@ -178,6 +183,10 @@ export const OnlineSystemServices = {
   },
   async initDataBranch(params: any) {
     return request(`${baseUrl}/online/init-data-branch`, { params });
+  },
+  // 数据库版本
+  async databaseVersion() {
+    return request(`${baseUrl}/online/database-version`);
   },
 
   async getOrgList(client: GqlClient<object>) {

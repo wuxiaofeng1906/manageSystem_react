@@ -78,14 +78,8 @@ interface Iparam {
   isTest?: boolean; // 测试-指标模块
 }
 
-export const formatTreeData = ({
-  origin = [],
-  showDenominator = false,
-  percent = 1,
-  showSide = false,
-  isMulti = true,
-  isTest = false,
-}: Iparam) => {
+export const formatTreeData = ({origin = [], showDenominator = false,
+  percent = 1, showSide = false, isMulti = true, isTest = false,}: Iparam) => {
   if (!origin) return null;
   const result: any = [];
   origin.forEach((elements: any) => {

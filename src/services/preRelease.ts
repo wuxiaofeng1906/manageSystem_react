@@ -1,14 +1,15 @@
 import request from './request';
+
 const baseUrl = '/api/verify';
 // 发布过程
 const PreReleaseServices = {
   // 上线分支 手动执行状态检查
   async refreshCheckStatus(params: any) {
-    return request(`${baseUrl}/release/refresh`, { params, msg: true });
+    return request(`${baseUrl}/release/refresh`, {params, msg: true});
   },
   // 热更新检查
   async hotUpdateCheck(data: any) {
-    return request(`${baseUrl}/release/hotupdate`, { data, method: 'put', msg: true });
+    return request(`${baseUrl}/release/hotupdate`, {data, method: 'put', msg: true});
   },
   // 热更新的发布环境
   async getEnvList() {
@@ -16,28 +17,28 @@ const PreReleaseServices = {
   },
   // 保存热更新的发布环境
   async saveHotEnv(data: any) {
-    return request(`${baseUrl}/release/hotupdate`, { data, method: 'post' });
+    return request(`${baseUrl}/release/hotupdate`, {data, method: 'post'});
   },
   // 待发布需求列表-预发布项目保存后 弹窗 sprint-type 含有emergency，stage-patch
   async getStoryList(params: any) {
-    return request(`${baseUrl}/release/story`, { params });
+    return request(`${baseUrl}/release/story`, {params});
   },
   // 更新待发布需求列表
   async updateStory(data: any) {
-    return request(`${baseUrl}/release/story`, { data, method: 'post', msg: '保存成功' });
+    return request(`${baseUrl}/release/story`, {data, method: 'post', msg: '保存成功'});
   },
   // 获取需求编号
   async getStoryNum(executions_id: string) {
-    return request(`${baseUrl}/release/execution_story`, { params: { executions_id } });
+    return request(`${baseUrl}/release/execution_story`, {params: {executions_id}});
   },
   // 获取所属执行
   async getExecutions(ready_release_num: string) {
-    return request(`${baseUrl}/release/execution`, { params: { ready_release_num } });
+    return request(`${baseUrl}/release/execution`, {params: {ready_release_num}});
   },
   // 刷新服务
   async refreshService(ready_release_num: string) {
     return request(`${baseUrl}/release/refresh_server`, {
-      params: { ready_release_num },
+      params: {ready_release_num},
     });
   },
   // 灰度发布失败列表
@@ -78,11 +79,11 @@ const PreReleaseServices = {
   },
   // 发布列表排序
   async releaseOrder(data: any) {
-    return request(`${baseUrl}/latest-release/order-by`, { method: 'post', data });
+    return request(`${baseUrl}/latest-release/order-by`, {method: 'post', data});
   },
   // 发布历史
   async historyList(params: any) {
-    return request(`${baseUrl}/latest-release/history`, { params });
+    return request(`${baseUrl}/latest-release/history`, {params});
   },
   // 工单编号
   async orderNumbers() {
@@ -98,7 +99,7 @@ const PreReleaseServices = {
   },
   // 发布视图数据（发版计划）
   async releasePlan(params: any) {
-    return request(`${baseUrl}/latest-release/release-plan`, { params });
+    return request(`${baseUrl}/latest-release/release-plan`, {params});
   },
   // 删除发布列表（视图）
   async removeRelease(data: any, showMsg = true) {
@@ -120,37 +121,43 @@ const PreReleaseServices = {
   // 积压工单【环境】对应的列表数据
   async orderList(cluster: string) {
     return request(`${baseUrl}/latest-release/order-project`, {
-      params: { cluster },
+      params: {cluster},
     });
   },
   // 运维工单
   async opsList(cluster: string) {
     return request(`${baseUrl}/latest-release/ops-order`, {
-      params: { cluster },
+      params: {cluster},
     });
   },
   // 保存
   async saveOrder(data: any) {
-    return request(`${baseUrl}/latest-release/list`, { method: 'post', data, msg: '保存成功' });
+    return request(`${baseUrl}/latest-release/list`, {method: 'post', data, msg: '保存成功'});
   },
   // 单独保存rd工单和OPS工单
   async separateSaveOrder(data: any) {
-    return request(`${baseUrl}/latest-release/repair-data`, { method: 'post', data });
+    return request(`${baseUrl}/latest-release/repair-data`, {method: 'post', data});
   },
   async orderDetail(params: any) {
-    return request(`${baseUrl}/latest-release/detail`, { params, warn: false });
+    return request(`${baseUrl}/latest-release/detail`, {params, warn: false});
   },
   // 自动化检查-发布成功
   async automation(data: any) {
-    return request(`${baseUrl}/latest-release/automation`, { data, method: 'post' });
+    return request(`${baseUrl}/latest-release/automation`, {data, method: 'post'});
   },
   // 升级公告挂起
   async saveAnnouncement(params: any) {
-    return request(`${baseUrl}/latest-release/announcement`, { params });
+    return request(`${baseUrl}/latest-release/announcement`, {params});
   },
   // 所有集群组合情况
   async clusterGroup() {
     return request(`${baseUrl}/latest-release/cluster`);
   },
+
+  // 运维工单
+  async getRelatedInfo(data: any) {
+    return request(`${baseUrl}/online/sql_api_repair_order`, {params: data});
+  },
+
 };
 export default PreReleaseServices;

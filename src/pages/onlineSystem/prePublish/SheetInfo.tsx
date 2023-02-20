@@ -688,7 +688,7 @@ const SheetInfo = (props: any, ref: any) => {
         </Form>
         <h4 style={{margin: '16px 0'}}>二、发布服务</h4>
         <div style={{
-          height: 150,
+          height: 200,
           width: '100%', marginTop: 8
         }}>
           <AgGridReact
@@ -729,7 +729,7 @@ const SheetInfo = (props: any, ref: any) => {
               />
             </h4>
             <div style={{
-              height: upgradeData?.upgrade_api === undefined ? 100 : (upgradeData?.upgrade_api)?.length * 28 + 80,
+              height: 300,
               width: '100%'
             }}>
               <AgGridReact
@@ -738,7 +738,7 @@ const SheetInfo = (props: any, ref: any) => {
                 onRowDragEnd={onDrag}
                 columnDefs={PublishUpgradeColumn}
                 rowData={upgradeData?.upgrade_api ?? []}
-                {...initGridTable({ref: upgradeRef, height: 30})}
+                {...initGridTable({ref: upgradeRef, height: 30, otherDefault: {wrapText: true, autoHeight: true}})}
                 frameworkComponents={{
                   operation: (p: CellClickedEvent) => (
                     <Space size={8}>

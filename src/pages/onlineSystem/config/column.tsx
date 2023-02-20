@@ -394,7 +394,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
     {
       headerName: 'batch版本',
       field: 'batch',
-      minWidth: 110,
+      minWidth: 150,
       hide: data?.release_type?.release_type == 'global',
       cellRenderer: 'select',
       autoHeight: true,

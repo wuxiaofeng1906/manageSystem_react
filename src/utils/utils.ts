@@ -1,8 +1,8 @@
-import { IRecord } from '@/namespaces/interface';
-import { isEmpty, omit } from 'lodash';
-import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
+import {IRecord} from '@/namespaces/interface';
+import {isEmpty, omit} from 'lodash';
+import {ColDef, GridApi, GridReadyEvent} from 'ag-grid-community';
 import cls from 'classnames';
-import { useModel } from 'umi';
+import {useModel} from 'umi';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
@@ -17,7 +17,7 @@ export const isAntDesignPro = (): boolean => {
 
 // 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
 export const isAntDesignProOrDev = (): boolean => {
-  const { NODE_ENV } = process.env;
+  const {NODE_ENV} = process.env;
   if (NODE_ENV === 'development') {
     return true;
   }
@@ -62,6 +62,7 @@ export const replaceKeyMap = <T extends IRecord, K extends keyof T = keyof T>(
 function set<T>(key: string, data: T) {
   return localStorage.setItem(key, JSON.stringify(data));
 }
+
 function get<T = any>(key: string): T | null {
   const result = localStorage.getItem(key);
   if (!result) return null;
@@ -71,13 +72,15 @@ function get<T = any>(key: string): T | null {
 function remove(key: string) {
   return localStorage.removeItem(key);
 }
+
 function has(key: string): boolean {
   if (Reflect.has(localStorage, key)) {
     return Boolean(get(key));
   }
   return false;
 }
-export const storage = { set, get, remove, has };
+
+export const storage = {set, get, remove, has};
 
 export function valueMap(option: IRecord[], values: string[]) {
   const result: IRecord = {};
@@ -116,45 +119,40 @@ export function mergeCellsTable(data: any[], key: string, rowspan: string = 'row
 export const checkLogin = () => {
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const token = localStorage.getItem('accessId');
-  if (token && !isEmpty(user?.userid)) return { flag: true, redirect: '' };
+  if (token && !isEmpty(user?.userid)) return {flag: true, redirect: ''};
   const href = location.pathname + location.search;
-  return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
+  return {flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}`};
 };
 
-const initColDef: ColDef = { resizable: true, suppressMenu: true, flex: 1, filter: true };
+const initColDef: ColDef = {resizable: true, suppressMenu: true, flex: 1, filter: true};
 
 const onGridReady = (params: GridReadyEvent, ref: React.MutableRefObject<GridApi | undefined>) => {
   ref.current = params.api;
   params.api.sizeColumnsToFit();
 };
 
-export const initGridTable = ({
-  ref,
-  border = false,
-  height = 32,
-  options,
-}: {
-  ref: React.MutableRefObject<GridApi | undefined>;
-  border?: boolean;
-  height?: number;
-  options?: ColDef;
+export const initGridTable = ({ref, border = false, height = 32, otherDefault, options}: {
+  ref: React.MutableRefObject<GridApi | undefined>; border?: boolean; height?: number; otherDefault?: any; options?: ColDef
 }) => ({
   className: cls('ag-theme-alpine', 'ag-initialize-theme'),
   defaultColDef: {
     ...initColDef,
     ...{
       cellStyle: {
-        ...(border ? { 'border-right': 'solid 0.5px #E3E6E6' } : {}),
+        ...(border ? {'border-right': 'solid 0.5px #E3E6E6'} : {}),
         'line-height': `${height}px`,
       },
     },
     ...options,
+    ...otherDefault,
   },
   onGridReady: (v: GridReadyEvent) => onGridReady(v, ref),
   onGridSizeChanged: (v: GridReadyEvent) => onGridReady(v, ref),
   rowHeight: height,
   headerHeight: height,
+
 });
+
 
 export const getkeyFromvalue = (object: Record<any, any>, value: any): any => {
   for (let ob in object) {

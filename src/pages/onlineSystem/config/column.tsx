@@ -407,7 +407,8 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       hide: keepServer,
       autoHeight: true,
       wrapText: true,
-      cellRenderer: 'select',
+
+      cellRenderer: 'select', // 版本渲染
     },
     {
       headerName: '数据Recovery',

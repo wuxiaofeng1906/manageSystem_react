@@ -407,6 +407,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       hide: keepServer,
       autoHeight: true,
       wrapText: true,
+
       cellRenderer: 'select', // 版本渲染
     },
     {

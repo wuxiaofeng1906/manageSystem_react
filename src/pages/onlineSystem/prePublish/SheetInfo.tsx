@@ -1,25 +1,11 @@
-import React, {
-  forwardRef,
-  useRef,
-  useState,
-  useMemo,
-  useImperativeHandle,
-  useEffect,
-} from 'react';
 import styles from '../config/common.less';
+import React, {
+  forwardRef, useRef, useState,
+  useMemo, useImperativeHandle, useEffect,
+} from 'react';
 import {
-  Col,
-  DatePicker,
-  Form,
-  Input,
-  Select,
-  Spin,
-  Row,
-  Space,
-  Modal,
-  InputNumber,
-  ModalFuncProps,
-  Cascader,
+  Col, DatePicker, Form, Input, Select, Spin,
+  Row, Space, Modal, InputNumber, ModalFuncProps, Cascader,
 } from 'antd';
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
@@ -28,12 +14,8 @@ import {infoMessage} from '@/publicMethods/showMessages';
 import {useModel} from '@@/plugin-model/useModel';
 import {getDevOpsOrderColumn, PublishSeverColumn, PublishUpgradeColumn} from '@/pages/onlineSystem/config/column';
 import {
-  AutoCheckType,
-  ClusterType,
-  onLog,
-  OrderExecutionBy,
-  PublishWay,
-  WhetherOrNot,
+  AutoCheckType, ClusterType, onLog,
+  OrderExecutionBy, PublishWay, WhetherOrNot,
 } from '@/pages/onlineSystem/config/constant';
 import {history, useLocation, useParams} from 'umi';
 import {Prompt} from 'react-router-dom';
@@ -483,27 +465,30 @@ const SheetInfo = (props: any, ref: any) => {
         />
       );
     return (
-      <Select
-        size={'small'}
-        value={isEmpty(p.value) ? undefined : p.value}
-        style={{width: '100%'}}
-        disabled={agFinished}
-        allowClear={['batch', 'database_version'].includes(field)}
-        options={
-          field == 'database_version'
-            ? databaseVersion
-            : field == 'batch'
-            ? agBatch
-            : Object.keys(WhetherOrNot)?.map((k) => ({
-              value: k,
-              label: WhetherOrNot[k],
-            }))
-        }
-        onChange={(v) => {
-          updateFieldValue(p, v);
-          if (!leaveShow) setLeaveShow(true);
-        }}
-      />
+      <div className={styles.antSelectStyle}>
+        <Select
+          size={'small'}
+          value={isEmpty(p.value) ? undefined : p.value}
+          style={{width: '100%'}}
+          disabled={agFinished}
+          allowClear={['batch', 'database_version'].includes(field)}
+          options={
+            field == 'database_version'
+              ? databaseVersion
+              : field == 'batch'
+              ? agBatch
+              : Object.keys(WhetherOrNot)?.map((k) => ({
+                value: k,
+                label: WhetherOrNot[k],
+              }))
+          }
+          onChange={(v) => {
+            updateFieldValue(p, v);
+            if (!leaveShow) setLeaveShow(true);
+          }}
+        />
+      </div>
+
     );
   };
 

@@ -103,7 +103,7 @@ const Announce: React.FC<any> = (props: any) => {
         modules: "1",
         announce_name: `${releaseNum}升级公告`,
         announce_time: moment(),
-        announce_carousel: 1,
+        announce_carousel: 0, // 默认为否
         carouselNum: 5
       });
       setCarouselNumShow("none");

@@ -55,3 +55,10 @@ export const postAnnouncementForOtherPage = async (formData: any) => {
   };
   return axiosPost('/api/verify/release/announcement', data);
 };
+
+// 公告改版后的保存公告内容
+export const getYuQueContent = async (Url: string) => {
+  return axiosPost('/api/77hub/yuque/docs/headings', {
+    yuQue: Url
+  });
+};

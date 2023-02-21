@@ -1,25 +1,29 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Image,
-  Radio, Tabs, Divider, Layout
+  Button, Form, Input, Row, Col, Modal, Upload, Image, Radio, Tabs, Divider, Layout,
+  Spin
 } from 'antd';
 import {useParams} from "umi";
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
-import type {UploadFile} from 'antd/es/upload/interface';
-
+import {getYuQueContent} from '../axiosRequest/apiPage';
+import {analysisSpecialTitle} from "../dataAnalysis/index";
+import {errorMessage} from "@/publicMethods/showMessages";
+import {isEmpty} from "lodash";
 
 const {Footer} = Layout;
 const {TabPane} = Tabs;
 const PopupCard: React.FC<any> = (props: any) => {
   const [dtForm] = Form.useForm();
+  // isCarousel是否轮播 ，轮播张数
   const {isCarousel, count} = useParams() as { isCarousel: string; count: string };
+  // 图片上传框
   const [picModalState, setPicModalState] = useState({
     visible: false
   });
-
+  const [spinLoading, setSpinLoading] = useState(false);
   const onFinish = (values: any) => {
     console.log('Received values of form:', values);
   };
@@ -57,16 +61,40 @@ const PopupCard: React.FC<any> = (props: any) => {
   useEffect(() => {
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
     dtForm.setFieldsValue({
-      ptyGroup: [{first: "钱钱钱钱钱", seconds: [{"second": "2324234"}]}]
+      picLayout: 1, // 默认上下布局
+      ptyGroup: [{ // 默认一组特性
+        first: "",
+        seconds: [{"second": ""}]
+      }]
     });
 
   }, []);
 
+  // 同步语雀信息
+  const syncYuqueInfo = async () => {
 
+    const yuQueUrl = dtForm.getFieldValue("yuQueUrl");
+    if (isEmpty(yuQueUrl)) {
+      errorMessage("请输入语雀迭代版本地址！");
+      return;
+    }
+    // 加载中进度显示
+    setSpinLoading(true);
+    const specialTitles = await getYuQueContent(yuQueUrl);
+    if (specialTitles.ok) {
+      dtForm.setFieldsValue({
+        ptyGroup: analysisSpecialTitle(specialTitles?.data)
+      });
+    } else {
+      errorMessage("从语雀获取信息失败！")
+    }
+    setSpinLoading(false);
+
+  };
   return (
     <PageContainer>
       {/* 要轮播界面 */}
-      <div>
+      <Spin spinning={spinLoading} size={"large"} tip={"数据同步中，请稍后..."}>
         <div className={style.popForm}>
           <Tabs onChange={onTabsChange} style={{display: isCarousel === "true" ? "inline" : "none"}}>
             {tabsData()?.map((pane: any) => (
@@ -82,29 +110,31 @@ const PopupCard: React.FC<any> = (props: any) => {
               </Form.Item>
             </Row>
             {/* 特性名称只针对不轮播功能 */}
-            <Row style={{display: isCarousel === "true" ? "none" : "inline"}}>
+            <Row style={{display: isCarousel === "true" ? "none" : "inline-flex"}}>
               <Col>
-                <Form.Item label={"语雀迭代版本地址："} name={"yuqueUrl"}>
+                <Form.Item label={"语雀迭代版本地址："} name={"yuQueUrl"}>
                   <Input style={{minWidth: 300}} placeholder={"从语雀复制更新版本地址"}></Input>
                 </Form.Item>
               </Col>
               <Col>
                 <Button
-                  className={style.commonBtn} style={{marginLeft: 10}}>同步信息
+                  className={style.commonBtn} style={{marginLeft: 10}}
+                  onClick={syncYuqueInfo}>
+                  同步信息
                 </Button>
               </Col>
             </Row>
 
-            <Form.Item label={"上传图片"} name={"uploadPic"}>
+            <Form.Item label={"上传图片"} name={"uploadPic"} required>
               <Button type="default" icon={<UploadOutlined/>} style={{color: "#1890FF", border: "none"}}
                       onClick={() => setPicModalState({visible: true})}>
                 选择/上传
               </Button>
             </Form.Item>
-            <Form.Item label={"图文布局"} name={"picLayout"} required={false}>
+            <Form.Item label={"图文布局"} name={"picLayout"} required>
               <Radio.Group>
                 <Radio value={1}>上下布局</Radio>
-                <Radio value={0}>左右布局</Radio>
+                <Radio value={2}>左右布局</Radio>
               </Radio.Group>
             </Form.Item>
 
@@ -199,10 +229,10 @@ const PopupCard: React.FC<any> = (props: any) => {
           </Form>
 
         </div>
-      </div>
+      </Spin>
 
       {/* 图片上传弹出框 */}
-      <Modal title="上传图片" visible={true} centered={true} maskClosable={false}
+      <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
              onOk={() => setPicModalState({visible: false})}
              onCancel={() => setPicModalState({visible: false})}
              width={700}>
@@ -241,13 +271,13 @@ const PopupCard: React.FC<any> = (props: any) => {
           </Col>
           <Col span={12}>
 
-            <Upload
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              listType="picture-circle"
+            {/*<Upload*/}
+            {/*  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"*/}
+            {/*  listType="picture-circle"*/}
 
-            >
-              {fileList.length < 5 && '+ Upload'}
-            </Upload>
+            {/*>*/}
+            {/*  {fileList.length < 5 && '+ Upload'}*/}
+            {/*</Upload>*/}
 
           </Col>
         </Row>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { errorMessage } from './showMessages';
+import {errorMessage} from './showMessages';
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -9,7 +9,7 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 const axiosGet = async (url: string, queryData: any = {}) => {
   let result: any = {};
   await axios
-    .get(url, { params: queryData })
+    .get(url, {params: queryData})
     .then((res: any) => {
       result = res.data.data;
     })
@@ -27,7 +27,7 @@ const axiosGet = async (url: string, queryData: any = {}) => {
 const axiosGet_TJ = async (url: string, queryData: any = {}) => {
   let result: any = {};
   await axios
-    .get(url, { params: queryData })
+    .get(url, {params: queryData})
     .then((res: any) => {
       result = res.data;
     })
@@ -67,7 +67,7 @@ const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) =
   let result: any = {};
 
   await axios
-    .post(url, bodyData, { params: queryData })
+    .post(url, bodyData, {params: queryData})
     .then((res: any) => {
       result = res.data;
     })
@@ -86,7 +86,7 @@ const axiosPut = async (url: string, bodyData: any = {}, queryData: any = {}) =>
   let result: any = {};
 
   await axios
-    .put(url, bodyData, { params: queryData })
+    .put(url, bodyData, {params: queryData})
     .then((res: any) => {
       result = res.data;
     })
@@ -119,4 +119,4 @@ const axiosPatch = async (url: string, bodyData: any = {}) => {
   return result;
 };
 
-export { axiosGet, axiosDelete, axiosPost, axiosPut, axiosPatch, axiosGet_TJ };
+export {axiosGet, axiosDelete, axiosPost, axiosPut, axiosPatch, axiosGet_TJ};

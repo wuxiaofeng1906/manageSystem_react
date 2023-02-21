@@ -343,12 +343,12 @@ export const repairColumn: (ColDef | ColGroupDef)[] = [
     pinned: 'left',
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
-  { headerName: '数据修复内容', field: 'title', tooltipField: 'title' },
-  { headerName: '涉及租户', field: 'tenant', minWidth: 100, maxWidth: 100 },
-  { headerName: '类型', field: 'recovery_type', minWidth: 100, maxWidth: 100 },
-  { headerName: '修复提交人', field: 'author', minWidth: 110, maxWidth: 110,hide:true },
-  { headerName: '分支', field: 'branch', minWidth: 110, maxWidth: 180 },
-  { headerName: 'sql详情', field: 'sql_detail', width: 90, maxWidth: 100, cellRenderer: 'log' },
+  {headerName: '数据修复内容', field: 'title', tooltipField: 'title'},
+  {headerName: '涉及租户', field: 'tenant', minWidth: 100, maxWidth: 100},
+  {headerName: '类型', field: 'recovery_type', minWidth: 100, maxWidth: 100},
+  {headerName: '修复提交人', field: 'author', minWidth: 110, maxWidth: 110, hide: true},
+  {headerName: '分支', field: 'branch', minWidth: 110, maxWidth: 180},
+  {headerName: 'sql详情', field: 'sql_detail', width: 90, maxWidth: 100, cellRenderer: 'log'},
 ];
 export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
   {
@@ -378,6 +378,7 @@ export const serverConfirmColumn: (ColDef | ColGroupDef)[] = [
 export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
   // 不停服
   const keepServer = data?.release_type?.release_way == 'keep_server';
+  // const stopServer = data?.release_type?.release_way == 'stop_server';
 
   return [
     {
@@ -393,7 +394,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
     {
       headerName: 'batch版本',
       field: 'batch',
-      minWidth: 110,
+      minWidth: 220,
       hide: data?.release_type?.release_type == 'global',
       cellRenderer: 'select',
       autoHeight: true,
@@ -406,7 +407,8 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       hide: keepServer,
       autoHeight: true,
       wrapText: true,
-      cellRenderer: 'select',
+
+      cellRenderer: 'select', // 版本渲染
     },
     {
       headerName: '数据Recovery',
@@ -435,11 +437,11 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       wrapText: true,
     },
     {
-      headerName: '是否清理应用缓存',
+      headerName: '是否清理应用缓存',  // 暂时隐藏
       field: 'clear_cache',
       minWidth: 150,
       cellRenderer: 'select',
-      hide: !keepServer,
+      hide: true,
       autoHeight: true,
       wrapText: true,
     },

@@ -1,4 +1,7 @@
 // 解析从语雀获取的数据，返回界面可以展示的格式
+import {isEmpty} from "lodash";
+import {errorMessage} from "@/publicMethods/showMessages";
+
 export const analysisSpecialTitle = (source: any) => {
 
   // const example = [{first: "一级标题", seconds: [{"second": "2324234"}, {"second": "dfdsfd"}, {"second": "22222"}]}]
@@ -18,3 +21,34 @@ export const analysisSpecialTitle = (source: any) => {
   });
   return result;
 }
+
+// 验证表单字段不能为空（公共字段）
+export const vertifyFieldForCommon = (formInfo: any, announceMsg: any) => {
+  if (isEmpty(formInfo.announce_name.trim())) {
+    errorMessage("公告名称不能为空！");
+    return false;
+  }
+  if (announceMsg && isEmpty((announceMsg.split("更新功能：")[1]).trim())) {
+    errorMessage("请完善公告详情！");
+    return false;
+  }
+  return true;
+};
+
+
+// 验证字段的必填项(弹窗界面)
+export const vertifyFieldForPopup = (popData: any) => {
+  // if (!popData.uploadPic) {
+  //   errorMessage("图片不能为空！");
+  //   return false;
+  // }
+  // const specialData = popData.ptyGroup;
+  (popData.ptyGroup).map((v: any) => {
+    if (isEmpty((v.first).trim())) {
+      errorMessage("一级特性不能为空！");
+      return false;
+    }
+    return true;
+  })
+  return true;
+};

@@ -10,9 +10,13 @@ import dayjs from "dayjs";
 import {SIZE} from "./constant";
 import {saveAnnounceContent} from "./axiosRequest/apiPage";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+import {useModel} from "@@/plugin-model/useModel";
+import {vertifyFieldForCommon} from "./dataAnalysis";
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
+  const {anCommonData, setAnCommonData} = useModel('announcement');
+
   // 公告列表过来的数据
   const {id: releaseNum, status: operteStatus} = useParams() as {
     id: string;
@@ -50,14 +54,17 @@ const Announce: React.FC<any> = (props: any) => {
   // 跳转到下一页
   const toNextPage = () => {
     if (stepShow.popCard !== "inline") return;
-    //是否轮播
-    const carInfo = announcementForm.getFieldsValue();
-    // 存储值到session
-    localStorage.setItem('announceItem', JSON.stringify(carInfo));
-    if (carInfo.announce_carousel === 0) {//  不是轮播
-      history.push('/onlineSystem/PopupCard/false/-1');
-    } else {
-      history.push(`/onlineSystem/PopupCard/true/${carInfo.carouselNum}`);
+    const formInfo = announcementForm.getFieldsValue();
+    const announceMsg = document.getElementById("announceContent")?.innerText;
+    if (vertifyFieldForCommon(formInfo, announceMsg)) {
+      setAnCommonData({...formInfo, announceMsg});
+      // 存储值到session
+      localStorage.setItem('announceItem', JSON.stringify(formInfo));
+      if (formInfo.announce_carousel === 0) {//  不是轮播
+        history.push('/onlineSystem/PopupCard/false/-1');
+      } else {
+        history.push(`/onlineSystem/PopupCard/true/${formInfo.carouselNum}`);
+      }
     }
   }
   // 监听删除键是否用于删除公告详情中的数据
@@ -110,22 +117,17 @@ const Announce: React.FC<any> = (props: any) => {
     }
   }, []);
 
+
   // 保存消息卡面数据
   const saveMsgInfo = async () => {
-    const formInfo = announcementForm.getFieldsValue();
-    if (isEmpty(formInfo.announce_name.trim())) {
-      errorMessage("公告名称不能为空！");
-      return;
-    }
     const announceMsg = document.getElementById("announceContent")?.innerText;
-    if (announceMsg && isEmpty((announceMsg.split("更新功能：")[1]).trim())) {
-      errorMessage("请完善公告详情！");
-      return;
-    }
-    const result = await saveAnnounceContent(formInfo, announceMsg);
-    if (result.ok) {
-      sucMessage("保存成功！");
-      return;
+    const formInfo = announcementForm.getFieldsValue();
+    if (vertifyFieldForCommon(formInfo, announceMsg)) {
+      const result = await saveAnnounceContent({...formInfo, announceMsg});
+      if (result.ok) {
+        sucMessage("保存成功！");
+        return;
+      }
     }
   };
 

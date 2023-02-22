@@ -8,14 +8,19 @@ import {useParams} from "umi";
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
-import {getYuQueContent} from '../axiosRequest/apiPage';
-import {analysisSpecialTitle} from "../dataAnalysis/index";
-import {errorMessage} from "@/publicMethods/showMessages";
+import {getYuQueContent, saveAnnounceContent} from '../axiosRequest/apiPage';
+import {analysisSpecialTitle,vertifyFieldForPopup} from "../dataAnalysis";
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
+import {matchYuQueUrl} from "@/publicMethods/regularExpression";
+import {useModel} from "@@/plugin-model/useModel";
+
+
 
 const {Footer} = Layout;
 const {TabPane} = Tabs;
 const PopupCard: React.FC<any> = (props: any) => {
+  const {anCommonData, setAnCommonData, anPopData, setAnnPopData} = useModel('announcement');
   const [dtForm] = Form.useForm();
   // isCarousel是否轮播 ，轮播张数
   const {isCarousel, count} = useParams() as { isCarousel: string; count: string };
@@ -24,10 +29,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     visible: false
   });
   const [spinLoading, setSpinLoading] = useState(false);
-  const onFinish = (values: any) => {
-    console.log('Received values of form:', values);
-  };
-
   // tab切换
   const onTabsChange = (key: string) => {
     console.log(key);
@@ -74,10 +75,11 @@ const PopupCard: React.FC<any> = (props: any) => {
   const syncYuqueInfo = async () => {
 
     const yuQueUrl = dtForm.getFieldValue("yuQueUrl");
-    if (isEmpty(yuQueUrl)) {
+    if (isEmpty(yuQueUrl) || !matchYuQueUrl(yuQueUrl)) {
       errorMessage("请输入语雀迭代版本地址！");
       return;
     }
+
     // 加载中进度显示
     setSpinLoading(true);
     const specialTitles = await getYuQueContent(yuQueUrl);
@@ -90,6 +92,21 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     setSpinLoading(false);
 
+  };
+
+
+  // 保存数据
+  const onFinish = async (popData: any) => {
+    if (vertifyFieldForPopup(popData)) {
+      // 需要验证必填项
+      debugger;
+      const result = await saveAnnounceContent(anCommonData, popData);
+      if (result.ok) {
+        sucMessage("保存成功！")
+        return;
+      }
+      errorMessage("保存失败！");
+    }
   };
   return (
     <PageContainer>
@@ -113,7 +130,7 @@ const PopupCard: React.FC<any> = (props: any) => {
             <Row style={{display: isCarousel === "true" ? "none" : "inline-flex"}}>
               <Col>
                 <Form.Item label={"语雀迭代版本地址："} name={"yuQueUrl"}>
-                  <Input style={{minWidth: 300}} placeholder={"从语雀复制更新版本地址"}></Input>
+                  <Input style={{minWidth: 400}} placeholder={"从语雀复制更新版本地址"} spellCheck={"false"}></Input>
                 </Form.Item>
               </Col>
               <Col>
@@ -149,9 +166,9 @@ const PopupCard: React.FC<any> = (props: any) => {
                             {...field}
                             label={"一级特性"}
                             name={[field.name, 'first']}
-                            rules={[{required: false, message: '请输入一级特性'}]}
+                            rules={[{required: true, message: '请输入一级特性'}]}
                           >
-                            <Input style={{minWidth: 300}}></Input>
+                            <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}></Input>
                           </Form.Item>
 
                           {/* 删除 */}
@@ -174,7 +191,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                         label={`二级特性${index + 1}`}
                                         name={[secondField.name, 'second']}
                                       >
-                                        <Input style={{minWidth: 300}}></Input>
+                                        <Input style={{minWidth: 400}}></Input>
                                       </Form.Item>
 
                                       {/* 删除 */}
@@ -195,8 +212,6 @@ const PopupCard: React.FC<any> = (props: any) => {
                             );
                           }}
                         </Form.List>
-
-
                       </div>
                     ))}
                     {/* 点击一级特性 */}

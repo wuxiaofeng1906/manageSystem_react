@@ -62,7 +62,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   useEffect(() => {
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
     dtForm.setFieldsValue({
-      picLayout: 1, // 默认上下布局
+      picLayout: "1", // 默认上下布局
       ptyGroup: [{ // 默认一组特性
         first: "",
         seconds: [{"second": ""}]
@@ -94,12 +94,10 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   };
 
-
   // 保存数据
   const onFinish = async (popData: any) => {
     if (vertifyFieldForPopup(popData)) {
       // 需要验证必填项
-      debugger;
       const result = await saveAnnounceContent(anCommonData, popData);
       if (result.ok) {
         sucMessage("保存成功！")
@@ -118,7 +116,6 @@ const PopupCard: React.FC<any> = (props: any) => {
               <TabPane tab={pane.title} key={pane.key}/>
             ))}
           </Tabs>
-
           <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}>
             {/* 特性名称只针对轮播功能 */}
             <Row style={{display: isCarousel === "true" ? "inline-block" : "none"}}>
@@ -141,20 +138,17 @@ const PopupCard: React.FC<any> = (props: any) => {
                 </Button>
               </Col>
             </Row>
-
             <Form.Item label={"上传图片"} name={"uploadPic"} required>
               <Button type="default" icon={<UploadOutlined/>} style={{color: "#1890FF", border: "none"}}
-                      onClick={() => setPicModalState({visible: true})}>
-                选择/上传
+                      onClick={() => setPicModalState({visible: true})}>选择/上传
               </Button>
             </Form.Item>
             <Form.Item label={"图文布局"} name={"picLayout"} required>
               <Radio.Group>
-                <Radio value={1}>上下布局</Radio>
-                <Radio value={2}>左右布局</Radio>
+                <Radio value={"1"}>上下布局</Radio>
+                <Radio value={"2"}>左右布局</Radio>
               </Radio.Group>
             </Form.Item>
-
             <Form.List name="ptyGroup" initialValue={[Object.create(null)]}>
               {(fields, {add: addFirst, remove: removeFirst}) => {
                 return (
@@ -226,7 +220,6 @@ const PopupCard: React.FC<any> = (props: any) => {
                 );
               }}
             </Form.List>
-
             <Divider/>
             <Form.Item>
               <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
@@ -240,9 +233,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                 </div>
               </Footer>
             </Form.Item>
-
           </Form>
-
         </div>
       </Spin>
 

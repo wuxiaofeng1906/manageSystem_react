@@ -1,6 +1,8 @@
 // 解析从语雀获取的数据，返回界面可以展示的格式
 import {isEmpty} from "lodash";
 import {errorMessage} from "@/publicMethods/showMessages";
+import {Tabs} from "antd";
+import React from "react";
 
 export const analysisSpecialTitle = (source: any) => {
 
@@ -51,4 +53,15 @@ export const vertifyFieldForPopup = (popData: any) => {
     return true;
   })
   return true;
+};
+
+
+// 动态panes
+export const tabsPanel = (count:number) => {
+  const panes = [];
+  for (let i = 1; i <= Number(count); i++) {
+    panes.push(<Tabs.TabPane tab={<label style={{fontSize: "medium"}}> 第{i}张 </label>} key={i}
+                             style={{fontWeight: "bold"}}/>);
+  }
+  return panes;
 };

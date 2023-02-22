@@ -9,13 +9,11 @@ import {history} from "@@/core/history";
 import style from '../style.less';
 import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
 import {getYuQueContent, saveAnnounceContent} from '../axiosRequest/apiPage';
-import {analysisSpecialTitle,vertifyFieldForPopup} from "../dataAnalysis";
+import {analysisSpecialTitle, vertifyFieldForPopup,tabsPanel} from "../dataAnalysis";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-
-
 
 const {Footer} = Layout;
 const {TabPane} = Tabs;
@@ -34,31 +32,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     console.log(key);
   };
 
-  // 动态panes
-  const tabsData = () => {
-    const numberChange = {
-      "1": "一",
-      "2": "二",
-      "3": "三",
-      "4": "四",
-      "5": "五",
-      "6": "六",
-      "7": "七",
-      "8": "八",
-      "9": "九",
-      "10": "十",
-    };
-
-    const panes = [];
-    for (let i = 1; i <= Number(count); i++) {
-      panes.push({
-        title: `第${numberChange[i]}张`, key: i
-      });
-    }
-
-    return panes;
-  };
-
   useEffect(() => {
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
     dtForm.setFieldsValue({
@@ -73,13 +46,11 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 同步语雀信息
   const syncYuqueInfo = async () => {
-
     const yuQueUrl = dtForm.getFieldValue("yuQueUrl");
     if (isEmpty(yuQueUrl) || !matchYuQueUrl(yuQueUrl)) {
       errorMessage("请输入语雀迭代版本地址！");
       return;
     }
-
     // 加载中进度显示
     setSpinLoading(true);
     const specialTitles = await getYuQueContent(yuQueUrl);
@@ -91,7 +62,6 @@ const PopupCard: React.FC<any> = (props: any) => {
       errorMessage("从语雀获取信息失败！")
     }
     setSpinLoading(false);
-
   };
 
   // 保存数据
@@ -106,21 +76,22 @@ const PopupCard: React.FC<any> = (props: any) => {
       errorMessage("保存失败！");
     }
   };
+
   return (
     <PageContainer>
       {/* 要轮播界面 */}
       <Spin spinning={spinLoading} size={"large"} tip={"数据同步中，请稍后..."}>
         <div className={style.popForm}>
-          <Tabs onChange={onTabsChange} style={{display: isCarousel === "true" ? "inline" : "none"}}>
-            {tabsData()?.map((pane: any) => (
-              <TabPane tab={pane.title} key={pane.key}/>
-            ))}
+          <Tabs
+            onChange={onTabsChange}
+            style={{width: '100%', marginLeft: 80, display: isCarousel === "true" ? "inline-block" : "none"}}>
+            {tabsPanel(Number(count))}
           </Tabs>
           <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}>
             {/* 特性名称只针对轮播功能 */}
             <Row style={{display: isCarousel === "true" ? "inline-block" : "none"}}>
               <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>
-                <Input style={{minWidth: 300}}></Input>
+                <Input style={{minWidth: 400}}></Input>
               </Form.Item>
             </Row>
             {/* 特性名称只针对不轮播功能 */}
@@ -237,7 +208,8 @@ const PopupCard: React.FC<any> = (props: any) => {
         </div>
       </Spin>
 
-      {/* 图片上传弹出框 */}
+      {/* 图片上传弹出框 */
+      }
       <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
              onOk={() => setPicModalState({visible: false})}
              onCancel={() => setPicModalState({visible: false})}

@@ -931,7 +931,6 @@ export const ModalSuccessCheck = ({visible, onOk, announce,}: {
     >
       <div>请确认是否标记发布成功？</div>
       <div>如有自动化也执行通过！确认通过，会自动开放所有租户。</div>
-      {/* checkbox 在表单中使用defaultchecked不一定有效。需要用表单的initialValues 属性 */}
       <Form form={form} layout={'inline'} initialValues={{announcement: announce === "免" ? false : true}}>
         <Form.Item noStyle shouldUpdate={(old, next) => old.checkResult != next.checkResult}>
           {({getFieldValue}) => {
@@ -973,8 +972,9 @@ export const ModalSuccessCheck = ({visible, onOk, announce,}: {
         </Form.Item>
 
         <Form.Item label="是否挂起升级后公告" name="announcement" valuePropName="true">
+          {/* checkbox这里的默认使用了三个属性 1.表单的initialValues 属性 ，2.Form.Item的valuePropName属性。3.checkbox的defaultChecked属性 */}
           <Checkbox
-            value=""
+            // value=""
             defaultChecked={announce === "免" ? false : true}
             disabled={isEmpty(announce) || announce == '免'}
           />

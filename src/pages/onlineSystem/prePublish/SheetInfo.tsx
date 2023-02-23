@@ -14,8 +14,8 @@ import {infoMessage} from '@/publicMethods/showMessages';
 import {useModel} from '@@/plugin-model/useModel';
 import {getDevOpsOrderColumn, PublishSeverColumn, PublishUpgradeColumn} from '@/pages/onlineSystem/config/column';
 import {
-  AutoCheckType, ClusterType, onLog,
-  OrderExecutionBy, PublishWay, WhetherOrNot,
+  AutoCheckType, ClusterType, onLog, OrderExecutionBy,
+  PublishWay, WhetherOrNot,
 } from '@/pages/onlineSystem/config/constant';
 import {history, useLocation, useParams} from 'umi';
 import {Prompt} from 'react-router-dom';
@@ -219,8 +219,22 @@ const SheetInfo = (props: any, ref: any) => {
     databaseVersion = database?.map((it: string) => ({label: it, value: it}));
     const batch = await OnlineSystemServices.getBatchVersion({release_num});
     agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
-    const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
+    setDutyList(
+      order?.map((it: any) => ({
+        label: it.duty_name ?? '',
+        value: it.person_duty_num,
+        key: it.person_duty_num,
+      })),
+    );
+    const announce = await AnnouncementServices.preAnnouncement();
+    setAnnouncementList(
+      announce.map((it: any) => ({
+        label: it.announcement_name,
+        value: it.announcement_num,
+        key: it.announcement_num,
+      })),
+    );
     const deployIds = await OnlineSystemServices.deployments({release_num});
     setDeployments(
       deployIds?.map((it: any) => ({
@@ -229,20 +243,6 @@ const SheetInfo = (props: any, ref: any) => {
         deployment_id: it.deployment_id,
         app: it.app,
         deployment_time: it.check_start_time ?? '',
-      })),
-    );
-    setDutyList(
-      order?.map((it: any) => ({
-        label: it.duty_name ?? '',
-        value: it.person_duty_num,
-        key: it.person_duty_num,
-      })),
-    );
-    setAnnouncementList(
-      announce.map((it: any) => ({
-        label: it.announcement_name,
-        value: it.announcement_num,
-        key: it.announcement_num,
       })),
     );
   };

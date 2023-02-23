@@ -898,18 +898,11 @@ const ReleaseOrder = () => {
 };
 export default ReleaseOrder;
 
-export const ModalSuccessCheck = ({
-                                    visible,
-                                    onOk,
-                                    announce,
-                                  }: {
-  visible: boolean;
-  announce: string;
-  onOk: (v?: any) => void;
+export const ModalSuccessCheck = ({visible, onOk, announce,}: {
+  visible: boolean; announce: string; onOk: (v?: any) => void;
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
   const onConfirm = async () => {
     setLoading(true);
     try {
@@ -938,7 +931,7 @@ export const ModalSuccessCheck = ({
     >
       <div>请确认是否标记发布成功？</div>
       <div>如有自动化也执行通过！确认通过，会自动开放所有租户。</div>
-      <Form form={form} layout={'inline'}>
+      <Form form={form} layout={'inline'} initialValues={{announcement: announce === "免" ? false : true}}>
         <Form.Item noStyle shouldUpdate={(old, next) => old.checkResult != next.checkResult}>
           {({getFieldValue}) => {
             return (
@@ -978,10 +971,11 @@ export const ModalSuccessCheck = ({
           }}
         </Form.Item>
 
-        <Form.Item label="是否挂起升级后公告" name="announcement" valuePropName="checked">
+        <Form.Item label="是否挂起升级后公告" name="announcement" valuePropName="true">
+          {/* checkbox这里的默认使用了三个属性 1.表单的initialValues 属性 ，2.Form.Item的valuePropName属性。3.checkbox的defaultChecked属性 */}
           <Checkbox
-            value="yes"
-            defaultChecked={true}
+            // value=""
+            defaultChecked={announce === "免" ? false : true}
             disabled={isEmpty(announce) || announce == '免'}
           />
         </Form.Item>

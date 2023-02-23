@@ -898,18 +898,11 @@ const ReleaseOrder = () => {
 };
 export default ReleaseOrder;
 
-export const ModalSuccessCheck = ({
-                                    visible,
-                                    onOk,
-                                    announce,
-                                  }: {
-  visible: boolean;
-  announce: string;
-  onOk: (v?: any) => void;
+export const ModalSuccessCheck = ({visible, onOk, announce,}: {
+  visible: boolean; announce: string; onOk: (v?: any) => void;
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
   const onConfirm = async () => {
     setLoading(true);
     try {
@@ -938,7 +931,8 @@ export const ModalSuccessCheck = ({
     >
       <div>请确认是否标记发布成功？</div>
       <div>如有自动化也执行通过！确认通过，会自动开放所有租户。</div>
-      <Form form={form} layout={'inline'}>
+      {/* checkbox 在表单中使用defaultchecked不一定有效。需要用表单的initialValues 属性 */}
+      <Form form={form} layout={'inline'} initialValues={{announcement: true}}>
         <Form.Item noStyle shouldUpdate={(old, next) => old.checkResult != next.checkResult}>
           {({getFieldValue}) => {
             return (

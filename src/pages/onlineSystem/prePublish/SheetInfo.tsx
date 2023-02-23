@@ -1,8 +1,8 @@
+import styles from '../config/common.less';
 import React, {
   forwardRef, useRef, useState,
   useMemo, useImperativeHandle, useEffect,
 } from 'react';
-import styles from '../config/common.less';
 import {
   Col, DatePicker, Form, Input, Select, Spin,
   Row, Space, Modal, InputNumber, ModalFuncProps, Cascader,
@@ -465,27 +465,30 @@ const SheetInfo = (props: any, ref: any) => {
         />
       );
     return (
-      <Select
-        size={'small'}
-        value={isEmpty(p.value) ? undefined : p.value}
-        style={{width: '100%'}}
-        disabled={agFinished}
-        allowClear={['batch', 'database_version'].includes(field)}
-        options={
-          field == 'database_version'
-            ? databaseVersion
-            : field == 'batch'
-            ? agBatch
-            : Object.keys(WhetherOrNot)?.map((k) => ({
-              value: k,
-              label: WhetherOrNot[k],
-            }))
-        }
-        onChange={(v) => {
-          updateFieldValue(p, v);
-          if (!leaveShow) setLeaveShow(true);
-        }}
-      />
+      <div className={styles.antSelectStyle}>
+        <Select
+          size={'small'}
+          value={isEmpty(p.value) ? undefined : p.value}
+          style={{width: '100%'}}
+          disabled={agFinished}
+          allowClear={['batch', 'database_version'].includes(field)}
+          options={
+            field == 'database_version'
+              ? databaseVersion
+              : field == 'batch'
+              ? agBatch
+              : Object.keys(WhetherOrNot)?.map((k) => ({
+                value: k,
+                label: WhetherOrNot[k],
+              }))
+          }
+          onChange={(v) => {
+            updateFieldValue(p, v);
+            if (!leaveShow) setLeaveShow(true);
+          }}
+        />
+      </div>
+
     );
   };
 
@@ -685,7 +688,7 @@ const SheetInfo = (props: any, ref: any) => {
         </Form>
         <h4 style={{margin: '16px 0'}}>二、发布服务</h4>
         <div style={{
-          height: 150,
+          height: 200,
           width: '100%', marginTop: 8
         }}>
           <AgGridReact
@@ -726,7 +729,7 @@ const SheetInfo = (props: any, ref: any) => {
               />
             </h4>
             <div style={{
-              height: upgradeData?.upgrade_api === undefined ? 100 : (upgradeData?.upgrade_api)?.length * 28 + 80,
+              height: 300,
               width: '100%'
             }}>
               <AgGridReact
@@ -735,7 +738,8 @@ const SheetInfo = (props: any, ref: any) => {
                 onRowDragEnd={onDrag}
                 columnDefs={PublishUpgradeColumn}
                 rowData={upgradeData?.upgrade_api ?? []}
-                {...initGridTable({ref: upgradeRef, height: 30})}
+                 // 超出范围换行显示
+                {...initGridTable({ref: upgradeRef, height: 30, otherDefault: {wrapText: true, autoHeight: true}})}
                 frameworkComponents={{
                   operation: (p: CellClickedEvent) => (
                     <Space size={8}>

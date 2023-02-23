@@ -4,11 +4,7 @@ import {
   Form, DatePicker, ModalFuncProps, Button, Tooltip, Input
 } from 'antd';
 import {
-  AutoCheckType,
-  checkInfo,
-  CheckStatus,
-  CheckTechnicalSide,
-  onLog,
+  AutoCheckType, checkInfo, CheckStatus, CheckTechnicalSide, onLog,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
 import {isEmpty, omit, delay, isString, uniq} from 'lodash';
@@ -21,13 +17,11 @@ import DutyListServices from '@/services/dutyList';
 import usePermission from '@/hooks/permission';
 
 const {TextArea} = Input;
-
-
 const Check = (props: any, ref: any) => {
   let timer: any;
-  const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
-  const { release_num } = useParams() as { release_num: string };
-  const { onlineSystemPermission } = usePermission();
+  const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
+  const {release_num} = useParams() as { release_num: string };
+  const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [globalState, setGlobalState, basic] = useModel('onlineSystem', (online) => [
     online.globalState,
@@ -77,7 +71,7 @@ const Check = (props: any, ref: any) => {
         timer && clearInterval(timer);
         init(true);
       },
-      onSetting: () => setShow({ visible: true, data: release_num }),
+      onSetting: () => setShow({visible: true, data: release_num}),
     }),
     [selected, ref, globalState, basic, list, subTab, tab],
   );
@@ -168,14 +162,14 @@ const Check = (props: any, ref: any) => {
       Promise.all(
         uniq(autoCheck).map((type) =>
           OnlineSystemServices.checkOpts(
-            { release_num, user_id: user?.userid, api_url: type },
+            {release_num, user_id: user?.userid, api_url: type},
             type as ICheckType,
           ),
         ),
       ).finally(async () => {
         // 存在值班人员为空
         const refresh = isEmpty(orignDuty) && count < 2;
-        const checkItem = await OnlineSystemServices.getCheckInfo({ release_num });
+        const checkItem = await OnlineSystemServices.getCheckInfo({release_num});
         formatCheckInfo = checkInfo.map((it) => {
           const currentKey = checkItem[it.rowKey];
           //升级前自动化检查是否通过 的状态要特殊处理
@@ -230,12 +224,12 @@ const Check = (props: any, ref: any) => {
           const firstDuty = await DutyListServices.getFirstDutyPerson(range);
           const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
           duty?.forEach((it: any) => {
-            orignDuty = { ...orignDuty, [it.user_tech]: it.user_name };
+            orignDuty = {...orignDuty, [it.user_tech]: it.user_name};
           });
           setDutyPerson(orignDuty);
           setCount(++count);
         }
-        setList(formatCheckInfo?.map((it) => ({ ...it, contact: orignDuty?.[it.contact] || '' })));
+        setList(formatCheckInfo?.map((it) => ({...it, contact: orignDuty?.[it.contact] || ''})));
         setSpin(false);
       });
     } catch (e) {
@@ -437,16 +431,11 @@ const Check = (props: any, ref: any) => {
                   'hot-update-check': {yes: 'hot', no: 'noHot'},
                 };
                 // 特殊处理 封板，热更 状态
-                if (
-                  ['sealing-version-check', 'hot-update-check'].includes(record.api_url) &&
-                  ['yes', 'no'].includes(p)
-                ) {
+                if (['sealing-version-check', 'hot-update-check'].includes(record.api_url) && ['yes', 'no'].includes(p)) {
                   status = special[record.api_url][p];
                 }
                 return (
-                  <span
-                    style={{color: CheckStatus[status]?.color ?? '#000000d9', fontWeight: 500}}
-                  >
+                  <span style={{color: CheckStatus[status]?.color ?? '#000000d9', fontWeight: 500}}>
                     {CheckStatus[status]?.text ?? status}
                   </span>
                 );
@@ -457,6 +446,7 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'check_person',
               width: 100,
               align: 'center',
+              render: (v, record) => !record.open ? "" : v,
             },
             {
               title: '检查开始时间',
@@ -464,13 +454,8 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'start',
               width: 180,
               render: (v, record) =>
-                !record.open ? (
-                  ''
-                ) : (
-                  <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
-                    {v}
-                  </Tooltip>
-                ),
+                !record.open ?
+                  ('') : (<Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>{v}</Tooltip>),
             },
             {
               title: '检查结束时间',
@@ -478,13 +463,8 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'end',
               width: 180,
               render: (v, record) =>
-                !record.open ? (
-                  ''
-                ) : (
-                  <Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>
-                    {v}
-                  </Tooltip>
-                ),
+                !record.open ?
+                  ('') : (<Tooltip title={v} placement={'bottomLeft'} color={'#108ee9'}>{v}</Tooltip>),
             },
             {
               title: '是否启用',

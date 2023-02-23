@@ -9,12 +9,14 @@ import {history} from "@@/core/history";
 import style from '../style.less';
 import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
 import {getYuQueContent, saveAnnounceContent} from '../axiosRequest/apiPage';
-import {analysisSpecialTitle, vertifyFieldForPopup,tabsPanel} from "../dataAnalysis";
+import {analysisSpecialTitle, vertifyFieldForPopup, tabsPanel} from "../dataAnalysis";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
 
+// 当前的tab页面
+let currentTab = 1;
 const {Footer} = Layout;
 const {TabPane} = Tabs;
 const PopupCard: React.FC<any> = (props: any) => {
@@ -27,11 +29,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     visible: false
   });
   const [spinLoading, setSpinLoading] = useState(false);
-  // tab切换
-  const onTabsChange = (key: string) => {
-    console.log(key);
-  };
-
   useEffect(() => {
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
     dtForm.setFieldsValue({
@@ -41,6 +38,17 @@ const PopupCard: React.FC<any> = (props: any) => {
         seconds: [{"second": ""}]
       }]
     });
+    // 轮播时记录数据
+    if (anCommonData?.announce_carousel === 1) {
+      let tabsContent: any = [];
+      for (let i = 0; i < anCommonData?.carouselNum; i++) {
+        tabsContent.push({
+          tabPage: i + 1,
+          tabsContent: {}
+        })
+      }
+      setAnnPopData(tabsContent)
+    }
 
   }, []);
 
@@ -63,19 +71,49 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     setSpinLoading(false);
   };
+  // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
+  const getPopupSource = () => {
+    debugger
+    const specialList = dtForm.getFieldsValue();
+    // 覆盖已有当前页的数据或者添加新数据
+    const oldList = [...anPopData];
+    oldList.map((v) => {
+      v.tabPage === currentTab ? v.tabsContent = specialList : v.tabsContent;
+    });
 
+    debugger;
+  }
+  // tab切换
+  const onTabsChange = (key: string) => {
+    debugger
+    currentTab = Number(key);
+    getPopupSource();
+    console.log(key);
+    // 切换Tabs时，清空原有数据
+    dtForm.resetFields();
+    dtForm.setFieldsValue({"picLayout": "1"});
+
+  };
   // 保存数据
   const onFinish = async (popData: any) => {
-    if (vertifyFieldForPopup(popData)) {
-      // 需要验证必填项
-      const result = await saveAnnounceContent(anCommonData, popData);
-      if (result.ok) {
-        sucMessage("保存成功！")
-        return;
+    debugger;
+    // 如果是轮播则先放到state中再保存
+    if (anCommonData?.announce_carousel === 1) {
+      getPopupSource();
+    } else {
+      if (vertifyFieldForPopup(popData)) {
+        // 需要验证必填项
+        const result = await saveAnnounceContent(anCommonData, popData);
+        if (result.ok) {
+          sucMessage("保存成功！")
+          return;
+        }
+        errorMessage("保存失败！");
       }
-      errorMessage("保存失败！");
     }
+
   };
+
 
   return (
     <PageContainer>

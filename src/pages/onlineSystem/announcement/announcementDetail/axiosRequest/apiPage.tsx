@@ -78,7 +78,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
     }
   }
 
-  return axiosPost('/api/77hub/notice', {...data, ...specialData});
+  // return axiosPost('/api/77hub/notice', {...data, ...specialData});
 };
 
 // 发送（保存）公告(旧的发布过程在用)

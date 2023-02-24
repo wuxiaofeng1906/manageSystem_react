@@ -529,6 +529,7 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'desc',
               width: 100,
               align: 'left',
+              render: (v, record) => record.open ? "" : v,
             },
           ]}
           dataSource={list}

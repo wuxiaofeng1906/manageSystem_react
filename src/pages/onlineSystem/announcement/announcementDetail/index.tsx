@@ -18,14 +18,7 @@ const Announce: React.FC<any> = (props: any) => {
   const {anCommonData, setAnCommonData} = useModel('announcement');
 
   // 公告列表过来的数据
-  const {id: releaseNum, status: operteStatus} = useParams() as {
-    id: string;
-    status: string;
-    type: 'add' | 'detail';
-    backPage: string // 是否是从上一页返回的数据
-  };
-  // 是下页返回的
-  const {backPage} = useParams() as { backPage: string; };
+  const {id: releaseNum} = useParams() as { id: string; type: 'add' | 'detail'; };
   const [announcementForm] = Form.useForm();
   // 如果是消息卡片，则显示一键发布和保存按钮，如果是弹窗卡片，则显示下一步按钮
   const [stepShow, setStepShow] = useState<any>({
@@ -58,13 +51,7 @@ const Announce: React.FC<any> = (props: any) => {
     const announceMsg = document.getElementById("announceContent")?.innerText;
     if (vertifyFieldForCommon(formInfo, announceMsg)) {
       setAnCommonData({...formInfo, announceMsg});
-      // 存储值到session
-      localStorage.setItem('announceItem', JSON.stringify(formInfo));
-      if (formInfo.announce_carousel === 0) {//  不是轮播
-        history.push('/onlineSystem/PopupCard/false/-1');
-      } else {
-        history.push(`/onlineSystem/PopupCard/true/${formInfo.carouselNum}`);
-      }
+      history.push('/onlineSystem/PopupCard');
     }
   }
   // 监听删除键是否用于删除公告详情中的数据
@@ -74,26 +61,19 @@ const Announce: React.FC<any> = (props: any) => {
     }
     return true;
   }
-  // 关闭窗口和错误的时候删除缓存
-  window.onunload = () => {
-    // 不是返回的上一页才删除缓存
-    if (backPage === "false") localStorage.removeItem("announceItem");
-  }
-  window.onerror = () => localStorage.removeItem("announceItem");
 
   useEffect(() => {
-    // 先判断有没有缓存，有的话则显示缓存(缓存是存储的之前编辑的数据，跳转到下一页后又返回来了)
-    const content = localStorage.getItem("announceItem");
-    if (content && backPage === "true") {
-      // 以下是下一页返回的数据
-      const data = JSON.parse(content);
+    // 先判断有没有存在原始数据（anCommonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
+    if (anCommonData) {
+      // 以下是已有的数据（下一页返回或者历史记录）
       announcementForm.setFieldsValue({
-        modules: data.module,
-        announce_time: moment(data.announce_time),
-        announce_carousel: data.announce_carousel,
-        carouselNum: data.carouselNum
+        announce_name: anCommonData.announce_name,
+        modules: anCommonData.modules,
+        announce_time: moment(anCommonData.announce_time),
+        announce_carousel: anCommonData.announce_carousel,
+        carouselNum: anCommonData.carouselNum
       });
-      if (data.module === 1) { // 如果是消息卡片
+      if (anCommonData.modules === 1) { // 如果是消息卡片
         setStepShow({
           msgCard: "inline",
           popCard: "none"
@@ -108,7 +88,7 @@ const Announce: React.FC<any> = (props: any) => {
     } else {
       announcementForm.setFieldsValue({
         modules: "1",
-        announce_name: `${releaseNum}升级公告`,
+        announce_name: `${dayjs().format("YYYYMMDD")}升级公告`,
         announce_time: moment(),
         announce_carousel: 0, // 默认为否
         carouselNum: 5

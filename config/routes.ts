@@ -208,14 +208,14 @@ export default [
       },
       {
         name: '升级公告详情',
-        path: 'announcementDetail/:id/:type/:status/:backPage',
+        path: 'announcementDetail',
         component: './onlineSystem/announcement/announcementDetail',
         hideInMenu: true,
         wrappers: ['../wrappers/auth'],
       },
       {
         name: '升级公告详情(弹窗)',
-        path: 'PopupCard/:isCarousel/:count',
+        path: 'PopupCard',
         component: './onlineSystem/announcement/announcementDetail/PopupCard',
         hideInMenu: true,
         wrappers: ['../wrappers/auth'],

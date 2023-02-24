@@ -86,7 +86,7 @@ const announcementList = () => {
       type = 'add';
     } else releaseNum = params?.data.announcement_num;
     if (isEmpty(releaseNum)) return infoMessage('数据异常');
-    history.push(`/onlineSystem/announcementDetail/${releaseNum}/${type}/false/false`);
+    history.push(`/onlineSystem/announcementDetail?releaseNum=${releaseNum}&type=add`);
   };
 
   const onDelete = async (params: CellClickedEvent) => {

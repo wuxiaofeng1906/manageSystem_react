@@ -18,12 +18,12 @@ import {useModel} from "@@/plugin-model/useModel";
 // 当前的tab页面
 let currentTab = 1;
 const {Footer} = Layout;
-const {TabPane} = Tabs;
 const PopupCard: React.FC<any> = (props: any) => {
+  debugger;
   const {anCommonData, setAnCommonData, anPopData, setAnnPopData} = useModel('announcement');
   const [dtForm] = Form.useForm();
   // isCarousel是否轮播 ，轮播张数
-  const {isCarousel, count} = useParams() as { isCarousel: string; count: string };
+  // const {isCarousel, count} = useParams() as { isCarousel: string; count: string };
   // 图片上传框
   const [picModalState, setPicModalState] = useState({
     visible: false
@@ -130,18 +130,22 @@ const PopupCard: React.FC<any> = (props: any) => {
         <div className={style.popForm}>
           <Tabs
             onChange={onTabsChange}
-            style={{width: '100%', marginLeft: 80, display: isCarousel === "true" ? "inline-block" : "none"}}>
-            {tabsPanel(Number(count))}
+            style={{
+              width: '100%',
+              marginLeft: 80,
+              display: anCommonData?.announce_carousel === 1 ? "inline-block" : "none"
+            }}>
+            {tabsPanel(Number(anCommonData?.carouselNum))}
           </Tabs>
           <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}>
             {/* 特性名称只针对轮播功能 */}
-            <Row style={{display: isCarousel === "true" ? "inline-block" : "none"}}>
+            <Row style={{display: anCommonData?.announce_carousel === 1 ? "inline-block" : "none"}}>
               <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>
                 <Input style={{minWidth: 400}}></Input>
               </Form.Item>
             </Row>
             {/* 特性名称只针对不轮播功能 */}
-            <Row style={{display: isCarousel === "true" ? "none" : "inline-flex"}}>
+            <Row style={{display: anCommonData?.announce_carousel === 1 ? "none" : "inline-flex"}}>
               <Col>
                 <Form.Item label={"语雀迭代版本地址："} name={"yuQueUrl"}>
                   <Input style={{minWidth: 400}} placeholder={"从语雀复制更新版本地址"} spellCheck={"false"}></Input>
@@ -246,7 +250,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                   <Button className={style.commonBtn} style={{marginLeft: 10}}>一键发布</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}}>预览</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}}
-                          onClick={() => history.push(`/onlineSystem/announcementDetail/1/1/false/true`)}>上一步</Button>
+                          onClick={() => history.push(`/onlineSystem/announcementDetail`)}>上一步</Button>
                 </div>
               </Footer>
             </Form.Item>

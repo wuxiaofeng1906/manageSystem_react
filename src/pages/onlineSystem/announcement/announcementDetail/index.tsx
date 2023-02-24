@@ -101,8 +101,6 @@ const Announce: React.FC<any> = (props: any) => {
       setCarouselNumShow("none");
     }
   }, []);
-
-
   // 保存消息卡面数据
   const saveMsgInfo = async () => {
     const announceMsg = document.getElementById("announceContent")?.innerText;
@@ -128,7 +126,10 @@ const Announce: React.FC<any> = (props: any) => {
         message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
       />
       <div style={{marginTop: -15, background: 'white', padding: 10}}>
-        <Form form={announcementForm} autoComplete={"off"}>
+        <Form form={announcementForm} autoComplete={"off"}
+              onFieldsChange={() => {
+                if (!leaveShow) setLeaveShow(true);
+              }}>
           <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
             {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
             <Radio.Group onChange={cardChanged}>

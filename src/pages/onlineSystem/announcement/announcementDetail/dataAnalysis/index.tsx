@@ -39,25 +39,27 @@ export const vertifyFieldForCommon = (formInfo: any, announceMsg: any) => {
 
 
 // 验证字段的必填项(弹窗界面)
-export const vertifyFieldForPopup = (popData: any) => {
-  // if (!popData.uploadPic) {
-  //   errorMessage("图片不能为空！");
-  //   return false;
-  // }
-  // const specialData = popData.ptyGroup;
-  (popData.ptyGroup).map((v: any) => {
-    if (isEmpty((v.first).trim())) {
-      errorMessage("一级特性不能为空！");
+export const vertifyFieldForPopup = (popDataArray: any) => {
+  popDataArray.map((popData: any) => {
+    if (!popData.uploadPic) {
+      errorMessage("图片不能为空！");
       return false;
     }
+    (popData.ptyGroup).map((v: any) => {
+      if (isEmpty((v.first).trim())) {
+        errorMessage("一级特性不能为空！");
+        return false;
+      }
+      return true;
+    });
     return true;
-  })
+  });
   return true;
 };
 
 
 // 动态panes
-export const tabsPanel = (count:number) => {
+export const tabsPanel = (count: number) => {
   const panes = [];
   for (let i = 1; i <= Number(count); i++) {
     panes.push(<Tabs.TabPane tab={<label style={{fontSize: "medium"}}> 第{i}张 </label>} key={i}

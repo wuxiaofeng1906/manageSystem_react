@@ -71,50 +71,58 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     setSpinLoading(false);
   };
+
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
-  const getPopupSource = () => {
-    debugger
+  const getPopupSource = (currentKey: number) => {
     const specialList = dtForm.getFieldsValue();
     // 覆盖已有当前页的数据或者添加新数据
     const oldList = [...anPopData];
-    oldList.map((v) => {
-      v.tabPage === currentTab ? v.tabsContent = specialList : v.tabsContent;
+    oldList.map((v: any) => {
+      v.tabPage === currentKey ? v.tabsContent = specialList : v.tabsContent;
     });
+    setAnnPopData(oldList);
 
-    debugger;
+    // 返回值共保存按钮使用
+    return oldList;
   }
   // tab切换
   const onTabsChange = (key: string) => {
-    debugger
+    // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
+    getPopupSource(currentTab);
+    const oldList = [...anPopData];
+    oldList.map((v: any) => {
+      if (v.tabPage === Number(key)) {
+        if (JSON.stringify(v.tabsContent) !== "{}") {
+          dtForm.setFieldsValue(v.tabsContent)
+        } else {
+          dtForm.resetFields();
+          dtForm.setFieldsValue({"picLayout": "1"});
+        }
+      }
+    });
+    //  需要最后再赋值当前tab页码
     currentTab = Number(key);
-    getPopupSource();
-    console.log(key);
-    // 切换Tabs时，清空原有数据
-    dtForm.resetFields();
-    dtForm.setFieldsValue({"picLayout": "1"});
-
   };
+
   // 保存数据
   const onFinish = async (popData: any) => {
-    debugger;
+    let finalData = [popData];
     // 如果是轮播则先放到state中再保存
     if (anCommonData?.announce_carousel === 1) {
-      getPopupSource();
-    } else {
-      if (vertifyFieldForPopup(popData)) {
-        // 需要验证必填项
-        const result = await saveAnnounceContent(anCommonData, popData);
-        if (result.ok) {
-          sucMessage("保存成功！")
-          return;
-        }
-        errorMessage("保存失败！");
+      finalData = getPopupSource(currentTab);
+    }
+
+    if (vertifyFieldForPopup([popData])) {
+      // 需要验证必填项
+      const result = await saveAnnounceContent(anCommonData, finalData);
+      if (result.ok) {
+        sucMessage("保存成功！")
+        return;
       }
+      errorMessage("保存失败！");
     }
 
   };
-
-
   return (
     <PageContainer>
       {/* 要轮播界面 */}

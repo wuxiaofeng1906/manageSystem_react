@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider} from 'antd';
+import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Spin} from 'antd';
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
 import moment from 'moment';
@@ -12,11 +12,13 @@ import {saveAnnounceContent} from "./axiosRequest/apiPage";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
+import {Prompt} from "react-router-dom";
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
   const {anCommonData, setAnCommonData} = useModel('announcement');
-
+  // 是否可以离开这个页面（只有在数据已经保存了才能离开）
+  const [leaveShow, setLeaveShow] = useState(false);
   // 公告列表过来的数据
   const {id: releaseNum} = useParams() as { id: string; type: 'add' | 'detail'; };
   const [announcementForm] = Form.useForm();
@@ -56,7 +58,8 @@ const Announce: React.FC<any> = (props: any) => {
   }
   // 监听删除键是否用于删除公告详情中的数据
   document.onkeydown = function (event: KeyboardEvent) {
-    if (event?.code === "Backspace" && event.target?.innerText.endsWith("更新升级。更新功能：")) {
+
+    if (event?.code === "Backspace" && announcementForm.getFieldValue("announce_content").endsWith("更新升级。更新功能：")) {
       return false;
     }
     return true;
@@ -70,6 +73,7 @@ const Announce: React.FC<any> = (props: any) => {
         announce_name: anCommonData.announce_name,
         modules: anCommonData.modules,
         announce_time: moment(anCommonData.announce_time),
+        announce_content: anCommonData.announce_content,
         announce_carousel: anCommonData.announce_carousel,
         carouselNum: anCommonData.carouselNum
       });
@@ -87,6 +91,7 @@ const Announce: React.FC<any> = (props: any) => {
       setCarouselNumShow("inline");
     } else {
       announcementForm.setFieldsValue({
+        announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
         modules: "1",
         announce_name: `${dayjs().format("YYYYMMDD")}升级公告`,
         announce_time: moment(),
@@ -118,6 +123,10 @@ const Announce: React.FC<any> = (props: any) => {
 
   return (
     <PageContainer>
+      <Prompt
+        when={leaveShow}
+        message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
+      />
       <div style={{marginTop: -15, background: 'white', padding: 10}}>
         <Form form={announcementForm} autoComplete={"off"}>
           <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
@@ -158,13 +167,15 @@ const Announce: React.FC<any> = (props: any) => {
           </Form.Item>
 
           <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-            <div id={"announceContent"} contentEditable={"true"}
-                 style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>
-              <label
-                contentEditable={"false"}
-                style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：
-              </label>
-            </div>
+            {/*<div id={"announceContent"} contentEditable={"true"}*/}
+            {/*     style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>*/}
+            {/*  <label*/}
+            {/*    contentEditable={"false"}*/}
+            {/*    style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：*/}
+            {/*  </label>*/}
+            {/*</div>*/}
+
+            <Input style={{minWidth: 300, width: "50%"}}/>
           </Form.Item>
 
           <div id={"popup"} style={{display: stepShow.popCard}}>

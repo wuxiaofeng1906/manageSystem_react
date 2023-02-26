@@ -13,6 +13,7 @@ import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
 import {Prompt} from "react-router-dom";
+const { TextArea } = Input;
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
@@ -122,13 +123,13 @@ const Announce: React.FC<any> = (props: any) => {
   return (
     <PageContainer>
       <Prompt
-        when={leaveShow}
+        when={false}
         message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
       />
       <div style={{marginTop: -15, background: 'white', padding: 10}}>
         <Form form={announcementForm} autoComplete={"off"}
               onFieldsChange={() => {
-                if (!leaveShow) setLeaveShow(true);
+                // if (!leaveShow) setLeaveShow(true);
               }}>
           <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
             {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
@@ -176,7 +177,7 @@ const Announce: React.FC<any> = (props: any) => {
             {/*  </label>*/}
             {/*</div>*/}
 
-            <Input style={{minWidth: 300, width: "50%"}}/>
+            <TextArea style={{minWidth: 300, width: "50%"}}/>
           </Form.Item>
 
           <div id={"popup"} style={{display: stepShow.popCard}}>

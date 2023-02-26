@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Image, Radio, Tabs, Divider, Layout,
+  Button, Form, Input, Row, Col, Modal, Upload, Image, Radio, Tabs, Divider, Layout, UploadProps,
   Spin
 } from 'antd';
-import {useParams} from "umi";
+// import {useParams} from "umi";
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
@@ -14,7 +14,8 @@ import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-import {defaultImgsUrl, bannerTips} from "../uploadPic/index"
+import {defaultImgsUrl, bannerTips} from "../uploadPic/index";
+// import {NoticeImageUploader} from "../uploadPic/NoticeImageUploader"
 
 // 当前的tab页面
 let currentTab = 1;
@@ -133,6 +134,30 @@ const PopupCard: React.FC<any> = (props: any) => {
       setPicModalState({...picModalState, checkedImg: e.target.currentSrc})
     }
   }
+
+  const upProps: UploadProps = {
+    name: 'file',
+    action: 'http://baseapp.cn-northwest-0.77hub.com/baseapp/Attachment/signature/post?fileName=xxx.jpg&isPublicRead=true&isHttp=false',
+    headers: {
+      authorization: 'authorization-text',
+    },
+    onChange(info) {
+      debugger
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        sucMessage(`${info.file.name} 上传成功`);
+      } else if (info.file.status === 'error') {
+        errorMessage(`伤上传失败，原因:${info.file.response.message}`);
+      }
+    },
+  };
+
+  const files: any = [];
+  const uploadPic = () => {
+
+  };
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -275,7 +300,6 @@ const PopupCard: React.FC<any> = (props: any) => {
              onCancel={() => setPicModalState({visible: false})}
              width={700}>
 
-
         <div className={style.imgComponentBox}>
           <div className={style.defaultBox}>
             <div className={style.titleBox}>
@@ -291,29 +315,23 @@ const PopupCard: React.FC<any> = (props: any) => {
           <div className={style.padBox}/>
           <div className={style.setBox}>
             <h5 className={style.titlew7}>从本地上传</h5>
-            {/*<NoticeImageUploader*/}
-            {/*  autoUpload*/}
-            {/*  isPublic={true}*/}
-            {/*  files={files}*/}
-            {/*  reload={true}*/}
-            {/*  className={style.autoWidth}*/}
-            {/*  noDelete={noDelete}*/}
-            {/*  noUpload={noUpload}*/}
-            {/*  onFileUploaded={res => {*/}
-            {/*    runInAction(() => {*/}
-            {/*      this.bannerPath = `${res.url}/${res.key}`;*/}
-            {/*      this.setState({checkedImg: this.bannerPath})*/}
-            {/*      // this.props.onUpdate && this.props.onUpdate(this.bannerPath);*/}
-            {/*    });*/}
-            {/*  }}*/}
-            {/*  onFileDeleted={() => {*/}
-            {/*    this.bannerPath = ''*/}
-            {/*    this.setState({checkedImg: ''})*/}
-            {/*  }}*/}
-            {/*  onUploadError={() => {*/}
-            {/*    showError('上传失败!');*/}
-            {/*  }}*/}
-            {/*/>*/}
+            <div style={{
+              marginTop: 13,
+              height: 115,
+              width: "100%",
+              backgroundColor: "#FAFAFA",
+              textAlign: "center",
+              lineHeight: 8,
+              border: "1px dashed Gainsboro"
+            }}>
+
+              <Upload {...upProps}>
+                <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>
+              </Upload>
+
+              {/*<PlusOutlined style={{height: 20, width: 20}} onClick={uploadPic}/>*/}
+              {/*<Button>点击进行图片上传</Button>*/}
+            </div>
             <div className={style.hintInfo}>{bannerTips}</div>
           </div>
         </div>

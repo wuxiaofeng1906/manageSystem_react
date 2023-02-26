@@ -14,6 +14,7 @@ import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
+import {defaultImgsUrl, bannerTips} from "../uploadPic/index"
 
 // 当前的tab页面
 let currentTab = 1;
@@ -26,7 +27,8 @@ const PopupCard: React.FC<any> = (props: any) => {
   // const {isCarousel, count} = useParams() as { isCarousel: string; count: string };
   // 图片上传框
   const [picModalState, setPicModalState] = useState({
-    visible: false
+    visible: false,
+    checkedImg: ""
   });
   const [spinLoading, setSpinLoading] = useState(false);
   useEffect(() => {
@@ -123,6 +125,14 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
 
   };
+
+  // 选择图片时
+  const picChecked = (e: any) => {
+    if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
+      debugger
+      setPicModalState({...picModalState, checkedImg: e.target.currentSrc})
+    }
+  }
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -258,57 +268,106 @@ const PopupCard: React.FC<any> = (props: any) => {
         </div>
       </Spin>
 
-      {/* 图片上传弹出框 */
+      {/* 图片上传弹出框 picModalState.visible */
       }
-      <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
+      <Modal title="上传图片" visible={true} centered={true} maskClosable={false}
              onOk={() => setPicModalState({visible: false})}
              onCancel={() => setPicModalState({visible: false})}
              width={700}>
+
+
+        <div className={style.imgComponentBox}>
+          <div className={style.defaultBox}>
+            <div className={style.titleBox}>
+              <h5 className={style.titlew}>选择默认图片</h5>
+            </div>
+            <ul className={style.imgList} onClick={picChecked}>
+              {defaultImgsUrl.map(item => (
+                <li key={item} data-value={item} className={picModalState.checkedImg === item ? style.activeChose : ''}>
+                  <img key={item} data-value={item} src={item} alt="默认图"/>
+                </li>))}
+            </ul>
+          </div>
+          <div className={style.padBox}/>
+          <div className={style.setBox}>
+            <h5 className={style.titlew7}>从本地上传</h5>
+            {/*<NoticeImageUploader*/}
+            {/*  autoUpload*/}
+            {/*  isPublic={true}*/}
+            {/*  files={files}*/}
+            {/*  reload={true}*/}
+            {/*  className={style.autoWidth}*/}
+            {/*  noDelete={noDelete}*/}
+            {/*  noUpload={noUpload}*/}
+            {/*  onFileUploaded={res => {*/}
+            {/*    runInAction(() => {*/}
+            {/*      this.bannerPath = `${res.url}/${res.key}`;*/}
+            {/*      this.setState({checkedImg: this.bannerPath})*/}
+            {/*      // this.props.onUpdate && this.props.onUpdate(this.bannerPath);*/}
+            {/*    });*/}
+            {/*  }}*/}
+            {/*  onFileDeleted={() => {*/}
+            {/*    this.bannerPath = ''*/}
+            {/*    this.setState({checkedImg: ''})*/}
+            {/*  }}*/}
+            {/*  onUploadError={() => {*/}
+            {/*    showError('上传失败!');*/}
+            {/*  }}*/}
+            {/*/>*/}
+            <div className={style.hintInfo}>{bannerTips}</div>
+          </div>
+        </div>
+
         {/* title */}
-        <Row>
-          <Col span={12}>
-            <h4 style={{fontWeight: "bold"}}>选择默认图片</h4>
-          </Col>
-          <Col span={12}>
-            <h4 style={{fontWeight: "bold"}}>从本地上传</h4>
-          </Col>
-        </Row>
+        {/*<Row>*/}
+        {/*  <Col span={12}>*/}
+        {/*    <h4 style={{fontWeight: "bold"}}>选择默认图片</h4>*/}
+        {/*  </Col>*/}
+        {/*  <Col span={12}>*/}
+        {/*    <h4 style={{fontWeight: "bold"}}>从本地上传</h4>*/}
+        {/*  </Col>*/}
+        {/*</Row>*/}
         {/* 图片展示和上传 */}
-        <Row>
+        {/*<Row>*/}
+        {/*  <Col span={12}>*/}
+        {/*    <div onClick={(e) => {*/}
+        {/*      // debugger*/}
+        {/*      // console.log(e)*/}
+        {/*    }}>*/}
+        {/*      <Image*/}
+        {/*        height={150} width={'90%'}*/}
+        {/*        src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"*/}
+        {/*      />*/}
 
-          <Col span={12}>
-            <div>
-              <Image
-                height={150} width={'90%'}
-                src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-              />
-            </div>
-            <div style={{marginTop: 10}}>
-              <Image
-                height={150} width={'90%'}
-                src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-              />
-            </div>
-            <div style={{marginTop: 10}}>
-              <Image
-                height={150} width={'90%'}
-                src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-              />
-            </div>
+        {/*      <img key={defaultImgsUrl[0]} data-value={defaultImgsUrl[0]} src={defaultImgsUrl[0]} alt="默认图" height={150}*/}
+        {/*           width={'90%'}/>*/}
+        {/*    </div>*/}
+        {/*    <div style={{marginTop: 10}}>*/}
+        {/*      <Image*/}
+        {/*        height={150} width={'90%'}*/}
+        {/*        src={defaultImgsUrl[1]}*/}
+        {/*      />*/}
+        {/*    </div>*/}
+        {/*    <div style={{marginTop: 10}}>*/}
+        {/*      <Image*/}
+        {/*        height={150} width={'90%'}*/}
+        {/*        src={defaultImgsUrl[2]}*/}
+        {/*      />*/}
+        {/*    </div>*/}
 
-          </Col>
-          <Col span={12}>
+        {/*  </Col>*/}
+        {/*  <Col span={12}>*/}
 
-            {/*<Upload*/}
-            {/*  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"*/}
-            {/*  listType="picture-circle"*/}
+        {/*    /!*<Upload*!/*/}
+        {/*    /!*  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"*!/*/}
+        {/*    /!*  listType="picture-circle"*!/*/}
 
-            {/*>*/}
-            {/*  {fileList.length < 5 && '+ Upload'}*/}
-            {/*</Upload>*/}
+        {/*    /!*>*!/*/}
+        {/*    /!*  {fileList.length < 5 && '+ Upload'}*!/*/}
+        {/*    /!*</Upload>*!/*/}
 
-          </Col>
-        </Row>
+        {/*  </Col>*/}
+        {/*</Row>*/}
 
       </Modal>
     </PageContainer>

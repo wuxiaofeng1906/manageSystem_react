@@ -1,5 +1,6 @@
 // 解析数据
 const parseData = (params: any) => {
+  debugger
   const returnValue: any = [];
   if (params) {
     params.forEach((project: any) => {
@@ -87,6 +88,14 @@ const parseData = (params: any) => {
       const projectItem_emitter = {
         person_num: '',
         user_tech: 'emitter',
+        user_name: '',
+        duty_start_time: '',
+        duty_end_time: '',
+        duty_order: '',
+      };
+      const projectItem_idps = {
+        person_num: '',
+        user_tech: 'idps',
         user_name: '',
         duty_start_time: '',
         duty_end_time: '',
@@ -293,6 +302,24 @@ const parseData = (params: any) => {
                   : `${projectItem_emitter.user_name}/${username}`;
             }
             break;
+          case 'idps':
+            projectItem_idps.person_num = ele.person_num;
+            projectItem_idps.user_tech = ele.user_tech;
+            projectItem_idps.duty_start_time = ele.duty_start_time;
+            projectItem_idps.duty_end_time = ele.duty_end_time;
+            projectItem_idps.duty_order = ele.duty_order;
+            if (ele.duty_order === '1') {
+              projectItem_idps.user_name =
+                projectItem_idps.user_name === ''
+                  ? username
+                  : `${username}/${projectItem_idps.user_name}`;
+            } else {
+              projectItem_idps.user_name =
+                projectItem_idps.user_name === ''
+                  ? username
+                  : `${projectItem_idps.user_name}/${username}`;
+            }
+            break;
           default:
             break;
         }
@@ -309,6 +336,7 @@ const parseData = (params: any) => {
           projectItemArray.push(projectItem_qbos_store);
           projectItemArray.push(projectItem_jsf);
           projectItemArray.push(projectItem_emitter);
+          projectItemArray.push(projectItem_idps);
         }
       });
       returnValue.push(projectItemArray);
@@ -319,6 +347,7 @@ const parseData = (params: any) => {
 };
 
 const parseSaveCardData = (data: any, oldDutyTask: any, startTime: string, endTime: string) => {
+  debugger
   const person_data_array: any = [];
 
   const {
@@ -344,6 +373,8 @@ const parseSaveCardData = (data: any, oldDutyTask: any, startTime: string, endTi
     secondDevops,
     firstEmitter,
     secondEmitter,
+    firstIdps,
+    secondIdps,
   } = data;
 
   // 前端第一值班人
@@ -609,7 +640,30 @@ const parseSaveCardData = (data: any, oldDutyTask: any, startTime: string, endTi
     },
   );
 
+  // idps
+  person_data_array.push(
+    {
+      peron_num: oldDutyTask.personNum,
+      duty_start_time: startTime,
+      duty_end_time: endTime,
+      person_id: oldDutyTask.firstIdpsId,
+      user_id: firstIdps === null ? '' : firstIdps?.split('&')[0],
+      user_name: firstIdps === null ? '' : firstIdps?.split('&')[1],
+      user_tech: '15',
+      duty_order: '1',
+    },
+    {
+      peron_num: oldDutyTask.personNum,
+      duty_start_time: startTime,
+      duty_end_time: endTime,
+      person_id: oldDutyTask.secondIdpsId,
+      user_id: secondIdps === null ? '' : secondIdps?.split('&')[0],
+      user_name: secondIdps === null ? '' : secondIdps?.split('&')[1],
+      user_tech: '15',
+      duty_order: '2',
+    },
+  );
   return person_data_array;
 };
 
-export { parseData, parseSaveCardData };
+export {parseData, parseSaveCardData};

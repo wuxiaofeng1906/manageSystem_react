@@ -9,15 +9,20 @@ export const getS3Key = async (fileName: string) => {
   return result;
 };
 
+const getBase64 = (file: File) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+};
+
 // 上传图片到上s3服务器
 export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
 
-  const fileReader = new FileReader();  // 通过FileReader对象读取文件
-  fileReader.readAsDataURL(picFile.originFileObj);
-  let result;
-  var formdata = new FormData();
-
   const data = {...s3Data.fields};
+  var formdata = new FormData();
   formdata.append("x-amz-date", data["x-amz-date"]);
   formdata.append("x-amz-signature", data["x-amz-signature"]);
   formdata.append("x-amz-meta-extension", data["x-amz-meta-extension"]);
@@ -30,13 +35,10 @@ export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
   formdata.append("Content-Type", data["Content-Type"]);
   formdata.append("policy", data["policy"]);
   // 获取二进制文件
-  fileReader.onload = async (event: any) => {
-    formdata.append("file", event.target?.result);
-    debugger
-    result = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, formdata);
-
-  };
-
+  const temp: any = await getBase64(picFile.originFileObj);
+  formdata.append("file", temp.toString());
+  debugger
+  return await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, {data:formdata});
 
   // console.log(result)
   // http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-test

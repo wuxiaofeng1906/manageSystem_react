@@ -77,15 +77,14 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
-    debugger
     const specialList = dtForm.getFieldsValue();
+    specialList.uploadPic = picModalState.checkedImg;
     // 覆盖已有当前页的数据或者添加新数据
     const oldList = [...anPopData];
     oldList.map((v: any) => {
       v.tabPage === currentKey ? v.tabsContent = specialList : v.tabsContent;
     });
     setAnnPopData(oldList);
-
     // 返回值共保存按钮使用
     return oldList;
   };
@@ -112,10 +111,14 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 保存数据
   const onFinish = async (popData: any) => {
     debugger
-    let finalData = [popData];
+    let finalData = [];
     // 如果是轮播则先放到state中再保存
     if (anCommonData?.announce_carousel === 1) {
       finalData = getPopupSource(currentTab);
+    } else {
+      // 不是轮播，需要把图片路径放进去
+      popData.uploadPic = picModalState.checkedImg;
+      finalData.push(popData);
     }
     if (vertifyFieldForPopup([popData])) {
       // 需要验证必填项
@@ -140,7 +143,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 点击确定按钮
   const uploadPicClick = async () => {
     // 判断是不是自动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
-    debugger;
     // 之前就选择了图片
     if (picModalState.checkedImg) {
       setPicModalState({...picModalState, visible: false})

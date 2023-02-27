@@ -102,16 +102,13 @@ const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) =
 };
 
 const axiosPost_77Service = async (url: string, bodyData: any = {}, queryData: any = {}) => {
-  // axios.defaults.headers["Content-Type"] = "multipart/form-data;";
-  // axios.defaults.headers["contentType"] = "multipart/form-data;";
-
   let result: any = {};
   await axios
     .post(url, bodyData, {
       params: queryData,
       headers: {
-        "contentType": "multipart/form-data; boundary=--------------------------983285823331796075899474",
-        "Content-Type": "multipart/form-data; boundary=--------------------------983285823331796075899474",
+        "contentType": "multipart/form-data; boundary=983285823331796075899474",
+        "Content-Type": "multipart/form-data; boundary=983285823331796075899474",
         "Authorization": ""
       }
     })

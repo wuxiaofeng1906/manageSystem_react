@@ -329,8 +329,8 @@ const PopupCard: React.FC<any> = (props: any) => {
                 beforeUpload={() => {
                   return false
                 }}
-                onChange={({fileList}) => {
-                  setFileList(fileList);
+                onChange={(v: any) => {
+                  setFileList(v.fileList);
                   // 清空之前选的图片
                   setPicModalState({checkedImg: "", visible: false})
                 }}

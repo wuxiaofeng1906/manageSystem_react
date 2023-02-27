@@ -12,20 +12,31 @@ export const getS3Key = async (fileName: string) => {
 // 上传图片到上s3服务器
 export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
 
-  debugger
   const fileReader = new FileReader();  // 通过FileReader对象读取文件
-  fileReader.readAsDataURL(picFile.originFileObj); // 图片、文字、需要用不同的转换，
+  fileReader.readAsDataURL(picFile.originFileObj);
   let result;
+  var formdata = new FormData();
 
-  new Promise((returnValue, reject) => {
-    fileReader.onload = async (event: any) => {
-      const picFlow = event.target?.result;
-      const data = {...s3Data.fields};
-      data["file"] = picFlow;
-      result = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, data);
-      returnValue(result);
-    };
-  });
+  const data = {...s3Data.fields};
+  formdata.append("x-amz-date", data["x-amz-date"]);
+  formdata.append("x-amz-signature", data["x-amz-signature"]);
+  formdata.append("x-amz-meta-extension", data["x-amz-meta-extension"]);
+  formdata.append("Content-Disposition", data["Content-Disposition"]);
+  formdata.append("x-amz-meta-name", data["x-amz-meta-name"]);
+  formdata.append("acl", data["acl"]);
+  formdata.append("key", data["key"]);
+  formdata.append("x-amz-algorithm", data["x-amz-algorithm"]);
+  formdata.append("x-amz-credential", data["x-amz-credential"]);
+  formdata.append("Content-Type", data["Content-Type"]);
+  formdata.append("policy", data["policy"]);
+  // 获取二进制文件
+  fileReader.onload = async (event: any) => {
+    formdata.append("file", event.target?.result);
+    debugger
+    result = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, formdata);
+
+  };
+
 
   // console.log(result)
   // http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-test

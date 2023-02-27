@@ -7,7 +7,7 @@ import {
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
-import {getYuQueContent, saveAnnounceContent} from '../axiosRequest/apiPage';
+import {getYuQueContent, oneKeyToRelease, saveAnnounceContent} from '../axiosRequest/apiPage';
 import {analysisSpecialTitle, vertifyFieldForPopup, tabsPanel} from "../dataAnalysis";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
@@ -21,7 +21,7 @@ import {getS3Key, uploadPicToS3} from "../uploadPic/NoticeImageUploader";
 let currentTab = 1;
 const {Footer} = Layout;
 const PopupCard: React.FC<any> = (props: any) => {
-  const {anCommonData, anPopData, setAnnPopData} = useModel('announcement');
+  const {anCommonData, anPopData, setAnnPopData, showPulishButton} = useModel('announcement');
   const [dtForm] = Form.useForm();
 
   // 图片上传弹出层显示
@@ -108,8 +108,13 @@ const PopupCard: React.FC<any> = (props: any) => {
     currentTab = Number(key);
   };
 
+  // 获取所有数据并进行校验
+  const getAllData = ()=>{
+
+  }
   // 保存数据
   const onFinish = async (popData: any) => {
+
     debugger
     let finalData = [];
     // 如果是轮播则先放到state中再保存
@@ -120,7 +125,8 @@ const PopupCard: React.FC<any> = (props: any) => {
       popData.uploadPic = picModalState.checkedImg;
       finalData.push(popData);
     }
-    if (vertifyFieldForPopup([popData])) {
+    if (vertifyFieldForPopup(finalData)) {
+      debugger
       // 需要验证必填项
       const result = await saveAnnounceContent(anCommonData, finalData);
       if (result.ok) {
@@ -166,6 +172,19 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
   };
 
+  // 预览
+  const onPreView = () => {
+    //   需要需要校验不能为空
+    vertifyFieldForPopup([popData])
+  }
+
+  // 一键发布
+  const releaseAnnounceInfo = async () => {
+    const releaseResult = await oneKeyToRelease("");
+    if (releaseResult.ok) {
+      sucMessage("公告发布成功！")
+    }
+  };
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -290,8 +309,10 @@ const PopupCard: React.FC<any> = (props: any) => {
                 <div id={"message"}>
                   <Button className={style.saveButtonStyle} type="primary" style={{marginLeft: 10}}
                           htmlType="submit">保存</Button>
-                  <Button className={style.commonBtn} style={{marginLeft: 10}}>一键发布</Button>
-                  <Button className={style.commonBtn} style={{marginLeft: 10}}>预览</Button>
+                  <Button className={style.commonBtn}
+                          style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
+                          onClick={releaseAnnounceInfo}>一键发布</Button>
+                  <Button className={style.commonBtn} style={{marginLeft: 10}} onClick={onPreView}>预览</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}}
                           onClick={() => history.push(`/onlineSystem/announcementDetail`)}>上一步</Button>
                 </div>

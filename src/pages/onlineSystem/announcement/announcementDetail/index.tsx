@@ -8,7 +8,7 @@ import {history, useParams} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
 import {SIZE} from "./constant";
-import {saveAnnounceContent, announceIsOnlined} from "./axiosRequest/apiPage";
+import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease} from "./axiosRequest/apiPage";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
@@ -18,8 +18,8 @@ const {TextArea} = Input;
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
-  const {anCommonData, setAnCommonData} = useModel('announcement');
-  const [showPulishButton, setShowPulishButton] = useState<boolean>(false);
+  const {anCommonData, setAnCommonData, showPulishButton, setShowPulishButton} = useModel('announcement');
+
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
   const [leaveShow, setLeaveShow] = useState(false);
   // 公告列表过来的数据
@@ -72,7 +72,7 @@ const Announce: React.FC<any> = (props: any) => {
   // 判断是否有上线，有上线才会进行一键发布
   const pulishButtonVisible = async () => {
     const result = await announceIsOnlined("");
-    if (!result.ok) {
+    if (result.ok) {
       setShowPulishButton(true);
     }
   }
@@ -127,8 +127,11 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   // 一键发布
-  const releaseMsgInfo = () => {
-
+  const releaseMsgInfo = async () => {
+    const releaseResult = await oneKeyToRelease("");
+    if (releaseResult.ok) {
+      sucMessage("公告发布成功！")
+    }
   };
 
   return (

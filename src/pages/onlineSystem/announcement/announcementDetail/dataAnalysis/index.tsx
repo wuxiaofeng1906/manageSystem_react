@@ -41,6 +41,7 @@ export const vertifyFieldForCommon = (formInfo: any, announceMsg: any) => {
 // 验证字段的必填项(弹窗界面)
 export const vertifyFieldForPopup = (popDataArray: any) => {
   popDataArray.map((popData: any) => {
+    debugger
     if (!popData.uploadPic) {
       errorMessage("图片不能为空！");
       return false;

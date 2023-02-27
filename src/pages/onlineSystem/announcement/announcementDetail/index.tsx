@@ -8,16 +8,18 @@ import {history, useParams} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
 import {SIZE} from "./constant";
-import {saveAnnounceContent} from "./axiosRequest/apiPage";
+import {saveAnnounceContent, announceIsOnlined} from "./axiosRequest/apiPage";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
 import {Prompt} from "react-router-dom";
-const { TextArea } = Input;
+
+const {TextArea} = Input;
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
   const {anCommonData, setAnCommonData} = useModel('announcement');
+  const [showPulishButton, setShowPulishButton] = useState<boolean>(false);
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
   const [leaveShow, setLeaveShow] = useState(false);
   // 公告列表过来的数据
@@ -59,14 +61,23 @@ const Announce: React.FC<any> = (props: any) => {
   }
   // 监听删除键是否用于删除公告详情中的数据
   document.onkeydown = function (event: KeyboardEvent) {
+    debugger
 
-    if (event?.code === "Backspace" && announcementForm.getFieldValue("announce_content").endsWith("更新升级。更新功能：")) {
+    if (event?.code === "Backspace" && event.target?.value.endsWith("更新升级。更新功能：")) {
       return false;
     }
     return true;
   }
 
+  // 判断是否有上线，有上线才会进行一键发布
+  const pulishButtonVisible = async () => {
+    const result = await announceIsOnlined("");
+    if (!result.ok) {
+      setShowPulishButton(true);
+    }
+  }
   useEffect(() => {
+    pulishButtonVisible();
     // 先判断有没有存在原始数据（anCommonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
     if (anCommonData) {
       // 以下是已有的数据（下一页返回或者历史记录）
@@ -177,7 +188,7 @@ const Announce: React.FC<any> = (props: any) => {
             {/*  </label>*/}
             {/*</div>*/}
 
-            <TextArea style={{minWidth: 300, width: "50%"}}/>
+            <TextArea rows={2} style={{minWidth: 300, width: "50%"}}/>
           </Form.Item>
 
           <div id={"popup"} style={{display: stepShow.popCard}}>
@@ -218,7 +229,7 @@ const Announce: React.FC<any> = (props: any) => {
               style={{marginLeft: 10}} onClick={saveMsgInfo}>保存
             </Button>
             <Button
-              className={style.commonBtn} style={{marginLeft: 10}}
+              className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
               onClick={releaseMsgInfo}>一键发布
             </Button>
           </div>

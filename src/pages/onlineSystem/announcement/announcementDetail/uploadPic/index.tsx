@@ -6,6 +6,3 @@ export const defaultImgsUrl = [
 
 export const bannerTips = '图片支持jpg、jpeg、png等图片格式, 比例将自动为你裁剪为2.35：1，图片的大小不超过10M'
 
-export const getDefaultImgs = () => {
-
-};

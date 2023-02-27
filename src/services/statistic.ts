@@ -834,7 +834,7 @@ const StatisticServices = {
         }
       }
   `);
-    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER'}), loading};
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', multiNumber: 100}), loading};
   },
 
   // 计划偏差率

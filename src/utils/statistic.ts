@@ -1,6 +1,6 @@
-import { intersection, isEmpty, isEqual, uniq, isArray } from 'lodash';
+import {intersection, isEmpty, isEqual, uniq, isArray} from 'lodash';
 import moment from 'moment';
-import { getMonthWeek } from '@/publicMethods/timeMethods';
+import {getMonthWeek} from '@/publicMethods/timeMethods';
 
 // 测试指标-不显示 管理会计研发部，供应链研发部 及子部门
 export const checkTesterGroup = (groups: string[]) =>
@@ -39,7 +39,7 @@ const managers = [
   '胡敬华',
   '何羽',
 ];
-const side = { 1: '前端', 2: '后端' };
+const side = {1: '前端', 2: '后端'};
 const developCenter = '研发中心';
 
 export const mergeArray = (origin: any) => {
@@ -69,6 +69,7 @@ export const mergeArray = (origin: any) => {
   }
   return source;
 };
+
 interface Iparam {
   origin: any[]; // 原数据
   showDenominator?: boolean; // 展示分子，分母
@@ -76,10 +77,13 @@ interface Iparam {
   showSide?: boolean; // 显示前后端
   isMulti?: boolean; // 默认为乘以
   isTest?: boolean; // 测试-指标模块
+  multiNumber?: number // 数据乘以多少（多用于统计单位为%的数据来乘以100）
 }
 
-export const formatTreeData = ({origin = [], showDenominator = false,
-  percent = 1, showSide = false, isMulti = true, isTest = false,}: Iparam) => {
+export const formatTreeData = ({
+                                 origin = [], showDenominator = false,
+                                 percent = 1, showSide = false, isMulti = true, isTest = false, multiNumber = 1
+                               }: Iparam) => {
   if (!origin) return null;
   const result: any = [];
   origin.forEach((elements: any) => {
@@ -92,7 +96,7 @@ export const formatTreeData = ({origin = [], showDenominator = false,
           dept: o.dept,
           extra: o.deptName.includes('全部') ? 1 : o.deptName.includes('班车') ? 2 : 0,
           [`${startTime}range`]: elements.range,
-          [startTime]: isMulti ? o.kpi * percent : o?.kpi / percent,
+          [startTime]: isMulti ? o.kpi * percent * multiNumber : o?.kpi / percent * multiNumber,
         });
       });
     } else {
@@ -101,12 +105,12 @@ export const formatTreeData = ({origin = [], showDenominator = false,
         isDept: true,
         dept: elements.total?.dept,
         [`${startTime}range`]: elements.range,
-        [startTime]: isMulti ? elements.total?.kpi * percent : elements.total?.kpi / percent,
+        [startTime]: isMulti ? elements.total?.kpi * percent * multiNumber : elements.total?.kpi / percent * multiNumber,
         ...(showDenominator
           ? {
-              [`${startTime}_numerator`]: elements.total?.sideKpi?.numerator,
-              [`${startTime}_denominator`]: elements.total?.sideKpi?.denominator,
-            }
+            [`${startTime}_numerator`]: elements.total?.sideKpi?.numerator,
+            [`${startTime}_denominator`]: elements.total?.sideKpi?.denominator,
+          }
           : {}),
       });
     }
@@ -120,10 +124,10 @@ export const formatTreeData = ({origin = [], showDenominator = false,
           [`${startTime}range`]: elements.range,
           ...(showDenominator
             ? {
-                [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
-                [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
-              }
-            : { [startTime]: elements.side.front }),
+              [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+              [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+            }
+            : {[startTime]: elements.side.front}),
         },
         {
           Group: [developCenter, side['2']],
@@ -132,10 +136,10 @@ export const formatTreeData = ({origin = [], showDenominator = false,
           [`${startTime}range`]: elements.range,
           ...(showDenominator
             ? {
-                [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
-                [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
-              }
-            : { [startTime]: elements.side.backend }),
+              [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+              [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+            }
+            : {[startTime]: elements.side.backend}),
         },
       );
     }
@@ -146,9 +150,9 @@ export const formatTreeData = ({origin = [], showDenominator = false,
       // 显示分子分母
       const denominator = showDenominator
         ? {
-            [`${startTime}_numerator`]: dept.sideKpi.numerator,
-            [`${startTime}_denominator`]: dept.sideKpi.denominator,
-          }
+          [`${startTime}_numerator`]: dept.sideKpi.numerator,
+          [`${startTime}_denominator`]: dept.sideKpi.denominator,
+        }
         : {};
       let groups: string[] = [dept.deptName];
       findParent(departments, dept, groups);
@@ -158,7 +162,7 @@ export const formatTreeData = ({origin = [], showDenominator = false,
         isDept: true,
         dept: dept.dept,
         [`${startTime}range`]: elements.range,
-        [startTime]: isMulti ? dept.kpi * percent : dept.kpi / percent,
+        [startTime]: isMulti ? dept.kpi * percent * multiNumber : dept.kpi / percent * multiNumber,
         ...denominator,
       });
       // 判断部门有没有前后端：
@@ -205,12 +209,12 @@ export const formatTreeData = ({origin = [], showDenominator = false,
               isDept: false,
               dept: dept.dept,
               [`${startTime}range`]: elements.range,
-              [startTime]: user.kpi * percent,
+              [startTime]: user.kpi * percent * multiNumber,
               ...(showDenominator
                 ? {
-                    [`${startTime}_numerator`]: user.sideKpi.numerator,
-                    [`${startTime}_denominator`]: user.sideKpi.denominator,
-                  }
+                  [`${startTime}_numerator`]: user.sideKpi.numerator,
+                  [`${startTime}_denominator`]: user.sideKpi.denominator,
+                }
                 : {}),
             });
           }
@@ -233,7 +237,7 @@ export const formatPivotMode = (origin: any[], kind: number) => {
         : `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`;
 
     if (isEmpty(data)) {
-      result.push({ Group: [developCenter], total: 0, title });
+      result.push({Group: [developCenter], total: 0, title});
     } else
       data?.forEach((obj: any) => {
         const startTime = obj.range.start;
@@ -277,7 +281,7 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
     column.push({
       headerName: title,
       children: [
-        { headerName: '自动化覆盖率执行完成时间', field: `execution${start}`, minWidth: 120 },
+        {headerName: '自动化覆盖率执行完成时间', field: `execution${start}`, minWidth: 120},
         {
           headerName: '结构覆盖率',
           field: `instCove${start}`,
@@ -303,10 +307,10 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
         branch: '',
         isDept: true,
         [`branCove${start}`]:
-          ((node?.branchCover?.numerator || 0) / (node.branchCover?.denominator || 0)) * 100,
+        ((node?.branchCover?.numerator || 0) / (node.branchCover?.denominator || 0)) * 100,
         [`execution${start}`]: '',
         [`instCove${start}`]:
-          ((node.instCover?.numerator || 0) / (node.instCover?.denominator || 0)) * 100,
+        ((node.instCover?.numerator || 0) / (node.instCover?.denominator || 0)) * 100,
       });
       if (!isEmpty(node.tech)) {
         node.tech.forEach((tech: any) => {
@@ -315,10 +319,10 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
             branch: tech?.branch,
             isDept: false,
             [`branCove${start}`]:
-              ((tech?.branchCover?.numerator || 0) / (tech?.branchCover?.denominator || 0)) * 100,
+            ((tech?.branchCover?.numerator || 0) / (tech?.branchCover?.denominator || 0)) * 100,
             [`execution${start}`]: tech?.runtime,
             [`instCove${start}`]:
-              ((tech?.instCover?.numerator || 0) / (tech?.instCover?.denominator || 0)) * 100,
+            ((tech?.instCover?.numerator || 0) / (tech?.instCover?.denominator || 0)) * 100,
           });
         });
       }
@@ -332,18 +336,18 @@ export const formatAutoTestCover = (origin: any[], kind: number = 2) => {
               isDept: false,
               isProject: true,
               [`branCove${start}`]:
-                ((exec?.branchCover?.numerator || 0) / (exec?.branchCover?.denominator || 0)) * 100,
+              ((exec?.branchCover?.numerator || 0) / (exec?.branchCover?.denominator || 0)) * 100,
               [`execution${start}`]: exec?.runtime,
               [`instCove${start}`]:
-                ((exec?.instCover?.numerator || 0) / (exec?.instCover?.denominator || 0)) * 100,
+              ((exec?.instCover?.numerator || 0) / (exec?.instCover?.denominator || 0)) * 100,
             },
-            { Group: [...Group, exec.name, ''] },
+            {Group: [...Group, exec.name, '']},
           );
         });
       }
     });
   });
-  return { rowData: mergeArray(result) || [], column, project: uniq(project) };
+  return {rowData: mergeArray(result) || [], column, project: uniq(project)};
 };
 
 export const formatActual = (data: any[]) => {
@@ -357,12 +361,12 @@ export const formatActual = (data: any[]) => {
         [`total${time}`]: o.total?.kpi * 100,
         [`story${time}`]: ((stage?.story?.numerator || 0) / (stage?.story?.denominator || 0)) * 100,
         [`detail${time}`]:
-          ((stage?.detail?.numerator || 0) / (stage?.detail?.denominator || 0)) * 100,
+        ((stage?.detail?.numerator || 0) / (stage?.detail?.denominator || 0)) * 100,
         [`develop${time}`]:
-          ((stage?.develop?.numerator || 0) / (stage?.develop?.denominator || 0)) * 100,
+        ((stage?.develop?.numerator || 0) / (stage?.develop?.denominator || 0)) * 100,
         [`test${time}`]: ((stage?.test?.numerator || 0) / (stage?.test?.denominator || 0)) * 100,
         [`overview${time}`]:
-          ((stage?.overView?.numerator || 0) / (stage?.overView?.denominator || 0)) * 100,
+        ((stage?.overView?.numerator || 0) / (stage?.overView?.denominator || 0)) * 100,
       });
     });
   });

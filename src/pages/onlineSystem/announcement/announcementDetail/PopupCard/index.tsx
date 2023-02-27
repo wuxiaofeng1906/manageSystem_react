@@ -15,13 +15,13 @@ import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
 import {defaultImgsUrl, bannerTips} from "../uploadPic/index";
-// import {NoticeImageUploader} from "../uploadPic/NoticeImageUploader"
+import {getS3Key} from "../uploadPic/NoticeImageUploader";
+
 
 // 当前的tab页面
 let currentTab = 1;
 const {Footer} = Layout;
 const PopupCard: React.FC<any> = (props: any) => {
-  debugger;
   const {anCommonData, setAnCommonData, anPopData, setAnnPopData} = useModel('announcement');
   const [dtForm] = Form.useForm();
   // isCarousel是否轮播 ，轮播张数
@@ -31,6 +31,9 @@ const PopupCard: React.FC<any> = (props: any) => {
     visible: false,
     checkedImg: ""
   });
+
+  // 图片上传文件
+  const [s3ServiceInfo, setS3ServiceInfo] = useState({fields: {}, url: ""});
   const [spinLoading, setSpinLoading] = useState(false);
   useEffect(() => {
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
@@ -130,22 +133,32 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 选择图片时
   const picChecked = (e: any) => {
     if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
-      debugger
       setPicModalState({...picModalState, checkedImg: e.target.currentSrc})
     }
   }
 
   const upProps: UploadProps = {
     name: 'file',
-    action: 'http://baseapp.cn-northwest-0.77hub.com/baseapp/Attachment/signature/post?fileName=xxx.jpg&isPublicRead=true&isHttp=false',
+    // action: 'http://baseapp.cn-northwest-0.77hub.com/baseapp/Attachment/signature/post?fileName=xxx.jpg&isPublicRead=true&isHttp=false',
     headers: {
       authorization: 'authorization-text',
     },
-    onChange(info) {
+    beforeUpload: async (file) => {
+      // debugger
+      //   获取鉴权
+      const s3Info = await getS3Key(file.name);
       debugger
-      if (info.file.status !== 'uploading') {
-        console.log(info.file, info.fileList);
+      if (s3Info) {
+        setS3ServiceInfo(s3Info);
+        return true
       }
+      return false;
+    },
+    onChange(info) {
+      // debugger/
+      // if (info.file.status !== 'uploading') {
+      //   console.log(info.file, info.fileList);
+      // }
       if (info.file.status === 'done') {
         sucMessage(`${info.file.name} 上传成功`);
       } else if (info.file.status === 'error') {

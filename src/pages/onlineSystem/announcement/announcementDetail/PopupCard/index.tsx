@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Image, Radio, Tabs, Divider, Layout, UploadProps,
+  Button, Form, Input, Row, Col, Modal, Upload, Radio, Tabs, Divider, Layout,
   Spin
 } from 'antd';
-// import {useParams} from "umi";
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
@@ -22,18 +21,17 @@ import {getS3Key, uploadPicToS3} from "../uploadPic/NoticeImageUploader";
 let currentTab = 1;
 const {Footer} = Layout;
 const PopupCard: React.FC<any> = (props: any) => {
-  const {anCommonData, setAnCommonData, anPopData, setAnnPopData} = useModel('announcement');
+  const {anCommonData, anPopData, setAnnPopData} = useModel('announcement');
   const [dtForm] = Form.useForm();
-  // isCarousel是否轮播 ，轮播张数
-  // const {isCarousel, count} = useParams() as { isCarousel: string; count: string };
-  // 图片上传框
+
+  // 图片上传弹出层显示
   const [picModalState, setPicModalState] = useState({
     visible: false,
     checkedImg: ""
   });
 
-
-  const [spinLoading, setSpinLoading] = useState(false);
+  // 语雀数据导入（加载）使用
+  const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
   useEffect(() => {
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
     dtForm.setFieldsValue({
@@ -65,7 +63,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       return;
     }
     // 加载中进度显示
-    setSpinLoading(true);
+    setYuQueSpinLoading(true);
     const specialTitles = await getYuQueContent(yuQueUrl);
     if (specialTitles.ok) {
       dtForm.setFieldsValue({
@@ -74,11 +72,12 @@ const PopupCard: React.FC<any> = (props: any) => {
     } else {
       errorMessage("从语雀获取信息失败！")
     }
-    setSpinLoading(false);
+    setYuQueSpinLoading(false);
   };
 
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
+    debugger
     const specialList = dtForm.getFieldsValue();
     // 覆盖已有当前页的数据或者添加新数据
     const oldList = [...anPopData];
@@ -89,7 +88,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     // 返回值共保存按钮使用
     return oldList;
-  }
+  };
+
   // tab切换
   const onTabsChange = (key: string) => {
     // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
@@ -111,12 +111,12 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any) => {
+    debugger
     let finalData = [popData];
     // 如果是轮播则先放到state中再保存
     if (anCommonData?.announce_carousel === 1) {
       finalData = getPopupSource(currentTab);
     }
-
     if (vertifyFieldForPopup([popData])) {
       // 需要验证必填项
       const result = await saveAnnounceContent(anCommonData, finalData);
@@ -126,7 +126,6 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
       errorMessage("保存失败！");
     }
-
   };
 
   // upload 组件使用上传图片
@@ -144,6 +143,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     debugger;
     // 之前就选择了图片
     if (picModalState.checkedImg) {
+      setPicModalState({...picModalState, visible: false})
       return;
     }
     // 这个是保存自己上传的图片
@@ -155,7 +155,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         if (upResult && upResult.status === 200) {
           const picUrl = `${s3Info.url}/${s3Info.fields?.key}`;
           debugger;
-          setPicModalState({checkedImg: picUrl, visible: false})
+          setPicModalState({checkedImg: picUrl, visible: false});
 
         } else {
           errorMessage("图片上传失败");
@@ -167,7 +167,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   return (
     <PageContainer>
       {/* 要轮播界面 */}
-      <Spin spinning={spinLoading} size={"large"} tip={"数据同步中，请稍后..."}>
+      <Spin spinning={yuQueSpinLoading} size={"large"} tip={"数据同步中，请稍后..."}>
         <div className={style.popForm}>
           <Tabs
             onChange={onTabsChange}
@@ -299,9 +299,8 @@ const PopupCard: React.FC<any> = (props: any) => {
         </div>
       </Spin>
 
-      {/* 图片上传弹出框 picModalState.visible */
-      }
-      <Modal title="上传图片" visible={true} centered={true} maskClosable={false}
+      {/* 图片上传弹出框 picModalState.visible */}
+      <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
              onOk={uploadPicClick}
              onCancel={() => setPicModalState({...picModalState, visible: false})}
              width={700}>

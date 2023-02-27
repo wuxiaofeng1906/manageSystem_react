@@ -145,8 +145,20 @@
 }
 
 .hintInfo {
-  margin-top: 20px;
+  margin-top: 10px;
   width: 100%;
   color: #7E7E81;
   padding-top: 7px;
+}
+
+// 重新设置ant deisgn upload style
+.antPicUpload {
+  :global {
+    .ant-upload.ant-upload-select-picture-card {
+      width: 100%;
+    }
+    .ant-upload-list-picture-card-container{
+      width: 100%;
+    }
+  }
 }

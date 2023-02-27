@@ -24,6 +24,11 @@ export default {
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
+    '/postImage/': {
+      target: 'http://s3.cn-northwest-1.amazonaws.com.cn/',
+      changeOrigin: true,
+      pathRewrite: {'/postImage/': ''},
+    },
   },
 
   // 本地测试地址

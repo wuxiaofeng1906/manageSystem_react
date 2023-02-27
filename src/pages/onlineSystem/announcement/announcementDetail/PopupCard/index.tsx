@@ -15,7 +15,7 @@ import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
 import {defaultImgsUrl, bannerTips} from "../uploadPic/index";
-import {getS3Key} from "../uploadPic/NoticeImageUploader";
+import {getS3Key, uploadPicToS3} from "../uploadPic/NoticeImageUploader";
 
 
 // 当前的tab页面
@@ -32,8 +32,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     checkedImg: ""
   });
 
-  // 图片上传文件
-  const [s3ServiceInfo, setS3ServiceInfo] = useState({fields: {}, url: ""});
+
   const [spinLoading, setSpinLoading] = useState(false);
   useEffect(() => {
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
@@ -130,6 +129,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   };
 
+  // upload 组件使用上传图片
+  const [fileList, setFileList] = useState<any[]>([])
   // 选择图片时
   const picChecked = (e: any) => {
     if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
@@ -137,40 +138,32 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
   }
 
-  const upProps: UploadProps = {
-    name: 'file',
-    // action: 'http://baseapp.cn-northwest-0.77hub.com/baseapp/Attachment/signature/post?fileName=xxx.jpg&isPublicRead=true&isHttp=false',
-    headers: {
-      authorization: 'authorization-text',
-    },
-    beforeUpload: async (file) => {
-      // debugger
-      //   获取鉴权
-      const s3Info = await getS3Key(file.name);
-      debugger
+  // 点击确定按钮
+  const uploadPicClick = async () => {
+    // 判断是不是自动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
+    debugger;
+    // 之前就选择了图片
+    if (picModalState.checkedImg) {
+      return;
+    }
+    // 这个是保存自己上传的图片
+    if (fileList.length) { // 如果大于0 则已手动上传了数据，如果小于0则看有没有以前的数据
+      const s3Info = await getS3Key(fileList[0].name);
       if (s3Info) {
-        setS3ServiceInfo(s3Info);
-        return true
+        // 再上传到服务器
+        const upResult = await uploadPicToS3(s3Info, fileList[0]);
+        if (upResult && upResult.status === 200) {
+          const picUrl = `${s3Info.url}/${s3Info.fields?.key}`;
+          debugger;
+          setPicModalState({checkedImg: picUrl, visible: false})
+
+        } else {
+          errorMessage("图片上传失败");
+        }
       }
-      return false;
-    },
-    onChange(info) {
-      // debugger/
-      // if (info.file.status !== 'uploading') {
-      //   console.log(info.file, info.fileList);
-      // }
-      if (info.file.status === 'done') {
-        sucMessage(`${info.file.name} 上传成功`);
-      } else if (info.file.status === 'error') {
-        errorMessage(`伤上传失败，原因:${info.file.response.message}`);
-      }
-    },
+    }
   };
 
-  const files: any = [];
-  const uploadPic = () => {
-
-  };
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -209,7 +202,7 @@ const PopupCard: React.FC<any> = (props: any) => {
             </Row>
             <Form.Item label={"上传图片"} name={"uploadPic"} required>
               <Button type="default" icon={<UploadOutlined/>} style={{color: "#1890FF", border: "none"}}
-                      onClick={() => setPicModalState({visible: true})}>选择/上传
+                      onClick={() => setPicModalState({...picModalState, visible: true})}>选择/上传
               </Button>
             </Form.Item>
             <Form.Item label={"图文布局"} name={"picLayout"} required>
@@ -309,8 +302,8 @@ const PopupCard: React.FC<any> = (props: any) => {
       {/* 图片上传弹出框 picModalState.visible */
       }
       <Modal title="上传图片" visible={true} centered={true} maskClosable={false}
-             onOk={() => setPicModalState({visible: false})}
-             onCancel={() => setPicModalState({visible: false})}
+             onOk={uploadPicClick}
+             onCancel={() => setPicModalState({...picModalState, visible: false})}
              width={700}>
 
         <div className={style.imgComponentBox}>
@@ -328,77 +321,27 @@ const PopupCard: React.FC<any> = (props: any) => {
           <div className={style.padBox}/>
           <div className={style.setBox}>
             <h5 className={style.titlew7}>从本地上传</h5>
-            <div style={{
-              marginTop: 13,
-              height: 115,
-              width: "100%",
-              backgroundColor: "#FAFAFA",
-              textAlign: "center",
-              lineHeight: 8,
-              border: "1px dashed Gainsboro"
-            }}>
-
-              <Upload {...upProps}>
-                <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>
+            <div className={style.antPicUpload} style={{backgroundColor: "transparent", marginTop: 13}}>
+              <Upload
+                style={{color: "red"}}
+                listType="picture-card"
+                fileList={fileList}
+                beforeUpload={() => {
+                  return false
+                }}
+                onChange={({fileList}) => {
+                  setFileList(fileList);
+                  // 清空之前选的图片
+                  setPicModalState({checkedImg: "", visible: false})
+                }}
+              >
+                {fileList.length >= 1 ? null :
+                  <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
               </Upload>
-
-              {/*<PlusOutlined style={{height: 20, width: 20}} onClick={uploadPic}/>*/}
-              {/*<Button>点击进行图片上传</Button>*/}
             </div>
             <div className={style.hintInfo}>{bannerTips}</div>
           </div>
         </div>
-
-        {/* title */}
-        {/*<Row>*/}
-        {/*  <Col span={12}>*/}
-        {/*    <h4 style={{fontWeight: "bold"}}>选择默认图片</h4>*/}
-        {/*  </Col>*/}
-        {/*  <Col span={12}>*/}
-        {/*    <h4 style={{fontWeight: "bold"}}>从本地上传</h4>*/}
-        {/*  </Col>*/}
-        {/*</Row>*/}
-        {/* 图片展示和上传 */}
-        {/*<Row>*/}
-        {/*  <Col span={12}>*/}
-        {/*    <div onClick={(e) => {*/}
-        {/*      // debugger*/}
-        {/*      // console.log(e)*/}
-        {/*    }}>*/}
-        {/*      <Image*/}
-        {/*        height={150} width={'90%'}*/}
-        {/*        src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"*/}
-        {/*      />*/}
-
-        {/*      <img key={defaultImgsUrl[0]} data-value={defaultImgsUrl[0]} src={defaultImgsUrl[0]} alt="默认图" height={150}*/}
-        {/*           width={'90%'}/>*/}
-        {/*    </div>*/}
-        {/*    <div style={{marginTop: 10}}>*/}
-        {/*      <Image*/}
-        {/*        height={150} width={'90%'}*/}
-        {/*        src={defaultImgsUrl[1]}*/}
-        {/*      />*/}
-        {/*    </div>*/}
-        {/*    <div style={{marginTop: 10}}>*/}
-        {/*      <Image*/}
-        {/*        height={150} width={'90%'}*/}
-        {/*        src={defaultImgsUrl[2]}*/}
-        {/*      />*/}
-        {/*    </div>*/}
-
-        {/*  </Col>*/}
-        {/*  <Col span={12}>*/}
-
-        {/*    /!*<Upload*!/*/}
-        {/*    /!*  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"*!/*/}
-        {/*    /!*  listType="picture-circle"*!/*/}
-
-        {/*    /!*>*!/*/}
-        {/*    /!*  {fileList.length < 5 && '+ Upload'}*!/*/}
-        {/*    /!*</Upload>*!/*/}
-
-        {/*  </Col>*/}
-        {/*</Row>*/}
 
       </Modal>
     </PageContainer>

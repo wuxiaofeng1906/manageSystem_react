@@ -4,7 +4,6 @@ import {errorMessage} from './showMessages';
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 // 设置get请求头的Content-Type总是失效，后来发现原来是一般get请求不需要设置Content-Type   所以axios内部会自动删除掉,解决办法是给get方法添加data（写一个空值都行，不能不要）
-axios.defaults.headers.contentType = "application/json";
 
 
 // axios中常见的get/delete请求，也称作query请求：
@@ -46,9 +45,10 @@ const axiosGet_TJ = async (url: string, queryData: any = {}) => {
 };
 
 const axiosGet_77Service = async (url: string, queryData: any = {}) => {
+  // axios.defaults.headers.contentType = "application/json";
   let result: any = {};
   await axios
-    .get(url, {params: queryData, data: {}})
+    .get(url, {params: queryData, data: {}, headers: {"contentType": "application/json"}})
     .then((res: any) => {
       result = res.data;
     }).catch((error: string) => {
@@ -66,7 +66,6 @@ const axiosGet_77Service = async (url: string, queryData: any = {}) => {
 // delete 请求
 const axiosDelete = async (url: string, queryData: any = {}) => {
   // queryData 格式 ： {data: queryData}或者 {params: queryData}
-
   let result: any = {};
   await axios
     .delete(url, queryData)
@@ -91,6 +90,33 @@ const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) =
     .post(url, bodyData, {params: queryData})
     .then((res: any) => {
       result = res.data;
+    })
+    .catch((error) => {
+      if (error.toString().includes('403')) {
+        errorMessage('您无操作权限！');
+      } else {
+        errorMessage(`异常信息:${error.toString()}`);
+      }
+    });
+  return result;
+};
+
+const axiosPost_77Service = async (url: string, bodyData: any = {}, queryData: any = {}) => {
+  // axios.defaults.headers["Content-Type"] = "multipart/form-data;";
+  // axios.defaults.headers["contentType"] = "multipart/form-data;";
+
+  let result: any = {};
+  await axios
+    .post(url, bodyData, {
+      params: queryData,
+      headers: {
+        "contentType": "multipart/form-data; boundary=--------------------------983285823331796075899474",
+        "Content-Type": "multipart/form-data; boundary=--------------------------983285823331796075899474",
+        "Authorization": ""
+      }
+    })
+    .then((res: any) => {
+      result = res;
     })
     .catch((error) => {
       if (error.toString().includes('403')) {
@@ -140,4 +166,4 @@ const axiosPatch = async (url: string, bodyData: any = {}) => {
   return result;
 };
 
-export {axiosGet, axiosDelete, axiosPost, axiosPut, axiosPatch, axiosGet_TJ, axiosGet_77Service};
+export {axiosGet, axiosDelete, axiosPost, axiosPut, axiosPatch, axiosGet_TJ, axiosGet_77Service, axiosPost_77Service};

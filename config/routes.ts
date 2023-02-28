@@ -203,7 +203,7 @@ export default [
       {
         name: '升级公告',
         path: 'announcementList',
-        component: './onlineSystem/announcement/AnnouncementList',
+        component: './onlineSystem/announcement/announceList',
         wrappers: ['../wrappers/auth'],
       },
       {

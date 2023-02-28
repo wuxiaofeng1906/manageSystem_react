@@ -8,7 +8,7 @@ import {history, useParams} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
 import {SIZE} from "./constant";
-import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease} from "./axiosRequest/apiPage";
+import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease, updateAnnouncement} from "./axiosRequest/apiPage";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
@@ -110,17 +110,20 @@ const Announce: React.FC<any> = (props: any) => {
       setCarouselNumShow("none");
     }
   }, []);
-  // 保存消息卡面数据
+  // 保存数据
   const saveMsgInfo = async () => {
-    // const announceMsg = document.getElementById("announceContent")?.innerText;
+
+    // 新增和修改调用不一样的接口
+    // const updateResult = await updateAnnouncement();
+
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
-      const result = await saveAnnounceContent({...formInfo});
-      if (result.ok) {
+      const addResult = await saveAnnounceContent({...formInfo});
+      if (addResult.ok) {
         sucMessage("保存成功！");
         return;
       } else {
-        errorMessage(result.message);
+        errorMessage(addResult.message);
       }
     }
   };

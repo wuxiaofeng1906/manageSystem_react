@@ -1,8 +1,7 @@
-import {axiosGet_TJ, axiosPost} from '@/publicMethods/axios';
+import {axiosGet_TJ, axiosPost, axiosPut} from '@/publicMethods/axios';
 import {getCurrentUserInfo} from '@/publicMethods/authorityJudge';
 import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
-
 
 const users = getCurrentUserInfo();
 
@@ -130,4 +129,10 @@ export const oneKeyToRelease = (id: any) => {
   return axiosPost('/api/77hub/notice/released/', {
     sid: id
   });
+};
+
+// 修改发布公告
+export const updateAnnouncementupdateAnnouncement = () => {
+  const data = {};
+  return axiosPut('/api/77hub/notice', data);
 };

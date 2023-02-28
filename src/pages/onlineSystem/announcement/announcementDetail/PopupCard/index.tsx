@@ -109,7 +109,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   // 获取所有数据并进行校验
-  const getAllData = ()=>{
+  const getAllData = () => {
 
   }
   // 保存数据
@@ -169,9 +169,21 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   // 预览
-  const onPreView = () => {
+  const onPreView = async () => {
     //   需要需要校验不能为空
-    vertifyFieldForPopup([popData])
+    let finalData = [];
+    // 如果是轮播则先放到state中再保存
+    if (anCommonData?.announce_carousel === 1) {
+      finalData = getPopupSource(currentTab);
+    } else {
+      // 不是轮播，需要把图片路径放进去
+      const popData = dtForm.getFieldsValue();
+      popData.uploadPic = picModalState.checkedImg;
+      finalData.push(popData);
+    }
+    if (vertifyFieldForPopup(finalData)) {
+      //    anCommonData, finalData  进行预览的数据
+    }
   }
 
   // 一键发布

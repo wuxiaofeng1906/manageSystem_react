@@ -38,7 +38,7 @@ const notCarouselData = (popupData: any) => {
     pages: [
       {
         "image": popupData.uploadPic,
-        "pageNum": 0,
+        "pageNum": 0, // 所属轮播页码
         "layoutTypeId": popupData.picLayout,
         "yuQue": popupData.yuQueUrl,
         "contents": getSpecialList(ptyGroup)
@@ -71,6 +71,7 @@ const carouselData = (popupData: any) => {
 
 // 公告改版后的保存公告内容
 export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
+  debugger
   let data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
@@ -81,11 +82,12 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
   if (data.templateTypeId === "2") { // 弹窗保存数据
     // 共同属性
     data["isCarousel"] = formData.announce_carousel; // 是否轮播
-    data["pageSize"] = formData.carouselNum; // 轮播总页数
     // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
     if (formData.announce_carousel === 1) {
+      data["pageSize"] = formData.carouselNum; // 轮播总页数
       specialData = carouselData(popupData);// 轮播
     } else {
+      data["pageSize"] = 0; // 不轮播的时候总页数为0
       specialData = notCarouselData(popupData[0]); // 不轮播
     }
   }

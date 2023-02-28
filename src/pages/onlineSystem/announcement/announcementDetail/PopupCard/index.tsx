@@ -108,6 +108,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 保存数据
   const onFinish = async (popData: any) => {
+    debugger
     let finalData = [];
     // 如果是轮播则先放到state中再保存
     if (anCommonData?.announce_carousel === 1) {

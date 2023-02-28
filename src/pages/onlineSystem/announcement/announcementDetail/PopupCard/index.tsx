@@ -336,7 +336,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       </Spin>
 
       {/* 图片上传弹出框 picModalState.visible */}
-      <Modal title="上传图片" visible={true} centered={true} maskClosable={false}
+      <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
              onOk={uploadPicClick}
              onCancel={() => setPicModalState({checkedImg: "", visible: false})}
              width={700}>

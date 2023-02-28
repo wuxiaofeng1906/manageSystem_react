@@ -30,6 +30,9 @@ const PopupCard: React.FC<any> = (props: any) => {
   });
   // 语雀数据导入（加载）使用
   const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
+
+  // 上传图片的进度
+  const [picUpLoading, setPicUpLoading] = useState(false);
   useEffect(() => {
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
     dtForm.setFieldsValue({
@@ -134,6 +137,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 点击确定按钮
   const uploadPicClick = async () => {
+    setPicUpLoading(true);
     // 判断是不是手动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
     // 之前就选择了图片
     if (picModalState.checkedImg) {
@@ -160,8 +164,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         // }
       }
     }
-
-
+    setPicUpLoading(false);
   };
   // 预览
   const onPreView = async () => {
@@ -336,68 +339,69 @@ const PopupCard: React.FC<any> = (props: any) => {
              onOk={uploadPicClick}
              onCancel={() => setPicModalState({checkedImg: "", visible: false})}
              width={700}>
-
-        <div className={style.imgComponentBox}>
-          <div className={style.defaultBox}>
-            <div className={style.titleBox}>
-              <h5 className={style.titlew}>选择默认图片</h5>
+        <Spin spinning={picUpLoading} size={"large"} tip={"图片上传中，请稍等..."}>
+          <div className={style.imgComponentBox}>
+            <div className={style.defaultBox}>
+              <div className={style.titleBox}>
+                <h5 className={style.titlew}>选择默认图片</h5>
+              </div>
+              <ul className={style.imgList} onClick={picChecked}>
+                {defaultImgsUrl.map(item => (
+                  <li key={item} data-value={item}
+                      className={picModalState.checkedImg === item ? style.activeChose : ''}>
+                    <img key={item} data-value={item} src={item} alt="默认图"/>
+                  </li>))}
+              </ul>
             </div>
-            <ul className={style.imgList} onClick={picChecked}>
-              {defaultImgsUrl.map(item => (
-                <li key={item} data-value={item} className={picModalState.checkedImg === item ? style.activeChose : ''}>
-                  <img key={item} data-value={item} src={item} alt="默认图"/>
-                </li>))}
-            </ul>
-          </div>
-          <div className={style.padBox}/>
-          <div className={style.setBox}>
-            <h5 className={style.titlew7}>从本地上传</h5>
-            <div className={style.antPicUpload} style={{backgroundColor: "transparent", marginTop: 13}}>
-              <ImgCrop
-                modalTitle={"裁剪图片"}
-                aspect={2.35 / 1}       // 裁剪比例
-                rotate
-                zoom
-                modalOk={"确定"}
-                modalCancel={"取消"}
-              >
-                <Upload
-                  style={{color: "red"}}
-                  listType="picture-card"
-                  showUploadList={{showPreviewIcon: false}}
-                  fileList={fileList}
-                  beforeUpload={(file) => {
-                    return false;
-                  }}
-                  onChange={(v: any) => {
-                    const {file} = v;
-                    // 判断文件类型，文件大小，和裁剪
-                    if (!picType.includes(file.type)) {
-                      errorMessage('仅支持上传jpg、jpeg、png格式的图片！');
-                      return;
-                    }
-                    if ((file.size / 1024 / 1024) >= 10) {
-                      errorMessage('图片大小不能超过10M');
-                      return;
-                    }
-                    setFileList(v.fileList);
-                    // 清空之前选的图片
-                    setPicModalState({...picModalState, checkedImg: ""});
-                  }}
+            <div className={style.padBox}/>
+            <div className={style.setBox}>
+              <h5 className={style.titlew7}>从本地上传</h5>
+              <div className={style.antPicUpload} style={{backgroundColor: "transparent", marginTop: 13}}>
+                <ImgCrop
+                  modalTitle={"裁剪图片"}
+                  aspect={2.35 / 1}       // 裁剪比例
+                  rotate
+                  zoom
+                  modalOk={"确定"}
+                  modalCancel={"取消"}
                 >
-                  {fileList.length >= 1 ? null :
-                    <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
-                </Upload>
-              </ImgCrop>
+                  <Upload
+                    style={{color: "red"}}
+                    listType="picture-card"
+                    showUploadList={{showPreviewIcon: false}}
+                    fileList={fileList}
+                    beforeUpload={(file) => {
+                      return false;
+                    }}
+                    onChange={(v: any) => {
+                      const {file} = v;
+                      // 判断文件类型，文件大小，和裁剪
+                      if (!picType.includes(file.type)) {
+                        errorMessage('仅支持上传jpg、jpeg、png格式的图片！');
+                        return;
+                      }
+                      if ((file.size / 1024 / 1024) >= 10) {
+                        errorMessage('图片大小不能超过10M');
+                        return;
+                      }
+                      setFileList(v.fileList);
+                      // 清空之前选的图片
+                      setPicModalState({...picModalState, checkedImg: ""});
+                    }}
+                  >
+                    {fileList.length >= 1 ? null :
+                      <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
+                  </Upload>
+                </ImgCrop>
+              </div>
+              <div className={style.hintInfo}>{bannerTips}</div>
             </div>
-            <div className={style.hintInfo}>{bannerTips}</div>
+            <div>
+              <img id={"file_img"} style={{width: 200, height: 100}}>
+              </img>
+            </div>
           </div>
-          <div>
-            <img id={"file_img"} style={{width: 200, height: 100}}>
-            </img>
-          </div>
-        </div>
-
+        </Spin>
       </Modal>
     </PageContainer>
   );

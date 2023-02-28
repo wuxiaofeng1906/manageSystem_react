@@ -38,8 +38,8 @@ export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
   const temp: any = await getBase64(picFile.originFileObj);
   formdata.append("file", temp.toString());
   debugger
-  await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, formdata);
-
+  const ur = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, formdata);
+  console.log(ur)
   // 返回二进制流测试
   return temp;
   // console.log(result)

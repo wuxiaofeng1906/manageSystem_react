@@ -15,6 +15,7 @@ import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
 import {defaultImgsUrl, bannerTips} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3} from "../uploadPic/NoticeImageUploader";
+import {isVisible} from "ag-grid-community/dist/lib/utils/dom";
 
 
 // 当前的tab页面
@@ -369,7 +370,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                 onChange={(v: any) => {
                   setFileList(v.fileList);
                   // 清空之前选的图片
-                  setPicModalState({checkedImg: "", visible: false})
+                  setPicModalState({...picModalState, checkedImg: ""});
                 }}
               >
                 {fileList.length >= 1 ? null :

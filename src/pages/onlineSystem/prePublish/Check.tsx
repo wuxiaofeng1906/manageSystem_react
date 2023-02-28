@@ -145,6 +145,7 @@ const Check = (props: any, ref: any) => {
   };
 
   const init = async (isFresh = false, showLoading = true) => {
+
     setSpin(showLoading);
     setSelected([]);
     let autoCheck: string[] = [];
@@ -152,9 +153,9 @@ const Check = (props: any, ref: any) => {
     let formatCheckInfo: any[] = [];
     try {
       if (isFresh) {
-        // 忽略 不用跑检查
+        // 忽略 不用跑检查(前端单元测试和后端单元测试有一个不是忽略状态都要跑test-unit 接口)
         autoCheck = list.flatMap((it) =>
-          ['check_list_data', 'backend_test_unit', 'story_data'].includes(it.rowKey) && it.open
+          ['backend_test_unit', 'front_test_unit'].includes(it.rowKey) && it.open
             ? [it.api_url]
             : [],
         );
@@ -528,6 +529,7 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'desc',
               width: 100,
               align: 'left',
+              render: (v, record) => record.open ? "" : v,
             },
           ]}
           dataSource={list}

@@ -45,4 +45,8 @@ export const dutyColumn = [
     headerName: 'emitter值班',
     field: 'emitter',
   },
+  {
+    headerName: 'idps值班',
+    field: 'idps',
+  },
 ];

@@ -6,7 +6,7 @@ export default () => {
   // 升级公告详情界面数据（弹窗数据）
   const [anPopData, setAnnPopData] = useState([]);
   // 当前公告所属内容是否已经上线
-  const [showPulishButton, setShowPulishButton] = useState<boolean>(true); // 暂时设置为true，正式使用要设置为false
+  const [showPulishButton, setShowPulishButton] = useState<boolean>(false); // 暂时设置为true，正式使用要设置为false
 
   return {
     anCommonData, setAnCommonData,

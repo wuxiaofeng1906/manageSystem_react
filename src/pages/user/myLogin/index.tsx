@@ -1,14 +1,15 @@
-import { message } from 'antd';
-import React, { useState, useEffect } from 'react';
+import {message} from 'antd';
+import React, {useState, useEffect} from 'react';
 import ProForm from '@ant-design/pro-form';
-import { history } from 'umi';
-import { useIntl } from '@@/plugin-locale/localeExports';
-import { useModel } from '@@/plugin-model/useModel';
+import {history} from 'umi';
+import {useIntl} from '@@/plugin-locale/localeExports';
+import {useModel} from '@@/plugin-model/useModel';
 import styles from './index.less';
 import axios from 'axios';
-import { useRequest } from 'ahooks';
-import { useUser } from '@/hooks/user';
-import { getParameters } from '@/utils/utils';
+import {useRequest} from 'ahooks';
+import {useUser} from '@/hooks/user';
+import {getParameters} from '@/utils/utils';
+import {isTestService} from "@/publicMethods/webMethod";
 
 /**
  * 此方法会跳转到 redirect 参数所在的位置
@@ -49,18 +50,18 @@ const qywxScript = () => {
 };
 
 const Login: React.FC<{}> = () => {
-  const { setUser } = useUser();
+  const {setUser} = useUser();
   const [submitting] = useState(false);
   const [showTitle, setTitleShown] = useState(false);
 
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const {initialState, setInitialState} = useModel('@@initialState');
   const intl = useIntl();
 
   const goto = async (prod = 'true', userInfo: any = null) => {
     if (!history) return;
     setTimeout(() => {
-      const { query } = history.location;
-      const { redirect } = query as { redirect: string };
+      const {query} = history.location;
+      const {redirect} = query as { redirect: string };
       if (prod == 'true') {
         history.push(redirect || '/');
       } else {
@@ -91,7 +92,7 @@ const Login: React.FC<{}> = () => {
     // console.log("userInfo", JSON.stringify(userInfo.authority));
 
     if (userInfo) {
-      setInitialState({ ...initialState, currentUser: userInfo });
+      setInitialState({...initialState, currentUser: userInfo});
     }
   };
 
@@ -105,7 +106,7 @@ const Login: React.FC<{}> = () => {
     }
     // 如果获取到了usercode，则拿取用户信息和权限
     if (urlParams.code && !urlParams.code.includes('%')) {
-      const data = { username: 'users', password: urlParams.code };
+      const data = {username: 'users', password: urlParams.code};
       await axios
         .post('/api/auth/login', data)
         .then(function (res) {
@@ -153,7 +154,7 @@ const Login: React.FC<{}> = () => {
       avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
     };
     // endregion
-    await setUser({ ...initialState, currentUser: userInfos });
+    await setUser({...initialState, currentUser: userInfos});
     goto();
   };
 
@@ -162,11 +163,11 @@ const Login: React.FC<{}> = () => {
   }, []);
 
   // 正式环境不能显示”登录按钮“，必须扫二维码登录
-  let showButton = 'none';
-  const url = window.location.host;
-  if (url !== 'rd.q7link.com:8000') {
-    showButton = 'inline';
-  }
+  // let showButton = 'none';
+  // const url = window.location.host;
+  // if (url !== 'rd.q7link.com:8000') {
+  //   showButton = 'inline';
+  // }
 
   return (
     <div className={styles.container}>
@@ -174,7 +175,7 @@ const Login: React.FC<{}> = () => {
         {/* logo  */}
         <div className={styles.top}>
           <div className={styles.header}>
-            <img alt="logo" className={styles.logo} src="/77Logo.png" />
+            <img alt="logo" className={styles.logo} src="/77Logo.png"/>
             <span className={styles.title}>企企研发管理平台</span>
           </div>
           <div className={styles.desc}></div>
@@ -190,7 +191,7 @@ const Login: React.FC<{}> = () => {
 
           {/* 手动登录 */}
 
-          <div style={{ display: showButton }}>
+          <div style={{display: isTestService() ? 'inline' : "none"}}>
             <ProForm
               submitter={{
                 searchConfig: {

@@ -72,6 +72,7 @@ export default () => {
   };
 
   const getServerConfirm = async (data: any) => {
+    debugger
     const res = await OnlineSystemServices.getServerConfirm(data);
     setServerConfirm(res);
   };

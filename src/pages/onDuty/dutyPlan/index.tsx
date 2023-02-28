@@ -1,45 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { useRequest } from 'ahooks';
+import React, {useEffect, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {useRequest} from 'ahooks';
 import {
-  Button,
-  DatePicker,
-  Checkbox,
-  Card,
-  message,
-  Table,
-  Modal,
-  Form,
-  Select,
-  Row,
-  Col,
-  Divider,
-  Input,
+  Button, DatePicker, Checkbox, Card, message, Table, Modal, Form,
+  Select, Row, Col, Divider, Input,
 } from 'antd';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
 import moment from 'moment';
 import dayjs from 'dayjs';
-import { getAllProject } from '@/publicMethods/verifyAxios';
+import {getAllProject} from '@/publicMethods/verifyAxios';
 import {
-  loadUserSelect,
-  loadPrjNameSelect,
-  loadPrjTypeSelect,
-  loadBanchSelect,
-  loadEnvironmentSelect,
-  loadAllUserSelect,
+  loadUserSelect, loadPrjNameSelect, loadPrjTypeSelect,
+  loadBanchSelect, loadEnvironmentSelect, loadAllUserSelect,
 } from './data/selector';
 import {
-  queryDutyCardInfo,
-  getPlanDetails,
-  sendMessageToApi,
-  submitModifyData,
+  queryDutyCardInfo, getPlanDetails, sendMessageToApi, submitModifyData,
 } from './data/axiosApi';
-import { judgeAuthorityByName } from '@/publicMethods/authorityJudge';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
-import { parseSaveCardData } from './data/cardDataAlaysis';
+import {judgeAuthorityByName} from '@/publicMethods/authorityJudge';
+import {errorMessage, sucMessage} from '@/publicMethods/showMessages';
+import {parseSaveCardData} from './data/cardDataAlaysis';
 import styles from './index.less';
 
-const { RangePicker } = DatePicker;
+const {RangePicker} = DatePicker;
 // 已选中的事件
 const selectedProject: any = [];
 // 保存被修改项的相关ID，用于修改时
@@ -67,6 +49,8 @@ const oldDutyTask = {
   secondDevopsId: '',
   firstEmitterId: '',
   secondEmitterId: '',
+  firstIdpsId: '',
+  secondIdpsId: '',
 };
 // 保存需要被删除的数据
 const deletedData: any = [];
@@ -74,7 +58,7 @@ const DutyPlan: React.FC<any> = () => {
   /* region useState定义 */
 
   // 查询条件
-  const [choicedCondition, setChoicedCondition] = useState({ start: '', end: '' });
+  const [choicedCondition, setChoicedCondition] = useState({start: '', end: ''});
   // 值班人员动态Card
   const [dutyCard, setDutyCart] = useState(<div></div>);
   // 弹出层是否可见
@@ -107,6 +91,7 @@ const DutyPlan: React.FC<any> = () => {
     jsf: [],
     devops: [],
     emitter: [],
+    idps: []
   });
   // 动态表单的下拉框
   const [projectInfo, setProjectInfo] = useState({
@@ -348,6 +333,21 @@ const DutyPlan: React.FC<any> = () => {
               });
             }
             break;
+          case 'idps':
+            if (users.duty_order === '1') {
+              oldDutyTask.firstIdpsId = users.person_id;
+              formForPlanModify.setFieldsValue({
+                ...formForPlanModify,
+                firstIdps: usersAccount,
+              });
+            } else {
+              oldDutyTask.secondIdpsId = users.person_id;
+              formForPlanModify.setFieldsValue({
+                ...formForPlanModify,
+                secondIdps: usersAccount,
+              });
+            }
+            break;
           default:
             break;
         }
@@ -371,7 +371,7 @@ const DutyPlan: React.FC<any> = () => {
           proId: '',
         },
       ];
-      formForPlanModify.setFieldsValue({ projects: emptyValue });
+      formForPlanModify.setFieldsValue({projects: emptyValue});
       setProjects(emptyValue);
       return;
     }
@@ -392,7 +392,7 @@ const DutyPlan: React.FC<any> = () => {
         proId: dts.pro_id,
       });
     });
-    formForPlanModify.setFieldsValue({ projects: detailsInfo });
+    formForPlanModify.setFieldsValue({projects: detailsInfo});
     setProjects(detailsInfo);
   };
   // 表格双击事件
@@ -429,6 +429,7 @@ const DutyPlan: React.FC<any> = () => {
       jsf: wx_allUsers,
       devops: wx_allUsers,
       emitter: wx_allUsers,
+      idps: wx_allUsers
     });
 
     // 生成项目名称、项目类型、对应分支、对应测试环境、对应升级环境、项目负责人的下拉框
@@ -588,8 +589,8 @@ const DutyPlan: React.FC<any> = () => {
     return (
       <div>
         <div>
-          <Form.Item label={order} name={['projects', index, 'prjName']} style={{ marginLeft: -5 }}>
-            <Select style={{ width: '93%', marginLeft: 27 }} showSearch>
+          <Form.Item label={order} name={['projects', index, 'prjName']} style={{marginLeft: -5}}>
+            <Select style={{width: '93%', marginLeft: 27}} showSearch>
               {projectInfo.prjName}
             </Select>
           </Form.Item>
@@ -597,10 +598,10 @@ const DutyPlan: React.FC<any> = () => {
           <Form.Item
             label="项目类型"
             name={['projects', index, 'prjType']}
-            style={{ marginTop: -20, marginLeft: 13 }}
+            style={{marginTop: -20, marginLeft: 13}}
           >
             <Select
-              style={{ width: '93%', marginLeft: 27 }}
+              style={{width: '93%', marginLeft: 27}}
               showSearch
               onChange={(event) => onPrjTypeChanged(index, 'prjType', event)}
             >
@@ -611,9 +612,9 @@ const DutyPlan: React.FC<any> = () => {
           <Form.Item
             label="对应分支"
             name={['projects', index, 'branch']}
-            style={{ marginTop: -20, marginLeft: 13 }}
+            style={{marginTop: -20, marginLeft: 13}}
           >
-            <Select style={{ width: '93%', marginLeft: 27 }} showSearch>
+            <Select style={{width: '93%', marginLeft: 27}} showSearch>
               {projectInfo.branch}
             </Select>
           </Form.Item>
@@ -621,9 +622,9 @@ const DutyPlan: React.FC<any> = () => {
           <Form.Item
             label="对应测试环境"
             name={['projects', index, 'testEnv']}
-            style={{ marginTop: -20, marginLeft: 13 }}
+            style={{marginTop: -20, marginLeft: 13}}
           >
-            <Select style={{ width: '100%' }} showSearch>
+            <Select style={{width: '100%'}} showSearch>
               {projectInfo.testEnv}
             </Select>
           </Form.Item>
@@ -631,9 +632,9 @@ const DutyPlan: React.FC<any> = () => {
           <Form.Item
             label="对应升级环境"
             name={['projects', index, 'upgradeEnv']}
-            style={{ marginTop: -20, marginLeft: 13 }}
+            style={{marginTop: -20, marginLeft: 13}}
           >
-            <Select style={{ width: '100%' }} showSearch>
+            <Select style={{width: '100%'}} showSearch>
               {projectInfo.upgradeEnv}
             </Select>
           </Form.Item>
@@ -641,61 +642,61 @@ const DutyPlan: React.FC<any> = () => {
           <Form.Item
             label="项目负责人"
             name={['projects', index, 'prjManager']}
-            style={{ marginTop: -20, marginLeft: 13 }}
+            style={{marginTop: -20, marginLeft: 13}}
           >
-            <Input style={{ width: '96%', marginLeft: 14, color: 'black' }} disabled />
+            <Input style={{width: '96%', marginLeft: 14, color: 'black'}} disabled/>
           </Form.Item>
 
           <Form.Item
             label="计划灰度时间"
             name={['projects', index, 'planGrayTime']}
-            style={{ marginTop: -20, marginLeft: 13 }}
+            style={{marginTop: -20, marginLeft: 13}}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker style={{width: '100%'}}/>
           </Form.Item>
 
           <Form.Item
             label="计划上线时间"
             name={['projects', index, 'planOnlineTime']}
-            style={{ marginTop: -20, marginLeft: 13 }}
+            style={{marginTop: -20, marginLeft: 13}}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker style={{width: '100%'}}/>
           </Form.Item>
 
           <Form.Item
             label="修改需要"
             name={['projects', index, 'proId']}
-            style={{ display: 'none' }}
+            style={{display: 'none'}}
           >
-            <Input style={{ width: 40 }} />
+            <Input style={{width: 40}}/>
           </Form.Item>
           <Form.Item
             label="修改需要"
             name={['projects', index, 'managerId']}
-            style={{ display: 'none' }}
+            style={{display: 'none'}}
           >
-            <Input style={{ width: 40 }} />
+            <Input style={{width: 40}}/>
           </Form.Item>
 
           {/* 增加和删除操作 */}
-          <Form.Item style={{ marginLeft: 17, marginTop: -30, marginBottom: -10 }}>
+          <Form.Item style={{marginLeft: 17, marginTop: -30, marginBottom: -10}}>
             <table>
               <tr>
                 <td>
                   <Button
-                    style={{ border: 'none', color: '#D0D0D0', marginLeft: -15 }}
+                    style={{border: 'none', color: '#D0D0D0', marginLeft: -15}}
                     onClick={() => addProject()}
-                    icon={<PlusOutlined />}
+                    icon={<PlusOutlined/>}
                   />
                 </td>
                 <td>
-                  <Divider style={{ width: '410px' }}></Divider>
+                  <Divider style={{width: '410px'}}></Divider>
                 </td>
                 <td>
                   <Button
-                    style={{ border: 'none', color: '#D0D0D0' }}
+                    style={{border: 'none', color: '#D0D0D0'}}
                     onClick={() => delProject(index)}
-                    icon={<MinusOutlined />}
+                    icon={<MinusOutlined/>}
                   />
                 </td>
               </tr>
@@ -737,19 +738,19 @@ const DutyPlan: React.FC<any> = () => {
         dayjs(startTime).format('YYYY-MM-DD') <= dayjs().format('YYYY-MM-DD') &&
         dayjs().format('YYYY-MM-DD') <= dayjs(endTime).format('YYYY-MM-DD')
       ) {
-        border_color = { border: '2px solid #46A0FC' };
+        border_color = {border: '2px solid #46A0FC'};
       }
       tdArray.push(
         <td>
           <Card
             size="small"
             title={`${startTime}~${endTime}`}
-            headStyle={{ textAlign: 'center' }}
+            headStyle={{textAlign: 'center'}}
             extra={<Checkbox id={`${ele_data[0].person_num}`} onChange={onPlanChanged}></Checkbox>}
             style={border_color}
           >
             <Table
-              style={{ marginTop: -10 }}
+              style={{marginTop: -10}}
               size="small"
               columns={columns}
               dataSource={ele_data}
@@ -1061,7 +1062,7 @@ const DutyPlan: React.FC<any> = () => {
     }
 
     // const allProject = project_data.concat(deletedData); // 将修改、新增和删除的数组连在一起进行保存
-    return { allProject: project_data, allEmpty };
+    return {allProject: project_data, allEmpty};
   };
 
   const requestAPpiToSaveData = async (person_data: any, allProject: any) => {
@@ -1105,7 +1106,7 @@ const DutyPlan: React.FC<any> = () => {
 
   /* region 时间数据查询以及展示 */
   let cardDatas: any = [];
-  const { data } = useRequest(() => queryDutyCardInfo(choicedCondition));
+  const {data} = useRequest(() => queryDutyCardInfo(choicedCondition));
 
   if (data) {
     if (data.message) {
@@ -1125,7 +1126,7 @@ const DutyPlan: React.FC<any> = () => {
   const onTimeSelected = async (params: any, dateString: any) => {
     let startTime = dateString[0];
     let endTime = dateString[1];
-    setChoicedCondition({ start: startTime, end: endTime });
+    setChoicedCondition({start: startTime, end: endTime});
     if (dateString[0] !== '' && dateString[1] !== '') {
       startTime = dayjs(dateString[0]).format('YYYY/MM/DD');
       endTime = dayjs(dateString[1]).format('YYYY/MM/DD');
@@ -1149,11 +1150,11 @@ const DutyPlan: React.FC<any> = () => {
   return (
     <PageContainer>
       {/* 时间查询条件 */}
-      <div style={{ width: '100%', backgroundColor: 'white', marginTop: -15 }}>
-        <label style={{ marginLeft: '10px' }}>计划筛选：</label>
+      <div style={{width: '100%', backgroundColor: 'white', marginTop: -15}}>
+        <label style={{marginLeft: '10px'}}>计划筛选：</label>
         <RangePicker
           className={'times'}
-          style={{ width: '18%' }}
+          style={{width: '18%'}}
           onChange={onTimeSelected}
           value={[
             choicedCondition.start === '' ? null : moment(choicedCondition.start),
@@ -1170,13 +1171,13 @@ const DutyPlan: React.FC<any> = () => {
             display: judgeAuthorityByName('addDutyMsgPush') === true ? 'inline' : 'none',
           }}
         >
-          <img src="../pushMessage.png" width="25" height="25" alt="一键推送" title="一键推送" />{' '}
+          <img src="../pushMessage.png" width="25" height="25" alt="一键推送" title="一键推送"/>{' '}
           &nbsp;一键推送
         </Button>
       </div>
 
-      <div style={{ marginTop: 5, overflow: 'scroll' }}>
-        <table style={{ width: '100%' }}>{dutyCard}</table>
+      <div style={{marginTop: 5, overflow: 'scroll'}}>
+        <table style={{width: '100%'}}>{dutyCard}</table>
       </div>
 
       {/* 弹出层界面 */}
@@ -1189,130 +1190,130 @@ const DutyPlan: React.FC<any> = () => {
         footer={null}
         maskClosable={false}
       >
-        <div style={{ height: 700, overflowY: 'scroll' }}>
+        <div style={{height: 700, overflowY: 'scroll'}}>
           <Form
             name="user_form"
             form={formForPlanModify}
             layout={'horizontal'}
             onFinish={submitForm}
-            initialValues={{ projects }}
+            initialValues={{projects}}
             className={styles['no-wrap-form']}
           >
             <Form.Item label="值班时间" name="dutyTime" required={true}>
-              <RangePicker style={{ width: '100%', color: 'red' }} disabled />
+              <RangePicker style={{width: '100%', color: 'red'}} disabled/>
             </Form.Item>
             {/* 值班人员Card */}
             <Card
               size="small"
               title="值班人员"
-              style={{ marginTop: -15 }}
-              bodyStyle={{ height: 500 }}
+              style={{marginTop: -15}}
+              bodyStyle={{height: 500}}
             >
               {/* 前端 */}
-              <Row gutter={40} style={{ marginTop: -10 }}>
+              <Row gutter={40} style={{marginTop: -10}}>
                 <Col span={10}>
-                  <Form.Item name="firstFront" label="前端" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstFront" label="前端" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.front}</Select>
                   </Form.Item>
                 </Col>
                 <Col span={14}>
-                  <Form.Item name="secondFront" label="前端第二值班人" style={{ marginTop: 7 }}>
+                  <Form.Item name="secondFront" label="前端第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.front}</Select>
                   </Form.Item>
                 </Col>
               </Row>
 
               {/*  后端 */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstBackend" label="后端" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstBackend" label="后端" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.backend}</Select>
                   </Form.Item>
                 </Col>
 
                 <Col span={14}>
-                  <Form.Item name="secondBackend" label="后端第二值班人" style={{ marginTop: 7 }}>
+                  <Form.Item name="secondBackend" label="后端第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.backend}</Select>
                   </Form.Item>
                 </Col>
               </Row>
 
               {/* 测试 */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstTester" label="测试" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstTester" label="测试" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.tester}</Select>
                   </Form.Item>
                 </Col>
                 <Col span={14}>
-                  <Form.Item name="secondTester" label="测试第二值班人" style={{ marginTop: 7 }}>
+                  <Form.Item name="secondTester" label="测试第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.tester}</Select>
                   </Form.Item>
                 </Col>
               </Row>
 
               {/* 流程 */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstFlow" label="流程" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstFlow" label="流程" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.flow}</Select>
                   </Form.Item>
                 </Col>
 
                 <Col span={14}>
-                  <Form.Item name="secondFlow" label="流程第二值班人" style={{ marginTop: 7 }}>
+                  <Form.Item name="secondFlow" label="流程第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.flow}</Select>
                   </Form.Item>
                 </Col>
               </Row>
               {/* 运维 */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstDevops" label="运维" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstDevops" label="运维" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.devops}</Select>
                   </Form.Item>
                 </Col>
 
                 <Col span={14}>
-                  <Form.Item name="secondDevops" label="运维第二值班人" style={{ marginTop: 7 }}>
+                  <Form.Item name="secondDevops" label="运维第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.devops}</Select>
                   </Form.Item>
                 </Col>
               </Row>
               {/* SQA */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstSQA" label="SQA" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstSQA" label="SQA" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.SQA}</Select>
                   </Form.Item>
                 </Col>
 
                 <Col span={14}>
-                  <Form.Item name="secondSQA" label="SQA第二值班人" style={{ marginTop: 7 }}>
+                  <Form.Item name="secondSQA" label="SQA第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.SQA}</Select>
                   </Form.Item>
                 </Col>
               </Row>
 
               {/* global  */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstGlobal" label="global" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstGlobal" label="global" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.my_global}</Select>
                   </Form.Item>
                 </Col>
 
                 <Col span={14}>
-                  <Form.Item name="secondGlobal" label="global第二值班人" style={{ marginTop: 7 }}>
+                  <Form.Item name="secondGlobal" label="global第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.my_global}</Select>
                   </Form.Item>
                 </Col>
               </Row>
 
               {/* openApi  */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstOpenApil" label="openApi&qtms" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstOpenApil" label="openApi&qtms" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.openApi}</Select>
                   </Form.Item>
                 </Col>
@@ -1321,7 +1322,7 @@ const DutyPlan: React.FC<any> = () => {
                   <Form.Item
                     name="secondOpenApi"
                     label="openApi&qtms第二值班人"
-                    style={{ marginTop: 7 }}
+                    style={{marginTop: 7}}
                   >
                     <Select showSearch>{allUsers.openApi}</Select>
                   </Form.Item>
@@ -1329,9 +1330,9 @@ const DutyPlan: React.FC<any> = () => {
               </Row>
 
               {/* qbos与store  */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstQbosStore" label="qbos&Store" style={{ marginTop: 7 }}>
+                  <Form.Item name="firstQbosStore" label="qbos&Store" style={{marginTop: 7}}>
                     <Select showSearch>{allUsers.qbos_store}</Select>
                   </Form.Item>
                 </Col>
@@ -1340,7 +1341,7 @@ const DutyPlan: React.FC<any> = () => {
                   <Form.Item
                     name="secondQbosStore"
                     label="qbos&Store第二值班人"
-                    style={{ marginTop: 7 }}
+                    style={{marginTop: 7}}
                   >
                     <Select showSearch>{allUsers.qbos_store}</Select>
                   </Form.Item>
@@ -1348,28 +1349,28 @@ const DutyPlan: React.FC<any> = () => {
               </Row>
 
               {/* jsf  */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstJsf" label="jsf" style={{ marginTop: 7 }}>
-                    <Select showSearch style={{ width: 'calc(100% - 60px)', marginLeft: 60 }}>
+                  <Form.Item name="firstJsf" label="jsf" style={{marginTop: 7}}>
+                    <Select showSearch style={{width: 'calc(100% - 60px)', marginLeft: 60}}>
                       {allUsers.jsf}
                     </Select>
                   </Form.Item>
                 </Col>
 
                 <Col span={14}>
-                  <Form.Item name="secondJsf" label="jsf第二值班人" style={{ marginTop: 7 }}>
-                    <Select showSearch style={{ width: 'calc(100% - 60px)', marginLeft: 60 }}>
+                  <Form.Item name="secondJsf" label="jsf第二值班人" style={{marginTop: 7}}>
+                    <Select showSearch style={{width: 'calc(100% - 60px)', marginLeft: 60}}>
                       {allUsers.jsf}
                     </Select>
                   </Form.Item>
                 </Col>
               </Row>
               {/* emitter  */}
-              <Row gutter={40} style={{ marginTop: -25 }}>
+              <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstEmitter" label="emitter" style={{ marginTop: 7 }}>
-                    <Select showSearch style={{ width: 'calc(100% - 22px)', marginLeft: 22 }}>
+                  <Form.Item name="firstEmitter" label="emitter" style={{marginTop: 7}}>
+                    <Select showSearch style={{width: 'calc(100% - 22px)', marginLeft: 22}}>
                       {allUsers.emitter}
                     </Select>
                   </Form.Item>
@@ -1379,10 +1380,33 @@ const DutyPlan: React.FC<any> = () => {
                   <Form.Item
                     name="secondEmitter"
                     label="emitter第二值班人"
-                    style={{ marginTop: 7 }}
+                    style={{marginTop: 7}}
                   >
-                    <Select showSearch style={{ width: 'calc(100% - 22px)', marginLeft: 22 }}>
+                    <Select showSearch style={{width: 'calc(100% - 22px)', marginLeft: 22}}>
                       {allUsers.emitter}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              {/* idps  */}
+              <Row gutter={40} style={{marginTop: -25}}>
+                <Col span={10}>
+                  <Form.Item name="firstIdps" label="idps" style={{marginTop: 7}}>
+                    <Select showSearch style={{width: 'calc(100% - 22px)', marginLeft: 22}}>
+                      {allUsers.idps}
+                    </Select>
+                  </Form.Item>
+                </Col>
+
+                <Col span={14}>
+                  <Form.Item
+                    name="secondIdps"
+                    label="idps第二值班人"
+                    style={{marginTop: 7}}
+                  >
+                    <Select showSearch style={{width: 'calc(100% - 22px)', marginLeft: 22}}>
+                      {allUsers.idps}
                     </Select>
                   </Form.Item>
                 </Col>
@@ -1390,26 +1414,26 @@ const DutyPlan: React.FC<any> = () => {
             </Card>
 
             {/* 项目明细Card */}
-            <Card size="small" title="项目" style={{ marginTop: 10 }}>
+            <Card size="small" title="项目" style={{marginTop: 10}}>
               <Form.Item>{projectItems}</Form.Item>
 
               {/* 备注显示  */}
               <div>
-                <label style={{ color: 'orange' }}> 备注： </label>
+                <label style={{color: 'orange'}}> 备注： </label>
                 <label>
                   {' '}
-                  需要当天紧急修复的请走emergency申请 <br />
+                  需要当天紧急修复的请走emergency申请 <br/>
                   对应分支：emergency/stage-emergency
-                  <br />
+                  <br/>
                   对应测试环境:nx-hotfix（如有变动，由测试负责人临时调配环境）{' '}
                 </label>
               </div>
             </Card>
 
             {/* 取消和保存按钮 */}
-            <Form.Item style={{ marginTop: 10, marginBottom: -10 }}>
+            <Form.Item style={{marginTop: 10, marginBottom: -10}}>
               <Button
-                style={{ float: 'right', borderRadius: 5, marginLeft: 20 }}
+                style={{float: 'right', borderRadius: 5, marginLeft: 20}}
                 onClick={planModalCancel}
               >
                 取消

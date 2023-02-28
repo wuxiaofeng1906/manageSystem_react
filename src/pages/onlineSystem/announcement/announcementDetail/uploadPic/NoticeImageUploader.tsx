@@ -20,7 +20,6 @@ const getBase64 = (file: File) => {
 
 // 上传图片到上s3服务器
 export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
-
   const data = {...s3Data.fields};
   const formdata = new FormData();
   formdata.append("x-amz-date", data["x-amz-date"]);
@@ -37,11 +36,9 @@ export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
   // 获取二进制文件
   const temp: any = await getBase64(picFile.originFileObj);
   formdata.append("file", temp.toString());
-  debugger
-  const ur = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, formdata);
-  console.log(ur)
+  const result = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, formdata);
   // 返回二进制流测试
-  return temp;
+  return {result, temp};
   // console.log(result)
   // http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-test
   // const result = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, data);

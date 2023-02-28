@@ -150,18 +150,19 @@ const PopupCard: React.FC<any> = (props: any) => {
       if (s3Info) {
         // 再上传到服务器
         const upResult = await uploadPicToS3(s3Info, fileList[0]);
+        document.getElementById("file_img").src = upResult.temp;
 
-        if (document.getElementById("file_img")) {
-          debugger
-          document.getElementById("file_img").src = upResult;
+        if (upResult.result && upResult.result.status === 204) {
+          // const picUrl = `${s3Info.url}/${s3Info.fields?.key}`;
+
+          // console.log("requestResult", upResult.result);
+          // upResult.result.headers.location 中就是返回的最终地址
+          console.log("finalUrl", upResult.result.headers.location);
+          setPicModalState({checkedImg: upResult.result.headers.location, visible: false});
+
+        } else {
+          errorMessage("图片上传失败");
         }
-        // if (upResult && upResult.status === 200) {
-        //   const picUrl = `${s3Info.url}/${s3Info.fields?.key}`;
-        //   setPicModalState({checkedImg: picUrl, visible: false});
-        //
-        // } else {
-        //   errorMessage("图片上传失败");
-        // }
       }
     }
     setPicUpLoading(false);

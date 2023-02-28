@@ -230,9 +230,16 @@ const PopupCard: React.FC<any> = (props: any) => {
               </Col>
             </Row>
             <Form.Item label={"上传图片"} name={"uploadPic"} required>
-              <Button type="default" icon={<UploadOutlined/>} style={{color: "#1890FF", border: "none"}}
-                      onClick={() => setPicModalState({...picModalState, visible: true})}>选择/上传
-              </Button>
+              {picModalState.checkedImg ?
+                <img key={picModalState.checkedImg} data-value={picModalState.checkedImg}
+                     src={picModalState.checkedImg}
+                     alt="默认图" style={{height: 100, width: 150}}
+                     onClick={() => setPicModalState({...picModalState, visible: true})}/>
+                :
+                <Button type="default" icon={<UploadOutlined/>}
+                        style={{color: "#1890FF", border: "none"}}
+                        onClick={() => setPicModalState({...picModalState, visible: true})}>选择/上传
+                </Button>}
             </Form.Item>
             <Form.Item label={"图文布局"} name={"picLayout"} required>
               <Radio.Group>
@@ -333,7 +340,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       {/* 图片上传弹出框 picModalState.visible */}
       <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
              onOk={uploadPicClick}
-             onCancel={() => setPicModalState({...picModalState, visible: false})}
+             onCancel={() => setPicModalState({checkedImg: "", visible: false})}
              width={700}>
 
         <div className={style.imgComponentBox}>

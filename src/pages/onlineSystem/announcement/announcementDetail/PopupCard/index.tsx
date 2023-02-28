@@ -134,7 +134,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 点击确定按钮
   const uploadPicClick = async () => {
-    // 判断是不是自动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
+    // 判断是不是手动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
     // 之前就选择了图片
     if (picModalState.checkedImg) {
       setPicModalState({...picModalState, visible: false})
@@ -146,15 +146,22 @@ const PopupCard: React.FC<any> = (props: any) => {
       if (s3Info) {
         // 再上传到服务器
         const upResult = await uploadPicToS3(s3Info, fileList[0]);
-        if (upResult && upResult.status === 200) {
-          const picUrl = `${s3Info.url}/${s3Info.fields?.key}`;
-          setPicModalState({checkedImg: picUrl, visible: false});
 
-        } else {
-          errorMessage("图片上传失败");
+        if (document.getElementById("file_img")) {
+          debugger
+          document.getElementById("file_img").src = upResult;
         }
+        // if (upResult && upResult.status === 200) {
+        //   const picUrl = `${s3Info.url}/${s3Info.fields?.key}`;
+        //   setPicModalState({checkedImg: picUrl, visible: false});
+        //
+        // } else {
+        //   errorMessage("图片上传失败");
+        // }
       }
     }
+
+
   };
   // 预览
   const onPreView = async () => {
@@ -325,7 +332,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       </Spin>
 
       {/* 图片上传弹出框 picModalState.visible */}
-      <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
+      <Modal title="上传图片" visible={true} centered={true} maskClosable={false}
              onOk={uploadPicClick}
              onCancel={() => setPicModalState({checkedImg: "", visible: false})}
              width={700}>
@@ -357,6 +364,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                 <Upload
                   style={{color: "red"}}
                   listType="picture-card"
+                  showUploadList={{showPreviewIcon: false}}
                   fileList={fileList}
                   beforeUpload={(file) => {
                     return false;
@@ -383,6 +391,10 @@ const PopupCard: React.FC<any> = (props: any) => {
               </ImgCrop>
             </div>
             <div className={style.hintInfo}>{bannerTips}</div>
+          </div>
+          <div>
+            <img id={"file_img"} style={{width: 200, height: 100}}>
+            </img>
           </div>
         </div>
 

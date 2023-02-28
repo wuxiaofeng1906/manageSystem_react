@@ -23,13 +23,11 @@ const {Footer} = Layout;
 const PopupCard: React.FC<any> = (props: any) => {
   const {anCommonData, anPopData, setAnnPopData, showPulishButton} = useModel('announcement');
   const [dtForm] = Form.useForm();
-
   // 图片上传弹出层显示
   const [picModalState, setPicModalState] = useState({
     visible: false,
     checkedImg: ""
   });
-
   // 语雀数据导入（加载）使用
   const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
   useEffect(() => {
@@ -74,7 +72,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     setYuQueSpinLoading(false);
   };
-
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
     const specialList = dtForm.getFieldsValue();
@@ -88,7 +85,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     // 返回值共保存按钮使用
     return oldList;
   };
-
   // tab切换
   const onTabsChange = (key: string) => {
     // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
@@ -107,11 +103,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     //  需要最后再赋值当前tab页码
     currentTab = Number(key);
   };
-
-  // 获取所有数据并进行校验
-  const getAllData = () => {
-
-  }
   // 保存数据
   const onFinish = async (popData: any) => {
     let finalData = [];
@@ -133,7 +124,6 @@ const PopupCard: React.FC<any> = (props: any) => {
       errorMessage("保存失败！");
     }
   };
-
   // upload 组件使用上传图片
   const [fileList, setFileList] = useState<any[]>([])
   // 选择图片时
@@ -141,8 +131,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
       setPicModalState({...picModalState, checkedImg: e.target.currentSrc})
     }
-  }
-
+  };
   // 点击确定按钮
   const uploadPicClick = async () => {
     // 判断是不是自动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
@@ -167,7 +156,6 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
     }
   };
-
   // 预览
   const onPreView = async () => {
     //   需要需要校验不能为空
@@ -184,8 +172,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (vertifyFieldForPopup(finalData)) {
       //    anCommonData, finalData  进行预览的数据
     }
-  }
-
+  };
   // 一键发布
   const releaseAnnounceInfo = async () => {
     const releaseResult = await oneKeyToRelease("");
@@ -403,6 +390,4 @@ const PopupCard: React.FC<any> = (props: any) => {
     </PageContainer>
   );
 };
-
-
 export default PopupCard;

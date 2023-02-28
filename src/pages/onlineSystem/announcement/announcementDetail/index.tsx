@@ -119,6 +119,8 @@ const Announce: React.FC<any> = (props: any) => {
       if (result.ok) {
         sucMessage("保存成功！");
         return;
+      } else {
+        errorMessage(result.message);
       }
     }
   };
@@ -128,6 +130,8 @@ const Announce: React.FC<any> = (props: any) => {
     const releaseResult = await oneKeyToRelease("");
     if (releaseResult.ok) {
       sucMessage("公告发布成功！")
+    } else {
+      errorMessage(releaseResult.message);
     }
   };
 

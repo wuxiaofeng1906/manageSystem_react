@@ -114,8 +114,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   }
   // 保存数据
   const onFinish = async (popData: any) => {
-
-    debugger
     let finalData = [];
     // 如果是轮播则先放到state中再保存
     if (anCommonData?.announce_carousel === 1) {
@@ -126,7 +124,6 @@ const PopupCard: React.FC<any> = (props: any) => {
       finalData.push(popData);
     }
     if (vertifyFieldForPopup(finalData)) {
-      debugger
       // 需要验证必填项
       const result = await saveAnnounceContent(anCommonData, finalData);
       if (result.ok) {
@@ -162,7 +159,6 @@ const PopupCard: React.FC<any> = (props: any) => {
         const upResult = await uploadPicToS3(s3Info, fileList[0]);
         if (upResult && upResult.status === 200) {
           const picUrl = `${s3Info.url}/${s3Info.fields?.key}`;
-          debugger;
           setPicModalState({checkedImg: picUrl, visible: false});
 
         } else {

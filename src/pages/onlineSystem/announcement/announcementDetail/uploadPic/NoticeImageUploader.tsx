@@ -37,7 +37,6 @@ export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
   // 获取二进制文件
   const temp: any = await getBase64(picFile.originFileObj);
   formdata.append("file", temp.toString());
-  debugger
   return await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, {data:formdata});
 
   // console.log(result)

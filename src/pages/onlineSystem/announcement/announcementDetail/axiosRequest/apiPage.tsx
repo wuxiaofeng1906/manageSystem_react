@@ -51,7 +51,6 @@ const notCarouselData = (popupData: any) => {
 
 // 轮播时的数据
 const carouselData = (popupData: any) => {
-  debugger
   if (!popupData && popupData.length) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   let data: any = [];
@@ -73,12 +72,11 @@ const carouselData = (popupData: any) => {
 
 // 公告改版后的保存公告内容
 export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
-  debugger
   let data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
     updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm:ss'), // 升级时间：手动选择时间，必填
-    description: formData.announceMsg, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
+    description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
   };
   let specialData = {};
   if (data.templateTypeId === "2") { // 弹窗保存数据

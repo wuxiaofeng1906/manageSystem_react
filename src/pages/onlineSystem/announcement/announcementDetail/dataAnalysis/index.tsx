@@ -25,12 +25,12 @@ export const analysisSpecialTitle = (source: any) => {
 }
 
 // 验证表单字段不能为空（公共字段）
-export const vertifyFieldForCommon = (formInfo: any, announceMsg: any) => {
+export const vertifyFieldForCommon = (formInfo: any) => {
   if (isEmpty(formInfo.announce_name.trim())) {
     errorMessage("公告名称不能为空！");
     return false;
   }
-  if (announceMsg && isEmpty((announceMsg.split("更新功能：")[1]).trim())) {
+  if (formInfo.announce_content && isEmpty(((formInfo.announce_content).split("更新功能：")[1]).trim())) {
     errorMessage("请完善公告详情！");
     return false;
   }
@@ -41,7 +41,6 @@ export const vertifyFieldForCommon = (formInfo: any, announceMsg: any) => {
 // 验证字段的必填项(弹窗界面)
 export const vertifyFieldForPopup = (popDataArray: any) => {
   popDataArray.map((popData: any) => {
-    debugger
     if (!popData.uploadPic) {
       errorMessage("图片不能为空！");
       return false;

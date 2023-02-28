@@ -53,16 +53,13 @@ const Announce: React.FC<any> = (props: any) => {
   const toNextPage = () => {
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
-    const announceMsg = document.getElementById("announceContent")?.innerText;
-    if (vertifyFieldForCommon(formInfo, announceMsg)) {
-      setAnCommonData({...formInfo, announceMsg});
+    if (vertifyFieldForCommon(formInfo)) {
+      setAnCommonData({...formInfo});
       history.push('/onlineSystem/PopupCard');
     }
   }
   // 监听删除键是否用于删除公告详情中的数据
   document.onkeydown = function (event: KeyboardEvent) {
-    debugger
-
     if (event?.code === "Backspace" && event.target?.value.endsWith("更新升级。更新功能：")) {
       return false;
     }
@@ -115,10 +112,10 @@ const Announce: React.FC<any> = (props: any) => {
   }, []);
   // 保存消息卡面数据
   const saveMsgInfo = async () => {
-    const announceMsg = document.getElementById("announceContent")?.innerText;
+    // const announceMsg = document.getElementById("announceContent")?.innerText;
     const formInfo = announcementForm.getFieldsValue();
-    if (vertifyFieldForCommon(formInfo, announceMsg)) {
-      const result = await saveAnnounceContent({...formInfo, announceMsg});
+    if (vertifyFieldForCommon(formInfo)) {
+      const result = await saveAnnounceContent({...formInfo});
       if (result.ok) {
         sucMessage("保存成功！");
         return;

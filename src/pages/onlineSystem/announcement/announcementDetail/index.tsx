@@ -22,8 +22,9 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
   const [leaveShow, setLeaveShow] = useState(false);
-  // 公告列表过来的数据
-  const {id: releaseNum} = useParams() as { id: string; type: 'add' | 'detail'; };
+  // 公告列表过来的数据（releaseName:公告名称, releaseID：公告id, type：新增还是删除）
+  const {releaseName, releaseID, type} = props.location?.query;
+
   const [announcementForm] = Form.useForm();
   // 如果是消息卡片，则显示一键发布和保存按钮，如果是弹窗卡片，则显示下一步按钮
   const [stepShow, setStepShow] = useState<any>({
@@ -57,7 +58,8 @@ const Announce: React.FC<any> = (props: any) => {
       setAnCommonData({...formInfo});
       history.push('/onlineSystem/PopupCard');
     }
-  }
+  };
+
   // 监听删除键是否用于删除公告详情中的数据
   document.onkeydown = function (event: KeyboardEvent) {
     if (event?.code === "Backspace" && event.target?.value.endsWith("更新升级。更新功能：")) {
@@ -68,12 +70,15 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 判断是否有上线，有上线才会进行一键发布
   const pulishButtonVisible = async () => {
-    const result = await announceIsOnlined("");
+    const result = await announceIsOnlined(releaseName);
     if (result.ok) {
       setShowPulishButton(true);
     }
   }
+
+
   useEffect(() => {
+
     pulishButtonVisible();
     // 先判断有没有存在原始数据（anCommonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
     if (anCommonData) {

@@ -65,21 +65,22 @@ const announceList = () => {
     // 新增
     if (isEmpty(params) && !announcePermission?.().add) return;
     if (!announcePermission?.().edit) return;
-    let releaseNum = '';
+    let releaseID = '';
+    let releaseName = '';
     let type = 'detail';
 
-    debugger
     if (isEmpty(params)) {
-      // 先要获取公告id（后端服务生成）
+      // 先要获取公告name（后端服务生成）
       const res = await DutyListServices.getDutyNum();
-      releaseNum = res.ready_release_num;
+      releaseName = res.ready_release_num;
       type = 'add';
     } else {
       // 修改的话就是原有的id
-      releaseNum = params?.data.iteration;
+      releaseName = params?.data.iteration;
+      releaseID = params?.data.id;
     }
-    if (isEmpty(releaseNum)) return errorMessage('数据异常');
-    history.push(`/onlineSystem/announcementDetail?releaseNum=${releaseNum}&type=${type}`);
+    if (isEmpty(releaseName)) return errorMessage('数据异常');
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}`);
   };
 
   // 删除数据

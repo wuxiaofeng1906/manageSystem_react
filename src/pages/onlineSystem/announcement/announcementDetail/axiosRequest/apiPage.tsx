@@ -73,7 +73,7 @@ const carouselData = (popupData: any) => {
 export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
   console.log("popupData", popupData)
   debugger
-  let data: any = {
+  const data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
     updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm:ss'), // 升级时间：手动选择时间，必填

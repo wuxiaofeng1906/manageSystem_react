@@ -35,30 +35,35 @@ const PopupCard: React.FC<any> = (props: any) => {
   const [picUpLoading, setPicUpLoading] = useState(false);
   useEffect(() => {
     // 需要先判断anPopData有没有数据
-    if(anPopData){
-
-    }
-    // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
-    dtForm.setFieldsValue({
-      picLayout: "1", // 默认上下布局
-      ptyGroup: [{ // 默认一组特性
-        first: "",
-        seconds: [{"second": ""}]
-      }]
-    });
-    // 轮播时记录数据
-    if (commonData?.announce_carousel === 1) {
-      let tabsContent: any = [];
-      for (let i = 0; i < commonData?.carouselNum; i++) {
-        tabsContent.push({
-          tabPage: i + 1,
-          tabsContent: {}
-        })
-      }
+    if (anPopData) {
       debugger
-      setAnnPopData(tabsContent)
+      // 展示第一个tab的数据即可。
+      dtForm.setFieldsValue(anPopData[0]?.tabsContent);
+      setPicModalState({
+        ...picModalState,
+        checkedImg:(anPopData[0]?.tabsContent).uploadPic
+      })
+    } else {
+      // 轮播时记录Tab数据用
+      if (commonData?.announce_carousel === 1) {
+        const tabsContent: any = [];
+        for (let i = 0; i < commonData?.carouselNum; i++) {
+          tabsContent.push({
+            tabPage: i + 1,
+            tabsContent: {}
+          })
+        }
+        setAnnPopData(tabsContent)
+      }
+      // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
+      dtForm.setFieldsValue({
+        picLayout: "1", // 默认上下布局
+        ptyGroup: [{ // 默认一组特性
+          first: "",
+          seconds: [{"second": ""}]
+        }]
+      });
     }
-
   }, []);
 
   // 同步语雀信息

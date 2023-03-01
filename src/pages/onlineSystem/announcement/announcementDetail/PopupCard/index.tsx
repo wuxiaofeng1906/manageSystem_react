@@ -21,7 +21,7 @@ import ImgCrop from 'antd-img-crop';
 let currentTab = 1;
 const {Footer} = Layout;
 const PopupCard: React.FC<any> = (props: any) => {
-  const {anCommonData, anPopData, setAnnPopData, showPulishButton} = useModel('announcement');
+  const {commonData, anPopData, setAnnPopData, showPulishButton} = useModel('announcement');
   const [dtForm] = Form.useForm();
   // 图片上传弹出层显示
   const [picModalState, setPicModalState] = useState({
@@ -43,9 +43,9 @@ const PopupCard: React.FC<any> = (props: any) => {
       }]
     });
     // 轮播时记录数据
-    if (anCommonData?.announce_carousel === 1) {
+    if (commonData?.announce_carousel === 1) {
       let tabsContent: any = [];
-      for (let i = 0; i < anCommonData?.carouselNum; i++) {
+      for (let i = 0; i < commonData?.carouselNum; i++) {
         tabsContent.push({
           tabPage: i + 1,
           tabsContent: {}
@@ -111,7 +111,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     debugger
     let finalData = [];
     // 如果是轮播则先放到state中再保存
-    if (anCommonData?.announce_carousel === 1) {
+    if (commonData?.announce_carousel === 1) {
       finalData = getPopupSource(currentTab);
     } else {
       // 不是轮播，需要把图片路径放进去
@@ -120,7 +120,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     if (vertifyFieldForPopup(finalData)) {
       // 需要验证必填项
-      const result = await saveAnnounceContent(anCommonData, finalData);
+      const result = await saveAnnounceContent(commonData, finalData);
       if (result.ok) {
         sucMessage("保存成功！")
         return;
@@ -173,7 +173,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     //   需要需要校验不能为空
     let finalData = [];
     // 如果是轮播则先放到state中再保存
-    if (anCommonData?.announce_carousel === 1) {
+    if (commonData?.announce_carousel === 1) {
       finalData = getPopupSource(currentTab);
     } else {
       // 不是轮播，需要把图片路径放进去
@@ -182,7 +182,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       finalData.push(popData);
     }
     if (vertifyFieldForPopup(finalData)) {
-      //    anCommonData, finalData  进行预览的数据
+      //    commonData, finalData  进行预览的数据
     }
   };
   // 一键发布
@@ -202,19 +202,19 @@ const PopupCard: React.FC<any> = (props: any) => {
             style={{
               width: '100%',
               marginLeft: 80,
-              display: anCommonData?.announce_carousel === 1 ? "inline-block" : "none"
+              display: commonData?.announce_carousel === 1 ? "inline-block" : "none"
             }}>
-            {tabsPanel(Number(anCommonData?.carouselNum))}
+            {tabsPanel(Number(commonData?.carouselNum))}
           </Tabs>
           <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}>
             {/* 特性名称只针对轮播功能 */}
-            <Row style={{display: anCommonData?.announce_carousel === 1 ? "inline-block" : "none"}}>
+            <Row style={{display: commonData?.announce_carousel === 1 ? "inline-block" : "none"}}>
               <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>
                 <Input style={{minWidth: 400}}></Input>
               </Form.Item>
             </Row>
             {/* 特性名称只针对不轮播功能 */}
-            <Row style={{display: anCommonData?.announce_carousel === 1 ? "none" : "inline-flex"}}>
+            <Row style={{display: commonData?.announce_carousel === 1 ? "none" : "inline-flex"}}>
               <Col>
                 <Form.Item label={"语雀迭代版本地址："} name={"yuQueUrl"}>
                   <Input style={{minWidth: 400}} placeholder={"从语雀复制更新版本地址"} spellCheck={"false"}></Input>

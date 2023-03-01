@@ -18,7 +18,7 @@ const {TextArea} = Input;
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
-  const {anCommonData, setAnCommonData, showPulishButton, setShowPulishButton} = useModel('announcement');
+  const {commonData, setCommonData, showPulishButton, setShowPulishButton} = useModel('announcement');
 
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
   const [leaveShow, setLeaveShow] = useState(false);
@@ -55,7 +55,7 @@ const Announce: React.FC<any> = (props: any) => {
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
-      setAnCommonData({...formInfo});
+      setCommonData({...formInfo});
       history.push('/onlineSystem/PopupCard');
     }
   };
@@ -76,22 +76,25 @@ const Announce: React.FC<any> = (props: any) => {
     }
   }
 
-
   useEffect(() => {
 
+    // 先设置数据源（）
+  });
+  useEffect(() => {
+    // 一键发布按钮是否展示
     pulishButtonVisible();
-    // 先判断有没有存在原始数据（anCommonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
-    if (anCommonData) {
+    // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
+    if (commonData) {
       // 以下是已有的数据（下一页返回或者历史记录）
       announcementForm.setFieldsValue({
-        announce_name: anCommonData.announce_name,
-        modules: anCommonData.modules,
-        announce_time: moment(anCommonData.announce_time),
-        announce_content: anCommonData.announce_content,
-        announce_carousel: anCommonData.announce_carousel,
-        carouselNum: anCommonData.carouselNum
+        announce_name: commonData.announce_name,
+        modules: commonData.modules,
+        announce_time: moment(commonData.announce_time),
+        announce_content: commonData.announce_content,
+        announce_carousel: commonData.announce_carousel,
+        carouselNum: commonData.carouselNum
       });
-      if (anCommonData.modules === 1) { // 如果是消息卡片
+      if (commonData.modules === 1) { // 如果是消息卡片
         setStepShow({
           msgCard: "inline",
           popCard: "none"

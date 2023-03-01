@@ -11,14 +11,13 @@ import AnnouncementServices from '@/services/announcement';
 import {isEmpty} from 'lodash';
 import IPagination from '@/components/IPagination';
 import {useModel, history} from 'umi';
-import moment from 'moment';
 import usePermission from '@/hooks/permission';
-import {infoMessage} from '@/publicMethods/showMessages';
+import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessages';
 
 
 import {deleteList} from "./axiosRequest/apiPage";
 import {queryAnnounceList} from "./axiosRequest/gqlPage";
-import {useGqlClient} from "@/hooks";
+
 
 const disabledStyle = {filter: 'grayscale(1)', cursor: 'not-allowed'};
 const announceList = () => {
@@ -42,17 +41,13 @@ const announceList = () => {
     params.api.sizeColumnsToFit();
   };
 
+  // 获取列表数据
   const getList = async (page = 1, page_size = pages.page_size) => {
     setSpinning(true);
     try {
       const res = await queryAnnounceList(page, page_size);
-      debugger
       setSpinning(false);
-      setList(res?.data?.map((it: any, index: number) => ({
-          ...it,
-          num: (page - 1) * page_size + index + 1,
-        })),
-      );
+      setList(res?.NoticeEdition);
       setPages({
         page: res?.page || 1,
         page_size: res?.page_size || 20,
@@ -63,11 +58,6 @@ const announceList = () => {
     }
   };
 
-  // 获取人
-  const getPerson = async () => {
-    const res = await AnnouncementServices.applicant();
-    setPersons(res?.map((it: any) => ({label: it.user_name, value: it.user_id})));
-  };
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
     if (!isEmpty(params) && !announcePermission?.().check) return infoMessage('您无查看公告权限！');
@@ -84,28 +74,39 @@ const announceList = () => {
     if (isEmpty(releaseNum)) return infoMessage('数据异常');
     history.push(`/onlineSystem/announcementDetail?releaseNum=${releaseNum}&type=add`);
   };
+
   // 删除数据
   const onDelete = async (params: CellClickedEvent) => {
     debugger
     if (!announcePermission?.().delete) return;
     // 判断是否关联了发布过程公告
-    if (isEmpty(params.data.announcement_num)) return infoMessage('数据异常');
-    const res = await AnnouncementServices.checkDeleteAnnouncement(params.data.announcement_num);
+    if (isEmpty(params.data.id)) return infoMessage('数据异常');
+    // const res = await AnnouncementServices.checkDeleteAnnouncement(params.data.announcement_num);
     let content = '请确认是否删除该公告?';
-    if (res.data == false) {
-      content = '该公告已关联发布，请确认是否仍要删除？';
-    }
+    // if (res.data == false) {
+    //   content = '该公告已关联发布，请确认是否仍要删除？';
+    // }
     Modal.confirm({
       title: '删除提醒',
       icon: <ExclamationCircleOutlined/>,
       content: content,
       onOk: async () => {
-        deleteList({})
-        getList();
+        const delResult = await deleteList(params.data.id);
+        if (delResult.ok) {
+          sucMessage("删除成功！")
+          getList();
+        } else {
+          errorMessage("删除失败，失败原因：" + delResult.message)
+        }
       },
     });
   };
 
+  // 获取人
+  const getPerson = async () => {
+    const res = await AnnouncementServices.applicant();
+    setPersons(res?.map((it: any) => ({label: it.user_name, value: it.user_id})));
+  };
   useEffect(() => {
     getPerson();
     getList();

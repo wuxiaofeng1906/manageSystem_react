@@ -1,11 +1,14 @@
-import type {ColDef, ColGroupDef} from 'ag-grid-community/dist/lib/entities/colDef';
+import {RELEASE_MODULE} from "../constant";
+import dayjs from "dayjs";
 
-export const announcementListColumn: (ColDef | ColGroupDef)[] = [
+export const announcementListColumn: any = [
   {
     headerName: '序号',
-    field: 'num',
-    minWidth: 90,
-    maxWidth: 90,
+    minWidth: 70,
+    maxWidth: 70,
+    cellRenderer: (params: any) => {
+      return Number(params.node.id) + 1;
+    },
   },
   {
     headerName: 'ID',
@@ -20,12 +23,18 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '升级模板',
     field: 'templateTypeId',
-    minWidth: 160,
+    minWidth: 100,
+    cellRenderer: (v: any) => {
+      return RELEASE_MODULE[v.value]
+    }
   },
   {
     headerName: '升级时间',
     field: 'updatedTime',
-    minWidth: 130,
+    minWidth: 160,
+    cellRenderer: (v: any) => {
+      return dayjs(v.value).format("YYYY-MM-DD hh:mm:ss")
+    }
   },
   {
     headerName: '升级描述',
@@ -35,8 +44,8 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '创建人',
     field: 'create_user',
-    minWidth: 120,
-    maxWidth: 150,
+    minWidth: 100,
+    maxWidth: 120,
   },
   {
     headerName: '创建时间',
@@ -46,7 +55,7 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '修改人',
     field: 'update_user',
-    minWidth: 120,
+    minWidth: 100,
   },
   {
     headerName: '修改时间',

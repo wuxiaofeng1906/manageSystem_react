@@ -3,10 +3,9 @@ import {ExternalGqlClient} from '@/hooks/externalGql';
 
 // 获取列表数据
 export const queryAnnounceList = async (page: number, pageSize: number) => {
-  debugger
   const {data} = await ExternalGqlClient.noticeGQLQuery(`
   {
-    NoticeEdition(firstResult: 0, maxResult: 10) {
+    NoticeEdition(firstResult: ${page-1}, maxResult: ${pageSize}) {
         id
         iteration
         updatedTime
@@ -15,24 +14,16 @@ export const queryAnnounceList = async (page: number, pageSize: number) => {
         isCarousel
         pageSize
     }
+
+    AggregateQueryOne(entity: "NoticeEdition") {
+      count: aggr(expr: "count(*)")
+    }
   }`);
 
-  console.log(data);
-  debugger
-
+  // console.log(data);
+  // debugger
+return data;
 };
 
 
-// // 获取列表总数
-// export const queryAnnounceListCount = async (client: GqlClient<object>, page: number, pageSize: number) => {
-//   const {data} = await client.query(`
-//   {
-//     AggregateQueryOne(entity: "NoticeEdition") {
-//       count: aggr(expr: "count(*)")
-//     }
-//   }`);
-//
-//   console.log(data);
-//   debugger
-//
-// };
+

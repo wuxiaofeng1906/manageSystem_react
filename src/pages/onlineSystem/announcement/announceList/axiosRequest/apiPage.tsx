@@ -23,9 +23,8 @@ export const oneKeyToRelease = (id: any) => {
 };
 
 
-// 一键发布
+// 删除公告
 export const deleteList = (id: any) => {
-  return axiosPost('/api/77hub/notice/', {
-    id: id
-  });
+  return axiosDelete(`/api/77hub/notice/${id}`, {});
+  // return axiosDelete(`/api/77hub/notice`, {data: {id: id}});
 };

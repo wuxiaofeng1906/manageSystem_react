@@ -7,7 +7,7 @@ import moment from 'moment';
 import {history, useParams} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
-import {SIZE} from "./constant";
+import {SIZE} from "../constant";
 import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease, updateAnnouncement} from "./axiosRequest/apiPage";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
@@ -121,9 +121,11 @@ const Announce: React.FC<any> = (props: any) => {
       const addResult = await saveAnnounceContent({...formInfo});
       if (addResult.ok) {
         sucMessage("保存成功！");
+        history.push('./announceList')
         return;
       } else {
-        errorMessage(addResult.message);
+        debugger
+        addResult.message ? errorMessage(addResult.message) : errorMessage("保存失败！");
       }
     }
   };

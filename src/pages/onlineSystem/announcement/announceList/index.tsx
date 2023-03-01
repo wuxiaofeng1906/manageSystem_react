@@ -61,18 +61,25 @@ const announceList = () => {
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
     if (!isEmpty(params) && !announcePermission?.().check) return infoMessage('您无查看公告权限！');
+
     // 新增
     if (isEmpty(params) && !announcePermission?.().add) return;
     if (!announcePermission?.().edit) return;
     let releaseNum = '';
     let type = 'detail';
+
+    debugger
     if (isEmpty(params)) {
+      // 先要获取公告id（后端服务生成）
       const res = await DutyListServices.getDutyNum();
       releaseNum = res.ready_release_num;
       type = 'add';
-    } else releaseNum = params?.data.announcement_num;
-    if (isEmpty(releaseNum)) return infoMessage('数据异常');
-    history.push(`/onlineSystem/announcementDetail?releaseNum=${releaseNum}&type=add`);
+    } else {
+      // 修改的话就是原有的id
+      releaseNum = params?.data.iteration;
+    }
+    if (isEmpty(releaseNum)) return errorMessage('数据异常');
+    history.push(`/onlineSystem/announcementDetail?releaseNum=${releaseNum}&type=${type}`);
   };
 
   // 删除数据

@@ -52,7 +52,7 @@ const notCarouselData = (popupData: any) => {
 const carouselData = (popupData: any) => {
   if (!popupData && popupData.length) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
-  let data: any = [];
+  const data: any = [];
   popupData.map((v: any) => {
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
@@ -66,11 +66,12 @@ const carouselData = (popupData: any) => {
       });
     }
   });
-  return data;
+  return {pages: data};
 };
 
 // 公告改版后的保存公告内容
 export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
+  console.log("popupData", popupData)
   debugger
   let data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)

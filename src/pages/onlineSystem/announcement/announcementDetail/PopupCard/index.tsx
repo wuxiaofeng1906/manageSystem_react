@@ -55,6 +55,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           tabsContent: {}
         })
       }
+      debugger
       setAnnPopData(tabsContent)
     }
 

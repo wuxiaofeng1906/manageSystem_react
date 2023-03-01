@@ -28,7 +28,6 @@ const announceList = () => {
   const [spinning, setSpinning] = useState(false);
   const [persons, setPersons] = useState<any[]>([]);
   const [gridHeight, setGridHeight] = useState(window.innerHeight - 300);
-  const gqlClient = useGqlClient();
   const [pages, setPages] = useState({
     page_size: 20,
     total: 0,
@@ -46,7 +45,7 @@ const announceList = () => {
   const getList = async (page = 1, page_size = pages.page_size) => {
     setSpinning(true);
     try {
-      const res = await queryAnnounceList(gqlClient, page, page_size);
+      const res = await queryAnnounceList(page, page_size);
       debugger
       setSpinning(false);
       setList(res?.data?.map((it: any, index: number) => ({

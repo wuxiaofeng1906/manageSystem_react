@@ -9,6 +9,7 @@ import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
 import {SIZE} from "../constant";
 import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease, updateAnnouncement} from "./axiosRequest/apiPage";
+import {queryAnnounceDetail} from "./axiosRequest/gqlPage";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
@@ -37,6 +38,7 @@ const Announce: React.FC<any> = (props: any) => {
   const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
   // 设置显示哪个模板(消息或者弹窗)
   const cardChanged = (e: RadioChangeEvent) => {
+    debugger
     if (e.target.value === "1") { // 1 是消息弹窗
       setStepShow({
         msgCard: "inline",
@@ -54,6 +56,7 @@ const Announce: React.FC<any> = (props: any) => {
   const toNextPage = () => {
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
+    debugger
     if (vertifyFieldForCommon(formInfo)) {
       setCommonData({...formInfo});
       history.push('/onlineSystem/PopupCard');
@@ -76,15 +79,50 @@ const Announce: React.FC<any> = (props: any) => {
     }
   }
 
-  useEffect(() => {
+  const getDataById = async () => {
+    const dts = await queryAnnounceDetail(releaseName, releaseID);
+    const {NoticeEdition} = dts;
+    if (NoticeEdition && NoticeEdition.length) {
+      debugger
+      const noticeDetails = NoticeEdition[0];
+      const formdata = {
+        announce_carousel: noticeDetails.isCarousel?1:0,
+        announce_content: noticeDetails.description,
+        announce_name: noticeDetails.iteration,
+        announce_time: moment(noticeDetails.updatedTime),
+        carouselNum: noticeDetails.pageSize,
+        modules: noticeDetails.templateTypeId
+      };
+      setCommonData(formdata);
+      announcementForm.setFieldsValue(formdata);
+      return;
+    }
+    errorMessage("明细获取失败！");
+  }
 
-    // 先设置数据源（）
-  });
+
   useEffect(() => {
+    debugger
     // 一键发布按钮是否展示
     pulishButtonVisible();
-    // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
-    if (commonData) {
+
+    // 先设置数据源（commonData：当前页面的数据）
+    if (type === "add") {
+      // 默认展示的数据
+      announcementForm.setFieldsValue({
+        announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
+        modules: "1",
+        announce_name: `${releaseName}升级公告`,
+        announce_time: moment(),
+        announce_carousel: 0, // 默认为否
+        carouselNum: 5
+      });
+      setCarouselNumShow("none");
+    } else if (type === "detail") {
+      // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
+      getDataById()
+    } else if (commonData && !type) { // 下一页返回上来的数据
+      // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
       // 以下是已有的数据（下一页返回或者历史记录）
       announcementForm.setFieldsValue({
         announce_name: commonData.announce_name,
@@ -107,15 +145,7 @@ const Announce: React.FC<any> = (props: any) => {
       }
       setCarouselNumShow("inline");
     } else {
-      announcementForm.setFieldsValue({
-        announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
-        modules: "1",
-        announce_name: `${dayjs().format("YYYYMMDD")}升级公告`,
-        announce_time: moment(),
-        announce_carousel: 0, // 默认为否
-        carouselNum: 5
-      });
-      setCarouselNumShow("none");
+      errorMessage("数据获取错误！")
     }
   }, []);
   // 保存数据

@@ -13,7 +13,7 @@ import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-import {defaultImgsUrl, bannerTips, picType} from "../uploadPic/index";
+import {imgUrlHeader, defaultImgsUrl, bannerTips, picType} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3} from "../uploadPic/NoticeImageUploader";
 import ImgCrop from 'antd-img-crop';
 
@@ -34,6 +34,10 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 上传图片的进度
   const [picUpLoading, setPicUpLoading] = useState(false);
   useEffect(() => {
+    // 需要先判断anPopData有没有数据
+    if(anPopData){
+
+    }
     // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
     dtForm.setFieldsValue({
       picLayout: "1", // 默认上下布局
@@ -122,7 +126,8 @@ const PopupCard: React.FC<any> = (props: any) => {
       // 需要验证必填项
       const result = await saveAnnounceContent(commonData, finalData);
       if (result.ok) {
-        sucMessage("保存成功！")
+        sucMessage("保存成功！");
+        history.push('./announceList');
         return;
       }
       errorMessage("保存失败！");
@@ -133,7 +138,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 选择图片时
   const picChecked = (e: any) => {
     if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
-      setPicModalState({...picModalState, checkedImg: e.target.currentSrc})
+      setPicModalState({...picModalState, checkedImg: e.target.dataset.value})
     }
   };
   // 点击确定按钮
@@ -231,7 +236,7 @@ const PopupCard: React.FC<any> = (props: any) => {
             <Form.Item label={"上传图片"} name={"uploadPic"} required>
               {picModalState.checkedImg ?
                 <img key={picModalState.checkedImg} data-value={picModalState.checkedImg}
-                     src={picModalState.checkedImg}
+                     src={`${imgUrlHeader}${picModalState.checkedImg}`}
                      alt="默认图" style={{height: 100, width: 150}}
                      onClick={() => setPicModalState({...picModalState, visible: true})}/>
                 :
@@ -351,7 +356,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                 {defaultImgsUrl.map(item => (
                   <li key={item} data-value={item}
                       className={picModalState.checkedImg === item ? style.activeChose : ''}>
-                    <img key={item} data-value={item} src={item} alt="默认图"/>
+                    <img key={item} data-value={item} src={`${imgUrlHeader}${item}`} alt="默认图"/>
                   </li>))}
               </ul>
             </div>

@@ -67,3 +67,14 @@ export const tabsPanel = (count: number) => {
   }
   return panes;
 };
+
+// 处理从服务器获取过来的弹窗数据放到state中
+export const dealPopDataFromService = (NoticeEdition: any) => {
+  if (!NoticeEdition || NoticeEdition.length === 0) {
+    return [];
+  }
+  debugger;
+  const sourceDt = NoticeEdition[1];
+
+  return [];
+};

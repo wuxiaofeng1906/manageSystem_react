@@ -81,7 +81,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
   let specialData = {};
   if (data.templateTypeId === "2") { // 弹窗保存数据
     // 共同属性
-    data["isCarousel"] = formData.announce_carousel; // 是否轮播
+    data["isCarousel"] = formData.announce_carousel === 0 ? false : true; // 是否轮播
     // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
     if (formData.announce_carousel === 1) {
       data["pageSize"] = formData.carouselNum; // 轮播总页数
@@ -92,7 +92,8 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
     }
   }
 
-  return axiosPost('/api/77hub/notice', {...data, ...specialData});
+  const relData = {...data, ...specialData};
+  return axiosPost('/api/77hub/notice', relData);
 };
 
 // 发送（保存）公告(旧的发布过程在用)

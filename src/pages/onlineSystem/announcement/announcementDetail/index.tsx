@@ -12,14 +12,14 @@ import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease, updateAnnouncem
 import {queryAnnounceDetail} from "./axiosRequest/gqlPage";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
-import {vertifyFieldForCommon} from "./dataAnalysis";
+import {vertifyFieldForCommon, dealPopDataFromService} from "./dataAnalysis";
 import {Prompt} from "react-router-dom";
 
 const {TextArea} = Input;
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
-  const {commonData, setCommonData, showPulishButton, setShowPulishButton} = useModel('announcement');
+  const {commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton} = useModel('announcement');
 
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
   const [leaveShow, setLeaveShow] = useState(false);
@@ -38,7 +38,6 @@ const Announce: React.FC<any> = (props: any) => {
   const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
   // 设置显示哪个模板(消息或者弹窗)
   const cardChanged = (e: RadioChangeEvent) => {
-    debugger
     if (e.target.value === "1") { // 1 是消息弹窗
       setStepShow({
         msgCard: "inline",
@@ -56,7 +55,6 @@ const Announce: React.FC<any> = (props: any) => {
   const toNextPage = () => {
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
-    debugger
     if (vertifyFieldForCommon(formInfo)) {
       setCommonData({...formInfo});
       history.push('/onlineSystem/PopupCard');
@@ -83,10 +81,9 @@ const Announce: React.FC<any> = (props: any) => {
     const dts = await queryAnnounceDetail(releaseName, releaseID);
     const {NoticeEdition} = dts;
     if (NoticeEdition && NoticeEdition.length) {
-      debugger
       const noticeDetails = NoticeEdition[0];
       const formdata = {
-        announce_carousel: noticeDetails.isCarousel?1:0,
+        announce_carousel: noticeDetails.isCarousel ? 1 : 0,
         announce_content: noticeDetails.description,
         announce_name: noticeDetails.iteration,
         announce_time: moment(noticeDetails.updatedTime),
@@ -95,6 +92,19 @@ const Announce: React.FC<any> = (props: any) => {
       };
       setCommonData(formdata);
       announcementForm.setFieldsValue(formdata);
+      // 显示下一步按钮还是保存按钮
+      if (formdata.modules === "2") { // 如果是弹窗的话
+        // 还需要在state中保存弹窗的数据
+        debugger;
+        setAnnPopData(dealPopDataFromService(NoticeEdition))
+
+        setStepShow({
+          msgCard: "none",
+          popCard: "inline"
+        });
+        if (formdata.announce_carousel === 1) setCarouselNumShow("inline");
+      }
+
       return;
     }
     errorMessage("明细获取失败！");

@@ -1,6 +1,7 @@
-import { axiosGet_TJ, axiosPost } from '@/publicMethods/axios';
-import { getCurrentUserInfo } from '@/publicMethods/authorityJudge';
+import {axiosGet_TJ, axiosPost, axiosPut} from '@/publicMethods/axios';
+import {getCurrentUserInfo} from '@/publicMethods/authorityJudge';
 import dayjs from 'dayjs';
+import {isEmpty} from "lodash";
 
 const users = getCurrentUserInfo();
 
@@ -14,29 +15,89 @@ export const getAnnouncement = async (readyReleaseNum: string, releaseType: stri
   return result;
 };
 
-// 发送（保存）公告
-export const postAnnouncement = async (formData: any, basicInfo: any) => {
-  // 需要判断内容是否为空
-  const upgradeTime = dayjs(formData.announceTime).format('YYYY-MM-DD HH:mm:ss');
-  const data: any = {
-    user_name: users.name,
-    user_id: users.userid,
-    announcement_num: formData.announcement_num,
-    upgrade_time: upgradeTime,
-    upgrade_description: `${formData.announceDetails_1}${upgradeTime}${formData.announceDetails_2}`,
-    is_upgrade: formData.showUpdateDetails === 'true' ? 'yes' : 'no',
-    announcement_status: basicInfo.releaseType,
-    announcement_time: basicInfo.releaseTime,
-    announcement_name: formData.announcement_name,
-  };
-
-  if (basicInfo.announceId > 0) {
-    data.announcement_id = formData.announcementId;
+// 获取特性列表list
+const getSpecialList = (ptyGroup: any) => {
+  const specialList: any = [];
+  ptyGroup.map((v: any) => {
+    const childList: any = [];
+    (v.seconds).map((v2: any) => {
+      if (!isEmpty(v2.second)) childList.push({"speciality": v2.second});
+    })
+    specialList.push({
+      "speciality": v.first,
+      "children": childList
+    });
+  });
+  return specialList;
+}
+// 不轮播时的数据
+const notCarouselData = (popupData: any) => {
+  // 相当于只有一个轮播页面
+  const {ptyGroup} = popupData;
+  const data = {
+    pages: [
+      {
+        "image": popupData.uploadPic,
+        "pageNum": 0, // 所属轮播页码
+        "layoutTypeId": popupData.picLayout,
+        "yuQue": popupData.yuQueUrl,
+        "contents": getSpecialList(ptyGroup)
+      }
+    ]
   }
-  return axiosPost('/api/verify/release/announcement', data);
+  return data;
 };
 
-// 发送（保存）公告
+// 轮播时的数据
+const carouselData = (popupData: any) => {
+  if (!popupData && popupData.length) return {};
+  // 轮播页数没填完的时候，只保存有数据的页面
+  const data: any = [];
+  popupData.map((v: any) => {
+    const {tabsContent} = v;
+    // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
+    if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
+      data.push({
+        featureName: tabsContent.specialName,
+        image: tabsContent.uploadPic,
+        pageNum: v.tabPage,
+        layoutTypeId: tabsContent.picLayout,
+        contents: getSpecialList(tabsContent.ptyGroup)
+      });
+    }
+  });
+  return {pages: data};
+};
+
+// 公告改版后的保存公告内容
+export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
+  console.log("popupData", popupData)
+  debugger
+  const data: any = {
+    iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
+    templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
+    updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm:ss'), // 升级时间：手动选择时间，必填
+    description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
+  };
+  let specialData = {};
+  if (data.templateTypeId === "2") { // 弹窗保存数据
+    // 共同属性
+    data["isCarousel"] = formData.announce_carousel === 0 ? false : true; // 是否轮播
+    // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
+    if (formData.announce_carousel === 1) {
+      data["pageSize"] = formData.carouselNum; // 轮播总页数
+      specialData = carouselData(popupData);// 轮播
+    } else {
+      data["pageSize"] = 0; // 不轮播的时候总页数为0
+      specialData = notCarouselData(popupData[0]); // 不轮播
+    }
+  }
+
+  const relData = {...data, ...specialData};
+  return axiosPost('/api/77hub/notice', relData);
+};
+
+// 发送（保存）公告(旧的发布过程在用)
 export const postAnnouncementForOtherPage = async (formData: any) => {
   const data: any = {
     user_name: users.name,
@@ -53,3 +114,47 @@ export const postAnnouncementForOtherPage = async (formData: any) => {
   };
   return axiosPost('/api/verify/release/announcement', data);
 };
+
+// 公告改版后的保存公告内容
+export const getYuQueContent = async (Url: string) => {
+  return axiosPost('/api/77hub/yuque/docs/headings', {
+    yuQue: Url
+  });
+};
+
+// 判断该公告是否已被上线，若没有上线，则不显示一键发布，若已上线才显示，位置在保存的左边。
+export const announceIsOnlined = async (announceName: string) => {
+  const result = await axiosGet_TJ('/api/77hub/notice/be-online', {iteration: announceName});
+  return result;
+}
+
+// 一键发布
+export const oneKeyToRelease = (id: any) => {
+  return axiosPost('/api/77hub/notice/released/', {
+    sid: id
+  });
+};
+
+
+// 常规的修改：不涉及新增
+const normalUpdate = ()=>{
+
+};
+
+// 特殊的修改：不支持templateTypeId、isCarousel字段的修改
+const specialUodateForidCarousel = ()=>{
+
+}
+
+// 弹窗- 不轮播时，新增了特性。
+const popupNoCarouseAddNew = ()=>{
+
+}
+
+
+// 修改发布公告
+export const updateAnnouncement = () => {
+  const data = {};
+  return axiosPut('/api/77hub/notice', data);
+};
+

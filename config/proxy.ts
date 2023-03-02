@@ -12,12 +12,22 @@ export default {
     '/api/verify/': {
       target: 'http://10.0.144.53:5000/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
     '/api/': {
       target: 'http://10.0.144.53:8300/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
+    },
+    '/identity/Attachment/': {
+      target: 'http://identity.nx-temp1-k8s.e7link.com/',
+      changeOrigin: true,
+      pathRewrite: {'^': ''},
+    },
+    '/postImage/': {
+      target: 'http://s3.cn-northwest-1.amazonaws.com.cn/',
+      changeOrigin: true,
+      pathRewrite: {'/postImage/': ''},
     },
   },
 
@@ -26,12 +36,12 @@ export default {
     '/api/verify/': {
       target: 'http://192.168.31.239:5001/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
     '/api/': {
       target: 'http://10.0.144.53:8300/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
   },
 
@@ -40,13 +50,13 @@ export default {
     '/api/verify/': {
       target: 'http://10.0.144.51:5000/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
     '/api/': {
       // target: 'http://dms.q7link.com:8300/',
       target: 'http://rd.q7link.com:8300/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
   },
 };

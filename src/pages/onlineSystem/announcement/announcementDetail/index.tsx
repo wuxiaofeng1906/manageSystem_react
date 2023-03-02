@@ -1,324 +1,294 @@
-import React, { useEffect, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
-import { Button, DatePicker, Form, Input, Radio, Tabs, Divider, Popconfirm } from 'antd';
-import './style.css';
-import { useRequest } from 'ahooks';
-import { postAnnouncement, getAnnouncement } from './axiosRequest/apiPage';
+import React, {useEffect, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Spin} from 'antd';
+import style from './style.less';
+import type {RadioChangeEvent} from 'antd';
 import moment from 'moment';
-import { getHeight } from '@/publicMethods/pageSet';
-import usePermission from '@/hooks/permission';
-import { useParams } from 'umi';
-import { isEmpty } from 'lodash';
+import {history, useParams} from 'umi';
+import {isEmpty} from 'lodash';
+import dayjs from "dayjs";
+import {SIZE} from "../constant";
+import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease, updateAnnouncement} from "./axiosRequest/apiPage";
+import {queryAnnounceDetail} from "./axiosRequest/gqlPage";
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+import {useModel} from "@@/plugin-model/useModel";
+import {vertifyFieldForCommon, dealPopDataFromService} from "./dataAnalysis";
+import {Prompt} from "react-router-dom";
 
-const { TextArea } = Input;
-const { TabPane } = Tabs;
-let releaseTime = 'before'; // 升级前公告还是升级后公告
-let announceId = 0; // 记录升级ID
+const {TextArea} = Input;
+
+const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
-  const { id: releaseNum, status: operteStatus } = useParams() as {
-    id: string;
-    status: string;
-    type: 'add' | 'detail';
-  };
+  const {commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton} = useModel('announcement');
 
-  const { announcePermission } = usePermission();
-  const hasPermission = announcePermission();
+  // 是否可以离开这个页面（只有在数据已经保存了才能离开）
+  const [leaveShow, setLeaveShow] = useState(false);
+  // 公告列表过来的数据（releaseName:公告名称, releaseID：公告id, type：新增还是删除）
+  const {releaseName, releaseID, type} = props.location?.query;
 
-  const [announceContentForm] = Form.useForm();
-  const [announcementNameForm] = Form.useForm();
-  const [pageHeight, setPageHeight] = useState(getHeight());
-  // 一键挂起公告按钮是否可用以及style
-  const [buttonDisable, setButtonDisable] = useState({
-    title: '前',
-    disable: true,
-    buttonStyle: '',
+  const [announcementForm] = Form.useForm();
+  // 如果是消息卡片，则显示一键发布和保存按钮，如果是弹窗卡片，则显示下一步按钮
+  const [stepShow, setStepShow] = useState<any>({
+    msgCard: "inline",
+    popCard: "none"
   });
-
-  // 当表单种数据被改变时候
-  const whenFormValueChanged = (changedFields: any, allFields: any) => {
-    if (changedFields && changedFields.length > 0) {
-      const fieldName = changedFields[0].name[0];
-      let fieldValue = changedFields[0].value;
-      switch (fieldName) {
-        case 'announceTime':
-          fieldValue = moment(fieldValue).format('YYYY-MM-DD HH:mm:ss');
-          announceContentForm.setFieldsValue({
-            showAnnounceTime: fieldValue,
-          });
-          break;
-        case 'announceDetails_1':
-          announceContentForm.setFieldsValue({
-            announceDetails_1: fieldValue,
-          });
-
-          break;
-        case 'announceDetails_2':
-          announceContentForm.setFieldsValue({
-            announceDetails_2: fieldValue,
-          });
-
-          break;
-        case 'showUpdateDetails':
-          announceContentForm.setFieldsValue({
-            showUpdateDetails: fieldValue,
-          });
-          break;
-        default:
-          break;
-      }
-
-      const formData = announceContentForm.getFieldsValue();
-      // 无论前面更新了哪个字段，后面的预览都要更新
-      announceContentForm.setFieldsValue({
-        UpgradeIntroDate: `"${formData.showAnnounceTime}"`,
-        UpgradeDescription: `"${formData.announceDetails_1}${formData.showAnnounceTime}${formData.announceDetails_2}"`,
-        isUpdated: `"${formData.showUpdateDetails}"`,
+  // 轮播页数展示控制
+  const [carouselNumShow, setCarouselNumShow] = useState<string>("none");
+  // 发布时间
+  const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+  // 设置显示哪个模板(消息或者弹窗)
+  const cardChanged = (e: RadioChangeEvent) => {
+    if (e.target.value === "1") { // 1 是消息弹窗
+      setStepShow({
+        msgCard: "inline",
+        popCard: "none"
       });
-    }
-  };
-
-  // 点击保存或者发布按钮
-  const saveAndReleaseAnnouncement = async (releaseType: string) => {
-    const basicInfo = {
-      releaseNum,
-      releaseTime,
-      announceId,
-      releaseType,
-    };
-    const nameValid = await announcementNameForm.validateFields();
-    const formDatas = announceContentForm.getFieldsValue();
-    if (!formDatas.announceDetails_1 || !formDatas.announceDetails_2) {
-      errorMessage('公告详情不能为空！');
       return;
     }
-    const result = await postAnnouncement(
-      {
-        ...formDatas,
-        ...nameValid,
-        announcement_num: releaseNum,
-      },
-      basicInfo,
-    );
-    const operate = releaseType === 'save' ? '保存' : '公告挂起';
-    if (result.code === 200) {
-      sucMessage(`${operate}成功！`);
-      setButtonDisable({
-        ...buttonDisable,
-        disable: false,
-        buttonStyle: 'saveButtonStyle',
+    setStepShow({
+      msgCard: "none",
+      popCard: "inline"
+    });
+    if (announcementForm.getFieldValue("announce_carousel") === 1) setCarouselNumShow("inline");
+  }
+  // 跳转到下一页
+  const toNextPage = () => {
+    if (stepShow.popCard !== "inline") return;
+    const formInfo = announcementForm.getFieldsValue();
+    if (vertifyFieldForCommon(formInfo)) {
+      setCommonData({...formInfo});
+      history.push('/onlineSystem/PopupCard');
+    }
+  };
+
+  // 监听删除键是否用于删除公告详情中的数据
+  document.onkeydown = function (event: KeyboardEvent) {
+    if (event?.code === "Backspace" && event.target?.value.endsWith("更新升级。更新功能：")) {
+      return false;
+    }
+    return true;
+  }
+
+  // 判断是否有上线，有上线才会进行一键发布
+  const pulishButtonVisible = async () => {
+    const result = await announceIsOnlined(releaseName);
+    if (result.ok) {
+      setShowPulishButton(true);
+    }
+  }
+
+  const getDataById = async () => {
+    const dts = await queryAnnounceDetail(releaseName, releaseID);
+    const {NoticeEdition} = dts;
+    if (NoticeEdition && NoticeEdition.length) {
+      const noticeDetails = NoticeEdition[0];
+      const formdata = {
+        announce_carousel: noticeDetails.isCarousel ? 1 : 0,
+        announce_content: noticeDetails.description,
+        announce_name: noticeDetails.iteration,
+        announce_time: moment(noticeDetails.updatedTime),
+        carouselNum: noticeDetails.pageSize,
+        modules: noticeDetails.templateTypeId
+      };
+      setCommonData(formdata);
+      announcementForm.setFieldsValue(formdata);
+      // 显示下一步按钮还是保存按钮
+      if (formdata.modules === "2") { // 如果是弹窗的话
+        // 还需要在state中保存弹窗的数据
+        setAnnPopData(dealPopDataFromService(NoticeEdition))
+
+        setStepShow({
+          msgCard: "none",
+          popCard: "inline"
+        });
+        if (formdata.announce_carousel === 1) setCarouselNumShow("inline");
+      }
+
+      return;
+    }
+    errorMessage("明细获取失败！");
+  }
+
+
+  useEffect(() => {
+    // 一键发布按钮是否展示
+    pulishButtonVisible();
+
+    // 先设置数据源（commonData：当前页面的数据）
+    if (type === "add") {
+      // 默认展示的数据
+      announcementForm.setFieldsValue({
+        announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
+        modules: "1",
+        announce_name: `${releaseName}升级公告`,
+        announce_time: moment(),
+        announce_carousel: 0, // 默认为否
+        carouselNum: 5
       });
+      setCarouselNumShow("none");
+    } else if (type === "detail") {
+      // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
+      getDataById()
+    } else if (commonData && !type) { // 下一页返回上来的数据
+      // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
+      // 以下是已有的数据（下一页返回或者历史记录）
+      announcementForm.setFieldsValue({
+        announce_name: commonData.announce_name,
+        modules: commonData.modules,
+        announce_time: moment(commonData.announce_time),
+        announce_content: commonData.announce_content,
+        announce_carousel: commonData.announce_carousel,
+        carouselNum: commonData.carouselNum
+      });
+      if (commonData.modules === 1) { // 如果是消息卡片
+        setStepShow({
+          msgCard: "inline",
+          popCard: "none"
+        });
+      } else {
+        setStepShow({
+          msgCard: "none",
+          popCard: "inline"
+        });
+      }
+      setCarouselNumShow("inline");
     } else {
-      errorMessage(`${operate}失败！`);
+      errorMessage("数据获取错误！")
     }
-  };
-  const initForm = () => {
-    const initTime = moment().add(1, 'day').startOf('day');
+  }, []);
+  // 保存数据
+  const saveMsgInfo = async () => {
 
-    announceContentForm.setFieldsValue({
-      announceTime: initTime,
-      announceDetails_1:
-        releaseTime === 'after'
-          ? '亲爱的用户：您好，企企经营管理平台已于'
-          : '亲爱的用户：您好，企企经营管理平台将于',
-      showAnnounceTime: initTime.format('YYYY-MM-DD HH:mm:ss'),
-      announceDetails_2: '',
-      showUpdateDetails: 'true',
+    // 新增和修改调用不一样的接口
+    // const updateResult = await updateAnnouncement();
 
-      //   以下为预览数据
-      UpgradeIntroDate: `"${initTime.format('YYYY-MM-DD HH:mm:ss')}"`,
-      UpgradeDescription: '',
-      isUpdated: 'true',
-    });
-  };
-
-  // 展示界面数据
-  const showFormData = (resData: any) => {
-    //   有数据的时候需要显示在界面上
-    if (resData.code === 4001 || isEmpty(resData.data)) {
-      // 没有发布公告，需要显示默认信息。
-      initForm();
-      setButtonDisable({
-        title: releaseTime === 'after' ? '后' : '前',
-        disable: true,
-        buttonStyle: '',
-      });
-    } else if (resData.data) {
-      // 有数据，则展示出来
-      const { data } = resData;
-      const time = data.upgrade_time;
-      const details = data.upgrade_description.split(time);
-
-      announceId = data.announcement_id;
-      announceContentForm.setFieldsValue({
-        announceTime: moment(time),
-        announceDetails_1: details[0],
-        showAnnounceTime: moment(time).format('YYYY-MM-DD HH:mm:ss'),
-        announceDetails_2: details[1],
-        showUpdateDetails: data.is_upgrade === 'yes' ? 'true' : 'false',
-
-        //   以下为预览数据
-        UpgradeIntroDate: `"${moment(time).format('YYYY-MM-DD HH:mm:ss')}"`,
-        UpgradeDescription: `"${data.upgrade_description}"`,
-        isUpdated: data.is_upgrade === 'yes' ? 'true' : 'false',
-      });
-      // 判断是否是历史信息(如果是历史信息，保存按钮和发布按钮都不能点击)
-      setButtonDisable({
-        title: releaseTime === 'after' ? '后' : '前',
-        disable: operteStatus === 'true',
-        buttonStyle: operteStatus === 'true' ? '' : 'saveButtonStyle',
-      });
+    const formInfo = announcementForm.getFieldsValue();
+    if (vertifyFieldForCommon(formInfo)) {
+      const addResult = await saveAnnounceContent({...formInfo});
+      if (addResult.ok) {
+        sucMessage("保存成功！");
+        history.push('./announceList')
+        return;
+      } else {
+        debugger
+        addResult.message ? errorMessage(addResult.message) : errorMessage("保存失败！");
+      }
     }
   };
 
-  // Tab 修改
-  const onTabChanged = async (activeKey: string) => {
-    releaseTime = activeKey;
-    const announceContent = await getAnnouncement(releaseNum, activeKey);
-    showFormData(announceContent);
-  };
-
-  const announceData = useRequest(() => getAnnouncement(releaseNum, 'before')).data; // 关联值班名单
-  useEffect(() => {
-    if (announceData) {
-      showFormData(announceData);
+  // 一键发布
+  const releaseMsgInfo = async () => {
+    const releaseResult = await oneKeyToRelease("");
+    if (releaseResult.ok) {
+      sucMessage("公告发布成功！")
+    } else {
+      errorMessage(releaseResult.message);
     }
-  }, [announceData]);
-
-  useEffect(() => {
-    announcementNameForm.setFieldsValue({
-      announcement_name: isEmpty(announceData?.data)
-        ? `${releaseNum}升级公告`
-        : announceData?.data?.announcement_name ?? '',
-    });
-  }, [releaseNum, announceData?.data?.announcement_name]);
-
-  window.onresize = function () {
-    setPageHeight(getHeight());
   };
 
   return (
     <PageContainer>
-      <div style={{ marginTop: -15, background: 'white', padding: 10 }}>
-        <Form form={announcementNameForm}>
-          <Form.Item
-            label={'公告批次名称'}
-            name={'announcement_name'}
-            rules={[
-              {
-                required: true,
-                validator: (r, v, callback) => {
-                  if (isEmpty(v?.trim())) callback('请填写公告批次名称！');
-                  else callback();
-                },
-              },
-            ]}
-          >
-            <Input placeholder={'公告批次名称'} style={{ width: '300px' }} />
+      <Prompt
+        when={false}
+        message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
+      />
+      <div style={{marginTop: -15, background: 'white', padding: 10}}>
+        <Form form={announcementForm} autoComplete={"off"}
+              onFieldsChange={() => {
+                // if (!leaveShow) setLeaveShow(true);
+              }}>
+          <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
+            {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
+            <Radio.Group onChange={cardChanged}>
+              <Radio.Button value={"1"} className={style.buttonStyle}>
+                <img
+                  {...SIZE}
+                  src={require('../../../../../public/msgCard.png')}
+                />
+                <span style={{marginLeft: 25}}>消息卡片</span>
+              </Radio.Button>
+              <Radio.Button value={"2"} className={style.marginStyle}>
+                <img
+                  {...SIZE}
+                  src={require('../../../../../public/popCard.png')}
+                />
+                <span style={{marginLeft: 30}}>弹窗</span>
+              </Radio.Button>
+            </Radio.Group>
           </Form.Item>
-        </Form>
-        {/* Tab展示 */}
-        <Tabs onChange={onTabChanged} type="card">
-          <TabPane tab="升级前公告" key="before"></TabPane>
-          <TabPane tab="升级后公告" key="after"></TabPane>
-        </Tabs>
 
-        {/* Tab内容 */}
-        <div
-          style={{
-            backgroundColor: 'white',
-            height: pageHeight,
-            minHeight: '500px',
-            marginTop: -15,
-          }}
-        >
-          <Form
-            form={announceContentForm}
-            autoComplete="off"
-            onFieldsChange={whenFormValueChanged}
-            style={{ marginLeft: 15 }}
-          >
-            <Form.Item label="升级时间:" name="announceTime" style={{ paddingTop: 5 }}>
-              <DatePicker allowClear={false} showTime disabled={!hasPermission?.edit} />
-            </Form.Item>
-            <Form.Item label="公告详情:" name="announceDetails_1" style={{ marginTop: -15 }}>
-              <Input disabled={!hasPermission?.edit} />
-            </Form.Item>
-            <Form.Item name="showAnnounceTime" className={'itemStyle'}>
-              <Input style={{ color: 'gray' }} disabled bordered={false}></Input>
-            </Form.Item>
-            <Form.Item name="announceDetails_2" className={'itemStyle'}>
-              <TextArea rows={2} disabled={!hasPermission?.edit} />
-            </Form.Item>
-            <Form.Item
-              label="展示查看更新详情:"
-              name="showUpdateDetails"
-              style={{ marginTop: -20 }}
-            >
-              <Radio.Group disabled={!hasPermission?.edit}>
-                <Radio value={'true'}>是</Radio>
-                <Radio value={'false'}>否</Radio>
-              </Radio.Group>
-            </Form.Item>
-            {/* 预览界面 */}
-            <Form.Item style={{ marginTop: -20 }}>
-              <Divider orientation="left" style={{ fontSize: 'small' }}>
-                预览
-              </Divider>
-              <div style={{ marginTop: -20 }}>
-                <Form.Item>{'{'}</Form.Item>
-                <Form.Item
-                  label={'"UpgradeIntroDate"'}
-                  name="UpgradeIntroDate"
-                  className={'marginStyle'}
-                >
-                  <Input disabled bordered={false} style={{ color: 'black' }}></Input>
-                </Form.Item>
-                <Form.Item
-                  label={'"UpgradeDescription"'}
-                  name="UpgradeDescription"
-                  className={'marginStyle'}
-                >
-                  <Input disabled bordered={false} style={{ color: 'black' }}></Input>
-                </Form.Item>
-                <Form.Item label={'"isUpdated"'} name="isUpdated" className={'marginStyle'}>
-                  <Input disabled bordered={false} style={{ color: 'black' }}></Input>
-                </Form.Item>
-                <Form.Item style={{ marginTop: -25 }}>{'}'}</Form.Item>
-              </div>
-              <Divider orientation="left" style={{ marginTop: -20 }}></Divider>
-            </Form.Item>
-          </Form>
+          <Form.Item label={'公告名称'} name={'announce_name'}
+                     rules={[{
+                       required: true,
+                       validator: (r, v, callback) => {
+                         if (isEmpty(v?.trim())) callback('请填写公告名称！');
+                         else callback();
+                       },
+                     },]}>
+            <Input style={{minWidth: 300, width: "50%"}}/>
+          </Form.Item>
 
-          {/* 保存按钮 */}
-          <div style={{ float: 'right' }}>
-            <Button
-              type="primary"
-              className={'saveButtonStyle'}
-              onClick={() => saveAndReleaseAnnouncement('save')}
-              disabled={operteStatus === 'true' || !hasPermission?.edit}
-            >
-              保存
-            </Button>
-            <Popconfirm
-              placement="top"
-              title={`确定一键挂起升级${buttonDisable.title}公告吗？`}
-              okText="是"
-              cancelText="否"
-              disabled={buttonDisable.disable || !hasPermission?.push}
-              onConfirm={() => saveAndReleaseAnnouncement('release')}
-            >
-              <Button
-                type="primary"
-                className={buttonDisable.buttonStyle}
-                style={{ marginLeft: 10 }}
-                disabled={buttonDisable.disable || !hasPermission?.push}
-              >
-                {`一键挂起升级${buttonDisable.title}公告`}
-              </Button>
-            </Popconfirm>
+          <Form.Item label={'升级时间'} name={'announce_time'}
+                     rules={[{required: true}]}>
+            <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false}
+                        onChange={(e, time) => setReleaseTime(time)}/>
+          </Form.Item>
+
+          <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
+            {/*<div id={"announceContent"} contentEditable={"true"}*/}
+            {/*     style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>*/}
+            {/*  <label*/}
+            {/*    contentEditable={"false"}*/}
+            {/*    style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：*/}
+            {/*  </label>*/}
+            {/*</div>*/}
+
+            <TextArea rows={2} style={{minWidth: 300, width: "50%"}}/>
+          </Form.Item>
+
+          <div id={"popup"} style={{display: stepShow.popCard}}>
+            <Row>
+              <Col>
+                <Form.Item label={'是否轮播'} name="announce_carousel" rules={[{required: true}]}>
+                  <Radio.Group onChange={(e: RadioChangeEvent) => {
+                    e.target?.value === 1 ? setCarouselNumShow("inline") : setCarouselNumShow("none");
+                  }}>
+                    <Radio value={1}>是</Radio>
+                    <Radio value={0}>否</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+              <Col>
+                <Form.Item name="carouselNum" rules={[{required: true}]} style={{display: carouselNumShow}}>
+                  <InputNumber></InputNumber>
+                </Form.Item>
+              </Col>
+            </Row>
           </div>
-        </div>
+        </Form>
+        {/* 我是一条分割线 */}
+        <Divider/>
+        {/* 一键发布、保存、下一步 */}
+        <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
+          {/* 弹窗操作 */}
+          <div id={"popup"} style={{display: stepShow.popCard}}>
+            <Button
+              type="primary" className={style.saveButtonStyle}
+              style={{marginLeft: 10}} onClick={toNextPage}>下一步
+            </Button>
+          </div>
+          {/* 消息卡片操作 */}
+          <div id={"message"} style={{display: stepShow.msgCard}}>
+            <Button
+              type="primary" className={style.saveButtonStyle}
+              style={{marginLeft: 10}} onClick={saveMsgInfo}>保存
+            </Button>
+            <Button
+              className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
+              onClick={releaseMsgInfo}>一键发布
+            </Button>
+          </div>
+        </Footer>
       </div>
     </PageContainer>
   );

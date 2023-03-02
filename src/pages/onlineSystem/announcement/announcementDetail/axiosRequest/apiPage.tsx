@@ -135,8 +135,26 @@ export const oneKeyToRelease = (id: any) => {
   });
 };
 
+
+// 常规的修改：不涉及新增
+const normalUpdate = ()=>{
+
+};
+
+// 特殊的修改：不支持templateTypeId、isCarousel字段的修改
+const specialUodateForidCarousel = ()=>{
+
+}
+
+// 弹窗- 不轮播时，新增了特性。
+const popupNoCarouseAddNew = ()=>{
+
+}
+
+
 // 修改发布公告
-export const updateAnnouncementupdateAnnouncement = () => {
+export const updateAnnouncement = () => {
   const data = {};
   return axiosPut('/api/77hub/notice', data);
 };
+

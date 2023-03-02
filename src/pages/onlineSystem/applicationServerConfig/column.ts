@@ -1,4 +1,4 @@
-import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import {ColDef, ColGroupDef} from 'ag-grid-community/dist/lib/entities/colDef';
 import {
   appServerSide,
   ClusterType,
@@ -48,7 +48,14 @@ export const applicationConfigColumn: (ColDef | ColGroupDef)[] = [
     headerName: '可上线环境',
     field: 'release_env',
     minWidth: 130,
-    valueFormatter: (p) => ClusterType[p.value],
+    valueFormatter: (p) => {
+      const valueArray = (p.value).split(",");
+      const finalStr: any = [];
+      valueArray.map((v: string) => {
+        finalStr.push(ClusterType[v]);
+      });
+      return finalStr.join(",")
+    }
   },
   {
     headerName: '是否是应用包',

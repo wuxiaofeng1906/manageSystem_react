@@ -19,13 +19,15 @@ const {TextArea} = Input;
 
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
-  const {commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton} = useModel('announcement');
+  const {
+    commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData,
+    oldAnPopData, setOldAnnPopData
+  } = useModel('announcement');
 
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
   const [leaveShow, setLeaveShow] = useState(false);
   // 公告列表过来的数据（releaseName:公告名称, releaseID：公告id, type：新增还是删除）
   const {releaseName, releaseID, type} = props.location?.query;
-
   const [announcementForm] = Form.useForm();
   // 如果是消息卡片，则显示一键发布和保存按钮，如果是弹窗卡片，则显示下一步按钮
   const [stepShow, setStepShow] = useState<any>({
@@ -57,7 +59,7 @@ const Announce: React.FC<any> = (props: any) => {
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
       setCommonData({...formInfo});
-      history.push('/onlineSystem/PopupCard');
+      history.push('/onlineSystem/PopupCard' + props.location?.search);
     }
   };
 
@@ -91,6 +93,8 @@ const Announce: React.FC<any> = (props: any) => {
         modules: noticeDetails.templateTypeId
       };
       setCommonData(formdata);
+      debugger
+      setOldCommonData({...formdata, releaseID});
       announcementForm.setFieldsValue(formdata);
       // 显示下一步按钮还是保存按钮
       if (formdata.modules === "2") { // 如果是弹窗的话
@@ -158,19 +162,24 @@ const Announce: React.FC<any> = (props: any) => {
   }, []);
   // 保存数据
   const saveMsgInfo = async () => {
-
-    // 新增和修改调用不一样的接口
-    const updateResult = await updateAnnouncement();
-
     const formInfo = announcementForm.getFieldsValue();
+    // 这个点击保存的，模板一定是消息卡片
     if (vertifyFieldForCommon(formInfo)) {
-      const addResult = await saveAnnounceContent({...formInfo});
-      if (addResult.ok) {
+      let result: any;
+      // 新增和修改调用不一样的接口
+      if (type === "detail") {
+        debugger
+        result = await updateAnnouncement({commonData: formInfo}, {oldCommonData});
+
+      } else if (type === "add") {
+        result = await saveAnnounceContent({...formInfo});
+      }
+      if (result.ok) {
         sucMessage("保存成功！");
         history.push('./announceList')
         return;
       } else {
-        addResult.message ? errorMessage(addResult.message) : errorMessage("保存失败！");
+        result.message ? errorMessage(result.message) : errorMessage("保存失败！");
       }
     }
   };

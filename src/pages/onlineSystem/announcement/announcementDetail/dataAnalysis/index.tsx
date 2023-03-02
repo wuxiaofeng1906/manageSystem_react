@@ -110,18 +110,9 @@ const getSpecialData = (data: any, specialName: string) => {
       result.push(parent)
     }
 
-    // else {
-    //   var parent = {
-    //     'id': "1",
-    //     'speciality': ""
-    //   }
-    //   parent.seconds = getchilds(param.id, data)  // 获取子节点
-    //   result.push(parent)
-    // }
   }
-  debugger
-  console.log("result", result[0].seconds)
-  return result[0].seconds
+ // result[0].seconds
+  return []
 
 };
 

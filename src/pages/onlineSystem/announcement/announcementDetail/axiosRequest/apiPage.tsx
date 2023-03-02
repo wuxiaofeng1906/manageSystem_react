@@ -188,9 +188,14 @@ const updateForChangeModules = async (newData: any, oldData: any) => {
 }
 
 // 弹窗- 新增（删除）page或特性 editFlag：update，detele，add
-const addOrDeleteMsg = async () => {
+const addOrDeleteMsg = async (newData: any, oldData: any) => {
   sucMessage("测试中。。。。。。。。。。。。。。。。。。。。。")
 
+
+  let relData = {id:"",pages:[]};
+
+  const result = await axiosPut('/api/77hub/notice', relData);
+  return result;
 }
 
 // 判断弹窗数据（是否轮播，轮播页数，以及特性条数）是否改变
@@ -202,33 +207,45 @@ const popupPageIsUpdate = (newData: any, oldData: any) => {
   if (commonData.announce_carousel !== oldCommonData.announce_carousel) {
     return true;
   }
-
   // 轮播页数：是否被修改过
   if (commonData.carouselNum !== oldCommonData.carouselNum) {
     return true;
   }
-
   // 轮播页数至少是1个，不是轮播也有一页特性
   for (let i = 0; i < commonData.carouselNum + 1; i++) {
-    const newPtGroup = finalData[i];
-    const oldPtGroup = (oldAnPopData.anPopData)[i];
+    const newPopData = finalData[i];
+    const oldPopData = (oldAnPopData.anPopData)[i];
     //   先判断有没有tabPage（有可能一个是有轮播的，一个没轮播的）
-    if (newPtGroup.tabPage !== oldPtGroup.tabPage) {
+    if (newPopData.tabPage !== oldPopData.tabPage) {
       return true;
       break;
     }
-    debugger
+
     // 如果是不轮播的数据
-
-    // 如果是轮播的数据
-
-    console.log(newPtGroup, oldPtGroup)
-    debugger
+    let newPtGroup = [];
+    let oldPtGroup = [];
+    if (!newPopData.tabPage) {
+      newPtGroup = newPopData.ptyGroup;
+      oldPtGroup = oldPopData.ptyGroup;
+    } else {
+      // 如果是轮播的数据
+      newPtGroup = newPopData.tabsContent?.ptyGroup;
+      oldPtGroup = oldPopData.tabsContent?.ptyGroup;
+    }
+    if (oldPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同，也不同
+      return true;
+      break
+    }
+    for (let m = 0; m < newPtGroup.length; m += 1) {
+      const newFirstSp = newPtGroup[m];
+      const oldFirstSp = oldPtGroup[m];
+      if (newFirstSp.length !== oldFirstSp.length) { // 二级特性个数不同
+        return true;
+        break
+      }
+    }
   }
-
-
   return false;
-
 }
 // 修改发布公告
 // note
@@ -248,7 +265,7 @@ export const updateAnnouncement = async (newData: any, oldData: any) => {
 
     // 1.2.2.1 如果有修改过，则调用特殊修改接口
     if (popupPageIsUpdate(newData, oldData)) {
-      // return await addOrDeleteMsg();
+      return await addOrDeleteMsg(newData, oldData);
     }
     // 1.2.2.2 如果没有修改过，则调用普通修改接口
     else {
@@ -258,8 +275,5 @@ export const updateAnnouncement = async (newData: any, oldData: any) => {
       }, {...newData.finalData});
     }
   }
-
-
-  // return axiosPut('/api/77hub/notice', data);
 };
 

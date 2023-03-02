@@ -1,28 +1,29 @@
-import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import { Tabs, Button, Space } from 'antd';
+import React, {Fragment, useEffect, useMemo, useRef, useState} from 'react';
+import {Tabs, Button, Space} from 'antd';
 import ProcessDetail from './ProcessDetail';
 import Check from './Check';
 import SheetInfo from './SheetInfo';
-import { useLocation, history, useParams, useModel } from 'umi';
-import { BarsOutlined, SyncOutlined } from '@ant-design/icons';
+import {useLocation, history, useParams, useModel} from 'umi';
+import {BarsOutlined, SyncOutlined} from '@ant-design/icons';
 import styles from '../config/common.less';
-import { OnlineSystemServices } from '@/services/onlineSystem';
-import { Step } from '@/pages/onlineSystem/config/constant';
+import {OnlineSystemServices} from '@/services/onlineSystem';
+import {Step} from '@/pages/onlineSystem/config/constant';
 import usePermission from '@/hooks/permission';
+import {isTestService} from "@/publicMethods/webMethod";
 
 const tabs = [
-  { name: '项目与服务详情', comp: ProcessDetail, key: 'server' },
-  { name: '检查', comp: Check, key: 'check' },
-  { name: '工单信息', comp: SheetInfo, key: 'sheet' },
+  {name: '项目与服务详情', comp: ProcessDetail, key: 'server'},
+  {name: '检查', comp: Check, key: 'check'},
+  {name: '工单信息', comp: SheetInfo, key: 'sheet'},
   // { name: '工单审批', comp: Approval, key: 'approval' },
   // { name: '发布', comp: Publish, key: 'publish' },
 ];
 const Layout = () => {
-  const { tab, subTab } = useLocation()?.query as { tab: string; subTab: string };
+  const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
-  const { onlineSystemPermission } = usePermission();
-  const { release_num } = useParams() as { release_num: string };
+  const {onlineSystemPermission} = usePermission();
+  const {release_num} = useParams() as { release_num: string };
   const [draft, globalState, setGlobalState] = useModel('onlineSystem', (online) => [
     online.draft,
     online.globalState,
@@ -46,7 +47,7 @@ const Layout = () => {
     if (!release_num) return;
     const status = ['success', 'failure'];
     let step = 0;
-    OnlineSystemServices.getReleaseStatus({ release_num }).then((res) => {
+    OnlineSystemServices.getReleaseStatus({release_num}).then((res) => {
       step = status.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;
       setGlobalState({
         ...globalState,
@@ -61,7 +62,7 @@ const Layout = () => {
   const updateHref = (key?: string) =>
     history.replace({
       pathname: history.location.pathname,
-      query: { tab: tab ?? 'process', subTab: key ?? 'server' },
+      query: {tab: tab ?? 'process', subTab: key ?? 'server'},
     });
 
   const onExtra = async (fn: Function) => {
@@ -80,7 +81,11 @@ const Layout = () => {
     return globalState.locked || globalState.finished;
   }, [globalState, touched, tab, subTab]);
 
+
   const renderTabContent = useMemo(() => {
+    const query = history.location;
+    debugger
+    console.log(query)
     const hasPermission = onlineSystemPermission();
     if (subTab == 'server')
       return (
@@ -90,8 +95,8 @@ const Layout = () => {
             title={'需求列表'}
             disabled={touched || checkStatus}
             hidden={!hasPermission.storyList}
-            icon={<BarsOutlined />}
-            style={{ border: 'none', background: 'initial' }}
+            icon={<BarsOutlined/>}
+            style={{border: 'none', background: 'initial'}}
             onClick={() => ref.current?.onShow?.()}
           />
           <Button
@@ -107,8 +112,8 @@ const Layout = () => {
             type={'text'}
             hidden={!hasPermission.refreshOnline}
             disabled={touched || checkStatus}
-            icon={<SyncOutlined />}
-            style={{ border: 'none', background: 'initial' }}
+            icon={<SyncOutlined/>}
+            style={{border: 'none', background: 'initial'}}
             onClick={() => onExtra(ref.current?.onRefresh)}
           />
         </Space>
@@ -161,8 +166,8 @@ const Layout = () => {
             type={'text'}
             hidden={!hasPermission.refreshCheck}
             disabled={touched || checkStatus}
-            icon={<SyncOutlined />}
-            style={{ border: 'none', background: 'initial' }}
+            icon={<SyncOutlined/>}
+            style={{border: 'none', background: 'initial'}}
             onClick={() => onExtra(ref.current?.onRefreshCheck)}
           />
         </Space>
@@ -170,13 +175,15 @@ const Layout = () => {
     else if (subTab == 'sheet')
       return (
         <div>
-          {draft && <strong style={{ color: '#fe7b00cf', marginRight: 16 }}>状态：草稿态</strong>}
-          <a href={"http://ops.q7link.com:8080/#/qqservice/opsticket"} target={"_blank"} style={{marginRight:20}}> 点击进入运维平台 </a>
+          {draft && <strong style={{color: '#fe7b00cf', marginRight: 16}}>状态：草稿态</strong>}
+          <a
+            href={isTestService() ? "http://ops.q7link.com:5000/#/qqservice/opsticket" : "http://ops.q7link.com:8080/#/qqservice/opsticket"}
+            target={"_blank"} style={{marginRight: 20}}> 点击进入运维平台 </a>
           <Button
             hidden={!hasPermission.orderSave}
             size={'small'}
             disabled={globalState.finished || touched}
-            style={{ width: 100, background: '#46a0fc', color: 'white' }}
+            style={{width: 100, background: '#46a0fc', color: 'white'}}
             onClick={async () => {
               setTouched(true);
               try {
@@ -191,7 +198,7 @@ const Layout = () => {
           </Button>
         </div>
       );
-    return <Fragment />;
+    return <Fragment/>;
   }, [release_num, tab, subTab, globalState, touched, draft, user?.group]);
 
   return (
@@ -211,7 +218,7 @@ const Layout = () => {
               disabled={(globalState.step || 1) < index || touched}
 
             >
-              <it.comp ref={ref} />
+              <it.comp ref={ref}/>
             </Tabs.TabPane>
           );
         })}

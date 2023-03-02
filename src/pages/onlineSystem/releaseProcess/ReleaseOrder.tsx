@@ -26,6 +26,7 @@ import {valueMap} from '@/utils/utils';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 import {pushType} from "@/pages/onlineSystem/config/constant";
+import {isTestService} from "@/publicMethods/webMethod";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 let releateOrderInfo: any = {
@@ -569,7 +570,9 @@ const ReleaseOrder = () => {
             <div className={styles.title}>工单基本信息</div>
 
             <div>
-              <a href={"http://ops.q7link.com:8080/#/qqservice/opsticket"} target={"_blank"}> 点击进入运维平台 </a>
+              <a
+                href={isTestService() ? "http://ops.q7link.com:5000/#/qqservice/opsticket" : "http://ops.q7link.com:8080/#/qqservice/opsticket"}
+                target={"_blank"}> 点击进入运维平台 </a>
               <Button
                 size={'small'}
                 onClick={() => onSaveBeforeCheck()}

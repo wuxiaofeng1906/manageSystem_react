@@ -160,7 +160,7 @@ const Announce: React.FC<any> = (props: any) => {
   const saveMsgInfo = async () => {
 
     // 新增和修改调用不一样的接口
-    // const updateResult = await updateAnnouncement();
+    const updateResult = await updateAnnouncement();
 
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
@@ -170,7 +170,6 @@ const Announce: React.FC<any> = (props: any) => {
         history.push('./announceList')
         return;
       } else {
-        debugger
         addResult.message ? errorMessage(addResult.message) : errorMessage("保存失败！");
       }
     }

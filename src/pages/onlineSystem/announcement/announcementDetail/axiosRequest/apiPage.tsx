@@ -141,13 +141,13 @@ const normalUpdate = ()=>{
 
 };
 
-// 特殊的修改：不支持templateTypeId、isCarousel字段的修改
-const specialUodateForidCarousel = ()=>{
+// 切换升级模板--调用新增接口（会删除原有公告）
+const updateModule = ()=>{
 
 }
 
-// 弹窗- 不轮播时，新增了特性。
-const popupNoCarouseAddNew = ()=>{
+// 弹窗- 新增（删除）page或特性 editFlag：update，detele，add
+const addOrDeleteMsg = ()=>{
 
 }
 

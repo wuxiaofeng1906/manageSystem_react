@@ -241,7 +241,7 @@ export const updateAnnouncement = async (newData: any, oldData: any) => {
   }
     // 1.2 如果模板类型没有改变
   // 1.2.1 如果是消息模板，则直接调用常规修改接口
-  else if (newData.commonData?.modules === "1") { // 如果是消息喇叭
+  else if (newData.commonData?.modules === "1") { // 如果是消息卡片
     return await normalUpdate({...newData.commonData, releaseId: oldData.oldCommonData.releaseID});
   } else {
     // // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过   是否轮播、特性项、以及轮播页数

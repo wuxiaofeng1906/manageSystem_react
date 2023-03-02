@@ -162,13 +162,14 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 点击确定按钮
   const uploadPicClick = async () => {
-    setPicUpLoading(true);
+
     // 判断是不是手动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
     // 之前就选择了图片
     if (picModalState.checkedImg) {
       setPicModalState({...picModalState, visible: false})
       return;
     }
+    setPicUpLoading(true);
     // 这个是保存自己上传的图片
     if (fileList.length) { // 如果大于0 则已手动上传了数据，如果小于0则看有没有以前的数据
       const s3Info = await getS3Key(fileList[0].name);

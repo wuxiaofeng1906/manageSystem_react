@@ -35,13 +35,13 @@ const PopupCard: React.FC<any> = (props: any) => {
   const [picUpLoading, setPicUpLoading] = useState(false);
   useEffect(() => {
     // 需要先判断anPopData有没有数据
-    if (anPopData) {
-      debugger
+    if (anPopData && anPopData.length) {
+debugger
       // 展示第一个tab的数据即可。
       dtForm.setFieldsValue(anPopData[0]?.tabsContent);
       setPicModalState({
         ...picModalState,
-        checkedImg:(anPopData[0]?.tabsContent).uploadPic
+        checkedImg: (anPopData[0]?.tabsContent).uploadPic
       })
     } else {
       // 轮播时记录Tab数据用
@@ -60,7 +60,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         picLayout: "1", // 默认上下布局
         ptyGroup: [{ // 默认一组特性
           first: "",
-          seconds: [{"second": ""}]
+          seconds: [{"first": ""}]
         }]
       });
     }
@@ -118,7 +118,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 保存数据
   const onFinish = async (popData: any) => {
-    debugger
     let finalData = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {
@@ -287,11 +286,12 @@ const PopupCard: React.FC<any> = (props: any) => {
                               <>
                                 {secondFields.map((secondField, index) => (
                                   <div key={secondField.key}>
+                                    {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
                                     <Row>
                                       <Form.Item
                                         {...secondField}
                                         label={`二级特性${index + 1}`}
-                                        name={[secondField.name, 'second']}
+                                        name={[secondField.name, 'first']}
                                       >
                                         <Input style={{minWidth: 400}}></Input>
                                       </Form.Item>
@@ -327,96 +327,96 @@ const PopupCard: React.FC<any> = (props: any) => {
                   </div>
                 );
               }}
-            </Form.List>
-            <Divider/>
-            <Form.Item>
-              <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
+                </Form.List>
+                <Divider/>
+                <Form.Item>
+                <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
                 <div id={"message"}>
-                  <Button className={style.saveButtonStyle} type="primary" style={{marginLeft: 10}}
-                          htmlType="submit">保存</Button>
-                  <Button className={style.commonBtn}
-                          style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
-                          onClick={releaseAnnounceInfo}>一键发布</Button>
-                  <Button className={style.commonBtn} style={{marginLeft: 10}} onClick={onPreView}>预览</Button>
-                  <Button className={style.commonBtn} style={{marginLeft: 10}}
-                          onClick={() => history.push(`/onlineSystem/announcementDetail`)}>上一步</Button>
+                <Button className={style.saveButtonStyle} type="primary" style={{marginLeft: 10}}
+                htmlType="submit">保存</Button>
+                <Button className={style.commonBtn}
+                style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
+                onClick={releaseAnnounceInfo}>一键发布</Button>
+                <Button className={style.commonBtn} style={{marginLeft: 10}} onClick={onPreView}>预览</Button>
+                <Button className={style.commonBtn} style={{marginLeft: 10}}
+                onClick={() => history.push(`/onlineSystem/announcementDetail`)}>上一步</Button>
                 </div>
-              </Footer>
-            </Form.Item>
-          </Form>
-        </div>
-      </Spin>
+                </Footer>
+                </Form.Item>
+                </Form>
+                </div>
+                </Spin>
 
-      {/* 图片上传弹出框 picModalState.visible */}
-      <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
-             onOk={uploadPicClick}
-             onCancel={() => setPicModalState({checkedImg: "", visible: false})}
-             width={700}>
-        <Spin spinning={picUpLoading} size={"large"} tip={"图片上传中，请稍等..."}>
-          <div className={style.imgComponentBox}>
-            <div className={style.defaultBox}>
-              <div className={style.titleBox}>
+              {/* 图片上传弹出框 picModalState.visible */}
+                <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
+                onOk={uploadPicClick}
+                onCancel={() => setPicModalState({checkedImg: "", visible: false})}
+                width={700}>
+                <Spin spinning={picUpLoading} size={"large"} tip={"图片上传中，请稍等..."}>
+                <div className={style.imgComponentBox}>
+                <div className={style.defaultBox}>
+                <div className={style.titleBox}>
                 <h5 className={style.titlew}>选择默认图片</h5>
-              </div>
-              <ul className={style.imgList} onClick={picChecked}>
-                {defaultImgsUrl.map(item => (
-                  <li key={item} data-value={item}
-                      className={picModalState.checkedImg === item ? style.activeChose : ''}>
-                    <img key={item} data-value={item} src={`${imgUrlHeader}${item}`} alt="默认图"/>
-                  </li>))}
-              </ul>
-            </div>
-            <div className={style.padBox}/>
-            <div className={style.setBox}>
-              <h5 className={style.titlew7}>从本地上传</h5>
-              <div className={style.antPicUpload} style={{backgroundColor: "transparent", marginTop: 13}}>
+                </div>
+                <ul className={style.imgList} onClick={picChecked}>
+              {defaultImgsUrl.map(item => (
+                <li key={item} data-value={item}
+                className={picModalState.checkedImg === item ? style.activeChose : ''}>
+                <img key={item} data-value={item} src={`${imgUrlHeader}${item}`} alt="默认图"/>
+                </li>))}
+                </ul>
+                </div>
+                <div className={style.padBox}/>
+                <div className={style.setBox}>
+                <h5 className={style.titlew7}>从本地上传</h5>
+                <div className={style.antPicUpload} style={{backgroundColor: "transparent", marginTop: 13}}>
                 <ImgCrop
-                  modalTitle={"裁剪图片"}
-                  aspect={2.35 / 1}       // 裁剪比例
-                  rotate
-                  zoom
-                  modalOk={"确定"}
-                  modalCancel={"取消"}
+                modalTitle={"裁剪图片"}
+                aspect={2.35 / 1}       // 裁剪比例
+                rotate
+                zoom
+                modalOk={"确定"}
+                modalCancel={"取消"}
                 >
-                  <Upload
-                    style={{color: "red"}}
-                    listType="picture-card"
-                    showUploadList={{showPreviewIcon: false}}
-                    fileList={fileList}
-                    beforeUpload={(file) => {
-                      return false;
-                    }}
-                    onChange={(v: any) => {
-                      const {file} = v;
-                      // 判断文件类型，文件大小，和裁剪
-                      if (!picType.includes(file.type)) {
-                        errorMessage('仅支持上传jpg、jpeg、png格式的图片！');
-                        return;
-                      }
-                      if ((file.size / 1024 / 1024) >= 10) {
-                        errorMessage('图片大小不能超过10M');
-                        return;
-                      }
-                      setFileList(v.fileList);
-                      // 清空之前选的图片
-                      setPicModalState({...picModalState, checkedImg: ""});
-                    }}
-                  >
-                    {fileList.length >= 1 ? null :
-                      <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
-                  </Upload>
+                <Upload
+                style={{color: "red"}}
+                listType="picture-card"
+                showUploadList={{showPreviewIcon: false}}
+                fileList={fileList}
+                beforeUpload={(file) => {
+                return false;
+              }}
+                onChange={(v: any) => {
+                const {file} = v;
+                // 判断文件类型，文件大小，和裁剪
+                if (!picType.includes(file.type)) {
+                errorMessage('仅支持上传jpg、jpeg、png格式的图片！');
+                return;
+              }
+                if ((file.size / 1024 / 1024) >= 10) {
+                errorMessage('图片大小不能超过10M');
+                return;
+              }
+                setFileList(v.fileList);
+                // 清空之前选的图片
+                setPicModalState({...picModalState, checkedImg: ""});
+              }}
+                >
+              {fileList.length >= 1 ? null :
+                <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
+                </Upload>
                 </ImgCrop>
-              </div>
-              <div className={style.hintInfo}>{bannerTips}</div>
-            </div>
-            <div>
-              <img id={"file_img"} style={{width: 200, height: 100}}>
-              </img>
-            </div>
-          </div>
-        </Spin>
-      </Modal>
-    </PageContainer>
-  );
-};
+                </div>
+                <div className={style.hintInfo}>{bannerTips}</div>
+                </div>
+                <div>
+                <img id={"file_img"} style={{width: 200, height: 100}}>
+                </img>
+                </div>
+                </div>
+                </Spin>
+                </Modal>
+                </PageContainer>
+                );
+              };
 export default PopupCard;

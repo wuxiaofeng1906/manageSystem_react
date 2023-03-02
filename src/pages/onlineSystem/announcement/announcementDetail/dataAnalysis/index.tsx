@@ -12,7 +12,7 @@ export const analysisSpecialTitle = (source: any) => {
     const childs: any = [];
     const specialChild = v.children;
     if (specialChild && specialChild.length > 0) {
-      specialChild.map((v2: any) => childs.push({"second": v2.speciality}));
+      specialChild.map((v2: any) => childs.push({"first": v2.speciality}));
     }
 
     result.push({
@@ -68,22 +68,85 @@ export const tabsPanel = (count: number) => {
   return panes;
 };
 
+
+const getchilds = (id: any, array: any) => {
+  debugger
+  const childs = []
+  for (const arr of array) {  // 循环获取子节点
+    if (arr.parentId === id) {
+      childs.push({
+        'id': arr.id,
+        'first': arr.speciality
+      })
+    }
+  }
+
+  for (const child of childs) { // 获取子节点的子节点
+    const childscopy = getchilds(child.id, array)// 递归获取子节点
+    if (childscopy.length > 0) {
+      child.seconds = childscopy
+    }
+  }
+  return childs
+}
+
+
+// 递归解析数据
+// @specialName 特性名称，用于判断是否有哦parentid
+const getSpecialData = (data: any, specialName: string) => {
+  //   [{ //  格式
+  //   first: "",
+  //   seconds: [{"first": ""}]
+  // }];
+  // 调用方法， temp为原始数据, result为树形结构数据
+  var result = []
+  for (const param of data) {
+    if (param.parentId === undefined) {  // 判断是否为顶层节点
+      var parent = {
+        'id': param.id,
+        'speciality': param.speciality
+      }
+      parent.seconds = getchilds(param.id, data)  // 获取子节点
+      result.push(parent)
+    }
+
+    // else {
+    //   var parent = {
+    //     'id': "1",
+    //     'speciality': ""
+    //   }
+    //   parent.seconds = getchilds(param.id, data)  // 获取子节点
+    //   result.push(parent)
+    // }
+  }
+  debugger
+  console.log("result", result[0].seconds)
+  return result[0].seconds
+
+};
+
 // 获取特性树
 const getSpecialListTree = (contents: any) => {
-
+  debugger
   const contentData: any = {
     ptyGroup: [],
     specialName: ""
   };
+  let oraSpecialList: any = []; // 去除最上面特性名称的特性数组
   contents.map((v: any) => {
     //判断对象中有没有包含parentId，如果没有，则这里面的speciality属性就属于界面最上面的特性名称
-    if (!Object.keys(v).includes("parentId")) contentData.specialName = v.speciality;
+    if (!Object.keys(v).includes("parentId")) {
+      contentData.specialName = v.speciality;
+    } else {
+      oraSpecialList.push(v);
+    }
   });
+  contentData.ptyGroup = getSpecialData(contents, contentData.specialName);
   return contentData;
-
 };
 // 处理从服务器获取过来的弹窗数据放到state中
 export const dealPopDataFromService = (NoticeEdition: any) => {
+  debugger
   if (!NoticeEdition || NoticeEdition.length === 0 || !NoticeEdition[0]) {
     return [];
   }
@@ -91,7 +154,6 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
   if (!pages || pages.length === 0) {
     return [];
   }
-  debugger;
   const formData: any = [];
   pages.map((v: any) => {
     let contentData: any = {};
@@ -111,5 +173,6 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
       }
     });
   });
+  debugger;
   return formData;
 };

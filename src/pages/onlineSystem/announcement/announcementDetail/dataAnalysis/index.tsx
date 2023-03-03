@@ -69,50 +69,81 @@ export const tabsPanel = (count: number) => {
 };
 
 
-const getchilds = (id: any, array: any) => {
-  debugger
-  const childs = []
-  for (const arr of array) {  // 循环获取子节点
-    if (arr.parentId === id) {
-      childs.push({
-        'id': arr.id,
-        'first': arr.speciality
-      })
-    }
-  }
+// const getchilds = (id: any, array: any) => {
+//   debugger
+//   const childs = []
+//   for (const arr of array) {  // 循环获取子节点
+//     if (arr.parentId === id) {
+//       childs.push({
+//         'id': arr.id,
+//         'first': arr.speciality
+//       })
+//     }
+//   }
+//
+//   for (const child of childs) { // 获取子节点的子节点
+//     const childscopy = getchilds(child.id, array)// 递归获取子节点
+//     if (childscopy.length > 0) {
+//       child.seconds = childscopy
+//     }
+//   }
+//   return childs
+// }
 
-  for (const child of childs) { // 获取子节点的子节点
-    const childscopy = getchilds(child.id, array)// 递归获取子节点
-    if (childscopy.length > 0) {
-      child.seconds = childscopy
-    }
-  }
-  return childs
-}
+
+const parTree = (oraData: any) => {
+  debugger
+
+
+  const parents = oraData.filter((value: any) => value.parentId === 'undefined' || value.parentId === undefined || value.parentId === null || value.parentId === "1");
+  const children = oraData.filter((value: any) => value.parentId !== 'undefined' && value.parentId !== undefined && value.parentId != null && value.parentId != "1");
+  const translator = (parentB: any, childrenB: any) => {
+    debugger
+    parentB.forEach((parent: any) => {
+      debugger
+      childrenB.forEach((child: any, index: any) => {
+        debugger
+        if (child.parentId === parent.id) {
+          const temp: any = JSON.parse(JSON.stringify(childrenB));
+          temp.splice(index, 1);
+          translator([child], temp);
+
+          if (typeof (parent.children) !== 'undefined') {
+            debugger
+            parent.children.push(child);
+            console.log(child)
+
+            // parent.children.push({id: child.id, parentId: child.parentId, speciality: child.speciality});
+          } else {
+            debugger
+            // eslint-disable-next-line no-param-reassign
+            console.log(child)
+            // parent.children = [{id: child.id, parentId: child.parentId, speciality: child.speciality}];
+            parent.children = [child];
+          }
+        }
+      });
+    });
+  };
+
+  translator(parents, children);
+
+  debugger
+  return parents;
+};
 
 
 // 递归解析数据
 // @specialName 特性名称，用于判断是否有哦parentid
-const getSpecialData = (data: any, specialName: string) => {
+const getSpecialData = (data: any) => {
   //   [{ //  格式
   //   first: "",
   //   seconds: [{"first": ""}]
   // }];
-  // 调用方法， temp为原始数据, result为树形结构数据
-  var result = []
-  for (const param of data) {
-    if (param.parentId === undefined) {  // 判断是否为顶层节点
-      var parent = {
-        'id': param.id,
-        'speciality': param.speciality
-      }
-      parent.seconds = getchilds(param.id, data)  // 获取子节点
-      result.push(parent)
-    }
 
-  }
-  // result[0].seconds
-  return []
+  const specialData = parTree(data);
+  console.log(specialData);
+  debugger
 
 };
 
@@ -132,7 +163,7 @@ const getSpecialList = (contents: any) => {
       oraSpecialList.push(v);
     }
   });
-  contentData.ptyGroup = getSpecialData(contents, contentData.specialName);
+  contentData.ptyGroup = getSpecialData(contents);
   return contentData;
 };
 // 处理从服务器获取过来的弹窗数据放到state中

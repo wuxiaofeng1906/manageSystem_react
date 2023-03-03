@@ -154,7 +154,7 @@ const normalUpdate = async (formData: any, popupData: object = {}) => {
     description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
   };
   let specialData = {};
-  if (data.templateTypeId === "2") { // 弹窗保存数据
+  if (formData.modules === "2") { // 弹窗保存数据
     // 共同属性
     data["isCarousel"] = formData.announce_carousel === 0 ? false : true; // 是否轮播
     // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
@@ -202,6 +202,7 @@ const addOrDeleteMsg = async (newData: any, oldData: any) => {
 
 // 判断弹窗数据（是否轮播，轮播页数，以及特性条数）是否改变
 const popupPageIsUpdate = (newData: any, oldData: any) => {
+  debugger
   const {commonData, finalData} = newData;  // commonData, finalData  ==> 新数据
   const {oldCommonData, oldAnPopData} = oldData; // oldCommonData, oldAnPopData ==> 旧数据
 
@@ -214,7 +215,7 @@ const popupPageIsUpdate = (newData: any, oldData: any) => {
     return true;
   }
   // 轮播页数至少是1个，不是轮播也有一页特性
-  for (let i = 0; i < commonData.carouselNum + 1; i++) {
+  for (let i = 0; i < commonData.carouselNum - 1; i++) {
     const newPopData = finalData[i];
     const oldPopData = (oldAnPopData.anPopData)[i];
     //   先判断有没有tabPage（有可能一个是有轮播的，一个没轮播的）
@@ -238,10 +239,10 @@ const popupPageIsUpdate = (newData: any, oldData: any) => {
       return true;
       break
     }
-    for (let m = 0; m < newPtGroup.length; m += 1) {
+    for (let m = 0; m < newPtGroup.length; m++) {
       const newFirstSp = newPtGroup[m];
       const oldFirstSp = oldPtGroup[m];
-      if (newFirstSp.length !== oldFirstSp.length) { // 二级特性个数不同
+      if (newFirstSp.seconds?.length !== oldFirstSp.seconds?.length) { // 二级特性个数不同
         return true;
         break
       }
@@ -252,7 +253,6 @@ const popupPageIsUpdate = (newData: any, oldData: any) => {
 // 修改发布公告
 // note
 export const updateAnnouncement = async (newData: any, oldData: any) => {
-  debugger
   // 1 进行判断，首先判断模板类型有没有被改变。
   // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
   if (newData.commonData?.modules !== oldData.oldCommonData?.modules) {
@@ -267,10 +267,12 @@ export const updateAnnouncement = async (newData: any, oldData: any) => {
 
     // 1.2.2.1 如果有修改过，则调用特殊修改接口
     if (popupPageIsUpdate(newData, oldData)) {
+      debugger
       return await addOrDeleteMsg(newData, oldData);
     }
     // 1.2.2.2 如果没有修改过，则调用普通修改接口
     else {
+      debugger
       return await normalUpdate({
         ...newData.commonData,
         releaseId: oldData.oldCommonData.releaseID

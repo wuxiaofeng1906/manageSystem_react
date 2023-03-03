@@ -97,7 +97,7 @@ const Announce: React.FC<any> = (props: any) => {
       setOldCommonData({...formdata, releaseID});
       announcementForm.setFieldsValue(formdata);
       // 显示下一步按钮还是保存按钮
-      if (formdata.modules === "2") { // 如果是弹窗的话，格式化弹窗数据
+      if (formdata.modules === "2") { // 如果是弹窗的话，格式化
         // 还需要在state中保存弹窗的数据
         setAnnPopData(dealPopDataFromService(NoticeEdition))
 
@@ -263,7 +263,12 @@ const Announce: React.FC<any> = (props: any) => {
               <Col>
                 <Form.Item label={'是否轮播'} name="announce_carousel" rules={[{required: true}]}>
                   <Radio.Group onChange={(e: RadioChangeEvent) => {
-                    e.target?.value === 1 ? setCarouselNumShow("inline") : setCarouselNumShow("none");
+                    if (e.target?.value === 1) {
+                      setCarouselNumShow("inline");
+                      announcementForm.setFieldsValue({carouselNum: 5});
+                    } else {
+                      setCarouselNumShow("none");
+                    }
                   }}>
                     <Radio value={1}>是</Radio>
                     <Radio value={0}>否</Radio>

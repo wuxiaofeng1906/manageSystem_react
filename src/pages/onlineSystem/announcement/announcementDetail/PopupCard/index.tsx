@@ -96,6 +96,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
+    debugger
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = picModalState.checkedImg;
     // 覆盖已有当前页的数据或者添加新数据

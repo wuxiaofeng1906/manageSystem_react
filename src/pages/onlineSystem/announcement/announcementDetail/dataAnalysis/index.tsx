@@ -133,14 +133,20 @@ const getSpecialData = (data: any, isCarousel: boolean) => {
 
     const child = v.children;
     const childGroup: any = [];
-    child.map((m: any) => {
+    if (child && child.length > 0) {
+      child.map((m: any) => {
 
-      childGroup.push({
-        first: m.speciality,
-        id: m.id,
-        parentId: m.parentId,
+        childGroup.push({
+          first: m.speciality,
+          id: m.id,
+          parentId: m.parentId,
+        });
       });
-    });
+    } else {
+      childGroup.push({
+        first: "",
+      });
+    }
 
     finalPtGroup.push({
       first: v.speciality,

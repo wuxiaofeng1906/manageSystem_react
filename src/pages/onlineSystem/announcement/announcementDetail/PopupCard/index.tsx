@@ -69,7 +69,8 @@ const PopupCard: React.FC<any> = (props: any) => {
         picLayout: "1", // 默认上下布局
         ptyGroup: [{ // 默认一组特性
           first: "",
-          seconds: [{"first": ""}]
+          id:"2222",
+          seconds: [{"first": "333",id:"33333"}]
         }]
       });
     }

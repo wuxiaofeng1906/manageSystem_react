@@ -93,32 +93,19 @@ export const tabsPanel = (count: number) => {
 
 const parTree = (oraData: any) => {
   debugger
-
-
   const parents = oraData.filter((value: any) => value.parentId === 'undefined' || value.parentId === undefined || value.parentId === null || value.parentId === "1");
   const children = oraData.filter((value: any) => value.parentId !== 'undefined' && value.parentId !== undefined && value.parentId != null && value.parentId != "1");
   const translator = (parentB: any, childrenB: any) => {
-    debugger
     parentB.forEach((parent: any) => {
-      debugger
       childrenB.forEach((child: any, index: any) => {
-        debugger
         if (child.parentId === parent.id) {
           const temp: any = JSON.parse(JSON.stringify(childrenB));
           temp.splice(index, 1);
           translator([child], temp);
-
           if (typeof (parent.children) !== 'undefined') {
-            debugger
             parent.children.push(child);
-            console.log(child)
-
-            // parent.children.push({id: child.id, parentId: child.parentId, speciality: child.speciality});
           } else {
-            debugger
             // eslint-disable-next-line no-param-reassign
-            console.log(child)
-            // parent.children = [{id: child.id, parentId: child.parentId, speciality: child.speciality}];
             parent.children = [child];
           }
         }
@@ -127,7 +114,6 @@ const parTree = (oraData: any) => {
   };
 
   translator(parents, children);
-
   debugger
   return parents;
 };
@@ -135,20 +121,48 @@ const parTree = (oraData: any) => {
 
 // 递归解析数据
 // @specialName 特性名称，用于判断是否有哦parentid
-const getSpecialData = (data: any) => {
+//@isCarousel 是否轮播
+const getSpecialData = (data: any, isCarousel: boolean) => {
+
+  let ptGroupData = parTree(data);
+  // 如果是轮播的话，第一个特性需要去除掉，才是下面的子特性
+  if (isCarousel) {
+    ptGroupData = ptGroupData[0].children;
+  }
+
+  let finalPtGroup: any = [];
+  ptGroupData.map((v: any) => {
+
+    const child = v.children;
+    const childGroup: any = [];
+    child.map((m: any) => {
+
+      childGroup.push({
+        first: m.speciality,
+        id: m.id,
+        parentId: m.parentId,
+      });
+    });
+
+    finalPtGroup.push({
+      first: v.speciality,
+      id: v.id,
+      parentId: v.parentId,
+      seconds: childGroup
+    })
+  });
+  debugger
+
   //   [{ //  格式
   //   first: "",
   //   seconds: [{"first": ""}]
   // }];
 
-  const specialData = parTree(data);
-  console.log(specialData);
-  debugger
-
+  return finalPtGroup;
 };
 
 // 获取特性树
-const getSpecialList = (contents: any) => {
+const getSpecialList = (contents: any, isCarousel: boolean) => {
   debugger
   const contentData: any = {
     ptyGroup: [],
@@ -163,11 +177,12 @@ const getSpecialList = (contents: any) => {
       oraSpecialList.push(v);
     }
   });
-  contentData.ptyGroup = getSpecialData(contents);
+  contentData.ptyGroup = getSpecialData(contents, isCarousel);
   return contentData;
 };
 // 处理从服务器获取过来的弹窗数据放到state中
 export const dealPopDataFromService = (NoticeEdition: any) => {
+  debugger
   if (!NoticeEdition || NoticeEdition.length === 0 || !NoticeEdition[0]) {
     return [];
   }
@@ -182,7 +197,7 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
     let contentData: any = {};
     const {contents} = v;
     if (contents && contents.length) {
-      contentData = getSpecialList(contents);
+      contentData = getSpecialList(contents, (NoticeEdition[0]).isCarousel);
     }
     // 如果是非轮播，tabpage =0
     formData.push({

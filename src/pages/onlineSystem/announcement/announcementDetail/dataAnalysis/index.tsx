@@ -92,7 +92,6 @@ export const tabsPanel = (count: number) => {
 
 
 const parTree = (oraData: any) => {
-  debugger
   const parents = oraData.filter((value: any) => value.parentId === 'undefined' || value.parentId === undefined || value.parentId === null || value.parentId === "1");
   const children = oraData.filter((value: any) => value.parentId !== 'undefined' && value.parentId !== undefined && value.parentId != null && value.parentId != "1");
   const translator = (parentB: any, childrenB: any) => {
@@ -114,7 +113,6 @@ const parTree = (oraData: any) => {
   };
 
   translator(parents, children);
-  debugger
   return parents;
 };
 
@@ -151,8 +149,6 @@ const getSpecialData = (data: any, isCarousel: boolean) => {
       seconds: childGroup
     })
   });
-  debugger
-
   //   [{ //  格式
   //   first: "",
   //   seconds: [{"first": ""}]
@@ -163,7 +159,6 @@ const getSpecialData = (data: any, isCarousel: boolean) => {
 
 // 获取特性树
 const getSpecialList = (contents: any, isCarousel: boolean) => {
-  debugger
   const contentData: any = {
     ptyGroup: [],
     specialName: ""
@@ -182,7 +177,6 @@ const getSpecialList = (contents: any, isCarousel: boolean) => {
 };
 // 处理从服务器获取过来的弹窗数据放到state中
 export const dealPopDataFromService = (NoticeEdition: any) => {
-  debugger
   if (!NoticeEdition || NoticeEdition.length === 0 || !NoticeEdition[0]) {
     return [];
   }
@@ -211,6 +205,5 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
       }
     });
   });
-  debugger;
   return formData;
 };

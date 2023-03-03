@@ -39,23 +39,31 @@ export const vertifyFieldForCommon = (formInfo: any) => {
 
 // 验证字段的必填项(弹窗界面)
 export const vertifyFieldForPopup = (popDataArray: any) => {
-  popDataArray.map((popData: any) => {
+  let value = true;
+  for (let i = 0; i < popDataArray.length; i++) {
+    const popData = popDataArray[i];
     if (!popData.uploadPic) {
       errorMessage("图片不能为空！");
-      return false;
+      value = false;
+      break;
     }
-    (popData.ptyGroup).map((v: any) => {
+
+    for (let i2 = 0; i < (popData.ptyGroup).length; i2++) {
+      const v = (popData.ptyGroup)[i2];
       if (isEmpty((v.first).trim())) {
         errorMessage("一级特性不能为空！");
-        return false;
+        value = false;
+        break;
       }
-      return true;
-    });
-    return true;
-  });
-  return true;
-};
+    }
 
+    if (!value) {
+      break;
+    }
+
+  }
+  return value;
+};
 
 // 动态panes
 export const tabsPanel = (count: number) => {

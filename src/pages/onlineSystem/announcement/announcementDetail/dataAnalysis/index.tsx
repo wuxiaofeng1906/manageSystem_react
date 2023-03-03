@@ -111,13 +111,13 @@ const getSpecialData = (data: any, specialName: string) => {
     }
 
   }
- // result[0].seconds
+  // result[0].seconds
   return []
 
 };
 
 // 获取特性树
-const getSpecialListTree = (contents: any) => {
+const getSpecialList = (contents: any) => {
   debugger
   const contentData: any = {
     ptyGroup: [],
@@ -137,7 +137,6 @@ const getSpecialListTree = (contents: any) => {
 };
 // 处理从服务器获取过来的弹窗数据放到state中
 export const dealPopDataFromService = (NoticeEdition: any) => {
-  debugger
   if (!NoticeEdition || NoticeEdition.length === 0 || !NoticeEdition[0]) {
     return [];
   }
@@ -145,19 +144,21 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
   if (!pages || pages.length === 0) {
     return [];
   }
+
+  // pages 里面有多少条数据，就有多少个tab
   const formData: any = [];
   pages.map((v: any) => {
     let contentData: any = {};
     const {contents} = v;
     if (contents && contents.length) {
-      contentData = getSpecialListTree(contents);
+      contentData = getSpecialList(contents);
     }
-
+    // 如果是非轮播，tabpage =0
     formData.push({
       tabPage: v.pageNum,
       tabsContent: {
         picLayout: v.layoutTypeId,
-        specialName: contentData.specialName, // 没有看到特性
+        specialName: contentData.specialName, // 特性名称在content中，没有parentid的那一项
         uploadPic: v.image,
         yuQueUrl: v.yuQue,
         ptyGroup: contentData.ptyGroup

@@ -79,7 +79,8 @@ const Announce: React.FC<any> = (props: any) => {
     }
   }
 
-  const getDataById = async () => {
+  // 根据公告ID获取对应的详细数据
+  const getDataByReleaseId = async () => {
     const dts = await queryAnnounceDetail(releaseName, releaseID);
     const {NoticeEdition} = dts;
     if (NoticeEdition && NoticeEdition.length) {
@@ -96,7 +97,7 @@ const Announce: React.FC<any> = (props: any) => {
       setOldCommonData({...formdata, releaseID});
       announcementForm.setFieldsValue(formdata);
       // 显示下一步按钮还是保存按钮
-      if (formdata.modules === "2") { // 如果是弹窗的话
+      if (formdata.modules === "2") { // 如果是弹窗的话，格式化弹窗数据
         // 还需要在state中保存弹窗的数据
         setAnnPopData(dealPopDataFromService(NoticeEdition))
 
@@ -135,7 +136,7 @@ const Announce: React.FC<any> = (props: any) => {
       setOldAnnPopData([]);
     } else if (type === "detail") {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
-      getDataById()
+      getDataByReleaseId()
     } else if (commonData && !type) { // 下一页返回上来的数据
       // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
       // 以下是已有的数据（下一页返回或者历史记录）

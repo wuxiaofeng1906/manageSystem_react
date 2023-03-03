@@ -18,11 +18,12 @@ export const getAnnouncement = async (readyReleaseNum: string, releaseType: stri
 
 // 获取特性列表list
 const getSpecialList = (ptyGroup: any) => {
+  debugger
   const specialList: any = [];
   ptyGroup.map((v: any) => {
     const childList: any = [];
     (v.seconds).map((v2: any) => {
-      if (!isEmpty(v2.second)) childList.push({"speciality": v2.second});
+      if (!isEmpty(v2.first)) childList.push({"speciality": v2.first});
     })
     specialList.push({
       "speciality": v.first,
@@ -67,6 +68,7 @@ const carouselData = (popupData: any) => {
       });
     }
   });
+  debugger
   return {pages: data};
 };
 
@@ -192,7 +194,7 @@ const addOrDeleteMsg = async (newData: any, oldData: any) => {
   sucMessage("测试中。。。。。。。。。。。。。。。。。。。。。")
 
 
-  let relData = {id:"",pages:[]};
+  let relData = {id: "", pages: []};
 
   const result = await axiosPut('/api/77hub/notice', relData);
   return result;

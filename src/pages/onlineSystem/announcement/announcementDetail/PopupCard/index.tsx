@@ -115,10 +115,12 @@ const PopupCard: React.FC<any> = (props: any) => {
     oldList.map((v: any) => {
       if (v.tabPage === Number(key)) {
         if (JSON.stringify(v.tabsContent) !== "{}") {
-          dtForm.setFieldsValue(v.tabsContent)
+          dtForm.setFieldsValue(v.tabsContent);
+          setPicModalState({...picModalState, checkedImg: v.tabsContent.uploadPic})
         } else {
           dtForm.resetFields();
           dtForm.setFieldsValue({"picLayout": "1"});
+          setPicModalState({...picModalState, checkedImg: ""})
         }
       }
     });

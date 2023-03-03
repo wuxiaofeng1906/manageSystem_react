@@ -21,7 +21,7 @@ const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
   const {
     commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData,
-    oldAnPopData, setOldAnnPopData
+    setOldAnnPopData
   } = useModel('announcement');
 
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
@@ -93,7 +93,6 @@ const Announce: React.FC<any> = (props: any) => {
         modules: noticeDetails.templateTypeId
       };
       setCommonData(formdata);
-      debugger
       setOldCommonData({...formdata, releaseID});
       announcementForm.setFieldsValue(formdata);
       // 显示下一步按钮还是保存按钮
@@ -130,6 +129,10 @@ const Announce: React.FC<any> = (props: any) => {
         carouselNum: 5
       });
       setCarouselNumShow("none");
+      setCommonData(null);
+      setOldCommonData(null);
+      setAnnPopData([]);
+      setOldAnnPopData([]);
     } else if (type === "detail") {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
       getDataById()

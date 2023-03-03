@@ -179,7 +179,7 @@ const normalUpdate = async (formData: any, popupData: object = {}) => {
 const updateForChangeModules = async (newData: any, oldData: any) => {
   //  此应用场景：弹窗模板变为消息模板
   if (newData.commonData?.modules === "1") {
-    return await saveAnnounceContent({...newData.commonData, releaseID: oldData.releaseID})
+    return await saveAnnounceContent({...newData.commonData, releaseID: oldData.oldCommonData?.releaseID})
   } else {
     //  此应用场景：消息卡片模板变为弹窗模板
     return await saveAnnounceContent({

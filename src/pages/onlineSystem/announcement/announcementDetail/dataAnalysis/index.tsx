@@ -37,7 +37,6 @@ export const vertifyFieldForCommon = (formInfo: any) => {
   return true;
 };
 
-
 // 验证字段的必填项(弹窗界面)
 export const vertifyFieldForPopup = (popDataArray: any) => {
   popDataArray.map((popData: any) => {
@@ -67,29 +66,6 @@ export const tabsPanel = (count: number) => {
   }
   return panes;
 };
-
-
-// const getchilds = (id: any, array: any) => {
-//   debugger
-//   const childs = []
-//   for (const arr of array) {  // 循环获取子节点
-//     if (arr.parentId === id) {
-//       childs.push({
-//         'id': arr.id,
-//         'first': arr.speciality
-//       })
-//     }
-//   }
-//
-//   for (const child of childs) { // 获取子节点的子节点
-//     const childscopy = getchilds(child.id, array)// 递归获取子节点
-//     if (childscopy.length > 0) {
-//       child.seconds = childscopy
-//     }
-//   }
-//   return childs
-// }
-
 
 const parTree = (oraData: any) => {
   const parents = oraData.filter((value: any) => value.parentId === 'undefined' || value.parentId === undefined || value.parentId === null || value.parentId === "1");
@@ -199,10 +175,12 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
     if (contents && contents.length) {
       contentData = getSpecialList(contents, (NoticeEdition[0]).isCarousel);
     }
+    debugger
     // 如果是非轮播，tabpage =0
     formData.push({
       tabPage: v.pageNum,
       tabsContent: {
+        id: v.id,
         picLayout: v.layoutTypeId,
         specialName: contentData.specialName, // 特性名称在content中，没有parentid的那一项
         uploadPic: v.image,

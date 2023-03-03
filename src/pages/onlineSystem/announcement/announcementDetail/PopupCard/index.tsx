@@ -7,7 +7,8 @@ import {
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
-import {getYuQueContent, oneKeyToRelease, saveAnnounceContent, updateAnnouncement} from '../axiosRequest/apiPage';
+import {getYuQueContent, oneKeyToRelease, saveAnnounceContent} from '../axiosRequest/apiPage';
+import {updateAnnouncement} from "../axiosRequest/apiPageForUpdate";
 import {analysisSpecialTitle, vertifyFieldForPopup, tabsPanel} from "../dataAnalysis";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
@@ -22,12 +23,8 @@ let currentTab = 1;
 const {Footer} = Layout;
 const PopupCard: React.FC<any> = (props: any) => {
   const {
-    commonData,
-    anPopData,
-    setAnnPopData,
-    showPulishButton,
-    oldCommonData,
-    oldAnPopData,
+    commonData, anPopData, setAnnPopData,
+    showPulishButton, oldCommonData, oldAnPopData,
     setOldAnnPopData
   } = useModel('announcement');
   const {releaseName, releaseID, type} = props.location?.query;
@@ -51,6 +48,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         ...picModalState,
         checkedImg: (anPopData[0]?.tabsContent).uploadPic
       });
+      debugger
       setOldAnnPopData({anPopData: anPopData, releaseID});
     } else {
       // 轮播时记录Tab数据用
@@ -102,7 +100,9 @@ const PopupCard: React.FC<any> = (props: any) => {
     // 覆盖已有当前页的数据或者添加新数据
     const oldList = [...anPopData];
     oldList.map((v: any) => {
-      v.tabPage === currentKey ? v.tabsContent = specialList : v.tabsContent;
+      debugger;
+      console.log(v)
+      v.tabPage === currentKey ? v.tabsContent = {...specialList, id: v.tabsContent.id} : v.tabsContent;
     });
     setAnnPopData(oldList);
     // 返回值共保存按钮使用

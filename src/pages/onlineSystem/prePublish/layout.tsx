@@ -84,8 +84,6 @@ const Layout = () => {
 
   const renderTabContent = useMemo(() => {
     const query = history.location;
-    debugger
-    console.log(query)
     const hasPermission = onlineSystemPermission();
     if (subTab == 'server')
       return (

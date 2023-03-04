@@ -306,7 +306,6 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   // const onDisExcuteTypeChanged = async (changedData: any, currentValue: any, test: any) => {
   //   // 选择全部的时候不能选择其他，有其他的时候不能有全部选项
   //   console.log("currentValue", currentValue, test);
-  //   debugger;
   //   const selectData = await getExcuteSelect(changedData);
   //   setExcute({
   //     ...excute,

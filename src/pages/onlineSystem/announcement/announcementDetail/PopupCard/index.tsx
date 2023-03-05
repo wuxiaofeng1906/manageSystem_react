@@ -61,6 +61,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 上传图片的进度
   const [picUpLoading, setPicUpLoading] = useState(false);
   useEffect(() => {
+    debugger
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
       // 首先保存以下旧数据
@@ -122,16 +123,15 @@ const PopupCard: React.FC<any> = (props: any) => {
     getPopupSource(currentTab);
     const oldList = [...anPopData];
     oldList.map((v: any) => {
-      if (v.tabPage === Number(key)) {
-        if (JSON.stringify(v.tabsContent) !== "{}") {
-          dtForm.setFieldsValue(v.tabsContent);
-          setPicModalState({...picModalState, checkedImg: v.tabsContent.uploadPic})
-        } else {
-          dtForm.resetFields();
-          dtForm.setFieldsValue({"picLayout": "1"});
-          setPicModalState({...picModalState, checkedImg: ""})
-        }
+      if (v.tabPage === Number(key) && JSON.stringify(v.tabsContent) !== "{}") {
+        dtForm.setFieldsValue(v.tabsContent);
+        setPicModalState({...picModalState, checkedImg: v.tabsContent.uploadPic})
+      } else {
+        dtForm.resetFields();
+        dtForm.setFieldsValue({"picLayout": "1"});
+        setPicModalState({...picModalState, checkedImg: ""})
       }
+
     });
     //  需要最后再赋值当前tab页码
     currentTab = Number(key);

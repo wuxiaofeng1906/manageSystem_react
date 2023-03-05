@@ -2,7 +2,14 @@ import {axiosPost, axiosPut} from '@/publicMethods/axios';
 import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
 
-// #region 修改时候调用的新增（比如修改模板类型，是否轮播）
+// 修改的api
+const updateApi = async (data: any) => {
+
+  const result = await axiosPut('/api/77hub/notice', data);
+  return result;
+}
+
+//  region 修改时候调用的新增（比如修改模板类型，是否轮播）
 const getSpecialListForAdd = (ptyGroup: any) => {
   const specialList: any = [];
   ptyGroup.map((v: any) => {
@@ -111,12 +118,8 @@ const normalUpdate = async (formData: any, popupData: any = []) => {
       specialData = notCarouselDataForAdd(popupData[0]); // 不轮播
     }
   }
-
   const relData = {...data, ...specialData};
-
-
-  const result = await axiosPut('/api/77hub/notice', relData);
-  return result;
+  return await updateApi(relData);
 
 };
 
@@ -133,116 +136,62 @@ const updateForModulesAndCarousel = async (newData: any, oldData: any) => {
     }, newData.finalData)
   }
 }
-// #endregion
+// endregion
 
-
-// 获取特性列表list
-const getSpecialList = (ptyGroup: any, operate: string) => {
-  const specialList: any = [];
-  ptyGroup.map((v: any) => {
-    const childList: any = [];
-    (v.seconds).map((v2: any) => {
-      if (!isEmpty(v2.first)) childList.push({id: v2.id, speciality: v2.first});
-    })
-    specialList.push({
-      edit: operate,
-      id: v.id,
-      speciality: v.first,
-      children: childList
-    });
-  });
-  return specialList;
-}
-
-
-// 添加需要删除的数据
-
-const requsestUpdateData = async (data: any) => {
-
-
-  const result = await axiosPut('/api/77hub/notice', data);
-  return result;
-
-}
-// 轮播和不轮播修改时数据保存。
-const alaysisCarouselData = (isCarouse: boolean, popupData: any, oldAnPopData: any) => {
-  debugger
-  const data: any = [];
-  //-  原来的特性添加edit：为delete，新增的轮播页面添加edit为add,
-  // 1.先添加删除的数据
-  // 只要是轮播，则页数最少有一页，
-  let deletedData = oldAnPopData;
-  // 是轮播
-  if (isCarouse) {
-    deletedData = oldAnPopData.anPopData;
-  }
-
-  deletedData.map((v: any) => {
-    data.push({
-      id: v.tabsContent?.id,
-      editFlag: "delete",
-    })
-  });
-
-  requsestUpdateData(deletedData)
-
-  // 2.再添加新增或者修改的数据
-  popupData.map((v: any) => {
-    const {tabsContent} = v;
-    // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
-    if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
-
-      data.push({
-        id: tabsContent.id,
-        editFlag: "add",
-        featureName: tabsContent.specialName,
-        image: tabsContent.uploadPic,
-        pageNum: v.tabPage,
-        layoutTypeId: tabsContent.picLayout,
-        contents: getSpecialList(tabsContent.ptyGroup, "add")
-      });
-    }
-  });
-  return {pages: data};
-};
-
-// 是否轮播选项不同
-const isCarouseUpdate = (commonData: any, finalData: any, oldCommonData: any, oldAnPopData: any) => {
-
-  const data: any = {
-    "$id": oldCommonData.releaseID,
-    isCarousel: commonData.announce_carousel === 0 ? false : true // 是否轮播
-  };
-
-  let specialData = {};
-
-  // 共同属性
-
-
-  debugger
-  if (oldCommonData.announce_carousel === 0 && commonData.announce_carousel === 1) {
-    //  如果从否变为是：
-    data["pageSize"] = commonData.carouselNum; // 轮播总页数
-    specialData = alaysisCarouselData(true, finalData, oldAnPopData);// 轮播
-  } else if (oldCommonData.announce_carousel === 1 && commonData.announce_carousel === 0) {
-    //  如果从是变为否
-    //  原来的轮播页面添加edit：为delete，新增的特性页面添加edit为add
-    data["pageSize"] = 0; // 不轮播的时候总页数为0
-    specialData = alaysisCarouselData(false, finalData, oldAnPopData); // 不轮播
-  }
-
-  return {...data, ...specialData};
-
-};
 
 // 轮播页发生改变
 const carousePageUpdate = (commonData: any, finalData: any, oldCommonData: any, oldAnPopData: any) => {
-  if (oldCommonData.carouselNum > commonData.carouselNum) {
-    //  轮播页减少
-  } else if (oldCommonData.carouselNum < commonData.carouselNum) {
-    //  轮播页增加
-  }
+  debugger
 
+  // const oldData = oldAnPopData.anPopData;
+
+  if (oldCommonData.carouselNum > commonData.carouselNum) {
+    //  轮播页减少,删除之前的轮播也
+    return {}
+  } else if (oldCommonData.carouselNum < commonData.carouselNum) {
+    const addCount = commonData.carouselNum - oldCommonData.carouselNum;
+    debugger
+    let page: any = [];
+    for (let i = 0; i < addCount; i++) {
+      const pageDt = finalData[i].tabsContent;
+      const content: any = [];
+
+      (pageDt.ptyGroup).map((v: any, index: number) => {
+
+        content.push({
+          "$id": "1",
+          "speciality": pageDt.specialName,
+          "editFlag": "add"
+        }, {
+          "$id": "10000001",
+          "parentId": "1",
+          "speciality": v.first,
+          "editFlag": "add"
+        });
+        const second = v.seconds;
+        second.map((v2: any, index2: number) => {
+          if (v2.first) {
+            content.push({
+              "$id": "20000001",
+              "parentId": "10000001",
+              "speciality": v2.first,
+              "editFlag": "add"
+            })
+          }
+
+        });
+      });
+      page.push({
+        id: pageDt.id,
+        contents: content
+      })
+    }
+    return {
+      id: commonData.id,
+      pages: page
+    }
+  }
+  return {}
 };
 
 // 一级特性发生改变
@@ -262,10 +211,6 @@ const addOrDeleteMsg = async (newData: any, oldData: any, updateType: string) =>
   let relData: any;
   // 判断是哪种情况的修改。
   switch (updateType) {
-    case "isCarouselUpdate": // 是否轮播 选择不同
-      relData = isCarouseUpdate(commonData, finalData, oldCommonData, oldAnPopData);
-      break;
-
     case "carouselPage": // 轮播页数不同
       relData = carousePageUpdate(commonData, finalData, oldCommonData, oldAnPopData);
       break;
@@ -282,17 +227,38 @@ const addOrDeleteMsg = async (newData: any, oldData: any, updateType: string) =>
       break;
   }
 
+  return await updateApi(relData);
 }
 
 // 判断弹窗数据（是否轮播，轮播页数，以及特性条数）是否改变
 const popupPageIsUpdate = (newData: any, oldData: any) => {
   const {commonData, finalData} = newData;  // commonData, finalData  ==> 新数据
   const {oldCommonData, oldAnPopData} = oldData; // oldCommonData, oldAnPopData ==> 旧数据
+  // 这个函数包含三种情况，1.新增或删除轮播页数  2.新增轮播页和相关属性 3.页面属性新增或者删除
+  // 首先，判断是否轮播，如果不是轮播，则需要看特性项有没有改变过。如果是轮播，则继续判断其他情况
+  debugger
+  // if (commonData.announce_carousel) {
+  //   const new_v = finalData[0]; // 不是轮播则只有一个数据、
+  //   const old_v = oldAnPopData.anPopData[0].tabsContent;
+  //   // 先判断一级特性
+  //   if ((new_v.ptyGroup).length !== (old_v.ptyGroup).length) {
+  //     return {status: true, type: "firstSpecity"};
+  //   }
+  //   //  再判断二级特性
+  //   const firstSpecial = new_v.ptyGroup;
+  //   const secondSpecial = new_v.ptyGroup;
+  //   for (let m = 0; m < firstSpecial.length; m++) {
+  //     const newFirstSp = firstSpecial[m];
+  //     const oldFirstSp = secondSpecial[m];
+  //     if (newFirstSp.seconds?.length !== oldFirstSp.seconds?.length) { // 二级特性个数不同
+  //       return {status: true, type: "secondSpecity"};
+  //       break
+  //     }
+  //   }
+  //
+  // }
 
-  // 是否轮播：不相等则是修改过是否轮播
-  if (commonData.announce_carousel !== oldCommonData.announce_carousel) {
-    return {status: true, type: "isCarouselUpdate"};
-  }
+
   // 轮播页数：是否被修改过
   if (commonData.carouselNum !== oldCommonData.carouselNum) {
     return {status: true, type: "carouselPage"};
@@ -301,12 +267,6 @@ const popupPageIsUpdate = (newData: any, oldData: any) => {
   for (let i = 0; i < commonData.carouselNum - 1; i++) {
     const newPopData = finalData[i];
     const oldPopData = (oldAnPopData.anPopData)[i];
-    //   先判断有没有tabPage（有可能一个是有轮播的，一个没轮播的）
-    if (newPopData.tabPage !== oldPopData.tabPage) {
-      return {status: true, type: "isCarouselUpdate"};
-      break;
-    }
-
     // 如果是不轮播的数据
     let newPtGroup = [];
     let oldPtGroup = [];
@@ -348,7 +308,7 @@ export const updateAnnouncement = async (newData: any, oldData: any) => {
   else if (newData.commonData?.modules === "1") { // 如果是消息卡片
     return await normalUpdate({...newData.commonData, releaseId: oldData.oldCommonData.releaseID});
   } else {
-    // // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过  特性项、以及轮播页数
+    // // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过轮播页数和特性项
 
     // 1.2.2.1 如果有修改过，则调用特殊修改接口
     const updateType = popupPageIsUpdate(newData, oldData);

@@ -116,6 +116,7 @@ const Announce: React.FC<any> = (props: any) => {
 
 
   useEffect(() => {
+
     // 一键发布按钮是否展示
     pulishButtonVisible();
 

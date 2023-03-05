@@ -13,11 +13,7 @@ import IPagination from '@/components/IPagination';
 import {useModel, history} from 'umi';
 import usePermission from '@/hooks/permission';
 import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessages';
-
-
-import {deleteList} from "./axiosRequest/apiPage";
-import {queryAnnounceList} from "./axiosRequest/gqlPage";
-
+import {deleteList, getAnnounceList} from "./axiosRequest/apiPage";
 
 const disabledStyle = {filter: 'grayscale(1)', cursor: 'not-allowed'};
 const announceList = () => {
@@ -45,9 +41,10 @@ const announceList = () => {
   const getList = async (page = 1, page_size = pages.page_size) => {
     setSpinning(true);
     try {
-      const res = await queryAnnounceList(page, page_size);
+      const res = await getAnnounceList(page, page_size);
       setSpinning(false);
-      setList(res?.NoticeEdition);
+
+      setList(res?.results);
       setPages({
         page: res?.page || 1,
         page_size: res?.page_size || 20,
@@ -223,4 +220,6 @@ const announceList = () => {
     </Spin>
   );
 };
+
+
 export default announceList;

@@ -48,12 +48,16 @@ export const vertifyFieldForPopup = (popDataArray: any) => {
       break;
     }
 
-    for (let i2 = 0; i < (popData.ptyGroup).length; i2++) {
+    for (let i2 = 0; i2 < (popData.ptyGroup).length; i2++) {
+
       const v = (popData.ptyGroup)[i2];
-      if (isEmpty((v.first).trim())) {
+      if (!v || !v.first) {
         errorMessage("一级特性不能为空！");
         value = false;
         break;
+      } else if (isEmpty((v.first).trim())) {
+        errorMessage("一级特性不能为空！");
+        value = false;
       }
     }
 

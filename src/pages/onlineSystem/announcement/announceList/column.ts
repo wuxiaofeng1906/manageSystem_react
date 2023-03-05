@@ -51,16 +51,28 @@ export const announcementListColumn: any = [
     headerName: '创建时间',
     field: 'create_time',
     minWidth: 160,
+    cellRenderer: (v: any) => {
+      if (v.value) {
+        return dayjs(v.value).format('YYYY-MM-DD hh:mm:ss');
+      }
+      return "";
+    }
   },
   {
     headerName: '修改人',
-    field: 'update_user',
+    field: 'modified_user',
     minWidth: 100,
   },
   {
     headerName: '修改时间',
-    field: 'update_time',
+    field: 'modified_time',
     minWidth: 160,
+    cellRenderer: (v: any) => {
+      if (v.value) {
+        return dayjs(v.value).format("YYYY-MM-DD hh:mm:ss");
+      }
+      return "";
+    }
   },
   {
     headerName: '操作',

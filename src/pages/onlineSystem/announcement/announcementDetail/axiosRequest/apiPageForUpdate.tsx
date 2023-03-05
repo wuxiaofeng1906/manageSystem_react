@@ -196,6 +196,41 @@ const carousePageUpdate = (commonData: any, finalData: any, oldCommonData: any, 
 
 // 一级特性发生改变
 const firstSpecityUpdate = (commonData: any, finalData: any, oldCommonData: any, oldAnPopData: any) => {
+  console.log(finalData,oldAnPopData);
+  debugger
+
+
+  // 轮播页数至少是1个，不是轮播也有一页特性
+  for (let i = 0; i < commonData.carouselNum - 1; i++) {
+    const newPopData = finalData[i];
+    const oldPopData = (oldAnPopData.anPopData)[i];
+    // 如果是不轮播的数据
+    let newPtGroup = [];
+    let oldPtGroup = [];
+    if (!newPopData.tabPage) {
+      newPtGroup = newPopData.ptyGroup;
+      oldPtGroup = oldPopData.ptyGroup;
+    } else {
+      // 如果是轮播的数据
+      newPtGroup = newPopData.tabsContent?.ptyGroup;
+      oldPtGroup = oldPopData.tabsContent?.ptyGroup;
+    }
+    if (newPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同
+    // 需要匹配哪些数据要add，哪些数据要delete
+      newPtGroup.map(()=>{
+
+      })
+    }
+    for (let m = 0; m < newPtGroup.length; m++) {
+      const newFirstSp = newPtGroup[m];
+      const oldFirstSp = oldPtGroup[m];
+      if (newFirstSp.seconds?.length !== oldFirstSp.seconds?.length) { // 二级特性个数不同
+
+
+      }
+    }
+  }
+
 
 };
 
@@ -278,7 +313,7 @@ const popupPageIsUpdate = (newData: any, oldData: any) => {
       newPtGroup = newPopData.tabsContent?.ptyGroup;
       oldPtGroup = oldPopData.tabsContent?.ptyGroup;
     }
-    if (oldPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同，也不同
+    if (newPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同，也不同
       return {status: true, type: "firstSpecity"};
       break
     }

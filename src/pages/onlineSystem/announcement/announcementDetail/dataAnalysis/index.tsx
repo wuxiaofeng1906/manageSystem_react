@@ -41,7 +41,11 @@ export const vertifyFieldForCommon = (formInfo: any) => {
 export const vertifyFieldForPopup = (popDataArray: any) => {
   let value = true;
   for (let i = 0; i < popDataArray.length; i++) {
-    const popData = popDataArray[i];
+    let popData = popDataArray[i]; // 不可轮播的数据
+
+    if (popDataArray[i].tabsContent) {
+      popData = popDataArray[i].tabsContent;  // 可轮播的数据
+    }
     if (!popData.uploadPic) {
       errorMessage("图片不能为空！");
       value = false;

@@ -37,39 +37,47 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 语雀数据导入（加载）使用
   const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
 
+  const setEmptyForm = () => {
+    // 轮播时记录Tab数据用
+    if (commonData?.announce_carousel === 1) {
+      const tabsContent: any = [];
+      for (let i = 0; i < commonData?.carouselNum; i++) {
+        tabsContent.push({
+          tabPage: i + 1,
+          tabsContent: {}
+        })
+      }
+      setAnnPopData(tabsContent)
+    }
+    // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
+    dtForm.setFieldsValue({
+      picLayout: "1", // 默认上下布局
+      ptyGroup: [{ // 默认一组特性
+        first: "",
+        seconds: [{first: ""}]
+      }]
+    });
+  };
   // 上传图片的进度
   const [picUpLoading, setPicUpLoading] = useState(false);
   useEffect(() => {
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
-      // 展示第一个tab的数据即可。
-      dtForm.setFieldsValue(anPopData[0]?.tabsContent);
-      setPicModalState({
-        ...picModalState,
-        checkedImg: (anPopData[0]?.tabsContent).uploadPic
-      });
-      debugger
+      // 首先保存以下旧数据
       setOldAnnPopData({anPopData: anPopData, releaseID});
-    } else {
-      // 轮播时记录Tab数据用
-      if (commonData?.announce_carousel === 1) {
-        const tabsContent: any = [];
-        for (let i = 0; i < commonData?.carouselNum; i++) {
-          tabsContent.push({
-            tabPage: i + 1,
-            tabsContent: {}
-          })
-        }
-        setAnnPopData(tabsContent)
+      // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
+      if (oldCommonData.announce_carousel === commonData.announce_carousel) {
+        // 展示第一个tab的数据即可。
+        dtForm.setFieldsValue(anPopData[0]?.tabsContent);
+        setPicModalState({
+          ...picModalState,
+          checkedImg: (anPopData[0]?.tabsContent).uploadPic
+        });
+      } else {
+        setEmptyForm();
       }
-      // 初始化表单(不知道怎么设置值的格式时，可以先获取值，按照获取值的格式来写)
-      dtForm.setFieldsValue({
-        picLayout: "1", // 默认上下布局
-        ptyGroup: [{ // 默认一组特性
-          first: "",
-          seconds: [{first: ""}]
-        }]
-      });
+    } else {
+      setEmptyForm();
     }
   }, []);
 
@@ -94,13 +102,12 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
-    debugger
+
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = picModalState.checkedImg;
     // 覆盖已有当前页的数据或者添加新数据
     const oldList = [...anPopData];
     oldList.map((v: any) => {
-      debugger;
       console.log(v)
       v.tabPage === currentKey ? v.tabsContent = {...specialList, id: v.tabsContent.id} : v.tabsContent;
     });
@@ -110,6 +117,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // tab切换
   const onTabsChange = (key: string) => {
+    debugger
     // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
     getPopupSource(currentTab);
     const oldList = [...anPopData];

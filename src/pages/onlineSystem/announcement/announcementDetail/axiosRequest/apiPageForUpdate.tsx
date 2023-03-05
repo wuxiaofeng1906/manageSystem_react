@@ -1,8 +1,9 @@
 import {axiosPost, axiosPut} from '@/publicMethods/axios';
 import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
-// 获取特性列表list
-const getSpecialList = (ptyGroup: any) => {
+
+// #region 修改时候调用的新增（比如修改模板类型，是否轮播）
+const getSpecialListForAdd = (ptyGroup: any) => {
   const specialList: any = [];
   ptyGroup.map((v: any) => {
     const childList: any = [];
@@ -10,28 +11,26 @@ const getSpecialList = (ptyGroup: any) => {
       if (!isEmpty(v2.first)) childList.push({id: v2.id, speciality: v2.first});
     })
     specialList.push({
-      edit: "",
       id: v.id,
       speciality: v.first,
       children: childList
     });
   });
   return specialList;
-}
+};
+
 // 不轮播时的数据
-const notCarouselData = (popupData: any) => {
+const notCarouselDataForAdd = (popupData: any) => {
   // 相当于只有一个轮播页面
   const {ptyGroup} = popupData;
   const data = {
     pages: [
       {
-        id: "",
-        editFlag: "",
         image: popupData.uploadPic,
         pageNum: 0, // 所属轮播页码
         layoutTypeId: popupData.picLayout,
         yuQue: popupData.yuQueUrl,
-        contents: getSpecialList(ptyGroup)
+        contents: getSpecialListForAdd(ptyGroup)
       }
     ]
   }
@@ -39,7 +38,7 @@ const notCarouselData = (popupData: any) => {
 };
 
 // 轮播时的数据
-const carouselData = (popupData: any) => {
+const carouselDataForAdd = (popupData: any) => {
   if (!popupData || popupData.length === 0) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
@@ -48,13 +47,11 @@ const carouselData = (popupData: any) => {
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
       data.push({
-        id: tabsContent.id,
-        editFlag: "",
         featureName: tabsContent.specialName,
         image: tabsContent.uploadPic,
         pageNum: v.tabPage,
         layoutTypeId: tabsContent.picLayout,
-        contents: getSpecialList(tabsContent.ptyGroup)
+        contents: getSpecialListForAdd(tabsContent.ptyGroup)
       });
     }
   });
@@ -62,7 +59,7 @@ const carouselData = (popupData: any) => {
 };
 
 // 更新公告内容
-export const updateAnnounceContent = async (formData: any, popupData: object = {}) => {
+export const updateAnnounceContentForAdd = async (formData: any, popupData: object = {}) => {
   const data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
@@ -77,14 +74,14 @@ export const updateAnnounceContent = async (formData: any, popupData: object = {
   let specialData = {};
   if (data.templateTypeId === "2") { // 弹窗保存数据
     // 共同属性
-    // data["isCarousel"] = formData.announce_carousel === 0 ? false : true; // 是否轮播
+    data["isCarousel"] = formData.announce_carousel === 0 ? false : true; // 是否轮播
     // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
     if (formData.announce_carousel === 1) {
       data["pageSize"] = formData.carouselNum; // 轮播总页数
-      specialData = carouselData(popupData);// 轮播
+      specialData = carouselDataForAdd(popupData);// 轮播
     } else {
       data["pageSize"] = 0; // 不轮播的时候总页数为0
-      specialData = notCarouselData(popupData[0]); // 不轮播
+      specialData = notCarouselDataForAdd(popupData[0]); // 不轮播
     }
   }
 
@@ -108,10 +105,10 @@ const normalUpdate = async (formData: any, popupData: any = []) => {
     // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
     if (formData.announce_carousel === 1) {
       data["pageSize"] = formData.carouselNum; // 轮播总页数
-      specialData = carouselData(popupData);// 轮播
+      specialData = carouselDataForAdd(popupData);// 轮播
     } else {
       data["pageSize"] = 0; // 不轮播的时候总页数为0
-      specialData = notCarouselData(popupData[0]); // 不轮播
+      specialData = notCarouselDataForAdd(popupData[0]); // 不轮播
     }
   }
 
@@ -124,55 +121,117 @@ const normalUpdate = async (formData: any, popupData: any = []) => {
 };
 
 // 切换升级模板--调用新增接口（会删除原有公告）调用新增接口，多传一个参数 "$id":"Q8G383618N7003B",
-const updateForChangeModules = async (newData: any, oldData: any) => {
+const updateForModulesAndCarousel = async (newData: any, oldData: any) => {
   //  此应用场景：弹窗模板变为消息模板
   if (newData.commonData?.modules === "1") {
-    return await updateAnnounceContent({...newData.commonData, releaseID: oldData.oldCommonData?.releaseID})
+    return await updateAnnounceContentForAdd({...newData.commonData, releaseID: oldData.oldCommonData?.releaseID})
   } else {
     //  此应用场景：消息卡片模板变为弹窗模板
-    return await updateAnnounceContent({
+    return await updateAnnounceContentForAdd({
       ...newData.commonData,
       releaseID: oldData.oldCommonData?.releaseID
     }, newData.finalData)
   }
 }
+// #endregion
+
+
+// 获取特性列表list
+const getSpecialList = (ptyGroup: any, operate: string) => {
+  const specialList: any = [];
+  ptyGroup.map((v: any) => {
+    const childList: any = [];
+    (v.seconds).map((v2: any) => {
+      if (!isEmpty(v2.first)) childList.push({id: v2.id, speciality: v2.first});
+    })
+    specialList.push({
+      edit: operate,
+      id: v.id,
+      speciality: v.first,
+      children: childList
+    });
+  });
+  return specialList;
+}
+
+
+// 添加需要删除的数据
+
+const requsestUpdateData = async (data: any) => {
+
+
+  const result = await axiosPut('/api/77hub/notice', data);
+  return result;
+
+}
+// 轮播和不轮播修改时数据保存。
+const alaysisCarouselData = (isCarouse: boolean, popupData: any, oldAnPopData: any) => {
+  debugger
+  const data: any = [];
+  //-  原来的特性添加edit：为delete，新增的轮播页面添加edit为add,
+  // 1.先添加删除的数据
+  // 只要是轮播，则页数最少有一页，
+  let deletedData = oldAnPopData;
+  // 是轮播
+  if (isCarouse) {
+    deletedData = oldAnPopData.anPopData;
+  }
+
+  deletedData.map((v: any) => {
+    data.push({
+      id: v.tabsContent?.id,
+      editFlag: "delete",
+    })
+  });
+
+  requsestUpdateData(deletedData)
+
+  // 2.再添加新增或者修改的数据
+  popupData.map((v: any) => {
+    const {tabsContent} = v;
+    // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
+    if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
+
+      data.push({
+        id: tabsContent.id,
+        editFlag: "add",
+        featureName: tabsContent.specialName,
+        image: tabsContent.uploadPic,
+        pageNum: v.tabPage,
+        layoutTypeId: tabsContent.picLayout,
+        contents: getSpecialList(tabsContent.ptyGroup, "add")
+      });
+    }
+  });
+  return {pages: data};
+};
 
 // 是否轮播选项不同
 const isCarouseUpdate = (commonData: any, finalData: any, oldCommonData: any, oldAnPopData: any) => {
 
   const data: any = {
-    "$id": commonData.releaseID,
-    iteration: commonData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
-    templateTypeId: commonData.modules, // 通知模板：1.消息卡片，2.弹窗
-    updatedTime: dayjs(commonData.announce_time).format('YYYY-MM-DD HH:mm:ss'), // 升级时间：手动选择时间，必填
-    description: commonData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
+    "$id": oldCommonData.releaseID,
+    isCarousel: commonData.announce_carousel === 0 ? false : true // 是否轮播
   };
 
   let specialData = {};
-  if (data.templateTypeId === "2") { // 弹窗保存数据
-    // 共同属性
-    data["isCarousel"] = commonData.announce_carousel === 0 ? false : true; // 是否轮播
-    // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
-    if (commonData.announce_carousel === 1) {
-      data["pageSize"] = commonData.carouselNum; // 轮播总页数
-      specialData = carouselData(finalData);// 轮播
-    } else {
-      data["pageSize"] = 0; // 不轮播的时候总页数为0
-      specialData = notCarouselData(finalData[0]); // 不轮播
-    }
-  }
 
-  const relData = {...data, ...specialData};
+  // 共同属性
 
 
   debugger
   if (oldCommonData.announce_carousel === 0 && commonData.announce_carousel === 1) {
     //  如果从否变为是：
-    //  原来的特性添加edit：为delete，新增的轮播页面添加edit为add
+    data["pageSize"] = commonData.carouselNum; // 轮播总页数
+    specialData = alaysisCarouselData(true, finalData, oldAnPopData);// 轮播
   } else if (oldCommonData.announce_carousel === 1 && commonData.announce_carousel === 0) {
     //  如果从是变为否
     //  原来的轮播页面添加edit：为delete，新增的特性页面添加edit为add
+    data["pageSize"] = 0; // 不轮播的时候总页数为0
+    specialData = alaysisCarouselData(false, finalData, oldAnPopData); // 不轮播
   }
+
+  return {...data, ...specialData};
 
 };
 
@@ -223,9 +282,6 @@ const addOrDeleteMsg = async (newData: any, oldData: any, updateType: string) =>
       break;
   }
 
-
-  const result = await axiosPut('/api/77hub/notice', relData);
-  return result;
 }
 
 // 判断弹窗数据（是否轮播，轮播页数，以及特性条数）是否改变
@@ -276,21 +332,23 @@ const popupPageIsUpdate = (newData: any, oldData: any) => {
     }
   }
   return {status: false, type: ""};
-}
+};
+
 // 修改发布公告
-// note
 export const updateAnnouncement = async (newData: any, oldData: any) => {
-  // 1 进行判断，首先判断模板类型有没有被改变。
+  debugger
+  // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
   // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
-  if (newData.commonData?.modules !== oldData.oldCommonData?.modules) {
-    return await updateForChangeModules(newData, oldData);
+  if (newData.commonData?.modules !== oldData.oldCommonData?.modules
+    || newData.commonData?.announce_carousel !== oldData.oldCommonData?.announce_carousel) {
+    return await updateForModulesAndCarousel(newData, oldData);
   }
     // 1.2 如果模板类型没有改变
   // 1.2.1 如果是消息模板，则直接调用常规修改接口
   else if (newData.commonData?.modules === "1") { // 如果是消息卡片
     return await normalUpdate({...newData.commonData, releaseId: oldData.oldCommonData.releaseID});
   } else {
-    // // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过   是否轮播、特性项、以及轮播页数
+    // // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过  特性项、以及轮播页数
 
     // 1.2.2.1 如果有修改过，则调用特殊修改接口
     const updateType = popupPageIsUpdate(newData, oldData);

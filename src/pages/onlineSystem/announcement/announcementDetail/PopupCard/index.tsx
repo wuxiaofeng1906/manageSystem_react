@@ -34,7 +34,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     checkedImg: ""
   });
 
-  const picString = useRef("");
   // 语雀数据导入（加载）使用
   const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
 
@@ -172,7 +171,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   const picChecked = (e: any) => {
     if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
       setPicModalState({...picModalState, checkedImg: e.target.dataset.value});
-      // picString.current =
     }
   };
   // 点击确定按钮

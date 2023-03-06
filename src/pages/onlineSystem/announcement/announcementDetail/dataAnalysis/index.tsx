@@ -39,15 +39,12 @@ export const vertifyFieldForCommon = (formInfo: any) => {
 
 // 验证字段的必填项(弹窗界面)
 export const vertifyFieldForPopup = (popDataArray: any) => {
-  debugger
   let value = true;
   for (let i = 0; i < popDataArray.length; i++) {
     let popData = popDataArray[i]; // 不可轮播的数据
-
     if (popDataArray[i].tabsContent) {
       popData = popDataArray[i].tabsContent;  // 可轮播的数据
     }
-    debugger
     let firstLevelEmpty = false;
     if (popData.ptyGroup && (popData.ptyGroup).length) {
       for (let i2 = 0; i2 < (popData.ptyGroup).length; i2++) {
@@ -71,19 +68,15 @@ export const vertifyFieldForPopup = (popDataArray: any) => {
 
     // 除了图文布局，其他只要有一个不为空，就需要判断图片是否为空
     if (popData.specialName || popData.yuQueUrl || !firstLevelEmpty) {
-
       if (!popData.uploadPic) {
         errorMessage("图片不能为空！");
         value = false;
         break;
       }
     }
-
-
     if (!value) {
       break;
     }
-
   }
   return value;
 };
@@ -206,7 +199,7 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
     if (contents && contents.length) {
       contentData = getSpecialList(contents, (NoticeEdition[0]).isCarousel);
     }
-    debugger
+
     // 如果是非轮播，tabpage =0
     formData.push({
       tabPage: v.pageNum,

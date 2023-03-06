@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Spin} from 'antd';
+import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider} from 'antd';
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
 import moment from 'moment';
-import {history, useParams} from 'umi';
+import {history} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
 import {SIZE} from "../constant";
@@ -21,12 +21,11 @@ const {TextArea} = Input;
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
   const {
-    commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData,
-    setOldAnnPopData
+    commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData
   } = useModel('announcement');
 
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
-  const [leaveShow, setLeaveShow] = useState(false);
+  // const [leaveShow, setLeaveShow] = useState(false);
   // 公告列表过来的数据（releaseName:公告名称, releaseID：公告id, type：新增还是删除）
   const {releaseName, releaseID, type} = props.location?.query;
   const [announcementForm] = Form.useForm();
@@ -82,7 +81,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {
-    const dts = await queryAnnounceDetail(releaseName, releaseID);
+    const dts = await queryAnnounceDetail(releaseID);
     const {NoticeEdition} = dts;
     if (NoticeEdition && NoticeEdition.length) {
       const noticeDetails = NoticeEdition[0];
@@ -100,10 +99,7 @@ const Announce: React.FC<any> = (props: any) => {
       // 显示下一步按钮还是保存按钮
       if (formdata.modules === "2") { // 如果是弹窗的话，格式化
         // 还需要在state中保存弹窗的数据
-        // const popData =
-
         setAnnPopData(dealPopDataFromService(NoticeEdition))
-        // setOldAnnPopData([]);
         setStepShow({
           msgCard: "none",
           popCard: "inline"
@@ -137,7 +133,7 @@ const Announce: React.FC<any> = (props: any) => {
       setCommonData(null);
       setOldCommonData(null);
       setAnnPopData([]);
-      setOldAnnPopData([]);
+      // setOldAnnPopData([]);
     } else if (type === "detail") {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
       getDataByReleaseId()
@@ -172,24 +168,22 @@ const Announce: React.FC<any> = (props: any) => {
   const saveMsgInfo = async () => {
     const formInfo = announcementForm.getFieldsValue();
     // 这个点击保存的，模板一定是消息卡片
-    if (vertifyFieldForCommon(formInfo)) {
-      let result: any;
-      // 新增和修改调用不一样的接口
-      if (type === "detail") {
-        debugger
-        result = await updateAnnouncement({commonData: formInfo}, {oldCommonData});
-
-      } else if (type === "add") {
-        result = await saveAnnounceContent({...formInfo});
+      if (vertifyFieldForCommon(formInfo)) {
+        let result: any;
+        // 新增和修改调用不一样的接口
+        if (type === "detail") {
+          result = await updateAnnouncement(releaseID,formInfo, oldCommonData);
+        } else if (type === "add") {
+          result = await saveAnnounceContent({...formInfo});
+        }
+        if (result.ok) {
+          sucMessage("保存成功！");
+          history.push('./announceList')
+          return;
+        } else {
+          result.message ? errorMessage(result.message) : errorMessage("保存失败！");
+        }
       }
-      if (result.ok) {
-        sucMessage("保存成功！");
-        history.push('./announceList')
-        return;
-      } else {
-        result.message ? errorMessage(result.message) : errorMessage("保存失败！");
-      }
-    }
   };
 
   // 一键发布

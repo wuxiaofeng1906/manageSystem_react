@@ -24,8 +24,7 @@ const {Footer} = Layout;
 const PopupCard: React.FC<any> = (props: any) => {
   const {
     commonData, anPopData, setAnnPopData,
-    showPulishButton, oldCommonData, oldAnPopData,
-    setOldAnnPopData
+    showPulishButton, oldCommonData
   } = useModel('announcement');
   const {releaseName, releaseID, type} = props.location?.query;
   const [dtForm] = Form.useForm();
@@ -64,8 +63,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     debugger
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
-      // 首先保存以下旧数据
-      setOldAnnPopData({anPopData: anPopData, releaseID});
       // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
       if (oldCommonData.announce_carousel === commonData.announce_carousel) {
         // 展示第一个tab的数据即可。
@@ -152,7 +149,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (vertifyFieldForPopup(finalData)) {
       let result: any;
       if (type === "detail") {
-        result = await updateAnnouncement({commonData, finalData}, {oldCommonData, oldAnPopData});
+        result = await updateAnnouncement(releaseID, commonData, finalData,);
       } else {
         result = await saveAnnounceContent(commonData, finalData);
       }

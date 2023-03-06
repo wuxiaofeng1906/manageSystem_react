@@ -2,11 +2,11 @@
 import {ExternalGqlClient} from '@/hooks/externalGql';
 
 // 获取列表数据
-export const queryAnnounceDetail = async (iteration: string, id: string) => {
+export const queryAnnounceDetail = async (id: string) => {
 
   const {data} = await ExternalGqlClient.noticeGQLQuery(`
   {
-    NoticeEdition(criteriaStr:"iteration='${iteration}'&&id='${id}'") {
+    NoticeEdition(criteriaStr:"id='${id}'") {
     modifiedTime
     isDeleted
     id

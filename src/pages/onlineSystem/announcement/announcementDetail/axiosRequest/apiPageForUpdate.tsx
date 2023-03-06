@@ -1,6 +1,8 @@
 import {axiosPost, axiosPut} from '@/publicMethods/axios';
 import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
+import {queryAnnounceDetail} from "@/pages/onlineSystem/announcement/announcementDetail/axiosRequest/gqlPage";
+import {dealPopDataFromService} from "../dataAnalysis/index"
 
 // 修改的api
 const updateApi = async (data: any) => {
@@ -94,7 +96,21 @@ export const updateAnnounceContentForAdd = async (formData: any, popupData: obje
 
   const relData = {...data, ...specialData};
   return axiosPost('/api/77hub/notice', relData);
+  // return {ok: false, message: "ssssss"}
 };
+
+// 切换升级模板--调用新增接口（会删除原有公告）调用新增接口，多传一个参数 "$id":"Q8G383618N7003B",
+const updateForModulesAndCarousel = async (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
+  //  此应用场景：弹窗模板变为消息模板
+  if (newCommonData?.modules === "1") {
+    return await updateAnnounceContentForAdd({...newCommonData, releaseID: oldCommonData?.id})
+  } else {
+    //  此应用场景：消息卡片模板变为弹窗模板
+    return await updateAnnounceContentForAdd(
+      {...newCommonData, releaseID: oldCommonData?.id}, newPopData)
+  }
+}
+// endregion
 
 // 常规的修改：不涉及新增
 const normalUpdate = async (formData: any, popupData: any = []) => {
@@ -122,21 +138,6 @@ const normalUpdate = async (formData: any, popupData: any = []) => {
   return await updateApi(relData);
 
 };
-
-// 切换升级模板--调用新增接口（会删除原有公告）调用新增接口，多传一个参数 "$id":"Q8G383618N7003B",
-const updateForModulesAndCarousel = async (newData: any, oldData: any) => {
-  //  此应用场景：弹窗模板变为消息模板
-  if (newData.commonData?.modules === "1") {
-    return await updateAnnounceContentForAdd({...newData.commonData, releaseID: oldData.oldCommonData?.releaseID})
-  } else {
-    //  此应用场景：消息卡片模板变为弹窗模板
-    return await updateAnnounceContentForAdd({
-      ...newData.commonData,
-      releaseID: oldData.oldCommonData?.releaseID
-    }, newData.finalData)
-  }
-}
-// endregion
 
 
 // 轮播页发生改变
@@ -196,7 +197,7 @@ const carousePageUpdate = (commonData: any, finalData: any, oldCommonData: any, 
 
 // 一级特性发生改变
 const firstSpecityUpdate = (commonData: any, finalData: any, oldCommonData: any, oldAnPopData: any) => {
-  console.log(finalData,oldAnPopData);
+  console.log(finalData, oldAnPopData);
   debugger
 
 
@@ -216,8 +217,8 @@ const firstSpecityUpdate = (commonData: any, finalData: any, oldCommonData: any,
       oldPtGroup = oldPopData.tabsContent?.ptyGroup;
     }
     if (newPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同
-    // 需要匹配哪些数据要add，哪些数据要delete
-      newPtGroup.map(()=>{
+      // 需要匹配哪些数据要add，哪些数据要delete
+      newPtGroup.map(() => {
 
       })
     }
@@ -230,14 +231,13 @@ const firstSpecityUpdate = (commonData: any, finalData: any, oldCommonData: any,
       }
     }
   }
-
-
 };
 
 // 二级特性发生改变
 const secondSpecityUpdate = (commonData: any, finalData: any, oldCommonData: any, oldAnPopData: any) => {
 
 };
+
 // 弹窗- 新增（删除）page或特性 editFlag :detele，add
 const addOrDeleteMsg = async (newData: any, oldData: any, updateType: string) => {
   const {commonData, finalData} = newData;  // commonData, finalData  ==> 新数据
@@ -330,34 +330,56 @@ const popupPageIsUpdate = (newData: any, oldData: any) => {
 };
 
 // 修改发布公告
-export const updateAnnouncement = async (newData: any, oldData: any) => {
+export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
+
+  let oldCommonData = {
+    id: releaseID,
+    templateTypeId: "",
+    iteration: "",
+    updatedTime: "",
+    isCarousel: "",
+    description: ""
+  };
+  let oldPopData: any = [];
+  const dts = await queryAnnounceDetail(releaseID);
+  if (dts.NoticeEdition && (dts.NoticeEdition).length) {
+    const commonDatas = (dts.NoticeEdition)[0];
+    oldCommonData.templateTypeId = commonDatas.templateTypeId;
+    oldCommonData.iteration = commonDatas.iteration;
+    oldCommonData.updatedTime = commonDatas.updatedTime;
+    oldCommonData.isCarousel = commonDatas.isCarousel;
+    oldCommonData.description = commonDatas.description;
+    // 获取旧的数据，用于修改数据对比
+    oldPopData = await dealPopDataFromService(dts.NoticeEdition);
+  }
+
   debugger
-  // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
+  // // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
   // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
-  if (newData.commonData?.modules !== oldData.oldCommonData?.modules
-    || newData.commonData?.announce_carousel !== oldData.oldCommonData?.announce_carousel) {
-    return await updateForModulesAndCarousel(newData, oldData);
+  if (newCommonData.modules !== oldCommonData?.templateTypeId
+    || newCommonData?.announce_carousel !== oldCommonData?.isCarousel) {
+    return await updateForModulesAndCarousel(newCommonData, newPopData, oldCommonData, oldPopData);
   }
-    // 1.2 如果模板类型没有改变
-  // 1.2.1 如果是消息模板，则直接调用常规修改接口
-  else if (newData.commonData?.modules === "1") { // 如果是消息卡片
-    return await normalUpdate({...newData.commonData, releaseId: oldData.oldCommonData.releaseID});
-  } else {
-    // // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过轮播页数和特性项
-
-    // 1.2.2.1 如果有修改过，则调用特殊修改接口
-    const updateType = popupPageIsUpdate(newData, oldData);
-    if (updateType.status) {
-      return await addOrDeleteMsg(newData, oldData, updateType.type);
-    }
-    // 1.2.2.2 如果没有修改过，则调用普通修改接口
-    else {
-
-      return await normalUpdate({
-        ...newData.commonData,
-        releaseId: oldData.oldCommonData.releaseID
-      }, [...newData.finalData]);
-    }
-  }
+  //   // 1.2 如果模板类型没有改变
+  // // 1.2.1 如果是消息模板，则直接调用常规修改接口
+  // else if (newData.commonData?.modules === "1") { // 如果是消息卡片
+  //   return await normalUpdate({...newData.commonData, releaseId: oldData.oldCommonData.releaseID});
+  // } else {
+  //   // // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过轮播页数和特性项
+  //
+  //   // 1.2.2.1 如果有修改过，则调用特殊修改接口
+  //   const updateType = popupPageIsUpdate(newData, oldData);
+  //   if (updateType.status) {
+  //     return await addOrDeleteMsg(newData, oldData, updateType.type);
+  //   }
+  //   // 1.2.2.2 如果没有修改过，则调用普通修改接口
+  //   else {
+  //
+  //     return await normalUpdate({
+  //       ...newData.commonData,
+  //       releaseId: oldData.oldCommonData.releaseID
+  //     }, [...newData.finalData]);
+  //   }
+  // }
 };
 

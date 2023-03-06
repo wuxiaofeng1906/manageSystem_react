@@ -11,14 +11,14 @@ export default () => {
   // 旧的公告数据，用于修改公告 -- 升级公告详情界面数据（公共数据）
   const [oldCommonData, setOldCommonData] = useState<any>(null);
   // 旧的公告数据，用于修改公告 -- 升级公告详情界面数据（弹窗数据）
-  const [oldAnPopData, setOldAnnPopData] = useState<any>([]);
+  // const [oldAnPopData, setOldAnnPopData] = useState<any>([]);
 
   return {
     commonData, setCommonData,
     anPopData, setAnnPopData,
     showPulishButton, setShowPulishButton,
     oldCommonData, setOldCommonData,
-    oldAnPopData, setOldAnnPopData
+    // oldAnPopData, setOldAnnPopData
 
   };
 };

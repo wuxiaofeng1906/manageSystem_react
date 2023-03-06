@@ -129,32 +129,35 @@ const getSpecialData = (data: any, isCarousel: boolean) => {
   }
 
   let finalPtGroup: any = [];
-  ptGroupData.map((v: any) => {
+  if (ptGroupData) {
+    ptGroupData.map((v: any) => {
 
-    const child = v.children;
-    const childGroup: any = [];
-    if (child && child.length > 0) {
-      child.map((m: any) => {
+      const child = v.children;
+      const childGroup: any = [];
+      if (child && child.length > 0) {
+        child.map((m: any) => {
 
-        childGroup.push({
-          first: m.speciality,
-          id: m.id,
-          parentId: m.parentId,
+          childGroup.push({
+            first: m.speciality,
+            id: m.id,
+            parentId: m.parentId,
+          });
         });
-      });
-    } else {
-      childGroup.push({
-        first: "",
-      });
-    }
+      } else {
+        childGroup.push({
+          first: "",
+        });
+      }
 
-    finalPtGroup.push({
-      first: v.speciality,
-      id: v.id,
-      parentId: v.parentId,
-      seconds: childGroup
-    })
-  });
+      finalPtGroup.push({
+        first: v.speciality,
+        id: v.id,
+        parentId: v.parentId,
+        seconds: childGroup
+      })
+    });
+  }
+
   //   [{ //  格式
   //   first: "",
   //   seconds: [{"first": ""}]
@@ -186,32 +189,62 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
   if (!NoticeEdition || NoticeEdition.length === 0 || !NoticeEdition[0]) {
     return [];
   }
-  const {pages} = NoticeEdition[0];
+  const {pages, isCarousel, templateTypeId, pageSize} = NoticeEdition[0];
   if (!pages || pages.length === 0) {
     return [];
   }
 
-  // pages 里面有多少条数据，就有多少个tab
   const formData: any = [];
-  pages.map((v: any) => {
+  // 如果是弹窗，又不是轮播。则有一个数据。
+  if (templateTypeId === "2" && !isCarousel && pages) {
+    const tempData = pages[0];
     let contentData: any = {};
-    const {contents} = v;
+    const {contents} = tempData;
     if (contents && contents.length) {
-      contentData = getSpecialList(contents, (NoticeEdition[0]).isCarousel);
+      contentData = getSpecialList(contents, isCarousel);
     }
-
-    // 如果是非轮播，tabpage =0
     formData.push({
-      tabPage: v.pageNum,
+      tabPage: tempData.pageNum,
       tabsContent: {
-        id: v.id,
-        picLayout: v.layoutTypeId,
+        id: tempData.id,
+        picLayout: tempData.layoutTypeId,
         specialName: contentData.specialName, // 特性名称在content中，没有parentid的那一项
-        uploadPic: v.image,
-        yuQueUrl: v.yuQue,
+        uploadPic: tempData.image,
+        yuQueUrl: tempData.yuQue,
         ptyGroup: contentData.ptyGroup
       }
+    })
+  } else {
+    // pageSize 为几就有多少个tab，不能只看page 里面的数据条数
+    for (let i = 0; i < pageSize; i++) {
+      formData.push({
+        tabPage: i + 1,
+        tabsContent: {}
+      })
+    }
+
+    formData.map((v1: any) => {
+      pages.map((v: any) => {
+        if (v1.tabPage === v.pageNum) {
+          let contentData: any = {};
+          const {contents} = v;
+          if (contents && contents.length) {
+            contentData = getSpecialList(contents, isCarousel);
+          }
+          // 如果是非轮播，tabpage =0
+          v1.tabsContent = {
+            id: v.id,
+            picLayout: v.layoutTypeId,
+            specialName: contentData.specialName, // 特性名称在content中，没有parentid的那一项
+            uploadPic: v.image,
+            yuQueUrl: v.yuQue,
+            ptyGroup: contentData.ptyGroup
+          };
+        }
+      });
     });
-  });
+  }
+
+
   return formData;
 };

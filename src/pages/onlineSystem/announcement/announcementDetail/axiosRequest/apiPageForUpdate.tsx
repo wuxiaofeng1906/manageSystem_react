@@ -112,8 +112,68 @@ const updateForModulesAndCarousel = async (newCommonData: any, newPopData: any, 
 }
 // endregion
 
+
+const getSpecialListForUpdate = (ptyGroup: any) => {
+  const specialList: any = [];
+  ptyGroup.map((v: any) => {
+    const childList: any = [];
+    (v.seconds).map((v2: any) => {
+      if (!isEmpty(v2.first)) childList.push({id: v2.id, speciality: v2.first});
+    })
+    specialList.push({
+      id: v.id,
+      parentId:v.parentId,
+      speciality: v.first,
+      children: childList
+    });
+  });
+  return specialList;
+};
+
+// 不轮播时的数据
+const notCarouselDataForUpdate = (popupData: any) => {
+  // 相当于只有一个轮播页面
+  const {ptyGroup} = popupData;
+  const data = {
+    pages: [
+      {
+        image: popupData.uploadPic,
+        pageNum: 0, // 所属轮播页码
+        layoutTypeId: popupData.picLayout,
+        yuQue: popupData.yuQueUrl,
+        contents: getSpecialListForUpdate(ptyGroup)
+      }
+    ]
+  }
+  return data;
+};
+
+// 轮播时的数据
+const carouselDataForUpdate = (popupData: any) => {
+  debugger
+  if (!popupData || popupData.length === 0) return {};
+  // 轮播页数没填完的时候，只保存有数据的页面
+  const data: any = [];
+  popupData.map((v: any) => {
+    const {tabsContent} = v;
+    // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
+    if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
+      data.push({
+        id: tabsContent.id,
+        featureName: tabsContent.specialName,
+        image: tabsContent.uploadPic,
+        pageNum: v.tabPage,
+        layoutTypeId: tabsContent.picLayout,
+        contents: getSpecialListForUpdate(tabsContent.ptyGroup)
+      });
+    }
+  });
+  return {pages: data};
+};
+
 // 常规的修改：不涉及新增
 const normalUpdate = async (formData: any, popupData: any = []) => {
+  debugger
   const data: any = {
     id: formData.releaseId,
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
@@ -128,10 +188,10 @@ const normalUpdate = async (formData: any, popupData: any = []) => {
     // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
     if (formData.announce_carousel === 1) {
       data["pageSize"] = formData.carouselNum; // 轮播总页数
-      specialData = carouselDataForAdd(popupData);// 轮播
+      specialData = carouselDataForUpdate(popupData);// 轮播
     } else {
       data["pageSize"] = 0; // 不轮播的时候总页数为0
-      specialData = notCarouselDataForAdd(popupData[0]); // 不轮播
+      specialData = notCarouselDataForUpdate(popupData[0]); // 不轮播
     }
   }
   const relData = {...data, ...specialData};
@@ -266,52 +326,31 @@ const addOrDeleteMsg = async (newData: any, oldData: any, updateType: string) =>
 }
 
 // 判断弹窗数据（是否轮播，轮播页数，以及特性条数）是否改变
-const popupPageIsUpdate = (newData: any, oldData: any) => {
-  const {commonData, finalData} = newData;  // commonData, finalData  ==> 新数据
-  const {oldCommonData, oldAnPopData} = oldData; // oldCommonData, oldAnPopData ==> 旧数据
+const popupPageIsUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
+
   // 这个函数包含三种情况，1.新增或删除轮播页数  2.新增轮播页和相关属性 3.页面属性新增或者删除
   // 首先，判断是否轮播，如果不是轮播，则需要看特性项有没有改变过。如果是轮播，则继续判断其他情况
   debugger
-  // if (commonData.announce_carousel) {
-  //   const new_v = finalData[0]; // 不是轮播则只有一个数据、
-  //   const old_v = oldAnPopData.anPopData[0].tabsContent;
-  //   // 先判断一级特性
-  //   if ((new_v.ptyGroup).length !== (old_v.ptyGroup).length) {
-  //     return {status: true, type: "firstSpecity"};
-  //   }
-  //   //  再判断二级特性
-  //   const firstSpecial = new_v.ptyGroup;
-  //   const secondSpecial = new_v.ptyGroup;
-  //   for (let m = 0; m < firstSpecial.length; m++) {
-  //     const newFirstSp = firstSpecial[m];
-  //     const oldFirstSp = secondSpecial[m];
-  //     if (newFirstSp.seconds?.length !== oldFirstSp.seconds?.length) { // 二级特性个数不同
-  //       return {status: true, type: "secondSpecity"};
-  //       break
-  //     }
-  //   }
-  //
-  // }
-
 
   // 轮播页数：是否被修改过
-  if (commonData.carouselNum !== oldCommonData.carouselNum) {
+  if (newCommonData.carouselNum !== oldCommonData.carouselNum) {
     return {status: true, type: "carouselPage"};
   }
   // 轮播页数至少是1个，不是轮播也有一页特性
-  for (let i = 0; i < commonData.carouselNum - 1; i++) {
-    const newPopData = finalData[i];
-    const oldPopData = (oldAnPopData.anPopData)[i];
+  for (let i = 0; i < newCommonData.carouselNum - 1; i++) {
+    const newPopTemp = newPopData[i];
+    const oldPopTemp = oldPopData[i];
     // 如果是不轮播的数据
     let newPtGroup = [];
     let oldPtGroup = [];
-    if (!newPopData.tabPage) {
-      newPtGroup = newPopData.ptyGroup;
-      oldPtGroup = oldPopData.ptyGroup;
+    // 如果不是轮播
+    if (!newPopTemp.tabPage) {
+      newPtGroup = newPopTemp.ptyGroup;
+      oldPtGroup = oldPopTemp.ptyGroup;
     } else {
       // 如果是轮播的数据
-      newPtGroup = newPopData.tabsContent?.ptyGroup;
-      oldPtGroup = oldPopData.tabsContent?.ptyGroup;
+      newPtGroup = newPopTemp.tabsContent?.ptyGroup;
+      oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
     }
     if (newPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同，也不同
       return {status: true, type: "firstSpecity"};
@@ -338,48 +377,50 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     iteration: "",
     updatedTime: "",
     isCarousel: "",
-    description: ""
+    description: "",
+    carouselNum: 0
   };
   let oldPopData: any = [];
   const dts = await queryAnnounceDetail(releaseID);
   if (dts.NoticeEdition && (dts.NoticeEdition).length) {
-    const commonDatas = (dts.NoticeEdition)[0];
-    oldCommonData.templateTypeId = commonDatas.templateTypeId;
-    oldCommonData.iteration = commonDatas.iteration;
-    oldCommonData.updatedTime = commonDatas.updatedTime;
-    oldCommonData.isCarousel = commonDatas.isCarousel;
-    oldCommonData.description = commonDatas.description;
+    const temp = (dts.NoticeEdition)[0];
+    oldCommonData.templateTypeId = temp.templateTypeId;
+    oldCommonData.iteration = temp.iteration;
+    oldCommonData.updatedTime = temp.updatedTime;
+    oldCommonData.isCarousel = temp.isCarousel;
+    oldCommonData.description = temp.description;
+    oldCommonData.carouselNum = temp.pageSize;
     // 获取旧的数据，用于修改数据对比
     oldPopData = await dealPopDataFromService(dts.NoticeEdition);
   }
 
   debugger
+  // 是否轮播
+  const isCarsousel = oldCommonData?.isCarousel ? 1 : 0;
   // // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
   // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
   if (newCommonData.modules !== oldCommonData?.templateTypeId
-    || newCommonData?.announce_carousel !== oldCommonData?.isCarousel) {
+    || newCommonData?.announce_carousel !== isCarsousel) {
     return await updateForModulesAndCarousel(newCommonData, newPopData, oldCommonData, oldPopData);
   }
-  //   // 1.2 如果模板类型没有改变
-  // // 1.2.1 如果是消息模板，则直接调用常规修改接口
-  // else if (newData.commonData?.modules === "1") { // 如果是消息卡片
-  //   return await normalUpdate({...newData.commonData, releaseId: oldData.oldCommonData.releaseID});
-  // } else {
-  //   // // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过轮播页数和特性项
-  //
-  //   // 1.2.2.1 如果有修改过，则调用特殊修改接口
-  //   const updateType = popupPageIsUpdate(newData, oldData);
-  //   if (updateType.status) {
-  //     return await addOrDeleteMsg(newData, oldData, updateType.type);
-  //   }
-  //   // 1.2.2.2 如果没有修改过，则调用普通修改接口
-  //   else {
-  //
-  //     return await normalUpdate({
-  //       ...newData.commonData,
-  //       releaseId: oldData.oldCommonData.releaseID
-  //     }, [...newData.finalData]);
-  //   }
-  // }
+    // 1.2 如果模板类型没有改变
+  // 1.2.1 如果是消息模板，则直接调用常规修改接口
+  else if (newCommonData.modules === "1") { // 如果是消息卡片
+    return await normalUpdate({...newCommonData, releaseId: oldCommonData.id});
+  } else {
+    // 1.2.2 如果是弹窗，则需要判断有没有新增或删除过轮播页数和特性项
+    // 1.2.2.1 如果有修改过，则调用特殊修改接口
+    debugger
+    const updateType = popupPageIsUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
+    if (updateType.status) {
+      // return await addOrDeleteMsg(newData, oldData, updateType.type);
+    }
+    // 1.2.2.2 如果没有修改过，则调用普通修改接口
+    else {
+      return await normalUpdate(
+        {...newCommonData, releaseId: oldCommonData.id},
+        [...newPopData]);
+    }
+  }
 };
 

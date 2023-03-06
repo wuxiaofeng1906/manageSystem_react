@@ -60,7 +60,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 上传图片的进度
   const [picUpLoading, setPicUpLoading] = useState(false);
   useEffect(() => {
-    debugger
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
       // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
@@ -115,7 +114,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // tab切换
   const onTabsChange = (key: string) => {
-    debugger
     // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
     getPopupSource(currentTab);
     const oldList = [...anPopData];
@@ -137,6 +135,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 保存数据
   const onFinish = async (popData: any) => {
+    debugger
     let finalData = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {

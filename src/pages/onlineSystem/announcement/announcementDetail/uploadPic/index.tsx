@@ -1,8 +1,9 @@
-export const imgUrlHeader = "https://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-prod/q70j2x50gag001b/"
+export const imgUrlHeader = "http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-test/"
 export const defaultImgsUrl = [
-  '2023/02/c1948d76-4e9b-44e8-8439-16939dfa4e84.png',
-  '2023/02/33184b85-5079-4986-a573-da00917fb221.png',
-  '2023/02/3ebdd24a-daf7-46df-b15d-9b5bfb1b77e3.png'
+  "0/2023/03/0b2feb96-0295-4e2b-8179-1326ff072625.jpg",
+  "0/2023/03/7e413865-f78d-4dff-be2c-8e5ff1cd3f46.jpg",
+  "0/2023/03/4bef829b-a368-47ab-bc34-5701fa6d0be1.jpg",
+  "0/2023/03/8249dc6c-bab6-4304-b037-054e2bcf7dda.jpg"
 ];
 
 export const bannerTips = '图片支持jpg、jpeg、png等图片格式, 比例将自动为你裁剪为2.35：1，图片的大小不超过10M';

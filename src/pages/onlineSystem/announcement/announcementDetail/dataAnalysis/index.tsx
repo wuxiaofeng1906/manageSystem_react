@@ -39,6 +39,7 @@ export const vertifyFieldForCommon = (formInfo: any) => {
 
 // 验证字段的必填项(弹窗界面)
 export const vertifyFieldForPopup = (popDataArray: any) => {
+  debugger
   let value = true;
   for (let i = 0; i < popDataArray.length; i++) {
     let popData = popDataArray[i]; // 不可轮播的数据
@@ -46,24 +47,37 @@ export const vertifyFieldForPopup = (popDataArray: any) => {
     if (popDataArray[i].tabsContent) {
       popData = popDataArray[i].tabsContent;  // 可轮播的数据
     }
-    if (!popData.uploadPic) {
-      errorMessage("图片不能为空！");
-      value = false;
-      break;
+    debugger
+    let firstLevelEmpty = false;
+    if (popData && popData.length) {
+      for (let i2 = 0; i2 < (popData.ptyGroup).length; i2++) {
+
+        const v = (popData.ptyGroup)[i2];
+        if (!v || !v.first) {
+          firstLevelEmpty = true
+          errorMessage("一级特性不能为空！");
+          value = false;
+          break;
+        } else if (isEmpty((v.first).trim())) {
+          firstLevelEmpty = true
+          errorMessage("一级特性不能为空！");
+          value = false;
+        }
+      }
+    }else{
+      firstLevelEmpty = true
     }
 
-    for (let i2 = 0; i2 < (popData.ptyGroup).length; i2++) {
+    // 除了图文布局，其他只要有一个不为空，就需要判断图片是否为空
+    if (popData.specialName || popData.yuQueUrl || !firstLevelEmpty) {
 
-      const v = (popData.ptyGroup)[i2];
-      if (!v || !v.first) {
-        errorMessage("一级特性不能为空！");
+      if (!popData.uploadPic) {
+        errorMessage("图片不能为空！");
         value = false;
         break;
-      } else if (isEmpty((v.first).trim())) {
-        errorMessage("一级特性不能为空！");
-        value = false;
       }
     }
+
 
     if (!value) {
       break;

@@ -100,8 +100,10 @@ const Announce: React.FC<any> = (props: any) => {
       // 显示下一步按钮还是保存按钮
       if (formdata.modules === "2") { // 如果是弹窗的话，格式化
         // 还需要在state中保存弹窗的数据
-        setAnnPopData(dealPopDataFromService(NoticeEdition))
+        // const popData =
 
+        setAnnPopData(dealPopDataFromService(NoticeEdition))
+        // setOldAnnPopData([]);
         setStepShow({
           msgCard: "none",
           popCard: "inline"

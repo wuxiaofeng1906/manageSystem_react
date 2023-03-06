@@ -122,7 +122,7 @@ const getSpecialListForUpdate = (ptyGroup: any) => {
     })
     specialList.push({
       id: v.id,
-      parentId:v.parentId,
+      parentId: v.parentId,
       speciality: v.first,
       children: childList
     });
@@ -131,12 +131,15 @@ const getSpecialListForUpdate = (ptyGroup: any) => {
 };
 
 // 不轮播时的数据
-const notCarouselDataForUpdate = (popupData: any) => {
+const notCarouselDataForUpdate = (popupData: any, oldPopData: any = []) => {
+
+  debugger
   // 相当于只有一个轮播页面
   const {ptyGroup} = popupData;
   const data = {
     pages: [
       {
+        id: oldPopData[0].tabsContent.id, // 非轮播的page id在界面拿不到。
         image: popupData.uploadPic,
         pageNum: 0, // 所属轮播页码
         layoutTypeId: popupData.picLayout,
@@ -150,7 +153,6 @@ const notCarouselDataForUpdate = (popupData: any) => {
 
 // 轮播时的数据
 const carouselDataForUpdate = (popupData: any) => {
-  debugger
   if (!popupData || popupData.length === 0) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
@@ -172,7 +174,7 @@ const carouselDataForUpdate = (popupData: any) => {
 };
 
 // 常规的修改：不涉及新增
-const normalUpdate = async (formData: any, popupData: any = []) => {
+const normalUpdate = async (formData: any, popupData: any = [], oldPopData: any = []) => {
   debugger
   const data: any = {
     id: formData.releaseId,
@@ -191,7 +193,8 @@ const normalUpdate = async (formData: any, popupData: any = []) => {
       specialData = carouselDataForUpdate(popupData);// 轮播
     } else {
       data["pageSize"] = 0; // 不轮播的时候总页数为0
-      specialData = notCarouselDataForUpdate(popupData[0]); // 不轮播
+
+      specialData = notCarouselDataForUpdate(popupData[0], oldPopData); // 不轮播
     }
   }
   const relData = {...data, ...specialData};
@@ -419,7 +422,7 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     else {
       return await normalUpdate(
         {...newCommonData, releaseId: oldCommonData.id},
-        [...newPopData]);
+        [...newPopData], [...oldPopData]);
     }
   }
 };

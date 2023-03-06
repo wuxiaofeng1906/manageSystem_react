@@ -197,6 +197,7 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
   const formData: any = [];
   // 如果是弹窗，又不是轮播。则有一个数据。
   if (templateTypeId === "2" && !isCarousel && pages) {
+    debugger
     const tempData = pages[0];
     let contentData: any = {};
     const {contents} = tempData;

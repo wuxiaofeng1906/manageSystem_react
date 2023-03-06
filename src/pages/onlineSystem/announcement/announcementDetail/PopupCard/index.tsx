@@ -62,6 +62,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   useEffect(() => {
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
+      debugger
       // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
       if (oldCommonData.announce_carousel === commonData.announce_carousel) {
         // 展示第一个tab的数据即可。
@@ -141,8 +142,9 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (commonData?.announce_carousel === 1) {
       finalData = getPopupSource(currentTab);
     } else {
-      // 不是轮播，需要把图片路径放进去
+      // 不是轮播，需要把图片路径放进去.如果是修改的话还需要轮播旧数据的id
       popData.uploadPic = picModalState.checkedImg;
+
       finalData.push(popData);
     }
     if (vertifyFieldForPopup(finalData)) {

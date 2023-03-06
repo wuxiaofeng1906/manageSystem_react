@@ -266,8 +266,11 @@ const PopupCard: React.FC<any> = (props: any) => {
                 <img key={picModalState.checkedImg} data-value={picModalState.checkedImg}
                      src={`${imgUrlHeader}${picModalState.checkedImg}`}
                      alt="默认图" style={{height: 100, width: 150}}
-                     onClick={() => setPicModalState({...picModalState, visible: true})}/>
-                :
+                     onClick={() => {
+                       setFileList([]);
+                       setPicModalState({...picModalState, visible: true})
+                     }
+                     }/> :
                 <Button type="default" icon={<UploadOutlined/>}
                         style={{color: "#1890FF", border: "none"}}
                         onClick={() => setPicModalState({...picModalState, visible: true})}>选择/上传
@@ -373,7 +376,10 @@ const PopupCard: React.FC<any> = (props: any) => {
       {/* 图片上传弹出框 picModalState.visible */}
       <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
              onOk={uploadPicClick}
-             onCancel={() => setPicModalState({checkedImg: "", visible: false})}
+             onCancel={() => {
+               setPicModalState({checkedImg: "", visible: false})
+             }}
+             closable={false}
              width={700}>
         <Spin spinning={picUpLoading} size={"large"} tip={"图片上传中，请稍等..."}>
           <div className={style.imgComponentBox}>

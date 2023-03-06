@@ -33,16 +33,11 @@ export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
   formdata.append("x-amz-credential", data["x-amz-credential"]);
   formdata.append("Content-Type", data["Content-Type"]);
   formdata.append("policy", data["policy"]);
-  // 获取二进制文件
-  const temp: any = await getBase64(picFile.originFileObj);
-  formdata.append("file", temp.toString());
+
+  formdata.append("file", picFile.originFileObj);
   const result = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, formdata);
-  // 返回二进制流测试
-  return {result, temp};
-  // console.log(result)
-  // http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-test
-  // const result = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, data);
-  // return result;
+  return {result};
+
 };
 
 

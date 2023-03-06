@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
   Button, Form, Input, Row, Col, Modal, Upload, Radio, Tabs, Divider, Layout,
@@ -33,6 +33,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     visible: false,
     checkedImg: ""
   });
+
+  const picString = useRef("");
   // 语雀数据导入（加载）使用
   const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
 
@@ -59,6 +61,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 上传图片的进度
   const [picUpLoading, setPicUpLoading] = useState(false);
+
   useEffect(() => {
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
@@ -168,7 +171,8 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 选择图片时
   const picChecked = (e: any) => {
     if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
-      setPicModalState({...picModalState, checkedImg: e.target.dataset.value})
+      setPicModalState({...picModalState, checkedImg: e.target.dataset.value});
+      // picString.current =
     }
   };
   // 点击确定按钮
@@ -187,15 +191,10 @@ const PopupCard: React.FC<any> = (props: any) => {
       if (s3Info) {
         // 再上传到服务器
         const upResult = await uploadPicToS3(s3Info, fileList[0]);
-        document.getElementById("file_img").src = upResult.temp;
 
         if (upResult.result && upResult.result.status === 204) {
-          // const picUrl = `${s3Info.url}/${s3Info.fields?.key}`;
-
-          // console.log("requestResult", upResult.result);
-          // upResult.result.headers.location 中就是返回的最终地址
-          console.log("finalUrl", upResult.result.headers.location);
-          setPicModalState({checkedImg: upResult.result.headers.location, visible: false});
+          debugger
+          setPicModalState({checkedImg: s3Info.fields?.key, visible: false});
 
         } else {
           errorMessage("图片上传失败");
@@ -434,10 +433,6 @@ const PopupCard: React.FC<any> = (props: any) => {
                 </ImgCrop>
               </div>
               <div className={style.hintInfo}>{bannerTips}</div>
-            </div>
-            <div>
-              <img id={"file_img"} style={{width: 200, height: 100}}>
-              </img>
             </div>
           </div>
         </Spin>

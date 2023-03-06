@@ -122,17 +122,19 @@ const PopupCard: React.FC<any> = (props: any) => {
     // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
     getPopupSource(currentTab);
     const oldList = [...anPopData];
-    oldList.map((v: any) => {
+    for (let i = 0; i < oldList.length; i++) {
+      const v = oldList[i];
       if (v.tabPage === Number(key) && JSON.stringify(v.tabsContent) !== "{}") {
         dtForm.setFieldsValue(v.tabsContent);
-        setPicModalState({...picModalState, checkedImg: v.tabsContent.uploadPic})
+        setPicModalState({...picModalState, checkedImg: v.tabsContent.uploadPic});
+        break;
       } else {
         dtForm.resetFields();
         dtForm.setFieldsValue({"picLayout": "1"});
         setPicModalState({...picModalState, checkedImg: ""})
       }
+    }
 
-    });
     //  需要最后再赋值当前tab页码
     currentTab = Number(key);
   };

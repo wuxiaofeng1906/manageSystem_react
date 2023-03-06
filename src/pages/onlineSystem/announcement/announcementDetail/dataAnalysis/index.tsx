@@ -49,7 +49,7 @@ export const vertifyFieldForPopup = (popDataArray: any) => {
     }
     debugger
     let firstLevelEmpty = false;
-    if (popData && popData.length) {
+    if (popData.ptyGroup && (popData.ptyGroup).length) {
       for (let i2 = 0; i2 < (popData.ptyGroup).length; i2++) {
 
         const v = (popData.ptyGroup)[i2];
@@ -62,9 +62,10 @@ export const vertifyFieldForPopup = (popDataArray: any) => {
           firstLevelEmpty = true
           errorMessage("一级特性不能为空！");
           value = false;
+          break
         }
       }
-    }else{
+    } else {
       firstLevelEmpty = true
     }
 

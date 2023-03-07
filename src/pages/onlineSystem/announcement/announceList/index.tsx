@@ -39,6 +39,7 @@ const announceList = () => {
 
   // 获取列表数据
   const getList = async (page = 1, page_size = pages.page_size) => {
+    debugger
     setSpinning(true);
     try {
       const res = await getAnnounceList(page, page_size);

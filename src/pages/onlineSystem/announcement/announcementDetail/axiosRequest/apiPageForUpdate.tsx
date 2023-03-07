@@ -6,7 +6,7 @@ import {dealPopDataFromService} from "../dataAnalysis/index"
 
 // 修改的api
 const updateApi = async (data: any) => {
-
+  debugger
   const result = await axiosPut('/api/77hub/notice', data);
   return result;
 }
@@ -174,8 +174,7 @@ const carouselDataForUpdate = (popupData: any) => {
 };
 
 // 常规的修改：不涉及新增
-const normalUpdate = async (formData: any, popupData: any = [], oldPopData: any = []) => {
-  debugger
+const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) => {
   const data: any = {
     id: formData.releaseId,
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
@@ -346,8 +345,8 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
             rootSpecialId = n.parentId;
           }
 
-          // 如果旧的ID没有再新的ID集合中，表示旧的ID是需要删除的
-          if (n.id && !newIds.includes(n.id)) {
+          // 如果旧的ID没有在新的ID集合中，表示旧的ID是需要删除的
+          if (!newIds.includes(n.id)) {
             deletedId.push(n.id);
           }
         });
@@ -428,7 +427,7 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
 
 // 轮播页发生改变
 const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
-  debugger
+
   let page: any = [];
   // if (oldCommonData.carouselNum > newCommonData.carouselNum) {
   //  轮播页减少,删除最后几张的轮播页数(特性可能会被修改)
@@ -547,7 +546,6 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     oldPopData = await dealPopDataFromService(dts.NoticeEdition, true);
   }
 
-  debugger
   // 是否轮播
   const isCarsousel = oldCommonData?.isCarousel ? 1 : 0;
   // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
@@ -555,9 +553,7 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     || newCommonData?.announce_carousel !== isCarsousel) {
     // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
     return await updateForModulesAndCarousel(newCommonData, newPopData, oldCommonData, oldPopData);
-  }
-  // 1.2 如果模板类型没有改变
-  else if (newCommonData.modules === "1") {
+  } else if (newCommonData.modules === "1") {  // 1.2 如果模板类型没有改变
     // 1.2.1 如果是消息模板，则直接调用常规修改接口
     const relData = normalUpdate({...newCommonData, releaseId: oldCommonData.id});
     return await updateApi(relData);
@@ -577,8 +573,6 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
         {...newCommonData, releaseId: oldCommonData.id},
         [...newPopData], [...oldPopData]);
     }
-    debugger
-    console.log(relData)
     return await updateApi(relData);
   }
 };

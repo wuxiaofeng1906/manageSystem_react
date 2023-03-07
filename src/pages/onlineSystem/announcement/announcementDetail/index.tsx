@@ -138,6 +138,7 @@ const Announce: React.FC<any> = (props: any) => {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
       getDataByReleaseId()
     } else if (commonData && !type) { // 下一页返回上来的数据
+      debugger
       // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
       // 以下是已有的数据（下一页返回或者历史记录）
       announcementForm.setFieldsValue({
@@ -154,12 +155,17 @@ const Announce: React.FC<any> = (props: any) => {
           popCard: "none"
         });
       } else {
+        if (commonData.announce_carousel === 0) {
+          //   不轮播，不展示轮播页数
+          setCarouselNumShow("none");
+        } else {
+          setCarouselNumShow("inline");
+        }
         setStepShow({
           msgCard: "none",
           popCard: "inline"
         });
       }
-      setCarouselNumShow("inline");
     } else {
       errorMessage("数据获取错误！")
     }
@@ -168,22 +174,22 @@ const Announce: React.FC<any> = (props: any) => {
   const saveMsgInfo = async () => {
     const formInfo = announcementForm.getFieldsValue();
     // 这个点击保存的，模板一定是消息卡片
-      if (vertifyFieldForCommon(formInfo)) {
-        let result: any;
-        // 新增和修改调用不一样的接口
-        if (type === "detail") {
-          result = await updateAnnouncement(releaseID,formInfo, oldCommonData);
-        } else if (type === "add") {
-          result = await saveAnnounceContent({...formInfo});
-        }
-        if (result.ok) {
-          sucMessage("保存成功！");
-          history.push('./announceList')
-          return;
-        } else {
-          result.message ? errorMessage(result.message) : errorMessage("保存失败！");
-        }
+    if (vertifyFieldForCommon(formInfo)) {
+      let result: any;
+      // 新增和修改调用不一样的接口
+      if (type === "detail") {
+        result = await updateAnnouncement(releaseID, formInfo, oldCommonData);
+      } else if (type === "add") {
+        result = await saveAnnounceContent({...formInfo});
       }
+      if (result.ok) {
+        sucMessage("保存成功！");
+        history.push('./announceList')
+        return;
+      } else {
+        result.message ? errorMessage(result.message) : errorMessage("保存失败！");
+      }
+    }
   };
 
   // 一键发布

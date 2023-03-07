@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider,Modal} from 'antd';
+import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Modal, Space} from 'antd';
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
 import moment from 'moment';
@@ -23,12 +23,14 @@ const Announce: React.FC<any> = (props: any) => {
   const {
     commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData
   } = useModel('announcement');
-
+  // 轮播页面改小的选择
+  const [pageChoice, setPageChoice] = useState(false);
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
   // const [leaveShow, setLeaveShow] = useState(false);
   // 公告列表过来的数据（releaseName:公告名称, releaseID：公告id, type：新增还是删除）
   const {releaseName, releaseID, type} = props.location?.query;
   const [announcementForm] = Form.useForm();
+  const [carousePageForm] = Form.useForm();
   // 如果是消息卡片，则显示一键发布和保存按钮，如果是弹窗卡片，则显示下一步按钮
   const [stepShow, setStepShow] = useState<any>({
     msgCard: "inline",
@@ -52,25 +54,29 @@ const Announce: React.FC<any> = (props: any) => {
       popCard: "inline"
     });
     if (announcementForm.getFieldValue("announce_carousel") === 1) setCarouselNumShow("inline");
-  }
+  };
+
+  const goToNext = (formInfo: any, isClearAllTab: any = undefined) => {
+    setCommonData({...formInfo, clearTabContent: isClearAllTab});
+    history.push('/onlineSystem/PopupCard' + props.location?.search);
+  };
+
   // 跳转到下一页
-  const toNextPage = () => {
+  const nextPageClick = () => {
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
+    debugger
     if (vertifyFieldForCommon(formInfo)) {
       // 如果轮播页数减少，需要进行提示，是删除那些页。
       // 轮播图张数已改小，请选择删除轮播页面
       // 删除全部内容，重新创建
       // 删除后面多余张数的内容
       // 取消/确定
-      debugger
-      const commonData = {...formInfo, clearTabContent: false};
       if (oldCommonData.carouselNum > formInfo.carouselNum) {
-        commonData.clearTabContent = true;
+        setPageChoice(true);
+      } else {
+        goToNext(formInfo);
       }
-      console.log(oldCommonData)
-      setCommonData({...formInfo});
-      history.push('/onlineSystem/PopupCard' + props.location?.search);
     }
   };
 
@@ -307,7 +313,7 @@ const Announce: React.FC<any> = (props: any) => {
           <div id={"popup"} style={{display: stepShow.popCard}}>
             <Button
               type="primary" className={style.saveButtonStyle}
-              style={{marginLeft: 10}} onClick={toNextPage}>下一步
+              style={{marginLeft: 10}} onClick={nextPageClick}>下一步
             </Button>
           </div>
           {/* 消息卡片操作 */}
@@ -324,10 +330,29 @@ const Announce: React.FC<any> = (props: any) => {
         </Footer>
       </div>
 
-      <Modal title="Basic Modal" visible={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+      <Modal title="轮播页操作" visible={pageChoice}
+             onOk={() => {
+               debugger
+               const v = carousePageForm.getFieldValue("clearChoice");
+               //继续跳转到下一页
+               goToNext(announcementForm.getFieldsValue(), v ? true : false);
+             }}
+             onCancel={() => {
+               setPageChoice(false);
+             }}>
+        <Form form={carousePageForm}>
+
+          <p>轮播图张数已改小，请选择删除轮播页面:</p>
+          <Form.Item name={'clearChoice'} style={{textIndent: "10px"}}>
+            <Radio.Group defaultValue={false}>
+              <Space direction="vertical">
+                <Radio value={false}>删除后面多余张数的内容</Radio>
+                <Radio value={true}>删除全部内容，重新创建</Radio>
+              </Space>
+            </Radio.Group>
+          </Form.Item>
+        </Form>
+
       </Modal>
 
     </PageContainer>

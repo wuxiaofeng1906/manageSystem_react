@@ -120,7 +120,8 @@ const parTree = (oraData: any) => {
 // 递归解析数据
 // @specialName 特性名称，用于判断是否有哦parentid
 //@isCarousel 是否轮播
-const getSpecialData = (data: any, isCarousel: boolean) => {
+const getSpecialData = (data: any, isCarousel: boolean, updateGet: boolean) => {
+  debugger
 
   let ptGroupData = parTree(data);
   // 如果是轮播的话，第一个特性需要去除掉，才是下面的子特性
@@ -143,7 +144,8 @@ const getSpecialData = (data: any, isCarousel: boolean) => {
             parentId: m.parentId,
           });
         });
-      } else {
+      } else if (!updateGet) {
+        // 如果是修改时查数据，就不添加空数据了，空数据只是为了前端展示时二级特性至少有一个。
         childGroup.push({
           first: "",
         });
@@ -167,7 +169,7 @@ const getSpecialData = (data: any, isCarousel: boolean) => {
 };
 
 // 获取特性树
-const getSpecialList = (contents: any, isCarousel: boolean) => {
+const getSpecialList = (contents: any, isCarousel: boolean, updateGet: boolean) => {
   const contentData: any = {
     ptyGroup: [],
     specialName: ""
@@ -181,11 +183,12 @@ const getSpecialList = (contents: any, isCarousel: boolean) => {
       oraSpecialList.push(v);
     }
   });
-  contentData.ptyGroup = getSpecialData(contents, isCarousel);
+  contentData.ptyGroup = getSpecialData(contents, isCarousel, updateGet);
   return contentData;
 };
-// 处理从服务器获取过来的弹窗数据放到state中
-export const dealPopDataFromService = (NoticeEdition: any) => {
+// 处理从服务器获取过来的弹窗数据放到state中(updateGet 在修改时的数据获取)
+export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = false) => {
+  debugger
   if (!NoticeEdition || NoticeEdition.length === 0 || !NoticeEdition[0]) {
     return [];
   }
@@ -197,12 +200,11 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
   const formData: any = [];
   // 如果是弹窗，又不是轮播。则有一个数据。
   if (templateTypeId === "2" && !isCarousel && pages) {
-    debugger
     const tempData = pages[0];
     let contentData: any = {};
     const {contents} = tempData;
     if (contents && contents.length) {
-      contentData = getSpecialList(contents, isCarousel);
+      contentData = getSpecialList(contents, isCarousel, updateGet);
     }
     formData.push({
       tabPage: tempData.pageNum,
@@ -230,7 +232,7 @@ export const dealPopDataFromService = (NoticeEdition: any) => {
           let contentData: any = {};
           const {contents} = v;
           if (contents && contents.length) {
-            contentData = getSpecialList(contents, isCarousel);
+            contentData = getSpecialList(contents, isCarousel, updateGet);
           }
           // 如果是非轮播，tabpage =0
           v1.tabsContent = {

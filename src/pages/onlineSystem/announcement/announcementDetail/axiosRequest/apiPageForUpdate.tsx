@@ -175,6 +175,7 @@ const carouselDataForUpdate = (popupData: any) => {
 
 // 常规的修改：不涉及新增
 const normalUpdate = async (formData: any, popupData: any = [], oldPopData: any = []) => {
+  debugger
   const data: any = {
     id: formData.releaseId,
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
@@ -429,93 +430,93 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
 const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
   debugger
   let page: any = [];
-  if (oldCommonData.carouselNum > newCommonData.carouselNum) {
-    //  轮播页减少,删除最后几张的轮播页数(特性可能会被修改)
+  // if (oldCommonData.carouselNum > newCommonData.carouselNum) {
+  //  轮播页减少,删除最后几张的轮播页数(特性可能会被修改)
 
-    let modifyPopData = []
-    for (let i = 0; i < oldCommonData.carouselNum; i++) {
-      const pageDt = newPopData[i].tabsContent;
-      if (i > newCommonData.carouselNum - 1) {
-        // 需要删除的page
-        page.push({
-          id: pageDt.id,
-          editFlag: "delete",
-        })
-      } else {
-        modifyPopData.push(newPopData[i]);
-      }
-    }
-
-    if (modifyPopData.length > 0) {
-      // 判断一级特性是否修改过:是否可以不进行改变判断，直接取获取数据
-      // if (firstSpecialIsUpdate(newCommonData, modifyPopData, oldPopData)) {
-      const specialItem = firstSpecialDataUpdate(newCommonData, modifyPopData, oldCommonData, oldPopData);
-
-      page = page.concat(specialItem);
-      // }
-    }
-    debugger;
-    return {
-      id: oldCommonData.id,
-      pageSize: newCommonData.carouselNum,
-      iteration: newCommonData.announce_name,
-      updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm:ss"),
-      description: newCommonData.announce_content,
-      pages: page
-    }
-
-  } else if (oldCommonData.carouselNum < newCommonData.carouselNum) {
-    // 新增轮播页
-    let page: any = [];
-    //  拿最后新增的
-    for (let i = oldCommonData.carouselNum; i < newCommonData.carouselNum; i++) {
-      const pageDt = newPopData[i].tabsContent;
-      const content: any = [];
-
-      (pageDt.ptyGroup).map((v: any) => {
-
-        // 二级特性
-        const secondLevel: any = [];
-        const second = v.seconds;
-        second.map((v2: any) => {
-          if (v2.first) {
-            secondLevel.push({
-              speciality: v2.first,
-              editFlag: "add"
-            })
-          }
-        });
-        content.push({
-          speciality: v.first,
-          editFlag: "add",
-          children: secondLevel
-        });
-      });
+  let modifyPopData = []
+  for (let i = 0; i < oldCommonData.carouselNum; i++) {
+    const pageDt = newPopData[i].tabsContent;
+    if (i > newCommonData.carouselNum - 1) {
+      // 需要删除的page
       page.push({
-        image: pageDt.uploadPic,
-        pageNum: newPopData[i].tabPage,
-        layoutTypeId: pageDt.picLayout,
-        editFlag: "add",
-        contents: [{
-          speciality: pageDt.specialName,
-          editFlag: "add",
-          children: content
-        }]
+        id: pageDt.id,
+        editFlag: "delete",
       })
-    }
-    return {
-      id: oldCommonData.id,
-      pageSize: newCommonData.carouselNum,
-      iteration: newCommonData.announce_name,
-      updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm:ss"),
-      description: newCommonData.announce_content,
-      // 模板类型和是否轮播不能修改
-      // "templateTypeId": newCommonData.modules,
-      // "isCarousel": true,
-      pages: page
+    } else {
+      modifyPopData.push(newPopData[i]);
     }
   }
-  return {}
+
+  if (modifyPopData.length > 0) {
+    // 判断一级特性是否修改过:是否可以不进行改变判断，直接取获取数据
+    // if (firstSpecialIsUpdate(newCommonData, modifyPopData, oldPopData)) {
+    const specialItem = firstSpecialDataUpdate(newCommonData, modifyPopData, oldCommonData, oldPopData);
+
+    page = page.concat(specialItem);
+    // }
+  }
+  debugger;
+  return {
+    id: oldCommonData.id,
+    pageSize: newCommonData.carouselNum,
+    iteration: newCommonData.announce_name,
+    updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm:ss"),
+    description: newCommonData.announce_content,
+    pages: page
+  }
+  //
+  // } else if (oldCommonData.carouselNum < newCommonData.carouselNum) {
+  //   // 新增轮播页
+  //   let page: any = [];
+  //   //  拿最后新增的
+  //   for (let i = oldCommonData.carouselNum; i < newCommonData.carouselNum; i++) {
+  //     const pageDt = newPopData[i].tabsContent;
+  //     const content: any = [];
+  //
+  //     (pageDt.ptyGroup).map((v: any) => {
+  //
+  //       // 二级特性
+  //       const secondLevel: any = [];
+  //       const second = v.seconds;
+  //       second.map((v2: any) => {
+  //         if (v2.first) {
+  //           secondLevel.push({
+  //             speciality: v2.first,
+  //             editFlag: "add"
+  //           })
+  //         }
+  //       });
+  //       content.push({
+  //         speciality: v.first,
+  //         editFlag: "add",
+  //         children: secondLevel
+  //       });
+  //     });
+  //     page.push({
+  //       image: pageDt.uploadPic,
+  //       pageNum: newPopData[i].tabPage,
+  //       layoutTypeId: pageDt.picLayout,
+  //       editFlag: "add",
+  //       contents: [{
+  //         speciality: pageDt.specialName,
+  //         editFlag: "add",
+  //         children: content
+  //       }]
+  //     })
+  //   }
+  //   return {
+  //     id: oldCommonData.id,
+  //     pageSize: newCommonData.carouselNum,
+  //     iteration: newCommonData.announce_name,
+  //     updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm:ss"),
+  //     description: newCommonData.announce_content,
+  //     // 模板类型和是否轮播不能修改
+  //     // "templateTypeId": newCommonData.modules,
+  //     // "isCarousel": true,
+  //     pages: page
+  //   }
+  // }
+  // return {}
 };
 
 
@@ -543,7 +544,7 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     oldCommonData.description = temp.description;
     oldCommonData.carouselNum = temp.pageSize;
     // 获取旧的数据，用于修改数据对比
-    oldPopData = await dealPopDataFromService(dts.NoticeEdition);
+    oldPopData = await dealPopDataFromService(dts.NoticeEdition, true);
   }
 
   debugger

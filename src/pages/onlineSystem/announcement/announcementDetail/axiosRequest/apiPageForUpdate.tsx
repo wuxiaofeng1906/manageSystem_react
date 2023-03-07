@@ -414,10 +414,10 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
       image: tabsContent.uploadPic,
       pageNum: v1.tabPage,
       layoutTypeId: tabsContent.picLayout,
-      contents: {
+      contents: [{
         id: rootSpecialId,
         children: content
-      }
+      }]
     })
 
   });

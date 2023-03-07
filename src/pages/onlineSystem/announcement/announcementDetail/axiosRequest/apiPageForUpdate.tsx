@@ -204,54 +204,61 @@ const normalUpdate = async (formData: any, popupData: any = [], oldPopData: any 
 
 
 // 轮播页发生改变
-const carousePageUpdate = (commonData: any, finalData: any, oldCommonData: any, oldAnPopData: any) => {
+const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
   debugger
 
-  // const oldData = oldAnPopData.anPopData;
 
-  if (oldCommonData.carouselNum > commonData.carouselNum) {
-    //  轮播页减少,删除之前的轮播也
+  if (oldCommonData.carouselNum > newCommonData.carouselNum) {
+    //  轮播页减少,删除之前的轮播页数
     return {}
-  } else if (oldCommonData.carouselNum < commonData.carouselNum) {
-    const addCount = commonData.carouselNum - oldCommonData.carouselNum;
+  } else if (oldCommonData.carouselNum < newCommonData.carouselNum) {
     debugger
     let page: any = [];
-    for (let i = 0; i < addCount; i++) {
-      const pageDt = finalData[i].tabsContent;
+    //  拿最后新增的
+    for (let i = oldCommonData.carouselNum; i < newCommonData.carouselNum; i++) {
+      const pageDt = newPopData[i].tabsContent;
       const content: any = [];
 
-      (pageDt.ptyGroup).map((v: any, index: number) => {
+      (pageDt.ptyGroup).map((v: any) => {
 
-        content.push({
-          "$id": "1",
-          "speciality": pageDt.specialName,
-          "editFlag": "add"
-        }, {
-          "$id": "10000001",
-          "parentId": "1",
-          "speciality": v.first,
-          "editFlag": "add"
-        });
+        // 二级特性
+        const secondLevel: any = [];
         const second = v.seconds;
-        second.map((v2: any, index2: number) => {
+        second.map((v2: any) => {
           if (v2.first) {
-            content.push({
-              "$id": "20000001",
-              "parentId": "10000001",
+            secondLevel.push({
               "speciality": v2.first,
               "editFlag": "add"
             })
           }
-
+        });
+        content.push({
+          "speciality": v.first,
+          "editFlag": "add",
+          children: secondLevel
         });
       });
       page.push({
-        id: pageDt.id,
-        contents: content
+        image: pageDt.uploadPic,
+        pageNum: newPopData[i].tabPage,
+        layoutTypeId: pageDt.picLayout,
+        editFlag: "add",
+        contents: [{
+          "speciality": pageDt.specialName,
+          "editFlag": "add",
+          "children": content
+        }]
       })
     }
     return {
-      id: commonData.id,
+      id: oldCommonData.id,
+      pageSize: newCommonData.carouselNum,
+      iteration: newCommonData.announce_name,
+      updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm:ss"),
+      description: newCommonData.announce_content,
+      // 模板类型和是否轮播不能修改
+      // "templateTypeId": newCommonData.modules,
+      // "isCarousel": true,
       pages: page
     }
   }
@@ -261,7 +268,6 @@ const carousePageUpdate = (commonData: any, finalData: any, oldCommonData: any, 
 // 一级特性发生改变
 const firstSpecityUpdate = (commonData: any, finalData: any, oldCommonData: any, oldAnPopData: any) => {
   console.log(finalData, oldAnPopData);
-  debugger
 
 
   // 轮播页数至少是1个，不是轮播也有一页特性
@@ -302,23 +308,22 @@ const secondSpecityUpdate = (commonData: any, finalData: any, oldCommonData: any
 };
 
 // 弹窗- 新增（删除）page或特性 editFlag :detele，add
-const addOrDeleteMsg = async (newData: any, oldData: any, updateType: string) => {
-  const {commonData, finalData} = newData;  // commonData, finalData  ==> 新数据
-  const {oldCommonData, oldAnPopData} = oldData; // oldCommonData, oldAnPopData ==> 旧数据
+const addOrDeleteMsg = async (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any, updateType: string) => {
+
   debugger
   let relData: any;
   // 判断是哪种情况的修改。
   switch (updateType) {
     case "carouselPage": // 轮播页数不同
-      relData = carousePageUpdate(commonData, finalData, oldCommonData, oldAnPopData);
+      relData = carousePageUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
       break;
 
     case "firstSpecity": // 一级特性不同
-      relData = firstSpecityUpdate(commonData, finalData, oldCommonData, oldAnPopData);
+      relData = firstSpecityUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
       break;
 
     case "secondSpecity": // 二级特性不同
-      relData = secondSpecityUpdate(commonData, finalData, oldCommonData, oldAnPopData);
+      relData = secondSpecityUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
 
       break;
     default:
@@ -416,7 +421,7 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     debugger
     const updateType = popupPageIsUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
     if (updateType.status) {
-      // return await addOrDeleteMsg(newData, oldData, updateType.type);
+      return await addOrDeleteMsg(newCommonData, newPopData, oldCommonData, oldPopData, updateType.type);
     }
     // 1.2.2.2 如果没有修改过，则调用普通修改接口
     else {

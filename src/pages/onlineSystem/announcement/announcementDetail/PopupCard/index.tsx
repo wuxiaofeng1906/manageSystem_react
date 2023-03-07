@@ -107,6 +107,16 @@ const PopupCard: React.FC<any> = (props: any) => {
     specialList.uploadPic = picModalState.checkedImg;
     // 覆盖已有当前页的数据或者添加新数据
     const oldList = [...anPopData];
+    // 构造新增的tab数据框架
+    if (Number(commonData?.carouselNum) > oldList.length) {
+      for (let i = oldList.length; i < Number(commonData?.carouselNum); i++) {
+        oldList.push({
+          tabPage: i + 1,
+          tabsContent: {}
+        })
+      }
+    }
+    debugger
     oldList.map((v: any) => {
       console.log(v)
       v.tabPage === currentKey ? v.tabsContent = {...specialList, id: v.tabsContent.id} : v.tabsContent;

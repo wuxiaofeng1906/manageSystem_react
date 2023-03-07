@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider} from 'antd';
+import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider,Modal} from 'antd';
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
 import moment from 'moment';
@@ -58,6 +58,17 @@ const Announce: React.FC<any> = (props: any) => {
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
+      // 如果轮播页数减少，需要进行提示，是删除那些页。
+      // 轮播图张数已改小，请选择删除轮播页面
+      // 删除全部内容，重新创建
+      // 删除后面多余张数的内容
+      // 取消/确定
+      debugger
+      const commonData = {...formInfo, clearTabContent: false};
+      if (oldCommonData.carouselNum > formInfo.carouselNum) {
+        commonData.clearTabContent = true;
+      }
+      console.log(oldCommonData)
       setCommonData({...formInfo});
       history.push('/onlineSystem/PopupCard' + props.location?.search);
     }
@@ -202,6 +213,7 @@ const Announce: React.FC<any> = (props: any) => {
     }
   };
 
+
   return (
     <PageContainer>
       <Prompt
@@ -311,6 +323,13 @@ const Announce: React.FC<any> = (props: any) => {
           </div>
         </Footer>
       </div>
+
+      <Modal title="Basic Modal" visible={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
+
     </PageContainer>
   );
 };

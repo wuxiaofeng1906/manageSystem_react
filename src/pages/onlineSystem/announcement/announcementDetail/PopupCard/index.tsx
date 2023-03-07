@@ -67,12 +67,18 @@ const PopupCard: React.FC<any> = (props: any) => {
       debugger
       // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
       if (oldCommonData.announce_carousel === commonData.announce_carousel) {
-        // 展示第一个tab的数据即可。
-        dtForm.setFieldsValue(anPopData[0]?.tabsContent);
-        setPicModalState({
-          ...picModalState,
-          checkedImg: (anPopData[0]?.tabsContent).uploadPic
-        });
+        // 如果清空所有page页面为true，则也清空所有page数据，直接显示空数据
+        if (commonData.clearTabContent) { // 修改时，tabpage变小，用户选择清空所有tab重建
+          setEmptyForm();
+        } else {
+          // 展示第一个tab的数据即可。
+          dtForm.setFieldsValue(anPopData[0]?.tabsContent);
+          setPicModalState({
+            ...picModalState,
+            checkedImg: (anPopData[0]?.tabsContent).uploadPic
+          });
+        }
+
       } else {
         setEmptyForm();
       }
@@ -116,7 +122,6 @@ const PopupCard: React.FC<any> = (props: any) => {
         })
       }
     }
-    debugger
     oldList.map((v: any) => {
       console.log(v)
       v.tabPage === currentKey ? v.tabsContent = {...specialList, id: v.tabsContent.id} : v.tabsContent;
@@ -199,11 +204,8 @@ const PopupCard: React.FC<any> = (props: any) => {
       if (s3Info) {
         // 再上传到服务器
         const upResult = await uploadPicToS3(s3Info, fileList[0]);
-
         if (upResult.result && upResult.result.status === 204) {
-          debugger
           setPicModalState({checkedImg: s3Info.fields?.key, visible: false});
-
         } else {
           errorMessage("图片上传失败");
         }

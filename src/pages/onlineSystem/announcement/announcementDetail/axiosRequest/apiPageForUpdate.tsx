@@ -202,17 +202,51 @@ const normalUpdate = async (formData: any, popupData: any = [], oldPopData: any 
 
 };
 
+const specialDataUpdate = (newCommonData, modifyPopData, oldCommonData, oldPopData) => {
+
+};
 
 // 轮播页发生改变
 const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
   debugger
-
-
+  let page: any = [];
   if (oldCommonData.carouselNum > newCommonData.carouselNum) {
-    //  轮播页减少,删除之前的轮播页数
+    //  轮播页减少,删除最后几张的轮播页数(特性可能会被修改)
+
+    let modifyPopData = []
+    for (let i = 0; i < oldCommonData.carouselNum; i++) {
+      const pageDt = newPopData[i].tabsContent;
+      if (i > newCommonData.carouselNum - 1) {
+        // 需要删除的page
+        page.push({
+          id: pageDt.id,
+          editFlag: "delete",
+        })
+      } else {
+        modifyPopData.push(newPopData[i]);
+      }
+    }
+
+    if (modifyPopData.length > 0) {
+     const specialItem = specialDataUpdate(newCommonData, modifyPopData, oldCommonData, oldPopData);
+      page.push(specialItem);
+    }
+    return {
+      id: oldCommonData.id,
+      pageSize: newCommonData.carouselNum,
+      iteration: newCommonData.announce_name,
+      updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm:ss"),
+      description: newCommonData.announce_content,
+      // 模板类型和是否轮播不能修改
+      // "templateTypeId": newCommonData.modules,
+      // "isCarousel": true,
+      pages: page
+    }
+
+
     return {}
   } else if (oldCommonData.carouselNum < newCommonData.carouselNum) {
-    debugger
+
     let page: any = [];
     //  拿最后新增的
     for (let i = oldCommonData.carouselNum; i < newCommonData.carouselNum; i++) {
@@ -227,14 +261,14 @@ const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: a
         second.map((v2: any) => {
           if (v2.first) {
             secondLevel.push({
-              "speciality": v2.first,
-              "editFlag": "add"
+              speciality: v2.first,
+              editFlag: "add"
             })
           }
         });
         content.push({
-          "speciality": v.first,
-          "editFlag": "add",
+          speciality: v.first,
+          editFlag: "add",
           children: secondLevel
         });
       });
@@ -244,9 +278,9 @@ const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: a
         layoutTypeId: pageDt.picLayout,
         editFlag: "add",
         contents: [{
-          "speciality": pageDt.specialName,
-          "editFlag": "add",
-          "children": content
+          speciality: pageDt.specialName,
+          editFlag: "add",
+          children: content
         }]
       })
     }
@@ -330,7 +364,7 @@ const addOrDeleteMsg = async (newCommonData: any, newPopData: any, oldCommonData
       break;
   }
 
-  return await updateApi(relData);
+  // return await updateApi(relData);
 }
 
 // 判断弹窗数据（是否轮播，轮播页数，以及特性条数）是否改变

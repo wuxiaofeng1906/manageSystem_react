@@ -72,7 +72,7 @@ const Announce: React.FC<any> = (props: any) => {
       // 删除全部内容，重新创建
       // 删除后面多余张数的内容
       // 取消/确定
-      if (oldCommonData.carouselNum > formInfo.carouselNum) {
+      if (oldCommonData && oldCommonData.carouselNum > formInfo.carouselNum) {
         setPageChoice(true);
       } else {
         goToNext(formInfo);
@@ -331,8 +331,8 @@ const Announce: React.FC<any> = (props: any) => {
       </div>
 
       <Modal title="轮播页操作" visible={pageChoice}
+             centered maskClosable={false} destroyOnClose={true}
              onOk={() => {
-               debugger
                const v = carousePageForm.getFieldValue("clearChoice");
                //继续跳转到下一页
                goToNext(announcementForm.getFieldsValue(), v ? true : false);
@@ -340,7 +340,7 @@ const Announce: React.FC<any> = (props: any) => {
              onCancel={() => {
                setPageChoice(false);
              }}>
-        <Form form={carousePageForm}>
+        <Form form={carousePageForm} preserve={false}>
 
           <p>轮播图张数已改小，请选择删除轮播页面:</p>
           <Form.Item name={'clearChoice'} style={{textIndent: "10px"}}>

@@ -242,8 +242,10 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
 const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
   // 轮播页数至少是1个，不是轮播也有一页特性
   let updateValue = false;
-
-  for (let i = 0; i < newCommonData.carouselNum - 1; i++) {
+  debugger
+  // 如果是轮播，那么轮播页数就是所填写的数量，如果不是轮播，则只有一页
+  const carouselNum = newCommonData.announce_carousel === 1 ? newCommonData.carouselNum : 1;
+  for (let i = 0; i < carouselNum; i++) {
     const newPopTemp = newPopData[i];
     const oldPopTemp = oldPopData[i];
     // 如果是不轮播的数据
@@ -319,6 +321,25 @@ const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
   return children;
 };
 
+// 当删除一级特性后，所对应的二级特性也要删除
+const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
+  let children: any = [];
+  oldPopData.forEach((v2: any) => {
+    const v2_ptyGroup = v2.tabsContent?.ptyGroup;
+    v2_ptyGroup.map((n: any) => {
+      // 对应的一级特性数据
+      if (n.id === firstLevelId) {
+        (n.seconds).map((v: any) => {
+          children.push({
+            id: v.id,
+            editFlag: "delete"
+          })
+        })
+      }
+    });
+  });
+  return children;
+}
 
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
   debugger;
@@ -400,10 +421,11 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
     });
 
     // 将需要删除的id页保存进去
-    deletedId.map((id: number) => {
+    deletedId.map((id: string) => {
       content.push({
         id: id,
-        editFlag: "delete"
+        editFlag: "delete",
+        children: deleteSeconds(id, oldPopData)
       });
     })
     const {tabsContent} = v1;
@@ -435,7 +457,7 @@ const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: a
   let modifyPopData = []
   for (let i = 0; i < oldCommonData.carouselNum; i++) {
     const pageDt = newPopData[i].tabsContent;
-    if (i > newCommonData.carouselNum - 1) {
+    if (i > newCommonData.carouselNum - 1 && pageDt.id) {
       // 需要删除的page
       page.push({
         id: pageDt.id,
@@ -545,7 +567,7 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     // 获取旧的数据，用于修改数据对比
     oldPopData = await dealPopDataFromService(dts.NoticeEdition, true);
   }
-
+  debugger
   // 是否轮播
   const isCarsousel = oldCommonData?.isCarousel ? 1 : 0;
   // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。

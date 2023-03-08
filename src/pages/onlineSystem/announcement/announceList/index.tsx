@@ -96,6 +96,7 @@ const announceList = () => {
       title: '删除提醒',
       icon: <ExclamationCircleOutlined/>,
       content: content,
+      centered: true,
       onOk: async () => {
         const delResult = await deleteList(params.data.id);
         if (delResult.ok) {

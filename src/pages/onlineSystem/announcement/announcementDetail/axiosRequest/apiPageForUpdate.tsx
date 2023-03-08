@@ -342,10 +342,7 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
 }
 
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
-  debugger;
-
   const pages: any = [];
-
   modifyPopData.forEach((v1: any) => {
     const v1_ptyGroup = v1.tabsContent?.ptyGroup;
     // 用于记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id，不存在的id应该删除

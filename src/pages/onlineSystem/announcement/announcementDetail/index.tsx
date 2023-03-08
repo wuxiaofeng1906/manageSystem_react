@@ -233,14 +233,14 @@ const Announce: React.FC<any> = (props: any) => {
           <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
             {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
             <Radio.Group onChange={cardChanged}>
-              <Radio.Button value={"1"} className={style.buttonStyle}>
+              <Radio.Button value={"1"} style={{width: 140, height: 100}}>
                 <img
                   {...SIZE}
                   src={require('../../../../../public/msgCard.png')}
                 />
                 <span style={{marginLeft: 25}}>消息卡片</span>
               </Radio.Button>
-              <Radio.Button value={"2"} className={style.marginStyle}>
+              <Radio.Button value={"2"} style={{width: 140, height: 100, marginLeft: 25}}>
                 <img
                   {...SIZE}
                   src={require('../../../../../public/popCard.png')}

@@ -39,7 +39,6 @@ const announceList = () => {
 
   // 获取列表数据
   const getList = async (page = 1, page_size = pages.page_size) => {
-    debugger
     setSpinning(true);
     try {
       const res = await getAnnounceList(page, page_size);
@@ -78,12 +77,12 @@ const announceList = () => {
       releaseID = params?.data.id;
     }
     if (isEmpty(releaseName)) return errorMessage('数据异常');
+
     history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}`);
   };
 
   // 删除数据
   const onDelete = async (params: CellClickedEvent) => {
-    debugger
     if (!announcePermission?.().delete) return;
     // 判断是否关联了发布过程公告
     if (isEmpty(params.data.id)) return infoMessage('数据异常');

@@ -24,7 +24,7 @@ const {Footer} = Layout;
 const PopupCard: React.FC<any> = (props: any) => {
   const {
     commonData, anPopData, setAnnPopData,
-    showPulishButton, oldCommonData
+    showPulishButton, oldCommonData, setCommonData, setOldCommonData
   } = useModel('announcement');
   const {releaseName, releaseID, type} = props.location?.query;
   const [dtForm] = Form.useForm();
@@ -62,6 +62,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   const [picUpLoading, setPicUpLoading] = useState(false);
 
   useEffect(() => {
+    currentTab = 1;
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
       debugger
@@ -132,6 +133,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // tab切换
   const onTabsChange = (key: string) => {
+    debugger
     // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
     getPopupSource(currentTab);
     const oldList = [...anPopData];
@@ -153,7 +155,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 保存数据
   const onFinish = async (popData: any) => {
-    debugger
     let finalData = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {
@@ -167,6 +168,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (vertifyFieldForPopup(finalData)) {
       let result: any;
       if (type === "detail") {
+        debugger
         result = await updateAnnouncement(releaseID, commonData, finalData,);
       } else {
         result = await saveAnnounceContent(commonData, finalData);
@@ -174,6 +176,10 @@ const PopupCard: React.FC<any> = (props: any) => {
       // 需要验证必填项
       if (result.ok) {
         sucMessage("保存成功！");
+        // 清空state中原始数据
+        setAnnPopData([]);
+        setCommonData(null);
+        setOldCommonData(null);
         history.push('./announceList');
         return;
       }

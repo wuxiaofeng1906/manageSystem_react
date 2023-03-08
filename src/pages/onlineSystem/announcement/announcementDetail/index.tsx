@@ -65,7 +65,6 @@ const Announce: React.FC<any> = (props: any) => {
   const nextPageClick = () => {
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
-    debugger
     if (vertifyFieldForCommon(formInfo)) {
       // 如果轮播页数减少，需要进行提示，是删除那些页。
       // 轮播图张数已改小，请选择删除轮播页面
@@ -131,7 +130,10 @@ const Announce: React.FC<any> = (props: any) => {
 
 
   useEffect(() => {
-
+    // 不管怎样，先清空state
+    setCommonData(null);
+    setOldCommonData(null);
+    setAnnPopData([]);
     // 一键发布按钮是否展示
     pulishButtonVisible();
 
@@ -147,9 +149,6 @@ const Announce: React.FC<any> = (props: any) => {
         carouselNum: 5
       });
       setCarouselNumShow("none");
-      setCommonData(null);
-      setOldCommonData(null);
-      setAnnPopData([]);
       // setOldAnnPopData([]);
     } else if (type === "detail") {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段

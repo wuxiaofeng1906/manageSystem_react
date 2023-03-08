@@ -33,7 +33,7 @@ export const announcementListColumn: any = [
     field: 'updatedTime',
     minWidth: 160,
     cellRenderer: (v: any) => {
-      return dayjs(v.value).format("YYYY-MM-DD hh:mm:ss")
+      return dayjs(v.value).format("YYYY-MM-DD HH:mm:ss")
     }
   },
   {
@@ -53,7 +53,7 @@ export const announcementListColumn: any = [
     minWidth: 160,
     cellRenderer: (v: any) => {
       if (v.value) {
-        return dayjs(v.value).format('YYYY-MM-DD hh:mm:ss');
+        return dayjs(v.value).format('YYYY-MM-DD HH:mm:ss');
       }
       return "";
     }
@@ -69,7 +69,7 @@ export const announcementListColumn: any = [
     minWidth: 160,
     cellRenderer: (v: any) => {
       if (v.value) {
-        return dayjs(v.value).format("YYYY-MM-DD hh:mm:ss");
+        return dayjs(v.value).format("YYYY-MM-DD HH:mm:ss");
       }
       return "";
     }

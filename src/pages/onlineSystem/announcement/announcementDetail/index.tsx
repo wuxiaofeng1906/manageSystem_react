@@ -131,9 +131,9 @@ const Announce: React.FC<any> = (props: any) => {
 
   useEffect(() => {
     // 不管怎样，先清空state
-    setCommonData(null);
-    setOldCommonData(null);
-    setAnnPopData([]);
+    // setCommonData(null);
+    // setOldCommonData(null);
+    // setAnnPopData([]);
     // 一键发布按钮是否展示
     pulishButtonVisible();
 

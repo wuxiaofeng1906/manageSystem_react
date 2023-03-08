@@ -200,6 +200,20 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
   return relData;
 };
 
+//判断特性名称是否被改过(特性名称跟下面的一级特性是同一类型，是一级特性的上一层)
+const specialNameIsUpdate = (newPopData: any, oldPopData: any) => {
+  let state = false;
+  const pageCount = newPopData.length > oldPopData.length ? newPopData.length : oldPopData.length;
+  for (let i = 0; i < pageCount; i++) {
+    const newContent = newPopData[i].tabsContent;
+    const oldContent = oldPopData[i].tabsContent;
+    if (newContent.specialName !== oldContent.specialName) {
+      state = true;
+      break;
+    }
+  }
+  return state;
+};
 
 // 判断轮播页是否被修改
 const carouseNumIsUpdate = (newCommonData: any, oldCommonData: any) => {
@@ -242,7 +256,7 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
 const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
   // 轮播页数至少是1个，不是轮播也有一页特性
   let updateValue = false;
-  debugger
+
   // 如果是轮播，那么轮播页数就是所填写的数量，如果不是轮播，则只有一页
   const carouselNum = newCommonData.announce_carousel === 1 ? newCommonData.carouselNum : 1;
   for (let i = 0; i < carouselNum; i++) {
@@ -282,7 +296,6 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
 
 // 二级特性修改
 const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
-  debugger
   const children: any = [];
   const newIds: any = []; // 记录旧数据的id，拿来对比新数据用作删除，如果在新数据里找不到，则删除
   // 先添加新特性。记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id
@@ -340,7 +353,7 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
   });
   return children;
 }
-
+// 一级特性修改
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
   const pages: any = [];
   modifyPopData.forEach((v1: any) => {
@@ -426,7 +439,6 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
       });
     })
     const {tabsContent} = v1;
-    debugger
     pages.push({
       id: tabsContent.id,
       yuQue: tabsContent.yuQueUrl,
@@ -435,10 +447,10 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
       layoutTypeId: tabsContent.picLayout,
       contents: [{
         id: rootSpecialId,
+        speciality: tabsContent.specialName,
         children: content
       }]
-    })
-
+    });
   });
 
   return pages;
@@ -450,7 +462,6 @@ const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: a
   let page: any = [];
   // if (oldCommonData.carouselNum > newCommonData.carouselNum) {
   //  轮播页减少,删除最后几张的轮播页数(特性可能会被修改)
-
   let modifyPopData = []
   for (let i = 0; i < oldCommonData.carouselNum; i++) {
     const pageDt = newPopData[i].tabsContent;
@@ -469,7 +480,6 @@ const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: a
     // 判断一级特性是否修改过:是否可以不进行改变判断，直接取获取数据
     // if (firstSpecialIsUpdate(newCommonData, modifyPopData, oldPopData)) {
     const specialItem = firstSpecialDataUpdate(newCommonData, modifyPopData, oldCommonData, oldPopData);
-
     page = page.concat(specialItem);
     // }
   }
@@ -580,11 +590,12 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
   } else {
     // 1.2.2 如果是弹窗模板，还要看其他修改方向
     let relData: any;
+    const specialNameState = specialNameIsUpdate(newPopData, oldPopData);
     const carouseNumState = carouseNumIsUpdate(newCommonData, oldCommonData);  // 轮播页数是否修改
     const firstLevelState = firstSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 一级特性是否增加或者删除
     const secondLevelState = secondSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 二级特性是否增加或者删除
     // 如果只是修改过轮播页数，一级特性和二级特性都没有被修改过
-    if (carouseNumState || firstLevelState || secondLevelState) {
+    if (carouseNumState || firstLevelState || secondLevelState || specialNameState) {
       relData = carousePageUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
     } else {
       // 如果都没有被增加或者删除，则调用常规修改接口

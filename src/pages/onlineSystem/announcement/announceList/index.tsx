@@ -39,9 +39,10 @@ const announceList = () => {
 
   // 获取列表数据
   const getList = async (page = 1, page_size = pages.page_size) => {
+    const condition = form.getFieldsValue();
     setSpinning(true);
     try {
-      const res = await getAnnounceList(page, page_size);
+      const res = await getAnnounceList(page, page_size, condition.create_user, condition.create_time, condition.content);
       setSpinning(false);
 
       setList(res?.results);

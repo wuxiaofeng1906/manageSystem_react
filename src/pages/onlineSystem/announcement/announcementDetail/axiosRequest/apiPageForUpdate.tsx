@@ -10,6 +10,33 @@ const updateApi = async (data: any) => {
   return result;
 }
 
+// 根据获取旧的数据
+const getOldNoticeDetails = async (releaseID: string) => {
+  let oldCommonData = {
+    id: releaseID,
+    templateTypeId: "",
+    iteration: "",
+    updatedTime: "",
+    isCarousel: "",
+    description: "",
+    carouselNum: 0
+  };
+  let oldPopData: any = [];
+  const dts = await queryAnnounceDetail(releaseID);
+  if (dts.NoticeEdition && (dts.NoticeEdition).length) {
+    const temp = (dts.NoticeEdition)[0];
+    oldCommonData.templateTypeId = temp.templateTypeId;
+    oldCommonData.iteration = temp.iteration;
+    oldCommonData.updatedTime = temp.updatedTime;
+    oldCommonData.isCarousel = temp.isCarousel;
+    oldCommonData.description = temp.description;
+    oldCommonData.carouselNum = temp.pageSize;
+    // 获取旧的数据，用于修改数据对比
+    oldPopData = await dealPopDataFromService(dts.NoticeEdition, true);
+  }
+
+  return {oldCommonData, oldPopData};
+};
 
 // region 常规的修改
 const getSpecialListForUpdate = (ptyGroup: any) => {
@@ -253,6 +280,11 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
       newPtGroup = newPopTemp.tabsContent?.ptyGroup;
       oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
     }
+
+    if ((!newPtGroup && oldPtGroup) || (newPtGroup && !oldPtGroup)) {
+      updateValue = true;
+      break;
+    }
     if (newPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同，也不同
       updateValue = true;
       break
@@ -264,7 +296,6 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
 
 // 判断二级特性是否被修改
 const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
-  debugger
   let updateValue = false;
   // 如果是轮播，那么轮播页数就是所填写的数量，如果不是轮播，则只有一页
   const carouselNum = newCommonData.announce_carousel === 1 ? newCommonData.carouselNum : 1;
@@ -367,6 +398,7 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
 
 // 一级特性修改
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
+  debugger
   const pages: any = [];
   modifyPopData.forEach((v1: any) => {
     const v1_ptyGroup = v1.tabsContent?.ptyGroup;
@@ -380,14 +412,14 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
       });
     }
 
-    let rootSpecialId = ""; // 拿取根节点（特性名称）ID
+    let rootSpecialId = v1.tabsContent?.id; // 拿取根节点（特性名称）ID(如果是不轮播，根节点ID为tabsContent的id)
     const deletedId: any = [];    // 记录需要被删除的ID
     oldPopData.forEach((v2: any) => {
       if (v1.tabPage === v2.tabPage) {
         const v2_ptyGroup = v2.tabsContent?.ptyGroup;
         if (v2_ptyGroup && v2_ptyGroup.length) {
           v2_ptyGroup.map((n: any, index: number) => {
-            if (index === 0) { // 一级特性的父节点肯定是特性名称的根节点
+            if (index === 0 && newCommonData.announce_carousel === 1) { // 如果是轮播，一级特性的父节点肯定是特性名称的根节点
               rootSpecialId = n.parentId;
             }
 
@@ -403,7 +435,8 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
 
     // 用于记录特性数据
     const content: any = [];
-    if (v1_ptyGroup && v1_ptyGroup.length) {
+
+    if (v1.tabsContent && v1_ptyGroup && v1_ptyGroup.length) {
       v1_ptyGroup.map((m: any) => {
 
         // 有id则为修改，没有id则为新增
@@ -423,28 +456,38 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
           });
 
           let children = [];
-          if (oldSecondLevel) {
+          if (oldSecondLevel && oldSecondLevel.length) {
             children = secondSpecialDataUpdate(m.seconds, oldSecondLevel);
           }
-          content.push({
-            id: m.id,
-            speciality: m.first,
-            children: children
-          })
-        } else {
-          // 新增的一级特性（包含里面的二级特性）
-          let child: any = [];
+          if (m.first) {
+            content.push({
+              id: m.id,
+              speciality: m.first,
+              children: children
+            });
+          }
+        } else { // 新增的一级特性（包含里面的二级特性）
+
+          // 二级特性数据
+          let childs: any = [];
           (m.seconds).map((p: any) => {
-            child.push({
-              speciality: p.first,
+            if (p.first) {
+              childs.push({
+                speciality: p.first,
+                editFlag: "add",
+              });
+            }
+          });
+
+          if (m.first) {
+            // 一级特性
+            content.push({
+              speciality: m.first,
               editFlag: "add",
-            })
-          })
-          content.push({
-            speciality: m.first,
-            editFlag: "add",
-            children: child
-          })
+              children: childs
+            });
+          }
+
         }
       });
     }
@@ -458,23 +501,40 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
       });
     })
     const {tabsContent} = v1;
-    pages.push({
-      id: tabsContent.id,
-      yuQue: tabsContent.yuQueUrl,
-      image: tabsContent.uploadPic,
-      pageNum: v1.tabPage,
-      layoutTypeId: tabsContent.picLayout,
-      contents: [{
+
+    // 最上面的特性名称，有id则为修改，没有id则要添加add 属性
+    let specialItem = [];
+    if (rootSpecialId) {
+      specialItem.push({
         id: rootSpecialId,
         speciality: tabsContent.specialName,
         children: content
-      }]
-    });
+      })
+
+    } else if (content.length) {
+      specialItem.push({
+        editFlag: "add",
+        speciality: tabsContent.specialName,
+        children: content
+      })
+    }
+    //  有特性才会保存
+    if (specialItem.length) {
+      pages.push({
+        id: tabsContent.id,
+        yuQue: tabsContent.yuQueUrl,
+        image: tabsContent.uploadPic,
+        pageNum: v1.tabPage,
+        layoutTypeId: tabsContent.picLayout,
+        contents: specialItem
+      });
+    }
   });
 
   return pages;
 };
 
+// 新增轮播页
 const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any) => {
 
   // 新增轮播页
@@ -518,8 +578,9 @@ const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any)
   return page;
 }
 
-// 轮播页发生改变
-const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
+// 其他数据发生改变
+const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
+  debugger
   let page: any = [];
   //  轮播页减少,1.删除最后几张的轮播页数(特性可能会被修改) 2.删除所有的页面重建
   if (newCommonData.clearTabContent) {
@@ -537,19 +598,29 @@ const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: a
     //这个是新增的数据
     page = page.concat(addCarousePage(oldCommonData, newCommonData, newPopData));
   } else {
-    let modifyPopData = []
-    for (let i = 0; i < oldCommonData.carouselNum; i++) {
-      const pageDt = newPopData[i].tabsContent;
-      if (i > newCommonData.carouselNum - 1 && pageDt.id) {
-        // 需要删除的page
-        page.push({
-          id: pageDt.id,
-          editFlag: "delete",
-        });
-      } else {
-        modifyPopData.push(newPopData[i]);
+    let modifyPopData = [];
+    // 轮播的时候轮播页数才>0
+    if (newCommonData.announce_carousel === 1) {
+      for (let i = 0; i < oldCommonData.carouselNum; i++) {
+        const pageDt = newPopData[i].tabsContent;
+        if (i > newCommonData.carouselNum - 1 && pageDt.id) {
+          // 需要删除的page
+          page.push({
+            id: pageDt.id,
+            editFlag: "delete",
+          });
+        } else {
+          modifyPopData.push(newPopData[i]);
+        }
       }
+    } else {
+      // 不轮播时候构建相同的数据结构
+      modifyPopData.push({
+        tabPage: 0,
+        tabsContent: {...newPopData[0], id: oldPopData[0].tabsContent.id}
+      });
     }
+
     if (modifyPopData.length > 0) {
       const specialItem = firstSpecialDataUpdate(newCommonData, modifyPopData, oldCommonData, oldPopData);
       page = page.concat(specialItem);
@@ -570,28 +641,7 @@ const carousePageUpdate = (newCommonData: any, newPopData: any, oldCommonData: a
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
   // 构造基础数据
-  let oldCommonData = {
-    id: releaseID,
-    templateTypeId: "",
-    iteration: "",
-    updatedTime: "",
-    isCarousel: "",
-    description: "",
-    carouselNum: 0
-  };
-  let oldPopData: any = [];
-  const dts = await queryAnnounceDetail(releaseID);
-  if (dts.NoticeEdition && (dts.NoticeEdition).length) {
-    const temp = (dts.NoticeEdition)[0];
-    oldCommonData.templateTypeId = temp.templateTypeId;
-    oldCommonData.iteration = temp.iteration;
-    oldCommonData.updatedTime = temp.updatedTime;
-    oldCommonData.isCarousel = temp.isCarousel;
-    oldCommonData.description = temp.description;
-    oldCommonData.carouselNum = temp.pageSize;
-    // 获取旧的数据，用于修改数据对比
-    oldPopData = await dealPopDataFromService(dts.NoticeEdition, true);
-  }
+  const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
   debugger
   // 是否轮播
   const isCarsousel = oldCommonData?.isCarousel ? 1 : 0;
@@ -614,7 +664,7 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     const secondLevelState = secondSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 二级特性是否增加或者删除
     //  轮播页数，一级特性和二级特性被修改过
     if (carouseNumState || firstLevelState || secondLevelState || specialNameState) {
-      relData = carousePageUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
+      relData = otherInfoUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
     } else {
       // 如果都没有被增加或者删除，则调用常规修改接口
       relData = normalUpdate(

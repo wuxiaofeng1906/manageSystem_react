@@ -130,10 +130,7 @@ const Announce: React.FC<any> = (props: any) => {
 
 
   useEffect(() => {
-    // 不管怎样，先清空state
-    // setCommonData(null);
-    // setOldCommonData(null);
-    // setAnnPopData([]);
+
     // 一键发布按钮是否展示
     pulishButtonVisible();
 
@@ -149,7 +146,9 @@ const Announce: React.FC<any> = (props: any) => {
         carouselNum: 5
       });
       setCarouselNumShow("none");
-      // setOldAnnPopData([]);
+      setCommonData(null);
+      setOldCommonData(null);
+      setAnnPopData([]);
     } else if (type === "detail") {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
       getDataByReleaseId()

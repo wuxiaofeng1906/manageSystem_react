@@ -65,7 +65,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     currentTab = 1;
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
-      debugger
       // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
       if (oldCommonData.announce_carousel === commonData.announce_carousel) {
         // 如果清空所有page页面为true，则也清空所有page数据，直接显示空数据
@@ -133,7 +132,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // tab切换
   const onTabsChange = (key: string) => {
-    debugger
     // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
     getPopupSource(currentTab);
     const oldList = [...anPopData];
@@ -168,7 +166,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (vertifyFieldForPopup(finalData)) {
       let result: any;
       if (type === "detail") {
-        debugger
         result = await updateAnnouncement(releaseID, commonData, finalData,);
       } else {
         result = await saveAnnounceContent(commonData, finalData);

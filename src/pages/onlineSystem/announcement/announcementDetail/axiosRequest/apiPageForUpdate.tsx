@@ -201,12 +201,19 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
 };
 
 //判断特性名称是否被改过(特性名称跟下面的一级特性是同一类型，是一级特性的上一层)
-const specialNameIsUpdate = (newPopData: any, oldPopData: any) => {
+const specialNameIsUpdate = (newCommonData:any,newPopData: any, oldPopData: any) => {
+  debugger
+  // 是否轮播(不轮播的话就没有特性)
+  if(newCommonData.announce_carousel === 0){
+    return  false
+  }
+
   let state = false;
   const pageCount = newPopData.length > oldPopData.length ? newPopData.length : oldPopData.length;
   for (let i = 0; i < pageCount; i++) {
     const newContent = newPopData[i].tabsContent;
     const oldContent = oldPopData[i].tabsContent;
+
     if (newContent.specialName !== oldContent.specialName) {
       state = true;
       break;
@@ -254,6 +261,7 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
 
 // 判断二级特性是否被修改
 const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
+  debugger
   // 轮播页数至少是1个，不是轮播也有一页特性
   let updateValue = false;
 
@@ -588,7 +596,7 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
   } else {
     // 1.2.2 如果是弹窗模板，还要看其他修改方向
     let relData: any;
-    const specialNameState = specialNameIsUpdate(newPopData, oldPopData);
+    const specialNameState = specialNameIsUpdate(newCommonData,newPopData, oldPopData);
     const carouseNumState = carouseNumIsUpdate(newCommonData, oldCommonData);  // 轮播页数是否修改
     const firstLevelState = firstSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 一级特性是否增加或者删除
     const secondLevelState = secondSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 二级特性是否增加或者删除

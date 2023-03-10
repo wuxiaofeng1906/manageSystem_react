@@ -159,7 +159,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   const saveTabPages = async (finalData: any) => {
     let result: any;
     if (type === "detail") {
-      debugger
       result = await updateAnnouncement(releaseID, commonData, finalData,);
     } else {
       result = await saveAnnounceContent(commonData, finalData);
@@ -180,7 +179,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any) => {
-    debugger
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {
@@ -193,7 +191,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (vertifyFieldForPopup(finalData)) {
       // 验证所有的page 是否填写完，没有填写完则提示，但是不影响修改。
       const notFinishedPage = vertifyPageAllFinished(finalData);
-      debugger
       if (notFinishedPage.length) {
         confirm({
           title: "保存确认",

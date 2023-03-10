@@ -88,6 +88,22 @@ export const vertifyFieldForPopup = (popDataArray: any) => {
   return value;
 };
 
+// 判断所以的page是否填写完。
+export const vertifyPageAllFinished = (tabPage: any) => {
+  let notFinishedPage: any = [];
+  if (tabPage && tabPage.length > 1) { // 只有1页就不用判断了
+    tabPage.map((page: any) => {
+      // 如果图片没有，表示本页就没数据
+      const {uploadPic} = page.tabsContent;
+      if (isEmpty((uploadPic))) {
+        notFinishedPage.push(page.tabPage);
+      }
+    });
+  }
+
+  return notFinishedPage;
+};
+
 // 动态panes
 export const tabsPanel = (count: number) => {
   const panes = [];

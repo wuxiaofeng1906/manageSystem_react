@@ -6,10 +6,13 @@ import {
 } from 'antd';
 import {history} from "@@/core/history";
 import style from '../style.less';
-import {PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
+import {
+  PlusCircleOutlined, UploadOutlined, MinusCircleOutlined,
+  PlusOutlined, ExclamationCircleFilled
+} from '@ant-design/icons';
 import {getYuQueContent, oneKeyToRelease, saveAnnounceContent} from '../axiosRequest/apiPage';
 import {updateAnnouncement} from "../axiosRequest/apiPageForUpdate";
-import {analysisSpecialTitle, vertifyFieldForPopup, tabsPanel} from "../dataAnalysis";
+import {analysisSpecialTitle, vertifyFieldForPopup, tabsPanel, vertifyPageAllFinished} from "../dataAnalysis";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
@@ -21,6 +24,7 @@ import ImgCrop from 'antd-img-crop';
 // 当前的tab页面
 let currentTab = 1;
 const {Footer} = Layout;
+const {confirm} = Modal;
 const PopupCard: React.FC<any> = (props: any) => {
   const {
     commonData, anPopData, setAnnPopData,
@@ -151,38 +155,63 @@ const PopupCard: React.FC<any> = (props: any) => {
     //  需要最后再赋值当前tab页码
     currentTab = Number(key);
   };
+
+  const saveTabPages = async (finalData: any) => {
+    let result: any;
+    if (type === "detail") {
+      debugger
+      result = await updateAnnouncement(releaseID, commonData, finalData,);
+    } else {
+      result = await saveAnnounceContent(commonData, finalData);
+    }
+
+    if (result.ok) {
+      sucMessage("保存成功！");
+      // 清空state中原始数据
+      setAnnPopData([]);
+      setCommonData(null);
+      setOldCommonData(null);
+      history.push('./announceList');
+      return;
+    }
+    errorMessage("保存失败！");
+  };
+
+
   // 保存数据
   const onFinish = async (popData: any) => {
     debugger
-    let finalData = [];
+    let finalData: any = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {
       finalData = getPopupSource(currentTab);
     } else {
       // 不是轮播，需要把图片路径放进去.如果是修改的话还需要轮播旧数据的id
       popData.uploadPic = picModalState.checkedImg;
-
       finalData.push(popData);
     }
     if (vertifyFieldForPopup(finalData)) {
-      let result: any;
-      if (type === "detail") {
-        debugger
-        result = await updateAnnouncement(releaseID, commonData, finalData,);
+      // 验证所有的page 是否填写完，没有填写完则提示，但是不影响修改。
+      const notFinishedPage = vertifyPageAllFinished(finalData);
+      debugger
+      if (notFinishedPage.length) {
+        confirm({
+          title: "保存确认",
+          icon: <ExclamationCircleFilled/>,
+          content: `第${notFinishedPage.join(",")}页轮播页没有填写，确认要保存吗？`,
+          centered: true,
+          onOk() {
+            saveTabPages(finalData);
+          },
+          onCancel() {
+            return;
+          },
+        });
       } else {
-        result = await saveAnnounceContent(commonData, finalData);
+        // 填写完了则直接保存。
+        saveTabPages(finalData);
       }
-      // 需要验证必填项
-      if (result.ok) {
-        sucMessage("保存成功！");
-        // 清空state中原始数据
-        setAnnPopData([]);
-        setCommonData(null);
-        setOldCommonData(null);
-        history.push('./announceList');
-        return;
-      }
-      errorMessage("保存失败！");
+
     }
   };
   // upload 组件使用上传图片

@@ -187,6 +187,7 @@ const Announce: React.FC<any> = (props: any) => {
   }, []);
   // 保存数据
   const saveMsgInfo = async () => {
+    // const announceMsg = document.getElementById("announceContent")?.innerText;
     const formInfo = announcementForm.getFieldsValue();
     // 这个点击保存的，模板一定是消息卡片
     if (vertifyFieldForCommon(formInfo)) {
@@ -272,15 +273,15 @@ const Announce: React.FC<any> = (props: any) => {
           </Form.Item>
 
           <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-            {/*<div id={"announceContent"} contentEditable={"true"}*/}
-            {/*     style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>*/}
-            {/*  <label*/}
-            {/*    contentEditable={"false"}*/}
-            {/*    style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：*/}
-            {/*  </label>*/}
-            {/*</div>*/}
+            <div id={"announceContent"} contentEditable={"true"}
+                 style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>
+              <label
+                contentEditable={"false"}
+                style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：
+              </label>
+            </div>
 
-            <TextArea rows={2} style={{minWidth: 300, width: "50%"}}/>
+            {/*<TextArea rows={2} style={{minWidth: 300, width: "50%"}}/>*/}
           </Form.Item>
 
           <div id={"popup"} style={{display: stepShow.popCard}}>

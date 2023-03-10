@@ -374,7 +374,15 @@ const PopupCard: React.FC<any> = (props: any) => {
                                       <Button
                                         style={{border: 'none', color: "red", marginLeft: 5}}
                                         icon={<MinusCircleOutlined/>}
-                                        onClick={() => removeSeond(secondField.name)}
+                                        onClick={() => {
+                                          debugger
+                                          // 仅有一个二级属性时不能删
+                                          if (!secondFields || secondFields.length <= 1) {
+                                            errorMessage("只有一个二级特性时不能删除！")
+                                            return;
+                                          }
+                                          removeSeond(secondField.name);
+                                        }}
                                       />
                                     </Row>
                                   </div>

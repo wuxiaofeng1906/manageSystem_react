@@ -423,7 +423,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                setPicModalState({checkedImg: "", visible: false})
              }}
              closable={false}
-             width={700}>
+             width={570}>
         <Spin spinning={picUpLoading} size={"large"} tip={"图片上传中，请稍等..."}>
           <div className={style.imgComponentBox}>
             <div className={style.defaultBox}>
@@ -438,48 +438,35 @@ const PopupCard: React.FC<any> = (props: any) => {
                   </li>))}
               </ul>
             </div>
-            <div className={style.padBox}/>
+
             <div className={style.setBox}>
               <h5 className={style.titlew7}>从本地上传</h5>
               <div className={style.antPicUpload} style={{backgroundColor: "transparent", marginTop: 13}}>
-                <ImgCrop
-                  modalTitle={"裁剪图片"}
-                  aspect={2.35 / 1}       // 裁剪比例
-                  rotate
-                  zoom
-                  modalOk={"确定"}
-                  modalCancel={"取消"}
+                <Upload
+                  style={{color: "red"}}
+                  listType="picture-card"
+                  showUploadList={{showPreviewIcon: false}}
+                  fileList={fileList}
+                  beforeUpload={(file) => {
+                    return false;
+                  }}
+                  onChange={(v: any) => {
+                    const {file} = v;
+                    // 判断文件类型，文件大小，和裁剪
+                    if (!picType.includes(file.type)) {
+                      errorMessage('仅支持上传jpg、jpeg、png格式的图片！');
+                      return;
+                    }
+                    setFileList(v.fileList);
+                    // 清空之前选的图片
+                    setPicModalState({...picModalState, checkedImg: ""});
+                  }}
                 >
-                  <Upload
-                    style={{color: "red"}}
-                    listType="picture-card"
-                    showUploadList={{showPreviewIcon: false}}
-                    fileList={fileList}
-                    beforeUpload={(file) => {
-                      return false;
-                    }}
-                    onChange={(v: any) => {
-                      const {file} = v;
-                      // 判断文件类型，文件大小，和裁剪
-                      if (!picType.includes(file.type)) {
-                        errorMessage('仅支持上传jpg、jpeg、png格式的图片！');
-                        return;
-                      }
-                      if ((file.size / 1024 / 1024) >= 10) {
-                        errorMessage('图片大小不能超过10M');
-                        return;
-                      }
-                      setFileList(v.fileList);
-                      // 清空之前选的图片
-                      setPicModalState({...picModalState, checkedImg: ""});
-                    }}
-                  >
-                    {fileList.length >= 1 ? null :
-                      <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
-                  </Upload>
-                </ImgCrop>
+                  {fileList.length >= 1 ? null :
+                    <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
+                </Upload>
               </div>
-              <div className={style.hintInfo}>{bannerTips}</div>
+              <div className={style.hintInfo}></div>
             </div>
           </div>
         </Spin>

@@ -14,6 +14,7 @@ import {useModel, history} from 'umi';
 import usePermission from '@/hooks/permission';
 import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessages';
 import {deleteList, getAnnounceList} from "./axiosRequest/apiPage";
+import dayjs from "dayjs";
 
 const disabledStyle = {filter: 'grayscale(1)', cursor: 'not-allowed'};
 const announceList = () => {
@@ -40,9 +41,10 @@ const announceList = () => {
   // 获取列表数据
   const getList = async (page = 1, page_size = pages.page_size) => {
     const condition = form.getFieldsValue();
+    let createTime = condition.create_time ? dayjs(condition.create_time).format("YYYY-MM-DD") : "";
     setSpinning(true);
     try {
-      const res = await getAnnounceList(page, page_size, condition.create_user, condition.create_time, condition.content);
+      const res = await getAnnounceList(page, page_size, condition.create_user, createTime, condition.content);
       setSpinning(false);
 
       setList(res?.results);

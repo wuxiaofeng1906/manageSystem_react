@@ -412,14 +412,14 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
       });
     }
 
-    let rootSpecialId = v1.tabsContent?.id; // 拿取根节点（特性名称）ID(如果是不轮播，根节点ID为tabsContent的id)
+    let rootSpecialId = ""; // 拿取根节点（特性名称）ID
     const deletedId: any = [];    // 记录需要被删除的ID
     oldPopData.forEach((v2: any) => {
       if (v1.tabPage === v2.tabPage) {
         const v2_ptyGroup = v2.tabsContent?.ptyGroup;
         if (v2_ptyGroup && v2_ptyGroup.length) {
           v2_ptyGroup.map((n: any, index: number) => {
-            if (index === 0 && newCommonData.announce_carousel === 1) { // 如果是轮播，一级特性的父节点肯定是特性名称的根节点
+            if (index === 0) { // 如果是轮播，一级特性的父节点肯定是特性名称的根节点
               rootSpecialId = n.parentId;
             }
 

@@ -140,8 +140,8 @@ const Announce: React.FC<any> = (props: any) => {
       announcementForm.setFieldsValue({
         announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
         modules: "1",
-        announce_name: `${releaseName}升级公告`,
-        announce_time: moment(),
+        // announce_name: `${releaseName}升级公告`,
+        // announce_time: moment(),
         announce_carousel: 0, // 默认为否
         carouselNum: 5
       });
@@ -257,7 +257,7 @@ const Announce: React.FC<any> = (props: any) => {
                          else callback();
                        },
                      },]}>
-            <Input style={{minWidth: 300, width: "50%"}}/>
+            <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"} />
           </Form.Item>
 
           <Form.Item label={'升级时间'} name={'announce_time'}

@@ -26,10 +26,17 @@ export const analysisSpecialTitle = (source: any) => {
 
 // 验证表单字段不能为空（公共字段）
 export const vertifyFieldForCommon = (formInfo: any) => {
-  if (isEmpty(formInfo.announce_name.trim())) {
+
+  if (!formInfo.announce_name || isEmpty(formInfo.announce_name.trim())) {
     errorMessage("公告名称不能为空！");
     return false;
   }
+
+  if (!formInfo.announce_time) {
+    errorMessage("升级时间不能为空！");
+    return false;
+  }
+
   if (formInfo.announce_content && isEmpty(((formInfo.announce_content).split("更新功能：")[1]).trim())) {
     errorMessage("请完善公告详情！");
     return false;

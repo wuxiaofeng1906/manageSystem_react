@@ -257,12 +257,17 @@ const Announce: React.FC<any> = (props: any) => {
                          else callback();
                        },
                      },]}>
-            <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"} />
+            <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"}/>
           </Form.Item>
 
           <Form.Item label={'升级时间'} name={'announce_time'}
-                     rules={[{required: true}]}>
-            <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false}
+                     rules={[{
+                       required: true, validator: (r, v, callback) => {
+                         if (v === undefined) callback('请填写升级时间！');
+                         else callback();
+                       }
+                     }]}>
+            <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
                         onChange={(e, time) => setReleaseTime(time)}/>
           </Form.Item>
 

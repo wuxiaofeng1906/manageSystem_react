@@ -3,10 +3,17 @@ import {axiosGet_TJ, axiosPost, axiosDelete} from '@/publicMethods/axios';
 // 获取公告列表
 export const getAnnounceList = async (page: number, size: number, createdUser: any, createdTime: string, description: string) => {
 
-  debugger
-  const params = {page, size, createdUser, createdTime, description}
+  let params = {page, size};
+  if (createdUser && createdUser.length) {
+    params["createdUser"] = createdUser;
+  }
+  if (createdTime) {
+    params["createdTime"] = createdTime;
+  }
+  if (description) {
+    params["description"] = description;
+  }
   const result = await axiosGet_TJ('/api/77hub/notice/list', params);
-
   const data: any = [];
   if ((result.results) && (result.results).length) {
     (result.results).map((v: any) => {

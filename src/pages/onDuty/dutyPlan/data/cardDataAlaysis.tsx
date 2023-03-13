@@ -1,6 +1,5 @@
 // 解析数据
 const parseData = (params: any) => {
-  debugger
   const returnValue: any = [];
   if (params) {
     params.forEach((project: any) => {
@@ -347,7 +346,6 @@ const parseData = (params: any) => {
 };
 
 const parseSaveCardData = (data: any, oldDutyTask: any, startTime: string, endTime: string) => {
-  debugger
   const person_data_array: any = [];
 
   const {

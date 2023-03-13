@@ -153,7 +153,7 @@ const Announce: React.FC<any> = (props: any) => {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
       getDataByReleaseId()
     } else if (commonData && !type) { // 下一页返回上来的数据
-      debugger
+
       // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
       // 以下是已有的数据（下一页返回或者历史记录）
       announcementForm.setFieldsValue({

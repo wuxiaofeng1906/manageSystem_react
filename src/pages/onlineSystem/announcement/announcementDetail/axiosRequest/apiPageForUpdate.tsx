@@ -401,7 +401,6 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
 
 // 一级特性修改
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
-  debugger
   const pages: any = [];
   modifyPopData.forEach((v1: any) => {
     const v1_ptyGroup = v1.tabsContent?.ptyGroup;
@@ -579,7 +578,6 @@ const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any)
 
 // 其他数据发生改变
 const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
-  debugger
   let page: any = [];
   //  轮播页减少,1.删除最后几张的轮播页数(特性可能会被修改) 2.删除所有的页面重建
   if (newCommonData.clearTabContent) {
@@ -641,7 +639,6 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
   // 构造基础数据
   const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
-  debugger
   // 是否轮播
   const isCarsousel = oldCommonData?.isCarousel ? 1 : 0;
   // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。

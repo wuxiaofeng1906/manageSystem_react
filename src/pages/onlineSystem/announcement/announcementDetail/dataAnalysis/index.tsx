@@ -222,7 +222,7 @@ export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = fals
 
   const formData: any = [];
   // 如果是弹窗，又不是轮播。则有一个数据。
-  if (templateTypeId === "2" && pages) {
+  if (templateTypeId === "2" && !isCarousel && pages) {
     const tempData = pages[0];
     let contentData: any = {};
     const {contents} = tempData;

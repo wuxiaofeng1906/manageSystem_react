@@ -263,22 +263,22 @@ const carouseNumIsUpdate = (newCommonData: any, oldCommonData: any) => {
 
 // 判断一级特性是否被修改
 const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
+
+  let {carouselNum} = newCommonData;
   // 轮播页数至少是1个，不是轮播也有一页特性
+  if (newCommonData.announce_carousel === 0) {
+    carouselNum = 1;
+  }
   let updateValue = false;
-  for (let i = 0; i < newCommonData.carouselNum - 1; i++) {
+  for (let i = 0; i < carouselNum; i++) {
     const newPopTemp = newPopData[i];
     const oldPopTemp = oldPopData[i];
-    // 如果是不轮播的数据
-    let newPtGroup = [];
-    let oldPtGroup = [];
+    const oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
+    // 如果是轮播的数据
+    let newPtGroup = newPopTemp.tabsContent?.ptyGroup;
     // 如果不是轮播
     if (!newPopTemp.tabPage) {
       newPtGroup = newPopTemp.ptyGroup;
-      oldPtGroup = oldPopTemp.ptyGroup;
-    } else {
-      // 如果是轮播的数据
-      newPtGroup = newPopTemp.tabsContent?.ptyGroup;
-      oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
     }
 
     if ((!newPtGroup && oldPtGroup) || (newPtGroup && !oldPtGroup)) {
@@ -457,6 +457,7 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
 
           let children = [];
           if (oldSecondLevel && oldSecondLevel.length) {
+            // 获取二级数据
             children = secondSpecialDataUpdate(m.seconds, oldSecondLevel);
           }
           if (m.first) {
@@ -672,6 +673,8 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
         [...newPopData], [...oldPopData]);
     }
     return await updateApi(relData);
+    // return {ok: false}
+
   }
 };
 

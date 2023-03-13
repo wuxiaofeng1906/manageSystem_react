@@ -144,7 +144,7 @@ const parTree = (oraData: any) => {
 // @specialName 特性名称，用于判断是否有哦parentid
 //@isCarousel 是否轮播
 const getSpecialData = (data: any, isCarousel: boolean, updateGet: boolean) => {
-  debugger
+
   let ptGroupData = parTree(data);
   // ，第一个特性需要去除掉，才是下面的子特性
   // if (isCarousel) {

@@ -144,11 +144,12 @@ const parTree = (oraData: any) => {
 // @specialName 特性名称，用于判断是否有哦parentid
 //@isCarousel 是否轮播
 const getSpecialData = (data: any, isCarousel: boolean, updateGet: boolean) => {
+  debugger
   let ptGroupData = parTree(data);
-  // 如果是轮播的话，第一个特性需要去除掉，才是下面的子特性
-  if (isCarousel) {
-    ptGroupData = ptGroupData[0].children;
-  }
+  // ，第一个特性需要去除掉，才是下面的子特性
+  // if (isCarousel) {
+  ptGroupData = ptGroupData[0].children;
+  // }
 
   let finalPtGroup: any = [];
   if (ptGroupData) {
@@ -209,6 +210,7 @@ const getSpecialList = (contents: any, isCarousel: boolean, updateGet: boolean) 
 };
 // 处理从服务器获取过来的弹窗数据放到state中(updateGet 在修改时的数据获取)
 export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = false) => {
+  debugger
 
   if (!NoticeEdition || NoticeEdition.length === 0 || !NoticeEdition[0]) {
     return [];
@@ -220,7 +222,7 @@ export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = fals
 
   const formData: any = [];
   // 如果是弹窗，又不是轮播。则有一个数据。
-  if (templateTypeId === "2" && !isCarousel && pages) {
+  if (templateTypeId === "2" && pages) {
     const tempData = pages[0];
     let contentData: any = {};
     const {contents} = tempData;

@@ -38,11 +38,11 @@ const notCarouselData = (popupData: any) => {
   const data = {
     pages: [
       {
-        "image": popupData.uploadPic,
-        "pageNum": 0, // 所属轮播页码
-        "layoutTypeId": popupData.picLayout,
-        "yuQue": popupData.yuQueUrl,
-        "contents": getSpecialList(ptyGroup)
+        image: popupData.uploadPic,
+        pageNum: 0, // 所属轮播页码
+        layoutTypeId: popupData.picLayout,
+        yuQue: popupData.yuQueUrl,
+        contents: getSpecialList(ptyGroup)
       }
     ]
   }
@@ -80,6 +80,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
     description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
   };
 
+  debugger
 
   let specialData = {};
   if (data.templateTypeId === "2") { // 弹窗保存数据

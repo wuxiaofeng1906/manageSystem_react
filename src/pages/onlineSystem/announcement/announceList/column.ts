@@ -33,7 +33,7 @@ export const announcementListColumn: any = [
     field: 'updatedTime',
     minWidth: 160,
     cellRenderer: (v: any) => {
-      return dayjs(v.value).format("YYYY-MM-DD HH:mm:ss")
+      return dayjs(v.value).format("YYYY-MM-DD HH:mm")
     }
   },
   {

@@ -104,7 +104,7 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
     id: formData.releaseId,
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     // templateTypeId: formData.modules, //  修改的话不传模板id
-    updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm:ss'), // 升级时间：手动选择时间，必填
+    updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm'), // 升级时间：手动选择时间，必填
     description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
   };
   let specialData = {};
@@ -188,7 +188,7 @@ const updateAnnounceContentForAdd = async (formData: any, popupData: object = {}
   const data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
-    updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm:ss'), // 升级时间：手动选择时间，必填
+    updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm'), // 升级时间：手动选择时间，必填
     description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
   };
 
@@ -627,7 +627,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
     id: oldCommonData.id,
     pageSize: newCommonData.carouselNum,
     iteration: newCommonData.announce_name,
-    updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm:ss"),
+    updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm"),
     description: newCommonData.announce_content,
     pages: page
   }

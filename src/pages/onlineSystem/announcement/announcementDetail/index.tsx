@@ -39,7 +39,7 @@ const Announce: React.FC<any> = (props: any) => {
   // 轮播页数展示控制
   const [carouselNumShow, setCarouselNumShow] = useState<string>("none");
   // 发布时间
-  const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+  const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm"));
   // 设置显示哪个模板(消息或者弹窗)
   const cardChanged = (e: RadioChangeEvent) => {
     if (e.target.value === "1") { // 1 是消息弹窗
@@ -269,7 +269,15 @@ const Announce: React.FC<any> = (props: any) => {
                        }
                      }]}>
             <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
-                        onChange={(e, time) => setReleaseTime(time)}/>
+                        onChange={(e, time) => {
+                          setReleaseTime(time);
+                          // 先获取原始数据，再改变数据
+                          let source = announcementForm.getFieldValue("announce_content");
+                          // 用原来的时间替换选中的时间
+                          announcementForm.setFieldsValue({
+                            announce_content: source.replace(releaseTime, time)
+                          });
+                        }}/>
           </Form.Item>
 
           <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>

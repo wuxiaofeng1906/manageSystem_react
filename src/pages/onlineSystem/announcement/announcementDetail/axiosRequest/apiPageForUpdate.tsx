@@ -302,17 +302,12 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
   for (let i = 0; i < carouselNum; i++) {
     const newPopTemp = newPopData[i];
     const oldPopTemp = oldPopData[i];
-    // 如果是不轮播的数据
-    let newPtGroup = [];
-    let oldPtGroup = [];
+    // 如果是轮播的数据
+    let newPtGroup = newPopTemp.tabsContent?.ptyGroup;
+    const oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
     // 如果不是轮播  ,轮播页数至少是1个，不轮播也有一页特性
     if (!newPopTemp.tabPage) {
       newPtGroup = newPopTemp.ptyGroup;
-      oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
-    } else {
-      // 如果是轮播的数据
-      newPtGroup = newPopTemp.tabsContent?.ptyGroup;
-      oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
     }
     for (let m = 0; m < newPtGroup.length; m++) {
       const newFirstSp = newPtGroup[m];
@@ -339,38 +334,46 @@ const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
   const children: any = [];
   const newIds: any = []; // 记录旧数据的id，拿来对比新数据用作删除，如果在新数据里找不到，则删除
   // 先添加新特性。记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id
-  newSecondArray.forEach((v1: any) => {
-    if (v1.id) {
-      newIds.push(v1.id);
-      children.push({
-        id: v1.id,
-        speciality: v1.first,
-      });
-    } else if (!isEmpty((v1.first).trim())) {
-      // 没有ID的话就是新增的特性，同时也要判断是值是否为空
-      children.push({
-        speciality: v1.first,
-        editFlag: "add",
-      })
-    }
-  });
-
-  // 记录需要被删除的ID
-  const deletedId: any = [];
-  oldSecondArray.forEach((v2: any) => {
-    // 如果旧的ID没有再新的ID集合中，表示旧的ID是需要删除的
-    if (v2.id && !newIds.includes(v2.id)) {
-      deletedId.push(v2.id);
-    }
-  });
-
-  // 将需要删除的id页保存进去
-  deletedId.map((id: number) => {
-    children.push({
-      id: id,
-      editFlag: "delete"
+  if (newSecondArray && newSecondArray.length) {
+    newSecondArray.forEach((v1: any) => {
+      if (v1.id) {
+        newIds.push(v1.id);
+        children.push({
+          id: v1.id,
+          speciality: v1.first,
+        });
+      } else if (v1.first && !isEmpty((v1.first).trim())) {
+        // 没有ID的话就是新增的特性，同时也要判断是值是否为空
+        children.push({
+          speciality: v1.first,
+          editFlag: "add",
+        })
+      }
     });
-  })
+  }
+
+
+  // 记录需要被删除的数据
+  if (oldSecondArray && oldSecondArray.length) {
+    oldSecondArray.forEach((v2: any) => {
+      // 如果旧的ID没有再新的ID集合中，表示旧的ID是需要删除的
+      if (v2.id && !newIds.includes(v2.id)) {
+        children.push({
+          id: v2.id,
+          editFlag: "delete"
+        });
+      }
+    });
+  }
+
+  // const deletedId: any = [];
+  // 将需要删除的id页保存进去
+  // deletedId.map((id: number) => {
+  //   children.push({
+  //     id: id,
+  //     editFlag: "delete"
+  //   });
+  // })
   return children;
 };
 
@@ -455,16 +458,11 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
             }
           });
 
-          let children = [];
-          if (oldSecondLevel && oldSecondLevel.length) {
-            // 获取二级数据
-            children = secondSpecialDataUpdate(m.seconds, oldSecondLevel);
-          }
           if (m.first) {
             content.push({
               id: m.id,
               speciality: m.first,
-              children: children
+              children: secondSpecialDataUpdate(m.seconds, oldSecondLevel) // 获取二级数据
             });
           }
         } else { // 新增的一级特性（包含里面的二级特性）

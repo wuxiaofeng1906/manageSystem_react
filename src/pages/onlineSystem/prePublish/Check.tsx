@@ -505,6 +505,25 @@ const Check = (props: any, ref: any) => {
               ),
             },
             {
+              title: '说明',
+              dataIndex: 'desc',
+              width: 100,
+              align: 'left',
+              // fixed: 'right',
+              render: (v, record) => record.open ? "" : v,
+              onCell: (v, index) => {
+                // 历史记录不能再被编辑
+                if (!(hasEdit || v.disabled)) {
+                  return {
+                    onDoubleClick: () => {
+                      setDescShow({visible: true, data: v, param: {index, e: v.open}});
+                    }
+                  }
+                }
+                return {};
+              }
+            },
+            {
               title: '检查日志',
               dataIndex: 'log',
               width: 90,
@@ -524,13 +543,7 @@ const Check = (props: any, ref: any) => {
                 />
               ),
             },
-            {
-              title: '说明',
-              dataIndex: 'desc',
-              width: 100,
-              align: 'left',
-              render: (v, record) => record.open ? "" : v,
-            },
+
           ]}
           dataSource={list}
           pagination={false}
@@ -550,17 +563,19 @@ const Check = (props: any, ref: any) => {
                 record.rowKey == 'auto_obj_data', // 升级前自动化检查
             }),
           }}
-          onRow={(row, index) => {
-            // 历史记录不能再被编辑
-            if (!(hasEdit || row.disabled)) {
-              return {
-                onDoubleClick: () => {
-                  setDescShow({visible: true, data: row, param: {index, e: row.open}});
-                }
-              }
-            }
-            return {};
-          }}
+          // onRow={(row, index) => {
+          //
+          //   // 历史记录不能再被编辑
+          //   if (!(hasEdit || row.disabled)) {
+          //     return {
+          //       onDoubleClick: () => {
+          //         debugger
+          //         setDescShow({visible: true, data: row, param: {index, e: row.open}});
+          //       }
+          //     }
+          //   }
+          //   return {};
+          // }}
         />
         <CheckSettingModal
           init={show}

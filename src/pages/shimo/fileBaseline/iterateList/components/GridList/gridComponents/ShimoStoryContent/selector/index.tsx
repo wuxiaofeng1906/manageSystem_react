@@ -15,16 +15,16 @@ const sortShiMoContent = (datas: any) => {
 const getTreeSelectData = async (myGuid: string = "", parentId: string = "", fileType: string) => {
 
   const datas = await axiosGet("/api/verify/shimo/shimo_file", {guid: myGuid, file_type: fileType});
-
   // 分数字和非数字
   const newArray = sortShiMoContent(datas);
-  const treeData: any = [{
-    title: "请选择",
-    value: "empty",
-    id: "empty",
-    pId: -1
-  }];
+  const treeData: any = [];
   if (newArray && newArray.length > 0) {
+    treeData.push({
+      title: "请选择",
+      value: "empty",
+      id: "empty",
+      pId: -1
+    })
     newArray.forEach((ele: any) => {
       treeData.push({
         title: ele.name,

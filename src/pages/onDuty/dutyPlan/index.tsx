@@ -1421,11 +1421,11 @@ const DutyPlan: React.FC<any> = () => {
               <div>
                 <label style={{color: 'orange'}}> 备注： </label>
                 <label>
-                  {' '}
-                  需要当天紧急修复的请走emergency申请 <br/>
-                  对应分支：emergency/stage-emergency
+                  对应分支：emergency/stage-patch
                   <br/>
-                  对应测试环境:nx-hotfix（如有变动，由测试负责人临时调配环境）{' '}
+                  租户应用测试环境：hotfix-aws-编号
+                  <br/>
+                  global集群应用测试环境：hotfix-aws-编号-global
                 </label>
               </div>
             </Card>

@@ -275,6 +275,21 @@ export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = fals
 
 
 export const changeTabSort = (oraPopData: any, order: any) => {
-  console.log(oraPopData,order)
+  debugger
 
+  const returnData: any = [];
+  order.forEach((key: string, index: number) => {
+    oraPopData.forEach((v: any) => {
+
+      if ((v.tabPage).toString() === key) {
+        returnData.push({
+          tabPage: index + 1,
+          tabsContent: v.tabsContent
+        })
+      }
+    });
+
+  });
+
+  return returnData;
 };

@@ -75,7 +75,7 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
   //  更新数据源
   const updatePopData = () => {
     console.log(anPopData, setAnnPopData, tabOrder);
-    debugger
+
 
   };
   // 重新获得Tabs顺序
@@ -95,7 +95,6 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
 
     let oraData: any = [];
     pageArray.forEach((key: any) => {
-      debugger
       oraData.push(<TabPane tab={<label style={{fontSize: "medium"}}> 第{key}张 </label>} key={key.toString()}
                             style={{fontWeight: "bold"}}/>)
     });

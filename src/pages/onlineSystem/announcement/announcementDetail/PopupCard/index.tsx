@@ -207,7 +207,6 @@ const PopupCard: React.FC<any> = (props: any) => {
           content: `第${notFinishedPage.join(",")}页轮播页没有填写，确认要保存吗？`,
           centered: true,
           onOk() {
-            debugger
             saveTabPages(finalData);
           },
           onCancel() {

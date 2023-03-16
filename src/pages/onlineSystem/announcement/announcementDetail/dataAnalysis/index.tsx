@@ -273,16 +273,13 @@ export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = fals
   return formData;
 };
 
-
+// 修改tab保存时候的顺序
 export const changeTabSort = (oraPopData: any, order: any) => {
-  debugger
-
-  const returnData: any = [];
+  const sortedData: any = [];
   order.forEach((key: string, index: number) => {
     oraPopData.forEach((v: any) => {
-
       if ((v.tabPage).toString() === key) {
-        returnData.push({
+        sortedData.push({
           tabPage: index + 1,
           tabsContent: v.tabsContent
         })
@@ -291,5 +288,5 @@ export const changeTabSort = (oraPopData: any, order: any) => {
 
   });
 
-  return returnData;
+  return sortedData;
 };

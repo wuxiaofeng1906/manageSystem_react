@@ -12,7 +12,10 @@ import {
 } from '@ant-design/icons';
 import {getYuQueContent, oneKeyToRelease, saveAnnounceContent} from '../axiosRequest/apiPage';
 import {updateAnnouncement} from "../axiosRequest/apiPageForUpdate";
-import {analysisSpecialTitle, vertifyFieldForPopup, tabsPanel, vertifyPageAllFinished} from "../dataAnalysis";
+import {
+  analysisSpecialTitle, vertifyFieldForPopup, tabsPanel,
+  vertifyPageAllFinished, changeTabSort
+} from "../dataAnalysis";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
@@ -20,6 +23,7 @@ import {useModel} from "@@/plugin-model/useModel";
 import {imgUrlHeader, defaultImgsUrl, bannerTips, picType} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3} from "../uploadPic/NoticeImageUploader";
 import ImgCrop from 'antd-img-crop';
+import {DragTabs} from './TabsApi';
 
 // 当前的tab页面
 let currentTab = 1;
@@ -28,7 +32,7 @@ const {confirm} = Modal;
 const PopupCard: React.FC<any> = (props: any) => {
   const {
     commonData, anPopData, setAnnPopData,
-    showPulishButton, oldCommonData, setCommonData, setOldCommonData
+    showPulishButton, oldCommonData, setCommonData, setOldCommonData, tabOrder
   } = useModel('announcement');
   const {releaseName, releaseID, type} = props.location?.query;
   const [dtForm] = Form.useForm();
@@ -191,6 +195,11 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (vertifyFieldForPopup(finalData)) {
       // 验证所有的page 是否填写完，没有填写完则提示，但是不影响修改。
       const notFinishedPage = vertifyPageAllFinished(finalData);
+      // 重新对tab排序
+      if (tabOrder && tabOrder.length) {
+        finalData = changeTabSort(finalData, tabOrder);
+      }
+
       if (notFinishedPage.length) {
         confirm({
           title: "保存确认",
@@ -198,6 +207,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           content: `第${notFinishedPage.join(",")}页轮播页没有填写，确认要保存吗？`,
           centered: true,
           onOk() {
+            debugger
             saveTabPages(finalData);
           },
           onCancel() {
@@ -273,15 +283,18 @@ const PopupCard: React.FC<any> = (props: any) => {
       {/* 要轮播界面 */}
       <Spin spinning={yuQueSpinLoading} size={"large"} tip={"数据同步中，请稍后..."}>
         <div className={style.popForm}>
-          <Tabs
-            onChange={onTabsChange}
-            style={{
-              width: '100%',
-              marginLeft: 80,
-              display: commonData?.announce_carousel === 1 ? "inline-block" : "none"
-            }}>
-            {tabsPanel(Number(commonData?.carouselNum))}
-          </Tabs>
+          {/*<Tabs*/}
+          {/*  onChange={onTabsChange}*/}
+          {/*  style={{*/}
+          {/*    width: '100%',*/}
+          {/*    marginLeft: 80,*/}
+          {/*    display: commonData?.announce_carousel === 1 ? "inline-block" : "none"*/}
+          {/*  }}>*/}
+          {/*  {tabsPanel(Number(commonData?.carouselNum))}*/}
+          {/*</Tabs>*/}
+
+          <DragTabs onChange={onTabsChange}/>
+
           <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}>
             {/* 特性名称只针对轮播功能 */}
             <Row style={{display: commonData?.announce_carousel === 1 ? "inline-block" : "none"}}>

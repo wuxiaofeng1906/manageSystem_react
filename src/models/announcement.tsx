@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 
 export default () => {
   // 升级公告详情界面数据（公共数据）
@@ -13,11 +13,15 @@ export default () => {
   // 旧的公告数据，用于修改公告 -- 升级公告详情界面数据（弹窗数据）
   // const [oldAnPopData, setOldAnnPopData] = useState<any>([]);
 
+  // 记录tabs的排序
+  const [tabOrder, setTabOrder] = useState<React.Key[]>([]);
+
   return {
     commonData, setCommonData,
     anPopData, setAnnPopData,
     showPulishButton, setShowPulishButton,
     oldCommonData, setOldCommonData,
+    tabOrder, setTabOrder
     // oldAnPopData, setOldAnnPopData
 
   };

@@ -272,3 +272,9 @@ export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = fals
 
   return formData;
 };
+
+
+export const changeTabSort = (oraPopData: any, order: any) => {
+  console.log(oraPopData,order)
+
+};

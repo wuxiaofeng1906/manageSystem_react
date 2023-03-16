@@ -1,10 +1,10 @@
-import type { GqlClient } from '@/hooks';
-import { useQuery } from '@/hooks';
+import type {GqlClient} from '@/hooks';
+import {useQuery} from '@/hooks';
 import React from 'react';
-import { Select } from 'antd';
-import { isEmpty, sortBy, uniqBy } from 'lodash';
+import {Select} from 'antd';
+import {isEmpty, sortBy, uniqBy} from 'lodash';
 
-const { Option } = Select;
+const {Option} = Select;
 
 // 计算不同类型的个数
 const calTypeCount = (data: any) => {
@@ -27,7 +27,7 @@ const calTypeCount = (data: any) => {
   let testConfirm_no = 0;
 
   data.forEach((ele: any) => {
-    const { category, stage, testConfirmed } = ele;
+    const {category, stage, testConfirmed} = ele;
     // 获取统计类型的个数
     if (category === '1') {
       bug += 1;
@@ -207,7 +207,7 @@ const changeTypeColumns = (oraData: any) => {
   const changedArray: any = [];
   if (oraData && oraData?.length > 0) {
     oraData.forEach((ele: any) => {
-      const rows: any = { ...ele };
+      const rows: any = {...ele};
       if (ele.category === '3' && ele.fromBug !== 0) {
         rows.category = '-3'; // 表示为bug转需求
       }
@@ -240,7 +240,7 @@ const queryDevelopViews = async (
   execution: any,
 ) => {
   // baseline: 0 超范围 1 未超 ztUnlinkedAt： 禅道需求移除时间 null 未移除
-  const { data } = await client.query(`
+  const {data} = await client.query(`
       {
         proDetaiWithUser(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery},execution:${
     execution ?? undefined
@@ -332,7 +332,7 @@ const queryDevelopViews = async (
 
   let oraData: any = data?.proDetaiWithUser;
   if (isEmpty(data?.proDetaiWithUser)) {
-    return { result: [], resCount: null };
+    return {result: [], resCount: null};
   }
   if (prjType === '') {
     const changedRow = changeRowPosition(data?.proDetaiWithUser); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
@@ -347,12 +347,12 @@ const queryDevelopViews = async (
     oraData = filterTestConfirmed(oraData);
   }
 
-  return { result: showBelongItem(oraData), resCount: calTypeCount(oraData) };
+  return {result: showBelongItem(oraData), resCount: calTypeCount(oraData)};
 };
 
 // 查询是否有重复数据
 const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
-  const { data } = await client.query(`
+  const {data} = await client.query(`
       {
         proExist(name:"${prjName}"){
           ok
@@ -426,7 +426,7 @@ const getDeptMemner = async (client: GqlClient<object>, params: any) => {
           }`;
   }
 
-  const { data } = await client.query(deptMember);
+  const {data} = await client.query(deptMember);
 
   return data?.WxDeptUsers;
 };
@@ -468,7 +468,7 @@ const LoadCombobox = (params: any) => {
       `;
   }
 
-  const { data: { WxDeptUsers = [] } = {} } = useQuery(deptMember);
+  const {data: {WxDeptUsers = []} = {}} = useQuery(deptMember);
   const uniqData: any[] = uniqBy(WxDeptUsers, 'id');
   if (!isEmpty(uniqData)) {
     for (let index = 0; index < uniqData?.length; index += 1) {
@@ -481,7 +481,7 @@ const LoadCombobox = (params: any) => {
 
 const LoadTesterCombobox = () => {
   const deptMan = [<Option value="NA">NA</Option>];
-  const { data: { WxDeptUsers = [] } = {} } = useQuery(`
+  const {data: {WxDeptUsers = []} = {}} = useQuery(`
           {
             WxDeptUsers(techs:[TEST]){
                 id
@@ -506,7 +506,7 @@ const LoadTesterCombobox = () => {
 
 const LoadTesterUEDCombobox = () => {
   const deptMan = [<Option value="NA">NA</Option>];
-  const { data: { test = [], ued = [] } = {} } = useQuery(`
+  const {data: {test = [], ued = [], product = []} = {}} = useQuery(`
           {
             test:WxDeptUsers(techs:[TEST]){
                 id
@@ -518,9 +518,14 @@ const LoadTesterUEDCombobox = () => {
                userName
                hired
             }
+            product:WxDeptUsers(deptNames:["产品管理"]){
+               id
+               userName
+               hired
+            }
           }
       `);
-  const result = [...test, ...ued]?.filter((it: any) => it.hired != '0');
+  const result = [...test, ...ued, ...product]?.filter((it: any) => it.hired != '0');
   if (result && result.length > 0) {
     for (let index = 0; index < result.length; index += 1) {
       deptMan.push(
@@ -538,7 +543,7 @@ const LoadTesterUEDCombobox = () => {
 const GetSprintProject = () => {
   const projectArray = [];
 
-  const { data: { project = [] } = {} } = useQuery(`{
+  const {data: {project = []} = {}} = useQuery(`{
         project(range:{start:"", end:""},order:DESC,doSync:true){
         id
         name

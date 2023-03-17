@@ -90,14 +90,18 @@ export const formatTreeData = ({
     const startTime = elements.range.start;
     if (isArray(elements.total)) {
       elements.total?.forEach((o: any) => {
-        result.push({
-          Group: o.deptName.includes('全部') ? [developCenter] : [developCenter, o.deptName],
-          isDept: true,
-          dept: o.dept,
-          extra: o.deptName.includes('全部') ? 1 : o.deptName.includes('班车') ? 2 : 0,
-          [`${startTime}range`]: elements.range,
-          [startTime]: isMulti ? o.kpi * percent * multiNumber : o?.kpi / percent * multiNumber,
-        });
+        // 任务 107585：隐藏emergency项目的产出率数据
+        if (o.deptName !== "研发中心-EMERGENCY") {
+          result.push({
+            Group: o.deptName.includes('全部') ? [developCenter] : [developCenter, o.deptName],
+            isDept: true,
+            dept: o.dept,
+            extra: o.deptName.includes('全部') ? 1 : o.deptName.includes('班车') ? 2 : 0,
+            [`${startTime}range`]: elements.range,
+            [startTime]: isMulti ? o.kpi * percent * multiNumber : o?.kpi / percent * multiNumber,
+          });
+        }
+
       });
     } else {
       result.push({

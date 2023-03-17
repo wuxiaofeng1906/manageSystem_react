@@ -46,6 +46,7 @@ export const vertifyFieldForCommon = (formInfo: any) => {
 
 // 验证字段的必填项(弹窗界面)
 export const vertifyFieldForPopup = (popDataArray: any) => {
+
   let value = true;
   for (let i = 0; i < popDataArray.length; i++) {
     let popData = popDataArray[i]; // 不可轮播的数据

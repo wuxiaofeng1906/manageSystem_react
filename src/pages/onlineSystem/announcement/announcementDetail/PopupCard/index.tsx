@@ -114,11 +114,18 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     setYuQueSpinLoading(false);
   };
+
+  const delSavesData = (specialList: any) => {
+    if (isEmpty((specialList.specialName).trim())) {
+
+    }
+  }
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
-
+    debugger
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = picModalState.checkedImg;
+
     // 覆盖已有当前页的数据或者添加新数据
     const oldList = [...anPopData];
     // 构造新增的tab数据框架
@@ -130,6 +137,12 @@ const PopupCard: React.FC<any> = (props: any) => {
         })
       }
     }
+
+    // 判断数据是否为空，如果数据都为空，则tabsContent一定要为空。
+    const isAllEmpty = delSavesData(specialList);
+    // if(isAllEmpty){
+    //
+    // }
     oldList.map((v: any) => {
       console.log(v)
       v.tabPage === currentKey ? v.tabsContent = {...specialList, id: v.tabsContent.id} : v.tabsContent;

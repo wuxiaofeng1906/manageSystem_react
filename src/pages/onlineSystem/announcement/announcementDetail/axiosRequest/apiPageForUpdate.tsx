@@ -33,6 +33,7 @@ const getOldNoticeDetails = async (releaseID: string) => {
     oldCommonData.carouselNum = temp.pageSize;
     // 获取旧的数据，用于修改数据对比
     oldPopData = await dealPopDataFromService(dts.NoticeEdition, true);
+    //   如果有排序则需要对新的顺序进行排列
   }
 
   return {oldCommonData, oldPopData};
@@ -271,8 +272,20 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
   }
   let updateValue = false;
   for (let i = 0; i < carouselNum; i++) {
-    const newPopTemp = newPopData[i];
-    const oldPopTemp = oldPopData[i];
+    let newPopTemp: any = {};
+    // 查找对应的page数据
+    newPopData.map((v: any) => {
+      if (v.oldPage === i + 1) {
+        newPopTemp = v;
+      }
+    });
+    let oldPopTemp: any = {};
+    oldPopData.map((v: any) => {
+      if (v.tabPage === i + 1) {
+        oldPopTemp = v;
+      }
+    });
+
     const oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
     // 如果是轮播的数据
     let newPtGroup = newPopTemp.tabsContent?.ptyGroup;
@@ -300,8 +313,21 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
   // 如果是轮播，那么轮播页数就是所填写的数量，如果不是轮播，则只有一页
   const carouselNum = newCommonData.announce_carousel === 1 ? newCommonData.carouselNum : 1;
   for (let i = 0; i < carouselNum; i++) {
-    const newPopTemp = newPopData[i];
-    const oldPopTemp = oldPopData[i];
+
+    let newPopTemp: any = {};
+    // 查找对应的page数据
+    newPopData.map((v: any) => {
+      if (v.oldPage === i + 1) {
+        newPopTemp = v;
+      }
+    });
+    let oldPopTemp: any = {};
+    oldPopData.map((v: any) => {
+      if (v.tabPage === i + 1) {
+        oldPopTemp = v;
+      }
+    });
+
     // 如果是轮播的数据
     let newPtGroup = newPopTemp.tabsContent?.ptyGroup;
     const oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
@@ -309,6 +335,12 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
     if (!newPopTemp.tabPage) {
       newPtGroup = newPopTemp.ptyGroup;
     }
+
+    if (JSON.stringify(newPtGroup) !== JSON.stringify(oldPtGroup)) {
+      updateValue = true;
+      break
+    }
+
     for (let m = 0; m < newPtGroup.length; m++) {
       const newFirstSp = newPtGroup[m];
       const oldFirstSp = oldPtGroup[m];
@@ -417,7 +449,7 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
     let rootSpecialId = ""; // 拿取根节点（特性名称）ID
     const deletedId: any = [];    // 记录需要被删除的ID
     oldPopData.forEach((v2: any) => {
-      if (v1.tabPage === v2.tabPage) {
+      if (v1.oldPage === v2.tabPage) {
         const v2_ptyGroup = v2.tabsContent?.ptyGroup;
         if (v2_ptyGroup && v2_ptyGroup.length) {
           v2_ptyGroup.map((n: any, index: number) => {
@@ -446,14 +478,17 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
           // 寻找旧数据对应ID的二级特性数据
           let oldSecondLevel: any = [];
           oldPopData.forEach((b: any) => {
-            if (v1.tabPage === b.tabPage) {
+            if (v1.oldPage === b.tabPage) {
               const v2_ptyGroup = b.tabsContent?.ptyGroup;
-              v2_ptyGroup.map((c: any) => {
-                // 需要一级特性的id相等，才记录二级特性的数据
-                if (m.id === c.id) {
-                  oldSecondLevel = c.seconds;
-                }
-              });
+              if (v2_ptyGroup) {
+                v2_ptyGroup.map((c: any) => {
+                  // 需要一级特性的id相等，才记录二级特性的数据
+                  if (m.id === c.id) {
+                    oldSecondLevel = c.seconds;
+                  }
+                });
+              }
+
             }
           });
 
@@ -578,6 +613,7 @@ const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any)
 
 // 其他数据发生改变
 const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
+  debugger
   let page: any = [];
   //  轮播页减少,1.删除最后几张的轮播页数(特性可能会被修改) 2.删除所有的页面重建
   if (newCommonData.clearTabContent) {

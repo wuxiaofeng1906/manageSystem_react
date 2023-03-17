@@ -276,17 +276,38 @@ export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = fals
 // 修改tab保存时候的顺序
 export const changeTabSort = (oraPopData: any, order: any) => {
   const sortedData: any = [];
-  order.forEach((key: string, index: number) => {
-    oraPopData.forEach((v: any) => {
-      if ((v.tabPage).toString() === key) {
-        sortedData.push({
-          tabPage: index + 1,
-          tabsContent: v.tabsContent
-        })
-      }
-    });
+
+  oraPopData.forEach((v: any) => {
+    let currentPage = v.tabPage;
+    if (order && order.length) {
+      order.forEach((key: string, index: number) => {
+        if ((v.tabPage).toString() === key) {
+          currentPage = index + 1;
+        }
+      });
+    }
+
+    // 保存的时候，tabPage 用于传给后端，oldPage 用于对比数据
+    sortedData.push({
+      tabPage: currentPage,
+      oldPage: v.tabPage,
+      tabsContent: v.tabsContent
+    })
 
   });
+
+  // order.forEach((key: string, index: number) => {
+  //   oraPopData.forEach((v: any) => {
+  //     if ((v.tabPage).toString() === key) {
+  //       sortedData.push({
+  //         tabPage: index + 1,
+  //         oldPage: key,
+  //         tabsContent: v.tabsContent
+  //       })
+  //     }
+  //   });
+  //
+  // });
 
   return sortedData;
 };

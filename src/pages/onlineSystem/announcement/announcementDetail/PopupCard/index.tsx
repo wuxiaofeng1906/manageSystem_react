@@ -162,10 +162,12 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   const saveTabPages = async (finalData: any) => {
     let result: any;
+    // 重新对tab排序
+    const sortedFinalData = changeTabSort(finalData, tabOrder);
     if (type === "detail") {
-      result = await updateAnnouncement(releaseID, commonData, finalData,);
+      result = await updateAnnouncement(releaseID, commonData, sortedFinalData,);
     } else {
-      result = await saveAnnounceContent(commonData, finalData);
+      result = await saveAnnounceContent(commonData, sortedFinalData);
     }
 
     if (result.ok) {
@@ -195,10 +197,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (vertifyFieldForPopup(finalData)) {
       // 验证所有的page 是否填写完，没有填写完则提示，但是不影响修改。
       const notFinishedPage = vertifyPageAllFinished(finalData);
-      // 重新对tab排序
-      if (tabOrder && tabOrder.length) {
-        finalData = changeTabSort(finalData, tabOrder);
-      }
 
       if (notFinishedPage.length) {
         confirm({

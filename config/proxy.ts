@@ -15,7 +15,7 @@ export default {
       pathRewrite: {'^': ''},
     },
     '/api/': {
-      target: 'http://10.0.144.53:8300/',
+      target: 'http://10.0.144.53:8380/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },

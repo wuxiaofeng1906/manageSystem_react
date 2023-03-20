@@ -1,7 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Radio, Tabs, Divider, Layout,
+  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout,
   Spin
 } from 'antd';
 import {history} from "@@/core/history";
@@ -13,17 +13,17 @@ import {
 import {getYuQueContent, oneKeyToRelease, saveAnnounceContent} from '../axiosRequest/apiPage';
 import {updateAnnouncement} from "../axiosRequest/apiPageForUpdate";
 import {
-  analysisSpecialTitle, vertifyFieldForPopup, tabsPanel,
+  analysisSpecialTitle, vertifyFieldForPopup, getChanedData,
   vertifyPageAllFinished, changeTabSort
 } from "../dataAnalysis";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-import {imgUrlHeader, defaultImgsUrl, bannerTips, picType} from "../uploadPic/index";
+import {imgUrlHeader, defaultImgsUrl, picType} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3} from "../uploadPic/NoticeImageUploader";
-import ImgCrop from 'antd-img-crop';
 import {DragTabs} from './TabsApi';
+
 
 // 当前的tab页面
 let currentTab = 1;
@@ -34,7 +34,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     commonData, anPopData, setAnnPopData,
     showPulishButton, oldCommonData, setCommonData, setOldCommonData, tabOrder
   } = useModel('announcement');
-  const {releaseName, releaseID, type} = props.location?.query;
+  const { releaseID, type} = props.location?.query;
   const [dtForm] = Form.useForm();
   // 图片上传弹出层显示
   const [picModalState, setPicModalState] = useState({
@@ -115,86 +115,23 @@ const PopupCard: React.FC<any> = (props: any) => {
     setYuQueSpinLoading(false);
   };
 
-  // 判断是否界面有填写数据
-  const isPageImpty = (specialList: any) => {
-    // 除了图文布局，有一个不为空，则都返回fasle，都要将页面数据保留
-    // 特性名称不为空
-    if (specialList.specialName && !isEmpty(specialList.specialName)) {
-      return false;
-    }
-    // 图片不为空
-    if (!isEmpty(specialList.uploadPic)) {
-      return false;
-    }
-    // 一级二级特性
-    const {ptyGroup} = specialList;
-    if (ptyGroup && ptyGroup.length > 0) {
-      for (let i = 0; i < ptyGroup.length; i++) {
-        let flag = true;
-        const specilaList = ptyGroup[i];
-        if (specilaList.first && !isEmpty((specilaList.first).trim())) {
-          flag = false;
-        }
 
-        const secondList = specilaList.seconds;
-        //  二级特性不是必填，所以
-        for (let m = 0; m < secondList.length; m++) {
-          if (secondList[m].first && !isEmpty((secondList[m].first).trim())) {
-            flag = false;
-            break;
-          }
-        }
-
-        // 一级特性和二级特性有一个不为空都要保留演示数据
-        if (!flag) {
-          return false;
-        }
-      }
-    }
-
-    return true
-  }
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
 
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = picModalState.checkedImg;
-
-    // 覆盖已有当前页的数据或者添加新数据
-    const oldList = [...anPopData];
-    // 构造新增的tab数据框架
-    if (Number(commonData?.carouselNum) > oldList.length) {
-      for (let i = oldList.length; i < Number(commonData?.carouselNum); i++) {
-        oldList.push({
-          tabPage: i + 1,
-          tabsContent: {}
-        })
-      }
-    }
-    debugger
-    const result: any = [];
-    oldList.map((v: any) => {
-      // page 相等，并且里面的内容不为空
-      if (v.tabPage === currentKey && !isPageImpty(specialList)) {
-        result.push({
-          ...v,
-          tabsContent: {...specialList, id: v.tabsContent.id}
-        });
-      } else {
-        result.push(v);
-      }
-    });
+    const result = getChanedData(currentKey, commonData, anPopData, specialList);
     setAnnPopData(result);
-    // 返回值共保存按钮使用
     return result;
   };
   // tab切换
   const onTabsChange = (key: string) => {
-    // 先保存切换前的tab数据，后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
-    getPopupSource(currentTab);
-    const oldList = [...anPopData];
-    for (let i = 0; i < oldList.length; i++) {
-      const v = oldList[i];
+    // 保存切换前的tab数据，
+    const list = getPopupSource(currentTab);
+    // 后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
+    for (let i = 0; i < list.length; i++) {
+      const v = list[i];
       if (v.tabPage === Number(key) && JSON.stringify(v.tabsContent) !== "{}") {
         dtForm.setFieldsValue(v.tabsContent);
         setPicModalState({...picModalState, checkedImg: v.tabsContent.uploadPic});

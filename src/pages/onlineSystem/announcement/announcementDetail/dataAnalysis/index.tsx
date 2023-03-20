@@ -312,3 +312,74 @@ export const changeTabSort = (oraPopData: any, order: any) => {
 
   return sortedData;
 };
+
+// 判断是否界面有填写数据
+const isPageImpty = (specialList: any) => {
+  // 除了图文布局，有一个不为空，则都返回fasle，都要将页面数据保留
+  // 特性名称不为空
+  if (specialList.specialName && !isEmpty(specialList.specialName)) {
+    return false;
+  }
+  // 图片不为空
+  if (!isEmpty(specialList.uploadPic)) {
+    return false;
+  }
+  // 一级二级特性
+  const {ptyGroup} = specialList;
+  if (ptyGroup && ptyGroup.length > 0) {
+    for (let i = 0; i < ptyGroup.length; i++) {
+      let flag = true;
+      const specilaList = ptyGroup[i];
+      if (specilaList.first && !isEmpty((specilaList.first).trim())) {
+        flag = false;
+      }
+
+      const secondList = specilaList.seconds;
+      //  二级特性不是必填，所以
+      for (let m = 0; m < secondList.length; m++) {
+        if (secondList[m].first && !isEmpty((secondList[m].first).trim())) {
+          flag = false;
+          break;
+        }
+      }
+
+      // 一级特性和二级特性有一个不为空都要保留演示数据
+      if (!flag) {
+        return false;
+      }
+    }
+  }
+
+  return true
+}
+
+
+// 切换tab后的数据
+export const getChanedData = (currentKey: number, commonData: any, anPopData: any, specialList: any) => {
+
+  // 覆盖已有当前页的数据或者添加新数据
+  const oldList = [...anPopData];
+  // 构造新增的tab数据框架
+  if (Number(commonData?.carouselNum) > oldList.length) {
+    for (let i = oldList.length; i < Number(commonData?.carouselNum); i++) {
+      oldList.push({
+        tabPage: i + 1,
+        tabsContent: {}
+      })
+    }
+  }
+  const result: any = [];
+  oldList.map((v: any) => {
+    // page 相等，并且里面的内容不为空
+    if (v.tabPage === currentKey && !isPageImpty(specialList)) {
+      result.push({
+        ...v,
+        tabsContent: {...specialList, id: v.tabsContent.id}
+      });
+    } else {
+      result.push(v);
+    }
+  });
+
+  return result;
+};

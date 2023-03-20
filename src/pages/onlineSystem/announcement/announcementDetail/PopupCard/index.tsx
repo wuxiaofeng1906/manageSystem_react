@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
   Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout,
-  Spin
+  Spin, Image, Tabs
 } from 'antd';
 import {history} from "@@/core/history";
 import style from '../style.less';
@@ -21,7 +21,7 @@ import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
 import {imgUrlHeader, defaultImgsUrl, picType} from "../uploadPic/index";
-import {getS3Key, uploadPicToS3} from "../uploadPic/NoticeImageUploader";
+import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
 
 
@@ -29,12 +29,13 @@ import {DragTabs} from './TabsApi';
 let currentTab = 1;
 const {Footer} = Layout;
 const {confirm} = Modal;
+
 const PopupCard: React.FC<any> = (props: any) => {
   const {
     commonData, anPopData, setAnnPopData,
     showPulishButton, oldCommonData, setCommonData, setOldCommonData, tabOrder
   } = useModel('announcement');
-  const { releaseID, type} = props.location?.query;
+  const {releaseID, type} = props.location?.query;
   const [dtForm] = Form.useForm();
   // 图片上传弹出层显示
   const [picModalState, setPicModalState] = useState({
@@ -206,7 +207,9 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
   };
   // upload 组件使用上传图片
-  const [fileList, setFileList] = useState<any[]>([])
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [showUpload, setShowUpload] = useState<boolean>(true);
+
   // 选择图片时
   const picChecked = (e: any) => {
     if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
@@ -215,7 +218,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 点击确定按钮
   const uploadPicClick = async () => {
-
     // 判断是不是手动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
     // 之前就选择了图片
     if (picModalState.checkedImg) {
@@ -446,34 +448,69 @@ const PopupCard: React.FC<any> = (props: any) => {
             <div className={style.setBox}>
               <h5 className={style.titlew7}>从本地上传</h5>
               <div className={style.antPicUpload} style={{backgroundColor: "transparent", marginTop: 13}}>
-                <Upload
-                  style={{color: "red"}}
-                  listType="picture-card"
-                  showUploadList={{showPreviewIcon: false}}
-                  fileList={fileList}
-                  beforeUpload={(file) => {
-                    return false;
-                  }}
-                  onChange={(v: any) => {
-                    const {file} = v;
-                    // 判断文件类型，文件大小，和裁剪
-                    if (!picType.includes(file.type)) {
-                      errorMessage('仅支持上传jpg、jpeg、png格式的图片！');
-                      return;
-                    }
-                    setFileList(v.fileList);
-                    // 清空之前选的图片
-                    setPicModalState({...picModalState, checkedImg: ""});
-                  }}
-                >
-                  {fileList.length >= 1 ? null :
-                    <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
-                </Upload>
+                <div style={{display: showUpload ? "inline" : "none"}}>
+                  <Upload
+                    listType="picture-card"
+                    showUploadList={{showPreviewIcon: false, showRemoveIcon: false}}
+                    fileList={fileList}
+                    beforeUpload={() => {
+                      return false;
+                    }}
+                    onChange={async (v: any) => {
+                      const {file, fileList} = v;
+                      // 判断文件类型，文件大小，和裁剪
+                      if (!picType.includes(file.type)) {
+                        errorMessage('仅支持上传jpg、jpeg、png、gif、svg、psd格式的图片！');
+                        return;
+                      }
+                      setFileList(fileList);
+                      // 清空之前选的图片
+                      setPicModalState({...picModalState, checkedImg: ""});
+                      //   在界面展示图片
+                      const picString: any = await getBase64(fileList[0].originFileObj);
+                      document.getElementById("file_img")!.src = picString;
+                      setShowUpload(false);
+                    }}
+                  >
+                    {fileList.length >= 1 ? null :
+                      <Button icon={<PlusOutlined/>} style={{backgroundColor: "transparent", border: "none"}}></Button>}
+                  </Upload>
+                </div>
+
+                {/* 用于上传的图片选择后来展示已选择的照片，原始组件不支持图片展示的大小 */}
+                <img width={'100%'}
+                     height={77}
+                     id={"file_img"}
+                     style={{display: !showUpload ? "inline" : "none"}}
+                     onContextMenu={(e: any) => {
+                       e.preventDefault();
+                       confirm({
+                         title: "确定删除这张图片？",
+                         icon: <ExclamationCircleFilled/>,
+                         centered: true,
+                         onOk() {
+                           // 显示上传框
+                           setShowUpload(true);
+                           //   清空展示的图片
+                           document.getElementById("file_img")!.src = "";
+                           //   清空fileList
+                           setFileList([]);
+                         },
+                         onCancel() {
+                           return;
+                         },
+                       });
+                     }}
+                />
               </div>
               <div className={style.hintInfo}></div>
             </div>
           </div>
         </Spin>
+      </Modal>
+
+      <Modal>
+
       </Modal>
     </PageContainer>
   );

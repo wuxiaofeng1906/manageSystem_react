@@ -9,7 +9,8 @@ export const getS3Key = async (fileName: string) => {
   return result;
 };
 
-const getBase64 = (file: File) => {
+export const getBase64 = (file: File) => {
+  debugger
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);

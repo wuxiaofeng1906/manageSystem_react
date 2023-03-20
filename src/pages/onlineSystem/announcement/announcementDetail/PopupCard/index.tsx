@@ -264,6 +264,10 @@ const PopupCard: React.FC<any> = (props: any) => {
       sucMessage("公告发布成功！")
     }
   };
+
+  const setPicImgSource = (file: string) => {
+    document.getElementById("file_img")!.src = file;
+  };
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -310,7 +314,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                      alt="默认图" style={{height: 100, width: 150}}
                      onClick={() => {
                        setFileList([]);
-                       setPicModalState({...picModalState, visible: true})
+                       setPicModalState({...picModalState, visible: true});
                      }
                      }/> :
                 <Button type="default" icon={<UploadOutlined/>}
@@ -426,7 +430,10 @@ const PopupCard: React.FC<any> = (props: any) => {
       <Modal title="上传图片" visible={picModalState.visible} centered={true} maskClosable={false}
              onOk={uploadPicClick}
              onCancel={() => {
-               setPicModalState({checkedImg: "", visible: false})
+               setPicModalState({checkedImg: "", visible: false});
+               setPicImgSource("");
+               setShowUpload(true);
+               setFileList([]);
              }}
              closable={false}
              width={570}>
@@ -468,7 +475,8 @@ const PopupCard: React.FC<any> = (props: any) => {
                       setPicModalState({...picModalState, checkedImg: ""});
                       //   在界面展示图片
                       const picString: any = await getBase64(fileList[0].originFileObj);
-                      document.getElementById("file_img")!.src = picString;
+                      setPicImgSource(picString);
+                      // document.getElementById("file_img")!.src = picString;
                       setShowUpload(false);
                     }}
                   >
@@ -492,7 +500,8 @@ const PopupCard: React.FC<any> = (props: any) => {
                            // 显示上传框
                            setShowUpload(true);
                            //   清空展示的图片
-                           document.getElementById("file_img")!.src = "";
+                           setPicImgSource("")
+                           // document.getElementById("file_img")!.src = "";
                            //   清空fileList
                            setFileList([]);
                          },

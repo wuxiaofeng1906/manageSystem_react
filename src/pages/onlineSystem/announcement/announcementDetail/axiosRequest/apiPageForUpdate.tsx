@@ -581,39 +581,41 @@ const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any)
   let page: any = [];
   //  拿最后新增的
   for (let i = 0; i < newPopData.length; i++) {
+
     const pageDt = newPopData[i].tabsContent;
     const content: any = [];
+    if (pageDt.ptyGroup) {
+      (pageDt.ptyGroup).map((v: any) => {
 
-    (pageDt.ptyGroup).map((v: any) => {
-
-      // 二级特性
-      const secondLevel: any = [];
-      const second = v.seconds;
-      second.map((v2: any) => {
-        if (v2.first) {
-          secondLevel.push({
-            speciality: v2.first,
-            editFlag: "add"
-          })
-        }
+        // 二级特性
+        const secondLevel: any = [];
+        const second = v.seconds;
+        second.map((v2: any) => {
+          if (v2.first) {
+            secondLevel.push({
+              speciality: v2.first,
+              editFlag: "add"
+            })
+          }
+        });
+        content.push({
+          speciality: v.first,
+          editFlag: "add",
+          children: secondLevel
+        });
       });
-      content.push({
-        speciality: v.first,
+      page.push({
+        image: pageDt.uploadPic,
+        pageNum: newPopData[i].tabPage,
+        layoutTypeId: pageDt.picLayout,
         editFlag: "add",
-        children: secondLevel
-      });
-    });
-    page.push({
-      image: pageDt.uploadPic,
-      pageNum: newPopData[i].tabPage,
-      layoutTypeId: pageDt.picLayout,
-      editFlag: "add",
-      contents: [{
-        speciality: pageDt.specialName,
-        editFlag: "add",
-        children: content
-      }]
-    })
+        contents: [{
+          speciality: pageDt.specialName,
+          editFlag: "add",
+          children: content
+        }]
+      })
+    }
   }
   return page;
 }

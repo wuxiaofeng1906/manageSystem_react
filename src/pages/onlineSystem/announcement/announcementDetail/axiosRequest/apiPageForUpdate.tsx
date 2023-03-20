@@ -105,7 +105,7 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
     id: formData.releaseId,
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     // templateTypeId: formData.modules, //  修改的话不传模板id
-    updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm'), // 升级时间：手动选择时间，必填
+    updatedTime: dayjs(formData.announce_time).subtract(8, 'h').format('YYYY-MM-DD HH:mm'), // 升级时间：手动选择时间，必填
     description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
   };
   let specialData = {};
@@ -189,7 +189,7 @@ const updateAnnounceContentForAdd = async (formData: any, popupData: object = {}
   const data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
-    updatedTime: dayjs(formData.announce_time).format('YYYY-MM-DD HH:mm'), // 升级时间：手动选择时间，必填
+    updatedTime: dayjs(formData.announce_time).subtract(8, 'h').format('YYYY-MM-DD HH:mm'), // 升级时间：手动选择时间，必填
     description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
   };
 
@@ -264,8 +264,6 @@ const carouseNumIsUpdate = (newCommonData: any, oldCommonData: any) => {
 
 // 判断一级特性是否被修改
 const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
-  debugger
-
   let {carouselNum} = newCommonData;
   // 轮播页数至少是1个，不是轮播也有一页特性
   if (newCommonData.announce_carousel === 0) {
@@ -622,7 +620,6 @@ const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any)
 
 // 其他数据发生改变
 const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
-  debugger
   let page: any = [];
   //  轮播页减少,1.删除最后几张的轮播页数(特性可能会被修改) 2.删除所有的页面重建
   if (newCommonData.clearTabContent) {
@@ -672,7 +669,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
     id: oldCommonData.id,
     pageSize: newCommonData.carouselNum,
     iteration: newCommonData.announce_name,
-    updatedTime: dayjs(newCommonData.announce_time).format("YYYY-MM-DD hh:mm"),
+    updatedTime: dayjs(newCommonData.announce_time).subtract(8, 'h').format("YYYY-MM-DD hh:mm"),
     description: newCommonData.announce_content,
     pages: page
   }

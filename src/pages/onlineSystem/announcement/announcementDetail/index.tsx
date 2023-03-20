@@ -109,6 +109,7 @@ const Announce: React.FC<any> = (props: any) => {
         carouselNum: noticeDetails.pageSize,
         modules: noticeDetails.templateTypeId
       };
+      // setReleaseTime(dayjs(noticeDetails.updatedTime).format("YYYY-MM-DD HH:mm"))
       setCommonData(formdata);
       setOldCommonData({...formdata, releaseID});
       announcementForm.setFieldsValue(formdata);
@@ -270,13 +271,16 @@ const Announce: React.FC<any> = (props: any) => {
                      }]}>
             <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
                         onChange={(e, time) => {
-                          setReleaseTime(time);
+                          debugger
+
                           // 先获取原始数据，再改变数据
                           let source = announcementForm.getFieldValue("announce_content");
+                          const updateFunc = source.split("更新升级。更新功能：");
                           // 用原来的时间替换选中的时间
                           announcementForm.setFieldsValue({
-                            announce_content: source.replace(releaseTime, time)
+                            announce_content: `亲爱的用户：您好，企企经营管理平台已于${time}更新升级。更新功能：${updateFunc[1]}`
                           });
+                          setReleaseTime(time);
                         }}/>
           </Form.Item>
 

@@ -115,14 +115,48 @@ const PopupCard: React.FC<any> = (props: any) => {
     setYuQueSpinLoading(false);
   };
 
-  const delSavesData = (specialList: any) => {
-    if (isEmpty((specialList.specialName).trim())) {
-
+  // 判断是否界面有填写数据
+  const isPageImpty = (specialList: any) => {
+    // 除了图文布局，有一个不为空，则都返回fasle，都要将页面数据保留
+    // 特性名称不为空
+    if (specialList.specialName && !isEmpty(specialList.specialName)) {
+      return false;
     }
+    // 图片不为空
+    if (!isEmpty(specialList.uploadPic)) {
+      return false;
+    }
+    // 一级二级特性
+    const {ptyGroup} = specialList;
+    if (ptyGroup && ptyGroup.length > 0) {
+      for (let i = 0; i < ptyGroup.length; i++) {
+        let flag = true;
+        const specilaList = ptyGroup[i];
+        if (specilaList.first && !isEmpty((specilaList.first).trim())) {
+          flag = false;
+        }
+
+        const secondList = specilaList.seconds;
+        //  二级特性不是必填，所以
+        for (let m = 0; m < secondList.length; m++) {
+          if (secondList[m].first && !isEmpty((secondList[m].first).trim())) {
+            flag = false;
+            break;
+          }
+        }
+
+        // 一级特性和二级特性有一个不为空都要保留演示数据
+        if (!flag) {
+          return false;
+        }
+      }
+    }
+
+    return true
   }
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
-    debugger
+
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = picModalState.checkedImg;
 
@@ -137,19 +171,22 @@ const PopupCard: React.FC<any> = (props: any) => {
         })
       }
     }
-
-    // 判断数据是否为空，如果数据都为空，则tabsContent一定要为空。
-    const isAllEmpty = delSavesData(specialList);
-    // if(isAllEmpty){
-    //
-    // }
+    debugger
+    const result: any = [];
     oldList.map((v: any) => {
-      console.log(v)
-      v.tabPage === currentKey ? v.tabsContent = {...specialList, id: v.tabsContent.id} : v.tabsContent;
+      // page 相等，并且里面的内容不为空
+      if (v.tabPage === currentKey && !isPageImpty(specialList)) {
+        result.push({
+          ...v,
+          tabsContent: {...specialList, id: v.tabsContent.id}
+        });
+      } else {
+        result.push(v);
+      }
     });
-    setAnnPopData(oldList);
+    setAnnPopData(result);
     // 返回值共保存按钮使用
-    return oldList;
+    return result;
   };
   // tab切换
   const onTabsChange = (key: string) => {

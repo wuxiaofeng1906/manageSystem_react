@@ -264,6 +264,7 @@ const carouseNumIsUpdate = (newCommonData: any, oldCommonData: any) => {
 
 // 判断一级特性是否被修改
 const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
+  debugger
 
   let {carouselNum} = newCommonData;
   // 轮播页数至少是1个，不是轮播也有一页特性
@@ -294,13 +295,19 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
       newPtGroup = newPopTemp.ptyGroup;
     }
 
-    if ((!newPtGroup && oldPtGroup) || (newPtGroup && !oldPtGroup)) {
+    // if ((!newPtGroup && oldPtGroup) || (newPtGroup && !oldPtGroup)) {
+    //   updateValue = true;
+    //   break;
+    // }
+
+    if (newPtGroup && oldPtGroup) {
+      if (newPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同，也不同
+        updateValue = true;
+        break
+      }
+    } else {
       updateValue = true;
       break;
-    }
-    if (newPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同，也不同
-      updateValue = true;
-      break
     }
   }
 

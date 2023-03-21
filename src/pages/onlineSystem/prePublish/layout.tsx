@@ -121,7 +121,7 @@ const Layout = () => {
         <Space size={10}>
           <Button
             size={'small'}
-            disabled={checkStatus || touched}
+            // disabled={checkStatus || touched}
             onClick={() => onExtra(ref.current?.onSetting)}
             hidden={!hasPermission.paramSetting}
           >

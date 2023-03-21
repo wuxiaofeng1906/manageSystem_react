@@ -66,7 +66,8 @@ const Layout = () => {
     });
 
   const onExtra = async (fn: Function) => {
-    if (checkStatus || touched) return;
+    if (touched) return;
+    // if (checkStatus || touched) return;
     setTouched(true);
     try {
       await fn?.();
@@ -76,6 +77,7 @@ const Layout = () => {
     }
   };
 
+  //  封板锁定、历史记录
   const checkStatus = useMemo(() => {
     if (tab !== 'process') return true;
     return globalState.locked || globalState.finished;

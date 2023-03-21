@@ -66,7 +66,8 @@ const Layout = () => {
     });
 
   const onExtra = async (fn: Function) => {
-    if (checkStatus || touched) return;
+    if (touched) return;
+    // if (checkStatus || touched) return;
     setTouched(true);
     try {
       await fn?.();
@@ -76,6 +77,7 @@ const Layout = () => {
     }
   };
 
+  //  封板锁定、历史记录
   const checkStatus = useMemo(() => {
     if (tab !== 'process') return true;
     return globalState.locked || globalState.finished;
@@ -91,7 +93,7 @@ const Layout = () => {
           <Button
             type={'text'}
             title={'需求列表'}
-            disabled={touched || checkStatus}
+            // disabled={touched || checkStatus}
             hidden={!hasPermission.storyList}
             icon={<BarsOutlined/>}
             style={{border: 'none', background: 'initial'}}
@@ -121,7 +123,7 @@ const Layout = () => {
         <Space size={10}>
           <Button
             size={'small'}
-            disabled={checkStatus || touched}
+            // disabled={checkStatus || touched}
             onClick={() => onExtra(ref.current?.onSetting)}
             hidden={!hasPermission.paramSetting}
           >

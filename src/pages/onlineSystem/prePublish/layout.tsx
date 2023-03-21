@@ -91,7 +91,7 @@ const Layout = () => {
           <Button
             type={'text'}
             title={'需求列表'}
-            disabled={touched || checkStatus}
+            // disabled={touched || checkStatus}
             hidden={!hasPermission.storyList}
             icon={<BarsOutlined/>}
             style={{border: 'none', background: 'initial'}}

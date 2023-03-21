@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button } from 'antd';
+import React, {useState, useEffect, useMemo} from 'react';
+import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button} from 'antd';
 import dayjs from 'dayjs';
-import { useModel } from 'umi';
-import { isEmpty, difference, isEqual, intersection, uniq } from 'lodash';
+import {useModel} from 'umi';
+import {isEmpty, difference, isEqual, intersection, uniq} from 'lodash';
 import styles from './DemandListModal.less';
-import { OnlineSystemServices } from '@/services/onlineSystem';
+import {OnlineSystemServices} from '@/services/onlineSystem';
 import {
   ClusterType,
   StoryStatus,
   WhetherOrNot,
   onLog,
 } from '@/pages/onlineSystem/config/constant';
-import { errorMessage, infoMessage } from '@/publicMethods/showMessages';
+import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 
@@ -42,7 +42,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       return;
     }
     OnlineSystemServices.getBranch().then((res) => {
-      setBranchs(res?.map((it: any) => ({ label: it.branch_name, value: it.branch_name })));
+      setBranchs(res?.map((it: any) => ({label: it.branch_name, value: it.branch_name})));
     });
     if (!isEmpty(props.data)) {
       const branch = props.data?.branch;
@@ -52,7 +52,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         release_env: props.data.release_env,
       });
       if (branch) {
-        const result = { branch, type: '1' };
+        const result = {branch, type: '1'};
         baseForm.setFieldsValue(result);
         setComputed(result);
       }
@@ -78,14 +78,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const branchEnv = await OnlineSystemServices.branchEnv({
       branch: computed?.branch,
     });
-    setBranchEnv(branchEnv?.map((it: string) => ({ label: it, value: it })));
+    setBranchEnv(branchEnv?.map((it: string) => ({label: it, value: it})));
     setRelatedStory(res);
   };
 
   const getTableList = async () => {
     setSpin(true);
     try {
-      const res = await OnlineSystemServices.getStoryList({ branch: computed?.branch });
+      const res = await OnlineSystemServices.getStoryList({branch: computed?.branch});
       setList(res);
       // 新增 -默认勾选特性项目
       if (!props.data?.release_num) {
@@ -130,15 +130,15 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     // 灰度发布
     if (!isPreRelease) {
       setSpin(false);
-      props.onOk?.({ ...baseData, release_num });
+      props.onOk?.({...baseData, release_num});
       return;
     }
     // 非积压发布
     const time = (isEqual(values.cluster, ['cn-northwest-0'])
-      ? dayjs().startOf('d').hour(10)
-      : isEqual(values.cluster, ['cn-northwest-1'])
-      ? dayjs().startOf('d').hour(22)
-      : dayjs().startOf('d')
+        ? dayjs().startOf('d').hour(10)
+        : isEqual(values.cluster, ['cn-northwest-1'])
+          ? dayjs().startOf('d').hour(22)
+          : dayjs().startOf('d')
     ).format('YYYY-MM-DD HH:mm:ss');
     const name =
       difference(values.cluster, ['cn-northwest-0', 'cn-northwest-1'])?.length > 0
@@ -163,7 +163,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     try {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
-      props.onOk?.({ ...baseData, release_num });
+      props.onOk?.({...baseData, release_num});
     } catch (e) {
       errorMessage('接口异常');
       setSpin(false);
@@ -266,113 +266,113 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       isSprint,
       column: isSprint
         ? [
-            {
-              title: '序号',
-              width: 70,
-              render: (_: any, r: any, i: number) => i + 1,
-              fixed: 'left',
-            },
-            {
-              title: '禅道执行名称',
-              dataIndex: 'pro_name',
-              ellipsis: { showTitle: false },
-              width: 500,
-              fixed: 'left',
-              render: (v: string) => (
-                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
-              ),
-            },
-            {
-              title: '应用服务',
-              dataIndex: 'apps',
-              width: 400,
-              ellipsis: { showTitle: false },
-              render: (v: string) => (
-                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
-              ),
-            },
-          ]
+          {
+            title: '序号',
+            width: 70,
+            render: (_: any, r: any, i: number) => i + 1,
+            fixed: 'left',
+          },
+          {
+            title: '禅道执行名称',
+            dataIndex: 'pro_name',
+            ellipsis: {showTitle: false},
+            width: 500,
+            fixed: 'left',
+            render: (v: string) => (
+              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            ),
+          },
+          {
+            title: '应用服务',
+            dataIndex: 'apps',
+            width: 400,
+            ellipsis: {showTitle: false},
+            render: (v: string) => (
+              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            ),
+          },
+        ]
         : [
-            {
-              title: '序号',
-              width: 70,
-              render: (_: any, r: any, i: number) => i + 1,
-              fixed: 'left',
-            },
-            {
-              title: '禅道执行名称',
-              dataIndex: 'pro_name',
-              ellipsis: { showTitle: false },
-              width: 200,
-              fixed: 'left',
-              render: (v: string) => (
-                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+          {
+            title: '序号',
+            width: 70,
+            render: (_: any, r: any, i: number) => i + 1,
+            fixed: 'left',
+          },
+          {
+            title: '禅道执行名称',
+            dataIndex: 'pro_name',
+            ellipsis: {showTitle: false},
+            width: 200,
+            fixed: 'left',
+            render: (v: string) => (
+              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            ),
+          },
+          {
+            title: '需求编号',
+            dataIndex: 'story',
+            width: 90,
+          },
+          {
+            title: '需求标题',
+            dataIndex: 'title',
+            width: 150,
+            ellipsis: {showTitle: false},
+            render: (v: string) => (
+              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            ),
+          },
+          {
+            title: '需求阶段',
+            dataIndex: 'status',
+            width: 90,
+            ellipsis: {showTitle: false},
+            render: (v: string) => StoryStatus[v] ?? '',
+          },
+          {
+            title: '应用服务',
+            dataIndex: 'apps',
+            width: 110,
+            ellipsis: {showTitle: false},
+            render: (v: string) => (
+              <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'}/>
+            ),
+          },
+          {
+            title: '是否涉及数据update',
+            dataIndex: 'db_update',
+            // width: 150,
+            render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+          },
+          {
+            title: '是否涉及数据Recovery',
+            dataIndex: 'is_recovery',
+            render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+          },
+          {
+            title: '是否可热更',
+            dataIndex: 'is_update',
+            width: 90,
+            render: (v: string, row: any, i: number) =>
+              v == '-' ? (
+                v
+              ) : (
+                <Select
+                  disabled={user?.group !== 'superGroup' || memoEdit.update}
+                  value={v}
+                  style={{width: '100%'}}
+                  options={Object.keys(WhetherOrNot)?.map((k) => ({
+                    value: k,
+                    label: WhetherOrNot[k],
+                  }))}
+                  onChange={(e) => updateStatus(row, e, i)}
+                />
               ),
-            },
-            {
-              title: '需求编号',
-              dataIndex: 'story',
-              width: 90,
-            },
-            {
-              title: '需求标题',
-              dataIndex: 'title',
-              width: 150,
-              ellipsis: { showTitle: false },
-              render: (v: string) => (
-                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
-              ),
-            },
-            {
-              title: '需求阶段',
-              dataIndex: 'status',
-              width: 90,
-              ellipsis: { showTitle: false },
-              render: (v: string) => StoryStatus[v] ?? '',
-            },
-            {
-              title: '应用服务',
-              dataIndex: 'apps',
-              width: 110,
-              ellipsis: { showTitle: false },
-              render: (v: string) => (
-                <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'} />
-              ),
-            },
-            {
-              title: '是否涉及数据update',
-              dataIndex: 'db_update',
-              // width: 150,
-              render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-            },
-            {
-              title: '是否涉及数据Recovery',
-              dataIndex: 'is_recovery',
-              render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-            },
-            {
-              title: '是否可热更',
-              dataIndex: 'is_update',
-              width: 90,
-              render: (v: string, row: any, i: number) =>
-                v == '-' ? (
-                  v
-                ) : (
-                  <Select
-                    disabled={user?.group !== 'superGroup'}
-                    value={v}
-                    style={{ width: '100%' }}
-                    options={Object.keys(WhetherOrNot)?.map((k) => ({
-                      value: k,
-                      label: WhetherOrNot[k],
-                    }))}
-                    onChange={(e) => updateStatus(row, e, i)}
-                  />
-                ),
-            },
-            { title: '需求创建人', dataIndex: 'opened_by', width: 100 },
-            { title: '需求指派人', dataIndex: 'ass_to', width: 100 },
-          ],
+          },
+          {title: '需求创建人', dataIndex: 'opened_by', width: 100},
+          {title: '需求指派人', dataIndex: 'ass_to', width: 100},
+        ],
     };
   }, [JSON.stringify(list), user?.group]);
 
@@ -417,13 +417,13 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                 <Form.Item
                   label={'类型选择'}
                   name={'type'}
-                  rules={[{ required: true, message: '请选择发布类型！' }]}
+                  rules={[{required: true, message: '请选择发布类型！'}]}
                 >
                   <Select
                     disabled={memoEdit.update}
                     options={[
-                      { label: '非积压发布', value: '1' },
-                      { label: '灰度推线上', value: '2' },
+                      {label: '非积压发布', value: '1'},
+                      {label: '灰度推线上', value: '2'},
                     ]}
                   />
                 </Form.Item>
@@ -433,7 +433,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   <Form.Item
                     label={'上线分支'}
                     name={'branch'}
-                    rules={[{ required: true, message: '请选择发布类型！' }]}
+                    rules={[{required: true, message: '请选择发布类型！'}]}
                   >
                     <Select
                       options={branchs}
@@ -456,7 +456,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     <Form.Item
                       name={'release_env_type'}
                       label={'发布环境类型'}
-                      rules={[{ required: true, message: '请选择发布环境' }]}
+                      rules={[{required: true, message: '请选择发布环境'}]}
                     >
                       <Select
                         placeholder={'发布环境类型'}
@@ -474,22 +474,25 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                       noStyle
                       shouldUpdate={(old, next) => old.release_env_type !== next.release_env_type}
                     >
-                      {({ getFieldValue }) => {
+                      {({getFieldValue}) => {
                         const env = getFieldValue('release_env_type');
                         return (
                           <Form.Item
                             name={'cluster'}
                             label={'发布集群'}
-                            rules={[{ required: true, message: '请选择发布集群' }]}
+                            rules={[{required: true, message: '请选择发布集群'}]}
                           >
                             <Select
                               mode={'multiple'}
                               options={globalEnv}
                               placeholder={'发布集群'}
                               disabled={
-                                // global 、班车，特性项目 不可编辑
-                                env == 'global' || (memoColumn?.isSprint && env == 'tenant')
+                                memoEdit.update || env == 'global' || (memoColumn?.isSprint && env == 'tenant')
                               }
+                              //{
+                              // global 、班车，特性项目 不可编辑
+                              // env == 'global' || (memoColumn?.isSprint && env == 'tenant')
+                              //}
                             />
                           </Form.Item>
                         );
@@ -500,7 +503,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     <Form.Item
                       name={'release_env'}
                       label={'镜像环境绑定'}
-                      rules={[{ required: true, message: '请选择镜像环境绑定' }]}
+                      rules={[{required: true, message: '请选择镜像环境绑定'}]}
                     >
                       <Select
                         showSearch
@@ -515,7 +518,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               <div className={styles.onlineTable}>
                 <Table
                   size={'small'}
-                  scroll={{ y: 400, x: 500 }}
+                  scroll={{y: 400, x: 500}}
                   pagination={false}
                   columns={memoColumn.column}
                   rowKey={(p) => `${p.story}&${p.pro_id}`}
@@ -536,7 +539,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   }}
                 />
               </div>
-              <p style={{ marginTop: 8 }}>
+              <p style={{marginTop: 8}}>
                 提示：如本次发布不涉及的需求，请将对应需求前勾选的复选框去掉
               </p>
             </>

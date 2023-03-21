@@ -87,11 +87,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch});
       setList(res);
-      // 新增 -默认勾选特性项目
+      // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
         setSelected(
           res?.flatMap((it: any) =>
-            ['stagepatch', 'emergency', 'sprint'].includes(it.sprinttype) ? [] : [it],
+            ['stagepatch', 'emergency'].includes(it.sprinttype) ? [] : [it], // sprint
           ),
         );
       } else {
@@ -186,7 +186,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     } else {
       // 默认勾选 特性项目
       list
-        .filter((it) => !['stagepatch', 'emergency', 'sprint'].includes(it.sprinttype))
+        .filter((it) => !['stagepatch', 'emergency'].includes(it.sprinttype)) // sprint
         .forEach((o) => {
           const nothing = isEmpty(
             selectedData?.find(
@@ -210,6 +210,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         (o) => intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0,
       ),
     );
+
     if (isEmpty(appServers?.[v])) return;
     setList(
       list?.map((it: any) => ({

@@ -202,8 +202,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         v == 'global'
           ? ['cn-northwest-global']
           : memoColumn.isSprint
-          ? ['cn-northwest-0']
-          : uniq(selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : []))),
+          ? ['cn-northwest-0'] : []
+      // : uniq(selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : []))),
     });
     setSelected(
       selectedData?.filter(

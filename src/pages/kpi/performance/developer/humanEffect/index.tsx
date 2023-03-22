@@ -30,10 +30,12 @@ const ruleData: IRuleData[] = [
         {dataIndex: 'days', title: 'Q2工作日（天）'},
         {
           dataIndex: 'remark', title: '备注',
-          onCell: () => {
-            return {rowSpan: 3}
+          onCell: (v: any) => {
+            if (v.remark) {
+              return {rowSpan: 3}
+            }
+            return {rowSpan: 0}
           }
-          ,
         }
       ],
       dataSource: [

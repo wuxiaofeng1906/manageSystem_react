@@ -517,10 +517,10 @@ export default [
               },
               {
                 name: '实际产出率',
-                path: 'actualRate',
-                component: './kpi/performance/developer/actualRate',
+                path: 'actualOutputRate',
+                component: './kpi/performance/developer/actualOutputRate',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true, // 接口未开发
+                // hideInMenu: true, // 接口未开发
               },
             ],
           },

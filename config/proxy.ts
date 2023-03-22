@@ -15,7 +15,7 @@ export default {
       pathRewrite: { '^': '' },
     },
     '/api/': {
-      target: 'http://10.0.144.53:8300/',
+      target: 'http://10.0.144.53:8300/', // 8380 是公共连的测试服务器
       changeOrigin: true,
       pathRewrite: { '^': '' },
     },

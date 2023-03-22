@@ -77,12 +77,13 @@ interface Iparam {
   showSide?: boolean; // 显示前后端
   isMulti?: boolean; // 默认为乘以
   isTest?: boolean; // 测试-指标模块
-  multiNumber?: number // 数据乘以多少（多用于统计单位为%的数据来乘以100）
+  showEmpty?: boolean // 如果后端传的是null之，前端是否展示为空（还是0）
 }
 
 export const formatTreeData = ({
                                  origin = [], showDenominator = false,
-                                 percent = 1, showSide = false, isMulti = true, isTest = false, multiNumber = 1
+                                 percent = 1, showSide = false, isMulti = true, isTest = false,
+                                 showEmpty = false
                                }: Iparam) => {
   if (!origin) return null;
   const result: any = [];
@@ -98,7 +99,7 @@ export const formatTreeData = ({
             dept: o.dept,
             extra: o.deptName.includes('全部') ? 1 : o.deptName.includes('班车') ? 2 : 0,
             [`${startTime}range`]: elements.range,
-            [startTime]: isMulti ? o.kpi * percent * multiNumber : o?.kpi / percent * multiNumber,
+            [startTime]: isMulti ? o.kpi * percent : o?.kpi / percent,
           });
         }
 
@@ -109,7 +110,7 @@ export const formatTreeData = ({
         isDept: true,
         dept: elements.total?.dept,
         [`${startTime}range`]: elements.range,
-        [startTime]: isMulti ? elements.total?.kpi * percent * multiNumber : elements.total?.kpi / percent * multiNumber,
+        [startTime]: isMulti ? elements.total?.kpi * percent : elements.total?.kpi / percent,
         ...(showDenominator
           ? {
             [`${startTime}_numerator`]: elements.total?.sideKpi?.numerator,
@@ -166,7 +167,7 @@ export const formatTreeData = ({
         isDept: true,
         dept: dept.dept,
         [`${startTime}range`]: elements.range,
-        [startTime]: isMulti ? dept.kpi * percent * multiNumber : dept.kpi / percent * multiNumber,
+        [startTime]: isMulti ? dept.kpi * percent : dept.kpi / percent,
         ...denominator,
       });
       // 判断部门有没有前后端：
@@ -213,7 +214,7 @@ export const formatTreeData = ({
               isDept: false,
               dept: dept.dept,
               [`${startTime}range`]: elements.range,
-              [startTime]: user.kpi * percent * multiNumber,
+              [startTime]: showEmpty ? user.kpi : user.kpi * percent,
               ...(showDenominator
                 ? {
                   [`${startTime}_numerator`]: user.sideKpi.numerator,

@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { AgGridReact } from 'ag-grid-react';
-import type { CellClickedEvent, GridApi } from 'ag-grid-community';
-import { Button, Drawer, Table } from 'antd';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {AgGridReact} from 'ag-grid-react';
+import type {CellClickedEvent, GridApi} from 'ag-grid-community';
+import {Button, Drawer, Table} from 'antd';
 import {
   ScheduleTwoTone,
   CalendarTwoTone,
@@ -11,13 +11,13 @@ import {
   AppstoreTwoTone,
   FundTwoTone,
 } from '@ant-design/icons';
-import type { IStaticBy, IIdentity, Period } from '@/hooks/statistic';
-import { useStatistic } from '@/hooks/statistic';
-import { isEmpty, isString } from 'lodash';
-import type { ColumnsType } from 'antd/lib/table/interface';
-import type { IStatisticQuery } from '@/services/statistic';
-import { ColDef } from 'ag-grid-community/dist/lib/entities/colDef';
-import { initGridTable } from '@/utils/utils';
+import type {IStaticBy, IIdentity, Period} from '@/hooks/statistic';
+import {useStatistic} from '@/hooks/statistic';
+import {isEmpty, isString} from 'lodash';
+import type {ColumnsType} from 'antd/lib/table/interface';
+import type {IStatisticQuery} from '@/services/statistic';
+import {ColDef} from 'ag-grid-community/dist/lib/entities/colDef';
+import {initGridTable} from '@/utils/utils';
 import WrapperKpi from '@/components/wrapperKpi';
 
 interface IStatic {
@@ -28,6 +28,7 @@ interface IStatic {
   period?: Period; // 接口参数类型
   len?: number; // 保留小数位数
   unit?: string; // 指标单位
+  valueShowEmpty?:boolean, // 当返回值为null时，是否显示为”“（或者是0）
   initFilter?: IStaticBy[]; // 查询方式
   columnDefs?: any[]; // 列
   defaultColumn?: boolean; // 以默认列方式展示
@@ -38,38 +39,41 @@ interface IStatic {
 }
 
 type INode = string | React.ReactNode;
+
 export interface IRuleData {
   title: INode;
   child: INode[];
   table?: { dataSource: any[]; column: ColumnsType<any> }; // 支持antd table
 }
+
 const condition: { icon: React.ReactNode; title: string; type: IStaticBy }[] = [
-  { icon: <ProfileTwoTone />, title: '按天', type: 'day' },
-  { icon: <ProfileTwoTone />, title: '按周', type: 'week' },
-  { icon: <CalendarTwoTone />, title: '按月', type: 'month' },
-  { icon: <ScheduleTwoTone />, title: '按季', type: 'quarter' },
-  { icon: <FundTwoTone />, title: '按半年', type: 'halfYear' },
-  { icon: <AppstoreTwoTone />, title: '按年', type: 'year' },
+  {icon: <ProfileTwoTone/>, title: '按天', type: 'day'},
+  {icon: <ProfileTwoTone/>, title: '按周', type: 'week'},
+  {icon: <CalendarTwoTone/>, title: '按月', type: 'month'},
+  {icon: <ScheduleTwoTone/>, title: '按季', type: 'quarter'},
+  {icon: <FundTwoTone/>, title: '按半年', type: 'halfYear'},
+  {icon: <AppstoreTwoTone/>, title: '按年', type: 'year'},
 ];
 // 指标表格组件
 const IStaticAgTable: React.FC<IStatic> = ({
-  initFilter,
-  request,
-  ruleData,
-  len,
-  identity,
-  period,
-  columnDefs,
-  columnTypes,
-  unit = '%',
-  showDenominator = false,
-  defaultColumn = true,
-  treeData = true,
-  normalQuarter = false,
-  onClick,
-}) => {
+                                             initFilter,
+                                             request,
+                                             ruleData,
+                                             len,
+                                             identity,
+                                             period,
+                                             columnDefs,
+                                             columnTypes,
+                                             unit = '%',
+                                             valueShowEmpty = false,
+                                             showDenominator = false,
+                                             defaultColumn = true,
+                                             treeData = true,
+                                             normalQuarter = false,
+                                             onClick,
+                                           }) => {
   const gridApi = useRef<GridApi>();
-  const { handleStaticBy, columns, rowData, loading } = useStatistic();
+  const {handleStaticBy, columns, rowData, loading} = useStatistic();
   const [visible, setVisible] = useState(false);
 
   const [gridHeight, setGridHeight] = useState(window.innerHeight - 240);
@@ -108,38 +112,38 @@ const IStaticAgTable: React.FC<IStatic> = ({
     () =>
       treeData
         ? {
-            treeData: true,
-            groupDefaultExpanded: -1,
-            getDataPath: (source: any) => source.Group,
-            autoGroupColumnDef: {
-              minWidth: 280,
-              headerName: '部门-人员',
-              cellRendererParams: { suppressCount: true },
-              pinned: 'left',
-              suppressMenu: false,
-            },
-          }
+          treeData: true,
+          groupDefaultExpanded: -1,
+          getDataPath: (source: any) => source.Group,
+          autoGroupColumnDef: {
+            minWidth: 280,
+            headerName: '部门-人员',
+            cellRendererParams: {suppressCount: true},
+            pinned: 'left',
+            suppressMenu: false,
+          },
+        }
         : {},
     [treeData],
   );
   return (
     <PageContainer>
-      <div style={{ background: 'white' }}>
-        <ConditionHeader initFilter={initFilter} onChange={changeStaticBy} />
-        <label style={{ fontWeight: 'bold' }}>(统计单位：{unit})</label>
+      <div style={{background: 'white'}}>
+        <ConditionHeader initFilter={initFilter} onChange={changeStaticBy}/>
+        <label style={{fontWeight: 'bold'}}>(统计单位：{unit})</label>
         <Button
           type="text"
-          style={{ color: '#1890FF', float: 'right' }}
-          icon={<QuestionCircleTwoTone />}
+          style={{color: '#1890FF', float: 'right'}}
+          icon={<QuestionCircleTwoTone/>}
           size={'large'}
           onClick={() => setVisible(true)}
         >
           计算规则
         </Button>
       </div>
-      <div style={{ height: gridHeight, width: '100%' }}>
+      <div style={{height: gridHeight, width: '100%'}}>
         {isEmpty(columns) ? (
-          <div />
+          <div/>
         ) : (
           <AgGridReact
             {...opsMemo}
@@ -147,15 +151,15 @@ const IStaticAgTable: React.FC<IStatic> = ({
             rowData={rowData}
             animateRows={true}
             columnTypes={columnTypes}
-            {...initGridTable({ ref: gridApi, height: 32 })}
+            {...initGridTable({ref: gridApi, height: 32})}
             frameworkComponents={{
               wrapperkpi: (p: CellClickedEvent) =>
-                WrapperKpi({ params: p, showSplit: showDenominator, len, onClick }),
+                WrapperKpi({params: p, showSplit: showDenominator, len, onClick,valueShowEmpty}),
             }}
           />
         )}
       </div>
-      <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
+      <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData}/>
     </PageContainer>
   );
 };
@@ -164,17 +168,17 @@ export default IStaticAgTable;
 
 // 规则
 export const IDrawer = ({
-  visible,
-  setVisible,
-  ruleData,
-}: {
+                          visible,
+                          setVisible,
+                          ruleData,
+                        }: {
   visible: boolean;
   setVisible: (v: boolean) => void;
   ruleData: IRuleData[];
 }) => {
   return (
     <Drawer
-      title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
+      title={<label style={{fontWeight: 'bold', fontSize: 20}}>计算规则</label>}
       placement="right"
       width={300}
       closable={false}
@@ -184,22 +188,22 @@ export const IDrawer = ({
       {ruleData.map((it, i) => (
         <div key={i}>
           {isString(it.title)
-            ? it.title && <p style={{ fontWeight: 'bold' }}>{`${i + 1}.${it.title}:`}</p>
+            ? it.title && <p style={{fontWeight: 'bold'}}>{`${i + 1}.${it.title}:`}</p>
             : it.title}
           {it.child?.map((v) =>
             isString(v) ? (
-              <p key={v} style={{ textIndent: '2em', margin: '5px 0' }}>{`${v};`}</p>
+              <p key={v} style={{textIndent: '2em', margin: '5px 0'}}>{`${v};`}</p>
             ) : (
               v
             ),
           )}
           {!isEmpty(it.table) && (
             <Table
-              style={{ wordBreak: 'keep-all' }}
+              style={{wordBreak: 'keep-all'}}
               dataSource={it.table?.dataSource}
               columns={it.table?.column}
               pagination={false}
-              scroll={{ x: 300 }}
+              scroll={{x: 300}}
               bordered
             />
           )}
@@ -211,9 +215,9 @@ export const IDrawer = ({
 
 // 查询方式
 export const ConditionHeader = ({
-  initFilter = ['week', 'month', 'quarter', 'year'],
-  onChange,
-}: {
+                                  initFilter = ['week', 'month', 'quarter', 'year'],
+                                  onChange,
+                                }: {
   initFilter?: IStaticBy[];
   onChange: (type: IStaticBy) => void;
 }) => {
@@ -224,7 +228,7 @@ export const ConditionHeader = ({
           <Button
             key={it.type}
             type="text"
-            style={{ color: 'black' }}
+            style={{color: 'black'}}
             icon={it.icon}
             size={'large'}
             hidden={!initFilter?.includes(it.type)}

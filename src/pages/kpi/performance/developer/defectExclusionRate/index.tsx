@@ -159,7 +159,7 @@ const BugRateTableList: React.FC<any> = () => {
           <p style={cssIndent}>（1）bug创建人是开发；</p>
           <p style={cssIndent}>（2）bug来源是'概设评审、详设评审、CodeReview、开发自测、开发联调、内部演示、外部演示’；</p>
           <p style={cssIndent}>（3）解决方案为“空”“已解决”“延期处理”“后续版本”“转为需求”的；</p>
-          <p style={cssIndent}>（4）bug加权取bug严重程度 = 1*5+2*2+3*1+4*0.1；</p>
+          <p style={cssIndent}>（4）bug加权取bug严重程度 =P0*5+P1*2+P2*1+P3*0.1；</p>
 
           <p> 2.分母：开发自测加权bug数取上面分子的结果，测试发现加权bug数的bug范围。 </p>
           <p style={cssIndent}>（1）bug创建人是测试；</p>

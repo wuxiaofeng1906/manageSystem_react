@@ -169,7 +169,7 @@ export const zentaoTestColumn: (ColDef | ColGroupDef)[] = [
 
 export const preServerColumn = (data: any[]): ColumnsType<any> => {
   const flag = data.some(
-    (it: any) => it.project.includes('stage-patch') || it.project.includes('emergency'),
+    (it: any) => it.project ? it.project.includes('stage-patch') || it.project.includes('emergency') : false,
   );
   let arr: any[] = [
     {

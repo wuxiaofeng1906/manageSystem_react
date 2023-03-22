@@ -834,7 +834,7 @@ const StatisticServices = {
         }
       }
   `);
-    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', multiNumber: 100}), loading};
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', percent: 100}), loading};
   },
 
   // 计划偏差率
@@ -867,7 +867,7 @@ const StatisticServices = {
       }
   `);
 
-    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', multiNumber: 100}), loading};
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', percent: 100}), loading};
   },
 
   // 自动化单元测试覆盖率

@@ -52,7 +52,7 @@ const WrapperKpi = ({
   }
   // null 值是显示空
   if (valueShowEmpty) {
-    return "";
+    return "-";
   }
 
   // null 显示为0

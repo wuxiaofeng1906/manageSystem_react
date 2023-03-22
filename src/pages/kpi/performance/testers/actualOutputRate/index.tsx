@@ -59,6 +59,7 @@ const ActualOutputRate: React.FC<any> = () => {
       identity={'TESTER'}
       unit={'%'}
       len={2}
+      valueShowEmpty={true}
     />
   );
 };

@@ -12,16 +12,16 @@ const ruleData: IRuleData[] = [
     child: [
       '统计zt.project.scale>0',
       '统计完成或关闭任务',
-      '由开发完成或关闭的（没有完成人的取关闭人）由开发完成或关闭的（没有完成人的取关闭人）'
+      '由测试完成或关闭的（没有完成人的取关闭人）'
     ],
   },
   {
     title: '计算公式',
     child: [
-      '开发-实际产出率 = AVG(该周期该开发所有执行的"开发-实际产出率"）',
-      '单个执行的"开发-实际产出率" = SUM(该开发所有任务的标准工时) / SUM(该开发所有任务的实际消耗工时) *100',
-      '该开发所有任务的标准工时 = (该开发在该执行所有任务的预计工时 / 该执行的总预计工时) * 该执行的总标准工时.(注意：班车和emergency、stagepatch等任务消耗工时<=0.1的不计入)',
-      '该执行的总标准工时 = 规模*该执行对应的标准人天*8',
+      '测试-实际产出率 = AVG(该周期该测试所有执行的测试-实际产出率）',
+      '单个执行的测试-实际产出率 = SUM(该测试所有任务的标准工时) / SUM(该测试所有任务的实际消耗工时) *100',
+      '该测试所有任务的标准工时 = (该测试在该执行所有任务的预计工时 / 该执行的总预计工时) * 该执行的总标准工时，注意：班车和emergency、stagepatch等任务消耗工时<=0.1的不计入',
+      '该执行的总标准工时 = 规模*该执行对应的标准人天*8 ',
       '该执行对应的标准人天：'
     ],
     table: {
@@ -42,6 +42,10 @@ const ruleData: IRuleData[] = [
           type: 'sprint/hotfix/emergency/stage-patch/stage-emergency',
           days: '22',
         },
+        {
+          type: '自动化平台项目下的执行',
+          days: '27'
+        }
 
       ],
     },
@@ -52,7 +56,7 @@ const ActualOutputRate: React.FC<any> = () => {
     <IStaticAgTable
       ruleData={ruleData}
       request={StatisticServices.devTestActualOutputRate}
-      identity={'DEVELOPER'}
+      identity={'TESTER'}
       unit={'%'}
       len={2}
     />

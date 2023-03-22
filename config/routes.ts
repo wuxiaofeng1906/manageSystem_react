@@ -807,10 +807,10 @@ export default [
               },
               {
                 name: '实际产出率',
-                path: 'actualRate',
-                component: './kpi/performance/testers/actualRate',
+                path: 'actualOutputRate',
+                component: './kpi/performance/testers/actualOutputRate',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true, // 接口未开发
+                // hideInMenu: true, // 接口未开发
               },
             ],
           },

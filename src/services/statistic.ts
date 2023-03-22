@@ -1166,7 +1166,7 @@ const StatisticServices = {
             }
       }
   `);
-    return {loading, data: formatTreeData({origin: data.data, isTest: false})};
+    return {loading, data: formatTreeData({origin: data.data, isTest: identity === 'TESTER'})};
   },
 };
 export default StatisticServices;

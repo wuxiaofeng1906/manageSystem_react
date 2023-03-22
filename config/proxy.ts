@@ -15,7 +15,7 @@ export default {
       pathRewrite: {'^': ''},
     },
     '/api/': {
-      target: 'http://10.0.144.53:8380/',
+      target: 'http://10.0.144.53:8380/', // 原始端口：8300
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },

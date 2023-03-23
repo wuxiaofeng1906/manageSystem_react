@@ -10,6 +10,7 @@ import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import {isEmpty, orderBy} from 'lodash';
 import dayjs from 'dayjs';
 
+// 需求链接：https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-Q4V6 《研发过程数据统计2022-2023年》
 // 项目实际产出率
 const ruleData: IRuleData[] = [
   {
@@ -68,6 +69,7 @@ const ActualOutputRate: React.FC<any> = () => {
         normalQuarter={true}
         unit={'%'}
         len={2}
+        valueShowEmpty={true}
         onClick={(p: CellClickedEvent) =>
           setActiveItem({
             visible: true,

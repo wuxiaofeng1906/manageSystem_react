@@ -16,6 +16,7 @@ import {columsForWeeks, columsForMonths, columsForQuarters, columsForYears} from
 import {queryDevDefectExcRate} from "./gridConfigure/data";
 import {testPlanDevRateRuleColumns, testPlanDevRateRuleDatas} from "../devCommonRules";
 
+// 需求链接：https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-Yrw2
 const ShowTestPlanDeviationRate: React.FC<any> = () => {
 
   /* region ag-grid */
@@ -161,7 +162,10 @@ const ShowTestPlanDeviationRate: React.FC<any> = () => {
           <p style={cssIndent}>5.实际提测完成日期取值：任务类型为‘计划’，且任务名称包含'开发提测演示’，且任务状态为‘已完成 或 已关闭’
             ，取该任务的‘实际完成日期’（finishedDate）。如果有多个该类型任务，'实际完成日期'取该类任务最后的日期，Max（finishDate）；</p>
           <p style={cssIndent}>6.计划提测截止日期取值：取执行概况中的'计划提测时间‘；</p>
-          <p style={cssIndent}>7.开发阶段计划开始日期取值：任务类型为‘计划’，且任务名称包含'开发阶段计划’，且任务状态为‘已完成 或 已关闭’ ，取该任务的‘预计开始日期’；</p>
+          <p style={cssIndent}>7.开发阶段计划开始日期取值：任务类型为‘计划’，且任务名称包含'开发阶段计划’，且任务状态为‘已完成 或 已关闭’
+            ，取该任务的‘预计开始日期’（estStarted）；</p>
+          <p style={cssIndent}>8.优先查新表zt_executionplan，没有数据再去查‘计划’类任务
+            单个项目的开发计划偏差率直接取新表zt_executionplan中该执行的‘开发阶段计划--基线偏差率’；</p>
 
 
         </Drawer>

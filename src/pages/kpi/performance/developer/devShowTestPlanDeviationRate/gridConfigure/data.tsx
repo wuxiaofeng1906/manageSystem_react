@@ -8,7 +8,7 @@ export const queryDevDefectExcRate = async (client: GqlClient<object>, params: s
   if (condition.typeFlag === 0) {
     return [];
   }
-
+  // 开发-提测计划偏差率
   const {data} = await client.query(`
       {
           devShowcasePlanDept(kind: "${condition.typeFlag}", ends: ${condition.ends})  {

@@ -837,7 +837,7 @@ const StatisticServices = {
     return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', percent: 100}), loading};
   },
 
-  // 计划偏差率
+  // 开发（测试）-计划偏差率
   async planDeviationRate({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];

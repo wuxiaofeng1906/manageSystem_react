@@ -611,8 +611,8 @@ export default [
               {
                 name: '计划偏差率',
                 icon: 'table',
-                path: 'palnDeviationRate',
-                component: './kpi/performance/testers/palnDeviationRate',
+                path: 'planDeviationRate',
+                component: './kpi/performance/testers/planDeviationRate',
                 wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },

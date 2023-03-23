@@ -1,8 +1,12 @@
 import React from 'react';
-import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
+import IStaticAgTable, {IRuleData} from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
 // 累计线上千行bug率 -p0p1占比
 const ruleData: IRuleData[] = [
+  {
+    title: 'bug统计范围',
+    child: ['分别参照3个测试-线上千行bug率 和 3个测试-累计千行bug率的bug范围'],
+  },
   {
     title: '统计周期',
     child: ['按周、按月、按季、按年'],

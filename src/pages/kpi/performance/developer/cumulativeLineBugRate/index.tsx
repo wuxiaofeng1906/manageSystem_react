@@ -12,7 +12,7 @@ const ruleData: IRuleData[] = [
     child: [
       <p>
         bug统计范围详见
-        <a href={'https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-c8gc '} target={'_blank'}>
+        <a href={'https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-MjWH'} target={'_blank'}>
           《研发过程数据统计2022年》
         </a>
       </p>,

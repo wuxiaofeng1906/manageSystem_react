@@ -404,7 +404,7 @@ export default [
                 icon: 'table',
                 path: 'devShowTestPlanDeviationRate',
                 component: './kpi/performance/developer/devShowTestPlanDeviationRate',
-                // hideInMenu: true,
+                hideInMenu: true, // 修改后的页面叫做“计划偏差率”
                 wrappers: ['../wrappers/auth'],
               },
               {

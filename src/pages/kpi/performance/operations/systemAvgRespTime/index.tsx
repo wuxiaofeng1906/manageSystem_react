@@ -23,6 +23,7 @@ import { initGridTable } from '@/utils/utils';
 import WrapperKpi from '@/components/wrapperKpi';
 import { useModel } from '@@/plugin-model/useModel';
 
+// 需求：https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-WgyR 《研发过程数据统计2022-2023年》
 const ruleData: IRuleData[] = [
   {
     title: '统计周期',

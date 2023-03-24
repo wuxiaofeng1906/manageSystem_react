@@ -114,7 +114,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const onConfirm = async () => {
-    debugger
     const baseData = await baseForm.validateFields();
     const isPreRelease = baseData.type == '1';
     let release_num = props.data?.release_num;
@@ -148,8 +147,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const data = {
       user_id: user?.userid ?? '',
       cluster: uniq(values.cluster || [])?.join() ?? '',
-      // release_env: values.release_env ?? '',
-      release_env: 'nx-temp-test', // 测试环境测试时可以使用一个固定值
+      release_env: values.release_env ?? '',
+      // release_env: 'nx-temp-test', // 测试环境测试时可以使用一个固定值
       release_env_type: values.release_env_type,
       branch: computed.branch,
       pro_data: selected.map((o) => ({
@@ -181,7 +180,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       4. 特性项目 默认勾选未关联的需求项目
     */
     let selectedData: any[] = [];
-    if (!memoColumn.isSprint && v !== 'global') {
+    if (!memoColumn().isSprint && v !== 'global') {
       selectedData = isEmpty(relatedStory?.story)
         ? list
         : list.filter((it) => relatedStory?.story?.includes(String(it.story)));
@@ -203,7 +202,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       cluster:
         v == 'global'
           ? ['cn-northwest-global']
-          : memoColumn.isSprint
+          : memoColumn().isSprint
           ? ['cn-northwest-0'] : []
       // : uniq(selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : []))),
     });
@@ -262,7 +261,137 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     });
   };
 
-  const memoColumn = useMemo(() => {
+
+  const memoEdit = useMemo(
+    () => ({
+      global: globalState.locked || globalState.finished,
+      update: !isEmpty(props.data?.release_num), // 新增、修改
+    }),
+    [globalState, props.data],
+  );
+
+  // const memoColumn = useMemo(() => {
+  //   const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
+  //   debugger
+  //   const disableValue = user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update);
+  //   console.log("user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update", disableValue);
+  //
+  //   return {
+  //     isSprint,
+  //     column: isSprint
+  //       ? [
+  //         {
+  //           title: '序号',
+  //           width: 70,
+  //           render: (_: any, r: any, i: number) => i + 1,
+  //           fixed: 'left',
+  //         },
+  //         {
+  //           title: '禅道执行名称',
+  //           dataIndex: 'pro_name',
+  //           ellipsis: {showTitle: false},
+  //           width: 500,
+  //           fixed: 'left',
+  //           render: (v: string) => (
+  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+  //           ),
+  //         },
+  //         {
+  //           title: '应用服务',
+  //           dataIndex: 'apps',
+  //           width: 400,
+  //           ellipsis: {showTitle: false},
+  //           render: (v: string) => (
+  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+  //           ),
+  //         },
+  //       ]
+  //       : [
+  //         {
+  //           title: '序号',
+  //           width: 70,
+  //           render: (_: any, r: any, i: number) => i + 1,
+  //           fixed: 'left',
+  //         },
+  //         {
+  //           title: '禅道执行名称',
+  //           dataIndex: 'pro_name',
+  //           ellipsis: {showTitle: false},
+  //           width: 200,
+  //           fixed: 'left',
+  //           render: (v: string) => (
+  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+  //           ),
+  //         },
+  //         {
+  //           title: '需求编号',
+  //           dataIndex: 'story',
+  //           width: 90,
+  //         },
+  //         {
+  //           title: '需求标题',
+  //           dataIndex: 'title',
+  //           width: 150,
+  //           ellipsis: {showTitle: false},
+  //           render: (v: string) => (
+  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+  //           ),
+  //         },
+  //         {
+  //           title: '需求阶段',
+  //           dataIndex: 'status',
+  //           width: 90,
+  //           ellipsis: {showTitle: false},
+  //           render: (v: string) => StoryStatus[v] ?? '',
+  //         },
+  //         {
+  //           title: '应用服务',
+  //           dataIndex: 'apps',
+  //           width: 110,
+  //           ellipsis: {showTitle: false},
+  //           render: (v: string) => (
+  //             <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'}/>
+  //           ),
+  //         },
+  //         {
+  //           title: '是否涉及数据update',
+  //           dataIndex: 'db_update',
+  //           // width: 150,
+  //           render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+  //         },
+  //         {
+  //           title: '是否涉及数据Recovery',
+  //           dataIndex: 'is_recovery',
+  //           render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+  //         },
+  //         {
+  //           title: '是否可热更',
+  //           dataIndex: 'is_update',
+  //           width: 90,
+  //           render: (v: string, row: any, i: number) =>
+  //             v == '-' ? (
+  //               v
+  //             ) : (
+  //               <Select
+  //                 disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update)}
+  //                 value={v}
+  //                 style={{width: '100%'}}
+  //                 options={Object.keys(WhetherOrNot)?.map((k) => ({
+  //                   value: k,
+  //                   label: WhetherOrNot[k],
+  //                 }))}
+  //                 onChange={(e) => updateStatus(row, e, i)}
+  //               />
+  //             ),
+  //         },
+  //         {title: '需求创建人', dataIndex: 'opened_by', width: 100},
+  //         {title: '需求指派人', dataIndex: 'ass_to', width: 100},
+  //       ],
+  //   };
+  // }, [JSON.stringify(list), user?.group]);
+
+
+  const memoColumn: any = () => {
     const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
 
     return {
@@ -362,7 +491,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                 v
               ) : (
                 <Select
-                  disabled={user?.group !== 'superGroup' || memoEdit.update}
+                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update)}
                   value={v}
                   style={{width: '100%'}}
                   options={Object.keys(WhetherOrNot)?.map((k) => ({
@@ -377,15 +506,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           {title: '需求指派人', dataIndex: 'ass_to', width: 100},
         ],
     };
-  }, [JSON.stringify(list), user?.group]);
+  }
 
-  const memoEdit = useMemo(
-    () => ({
-      global: globalState.locked || globalState.finished,
-      update: !isEmpty(props.data?.release_num), // 新增、修改
-    }),
-    [globalState, props.data],
-  );
 
   return (
     <Modal
@@ -490,7 +612,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                               options={globalEnv}
                               placeholder={'发布集群'}
                               disabled={
-                                memoEdit.update || env == 'global' || (memoColumn?.isSprint && env == 'tenant')
+                                (memoEdit.update ? memoEdit.global : memoEdit.update) || env == 'global' || (memoColumn()?.isSprint && env == 'tenant')
                               }
                               //{
                               // global 、班车，特性项目 不可编辑
@@ -506,10 +628,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     <Form.Item
                       name={'release_env'}
                       label={'镜像环境绑定'}
-                      // rules={[{required: true, message: '请选择镜像环境绑定'}]}
+                      rules={[{required: true, message: '请选择镜像环境绑定'}]}
                     >
                       <Select
-                        defaultValue={"nx-temp-test"} // 测试环境测试时使用
+                        // defaultValue={"nx-temp-test"} // 测试环境测试时使用
                         showSearch
                         options={branchEnv}
                         placeholder={'镜像环境绑定'}
@@ -524,7 +646,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   size={'small'}
                   scroll={{y: 400, x: 500}}
                   pagination={false}
-                  columns={memoColumn.column}
+                  columns={memoColumn().column}
                   rowKey={(p) => `${p.story}&${p.pro_id}`}
                   dataSource={list}
                   rowSelection={{

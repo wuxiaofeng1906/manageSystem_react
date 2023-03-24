@@ -17,7 +17,7 @@ import {vertifyFieldForCommon, dealPopDataFromService} from "./dataAnalysis";
 import {Prompt} from "react-router-dom";
 
 const {TextArea} = Input;
-
+// 重新合并公告数据
 const {Footer} = Layout;
 const Announce: React.FC<any> = (props: any) => {
   const {

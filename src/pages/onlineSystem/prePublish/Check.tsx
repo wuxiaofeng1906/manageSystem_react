@@ -145,7 +145,6 @@ const Check = (props: any, ref: any) => {
   };
 
   const init = async (isFresh = false, showLoading = true) => {
-
     setSpin(showLoading);
     setSelected([]);
     let autoCheck: string[] = [];
@@ -161,11 +160,12 @@ const Check = (props: any, ref: any) => {
         );
       }
       Promise.all(
-        uniq(autoCheck).map((type) =>
-          OnlineSystemServices.checkOpts(
-            {release_num, user_id: user?.userid, api_url: type},
-            type as ICheckType,
-          ),
+        uniq(autoCheck).map((type) => {
+          }
+          // OnlineSystemServices.checkOpts(
+          //   {release_num, user_id: user?.userid, api_url: type},
+          //   type as ICheckType,
+          // ),
         ),
       ).finally(async () => {
         // 存在值班人员为空

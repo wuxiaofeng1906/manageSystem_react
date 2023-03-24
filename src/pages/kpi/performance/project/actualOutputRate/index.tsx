@@ -10,6 +10,7 @@ import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import {isEmpty, orderBy} from 'lodash';
 import dayjs from 'dayjs';
 
+// 需求链接：https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-Q4V6 《研发过程数据统计2022-2023年》
 // 项目实际产出率
 const ruleData: IRuleData[] = [
   {
@@ -46,7 +47,10 @@ const ruleData: IRuleData[] = [
   {
     title: '计算公式',
     child: [
-      '项目实际产出率 = SUM(项目总规模标准工时) / SUM(项目总实际消耗工时) *100'
+      '项目实际产出率 = SUM(项目总规模标准工时) / SUM(项目总实际消耗工时) *100',
+      '各阶段实际产出率 = SUM(各阶段规模标准工时) / SUM(各阶段实际消耗工时) *100',
+      '单个bug的实际消耗工时 = 该bug该人的消耗工时',
+      'bug中的工时也要算到项目和阶段中'
     ],
   },
 ];
@@ -65,6 +69,7 @@ const ActualOutputRate: React.FC<any> = () => {
         normalQuarter={true}
         unit={'%'}
         len={2}
+        valueShowEmpty={true}
         onClick={(p: CellClickedEvent) =>
           setActiveItem({
             visible: true,

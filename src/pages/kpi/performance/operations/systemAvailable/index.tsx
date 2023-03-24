@@ -10,7 +10,10 @@ import {IStaticBy, useStatistic} from '@/hooks/statistic';
 import {useGqlClient} from '@/hooks';
 import {isEmpty} from 'lodash';
 import {initGridTable} from '@/utils/utils';
-
+// 需求：
+// 系统可用性：https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-qf4l 《研发过程数据统计2022-2023年》
+// 系统平均可用时间：https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-z08f 《研发过程数据统计2022-2023年》
+// 系统平均修复时间： https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-wlf1 《研发过程数据统计2022-2023年》
 // 运维 系统可用性
 const ruleData: IRuleData[] = [
   {

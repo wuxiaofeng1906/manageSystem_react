@@ -1,22 +1,23 @@
 import React from 'react';
-import IStaticAgTable, { IRuleData } from '@/components/IStaticAgTable';
+import IStaticAgTable, {IRuleData} from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
+
 const ruleData: IRuleData[] = [
   {
     title: '取值范围',
     child: [
-      '班车工作台每周四9:30自动对当周的班车项目（执行名称包含sprint/hotfix）详情页的需求 或 超范围的bug ，进行延期标识：（超范围bug且bug所处阶段不为‘TE测试环境验证通过’特殊说明：当前班车中超范围的bug在未关联当前班车的需求或未转需求的情况，该bug算1个延期；当超范围bug关联到当前班车某个需求后，该bug不单独算延期，还是算该需求延期，但该bug要给对应的开发算1个延期；当超范围的bug转需求且进入当前班车后，转需求后的需求算1个延期（这里的需求创建时间>当周四9:30），原始bug不出现在班车详情页且不算延期',
+      '班车工作台每周四9:30自动对当周的班车项目（执行名称包含sprint/hotfix）详情页的需求 或 超范围的bug ，进行延期标识：（超范围bug且bug所处阶段不为‘TE测试环境验证通过’特殊说明：当前班车中超范围的bug在未关联当前班车的需求或未转需求的情况，该bug算1个延期；当超范围bug关联到当前班车某个需求后，该bug不单独算延期，还是算该需求延期，但该bug要给对应的开发算1个延期；当超范围的bug转需求且进入当前班车后，转需求后的需求算1个延期（这里的需求创建时间>当周四9:30），原始bug不出现在班车详情页且不算延期）',
     ],
     table: {
       column: [
-        { dataIndex: 'stage', title: '所处阶段' },
-        { dataIndex: 'rule', title: '其他规则' },
-        { dataIndex: 'postpone', title: '是否标识延期' },
-        { dataIndex: 'deferredBy', title: '延期归属方' },
+        {dataIndex: 'stage', title: '所处阶段'},
+        {dataIndex: 'rule', title: '其他规则'},
+        {dataIndex: 'postpone', title: '是否标识延期'},
+        {dataIndex: 'deferredBy', title: '延期归属方'},
         {
           dataIndex: 'mark',
           title: '延期归属对象',
-          render: (v) => <div style={{ whiteSpace: 'pre-wrap' }}>{v}</div>,
+          render: (v) => <div style={{whiteSpace: 'pre-wrap'}}>{v}</div>,
         },
       ],
       dataSource: [
@@ -75,6 +76,13 @@ const ruleData: IRuleData[] = [
     title: '',
     child: [
       '班车工作台每周四9:30后加入当周的班车项目（执行名称包含sprint/hotfix）详情页的需求 或 超范围的bug ，也需要自动进行延期标识',
+      '特殊说明：当一个延期需求涉及到多个开发，查该需求在该班车关联的任务状态为‘未开始或进行中’的任务指派给开发，同时查该需求在该班车关联的bug状态为‘激活 或已解决’，延期需求要归属到这些任务和bug的开发人员，1个需求涉及多个开发人员的，这些开发人员都要算这个需求，然后到部门统计时注意对延期需求数去重。'
+    ],
+  },
+  {
+    title: '按周期',
+    child: [
+      '按周、按月、按季、按年'
     ],
   },
   {

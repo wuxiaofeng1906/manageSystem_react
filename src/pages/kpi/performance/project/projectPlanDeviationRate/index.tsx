@@ -14,10 +14,9 @@ import {
 import {getHeight} from "@/publicMethods/pageSet";
 import {columsForWeeks, columsForMonths, columsForQuarters, columsForYears} from "./gridConfigure/columns";
 import {queryDevDefectExcRate} from "./gridConfigure/data";
-import {testPlanDevRateRuleColumns, testPlanDevRateRuleDatas} from "../devCommonRules";
+import {prjPlanDevRateRuleColumns, prjPlanDevRateRuleDatas} from "../../developer/devCommonRules";
 
-// 需求链接：https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-Yrw2
-const ShowTestPlanDeviationRate: React.FC<any> = () => {
+const PlanDeviationRate: React.FC<any> = () => {
 
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
@@ -152,20 +151,11 @@ const ShowTestPlanDeviationRate: React.FC<any> = () => {
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
 
-          <p style={cssIndent}>1.周期：按周、按月、按季、按年统计（实际提测完成日期落在哪个周期，就算到对应周期）；</p>
+          <p style={cssIndent}>1.周期：按周、按月、按季、按年统计（灰度实际结束时间或项目计划的实际结束时间落在哪个周期，就算到对应周期）;</p>
           <p style={cssIndent}>2.只展示部门数据（不展示人员数据）；</p>
-          <p style={cssIndent}>3.计算公式：提测计划偏差率 =Average（各项目的提测计划偏差率）；</p>
-          <p style={cssIndent}> 单个项目的提测计划偏差率 = (实际提测完成日期 - 计划提测截止日期)/(计划提测截止日期 - 开发阶段计划开始日期）*100；</p>
-          <p style={cssIndent}>4.项目取值范围：；</p>
-          <Table columns={testPlanDevRateRuleColumns} dataSource={testPlanDevRateRuleDatas}
-                 size={"small"} pagination={false} bordered/>
-          <p style={cssIndent}>5.实际提测完成日期取值：任务类型为‘计划’，且任务名称包含'开发提测演示’，且任务状态为‘已完成 或 已关闭’
-            ，取该任务的‘实际完成日期’（finishedDate）。如果有多个该类型任务，'实际完成日期'取该类任务最后的日期，Max（finishDate）；</p>
-          <p style={cssIndent}>6.计划提测截止日期取值：取执行概况中的'计划提测时间‘；</p>
-          <p style={cssIndent}>7.开发阶段计划开始日期取值：任务类型为‘计划’，且任务名称包含'开发阶段计划’，且任务状态为‘已完成 或 已关闭’
-            ，取该任务的‘预计开始日期’（estStarted）；</p>
-          <p style={cssIndent}>8.优先查新表zt_executionplan，没有数据再去查‘计划’类任务
-            单个项目的开发计划偏差率直接取新表zt_executionplan中该执行的‘开发阶段计划--基线偏差率’；</p>
+          <p style={cssIndent}>3.计算公式：项目计划偏差率 = Average（各项目计划偏差率）；</p>
+          <p
+            style={cssIndent}>4.优先查新表zt_executionplan，没有数据再去查‘计划’类任务单个项目计划偏差率直接取新表zt_executionplan中该执行的‘项目计划--基线偏差率’；</p>
 
 
         </Drawer>
@@ -174,4 +164,4 @@ const ShowTestPlanDeviationRate: React.FC<any> = () => {
   );
 };
 
-export default ShowTestPlanDeviationRate;
+export default PlanDeviationRate;

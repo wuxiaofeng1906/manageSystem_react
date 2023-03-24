@@ -114,6 +114,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const onConfirm = async () => {
+    debugger
     const baseData = await baseForm.validateFields();
     const isPreRelease = baseData.type == '1';
     let release_num = props.data?.release_num;
@@ -147,7 +148,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const data = {
       user_id: user?.userid ?? '',
       cluster: uniq(values.cluster || [])?.join() ?? '',
-      release_env: values.release_env ?? '',
+      // release_env: values.release_env ?? '',
+      release_env: 'nx-temp-test', // 测试环境测试时可以使用一个固定值
       release_env_type: values.release_env_type,
       branch: computed.branch,
       pro_data: selected.map((o) => ({
@@ -504,9 +506,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     <Form.Item
                       name={'release_env'}
                       label={'镜像环境绑定'}
-                      rules={[{required: true, message: '请选择镜像环境绑定'}]}
+                      // rules={[{required: true, message: '请选择镜像环境绑定'}]}
                     >
                       <Select
+                        defaultValue={"nx-temp-test"} // 测试环境测试时使用
                         showSearch
                         options={branchEnv}
                         placeholder={'镜像环境绑定'}

@@ -37,7 +37,7 @@ const getColums = (prjNames: any, show = true) => {
       pinned: 'left',
       filter: false,
       checkboxSelection: true,
-      headerCheckboxSelection: true,
+      // headerCheckboxSelection: true,
       maxWidth: 35,
     },
     {

@@ -306,7 +306,7 @@ const SprintList: React.FC<any> = () => {
       });
     }
 
-    console.log('gird_filter_condition', gird_filter_condition);
+    // console.log('gird_filter_condition', gird_filter_condition);
   };
   const updateGrid = async () => {
     // 需要结合筛选条件
@@ -1181,7 +1181,7 @@ const SprintList: React.FC<any> = () => {
       selectedRows.push(row.data);
     });
 
-    console.log("selectedRows", selectedRows)
+    // console.log("selectedRows", selectedRows)
     const result = await requestModFlowStage(selectedRows, content, values, prjNames);
     if (result?.code === 200) {
       setIsFlowModalVisible(false);

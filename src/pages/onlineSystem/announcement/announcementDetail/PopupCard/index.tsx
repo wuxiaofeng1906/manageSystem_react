@@ -149,9 +149,10 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   const saveTabPages = async (finalData: any) => {
+
     let result: any;
-    // 重新对tab排序
-    const sortedFinalData = changeTabSort(finalData, tabOrder);
+    //  重新对tab排序
+    const sortedFinalData = changeTabSort(commonData,finalData, tabOrder);
     if (type === "detail") {
       result = await updateAnnouncement(releaseID, commonData, sortedFinalData,);
     } else {
@@ -173,6 +174,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any) => {
+    debugger
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {

@@ -18,12 +18,16 @@ export const getAnnouncement = async (readyReleaseNum: string, releaseType: stri
 
 // 获取特性列表list
 const getSpecialList = (ptyGroup: any) => {
+  if (!ptyGroup) return [];
   const specialList: any = [];
   ptyGroup.map((v: any) => {
     const childList: any = [];
-    (v.seconds).map((v2: any) => {
-      if (!isEmpty(v2.first)) childList.push({speciality: v2.first});
-    })
+    if (v.seconds) {
+      (v.seconds).map((v2: any) => {
+        if (!isEmpty(v2.first)) childList.push({speciality: v2.first});
+      })
+    }
+
     specialList.push({
       speciality: v.first,
       children: childList
@@ -33,15 +37,17 @@ const getSpecialList = (ptyGroup: any) => {
 }
 // 不轮播时的数据
 const notCarouselData = (popupData: any) => {
+
+  const popData = popupData[0];
   // 相当于只有一个轮播页面
-  const {ptyGroup} = popupData;
+  const {ptyGroup, uploadPic, picLayout, yuQueUrl} = popData;
   const data = {
     pages: [
       {
-        image: popupData.uploadPic,
+        image: uploadPic,
         pageNum: 0, // 所属轮播页码
-        layoutTypeId: popupData.picLayout,
-        yuQue: popupData.yuQueUrl,
+        layoutTypeId: picLayout,
+        yuQue: yuQueUrl,
         contents: getSpecialList(ptyGroup)
       }
     ]
@@ -72,6 +78,7 @@ const carouselData = (popupData: any) => {
 
 // 公告改版后的保存公告内容
 export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
+  debugger
 
   const data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
@@ -90,7 +97,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
       specialData = carouselData(popupData);// 轮播
     } else {
       data["pageSize"] = 0; // 不轮播的时候总页数为0
-      specialData = notCarouselData(popupData[0]); // 不轮播
+      specialData = notCarouselData(popupData[0].tabsContent); // 不轮播
     }
   }
 

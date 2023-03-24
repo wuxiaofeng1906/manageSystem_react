@@ -275,7 +275,15 @@ export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = fals
 };
 
 // 修改tab保存时候的顺序
-export const changeTabSort = (oraPopData: any, order: any) => {
+export const changeTabSort = (commonData: any, oraPopData: any, order: any) => {
+  // 如果不是轮播的话
+  if (order.length === 0 && commonData?.announce_carousel === 0) {
+    return [{
+      tabPage: 0,
+      oldPage: 0,
+      tabsContent: oraPopData
+    }]
+  }
   const sortedData: any = [];
 
   oraPopData.forEach((v: any) => {

@@ -1,28 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
-import { Button, DatePicker, Form, Input, Radio, Tabs, Divider, Popconfirm } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {errorMessage, sucMessage} from '@/publicMethods/showMessages';
+import {Button, DatePicker, Form, Input, Radio, Tabs, Divider, Popconfirm} from 'antd';
 import './style.css';
-import { useRequest } from 'ahooks';
-import { postAnnouncement, getAnnouncement } from './axiosRequest/apiPage';
+import {useRequest} from 'ahooks';
+import {postAnnouncement, getAnnouncement} from './axiosRequest/apiPage';
 import moment from 'moment';
-import { getHeight } from '@/publicMethods/pageSet';
+import {getHeight} from '@/publicMethods/pageSet';
 import usePermission from '@/hooks/permission';
-import { useParams } from 'umi';
-import { isEmpty } from 'lodash';
+import {useParams} from 'umi';
+import {isEmpty} from 'lodash';
 
-const { TextArea } = Input;
-const { TabPane } = Tabs;
-let releaseTime = 'before'; // 升级前公告还是升级后公告
+const {TextArea} = Input;
+const {TabPane} = Tabs;
+let releaseTime = 'after'; // 升级前公告还是升级后公告
 let announceId = 0; // 记录升级ID
 const Announce: React.FC<any> = (props: any) => {
-  const { id: releaseNum, status: operteStatus } = useParams() as {
+  const {id: releaseNum, status: operteStatus} = useParams() as {
     id: string;
     status: string;
     type: 'add' | 'detail';
   };
 
-  const { announcePermission } = usePermission();
+  const {announcePermission} = usePermission();
   const hasPermission = announcePermission();
 
   const [announceContentForm] = Form.useForm();
@@ -92,6 +92,7 @@ const Announce: React.FC<any> = (props: any) => {
       errorMessage('公告详情不能为空！');
       return;
     }
+    debugger
     const result = await postAnnouncement(
       {
         ...formDatas,
@@ -134,6 +135,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   const showFormData = (resData: any) => {
+    debugger
     //   有数据的时候需要显示在界面上
     if (resData.code === 4001 || isEmpty(resData.data)) {
       // 没有发布公告，需要显示默认信息。
@@ -145,7 +147,7 @@ const Announce: React.FC<any> = (props: any) => {
       });
     } else if (resData.data) {
       // 有数据，则展示出来
-      const { data } = resData;
+      const {data} = resData;
       const time = data.upgrade_time;
       const details = data.upgrade_description.split(time);
 
@@ -178,7 +180,8 @@ const Announce: React.FC<any> = (props: any) => {
     showFormData(announceContent);
   };
 
-  const announceData = useRequest(() => getAnnouncement(releaseNum, 'before')).data; // 关联值班名单
+  // 不展示发布前的公告的话就默认展示发布后的公告
+  const announceData = useRequest(() => getAnnouncement(releaseNum, 'after')).data; // 关联值班名单
   useEffect(() => {
     if (announceData) {
       showFormData(announceData);
@@ -199,7 +202,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   return (
     <PageContainer>
-      <div style={{ marginTop: -15, background: 'white', padding: 10 }}>
+      <div style={{marginTop: -15, background: 'white', padding: 10}}>
         <Form form={announcementNameForm}>
           <Form.Item
             label={'公告批次名称'}
@@ -214,12 +217,12 @@ const Announce: React.FC<any> = (props: any) => {
               },
             ]}
           >
-            <Input placeholder={'公告批次名称'} style={{ width: '300px' }} />
+            <Input placeholder={'公告批次名称'} style={{width: '300px'}}/>
           </Form.Item>
         </Form>
         {/* Tab展示 */}
         <Tabs onChange={onTabChanged} type="card">
-          <TabPane tab="升级前公告" key="before"></TabPane>
+          {/*<TabPane tab="升级前公告" key="before"></TabPane>*/}
           <TabPane tab="升级后公告" key="after"></TabPane>
         </Tabs>
 
@@ -236,24 +239,24 @@ const Announce: React.FC<any> = (props: any) => {
             form={announceContentForm}
             autoComplete="off"
             onFieldsChange={whenFormValueChanged}
-            style={{ marginLeft: 15 }}
+            style={{marginLeft: 15}}
           >
-            <Form.Item label="升级时间:" name="announceTime" style={{ paddingTop: 5 }}>
-              <DatePicker allowClear={false} showTime disabled={!hasPermission?.edit} />
+            <Form.Item label="升级时间:" name="announceTime" style={{paddingTop: 5}}>
+              <DatePicker allowClear={false} showTime disabled={!hasPermission?.edit}/>
             </Form.Item>
-            <Form.Item label="公告详情:" name="announceDetails_1" style={{ marginTop: -15 }}>
-              <Input disabled={!hasPermission?.edit} />
+            <Form.Item label="公告详情:" name="announceDetails_1" style={{marginTop: -15}}>
+              <Input disabled={!hasPermission?.edit}/>
             </Form.Item>
             <Form.Item name="showAnnounceTime" className={'itemStyle'}>
-              <Input style={{ color: 'gray' }} disabled bordered={false}></Input>
+              <Input style={{color: 'gray'}} disabled bordered={false}></Input>
             </Form.Item>
             <Form.Item name="announceDetails_2" className={'itemStyle'}>
-              <TextArea rows={2} disabled={!hasPermission?.edit} />
+              <TextArea rows={2} disabled={!hasPermission?.edit}/>
             </Form.Item>
             <Form.Item
               label="展示查看更新详情:"
               name="showUpdateDetails"
-              style={{ marginTop: -20 }}
+              style={{marginTop: -20}}
             >
               <Radio.Group disabled={!hasPermission?.edit}>
                 <Radio value={'true'}>是</Radio>
@@ -261,37 +264,37 @@ const Announce: React.FC<any> = (props: any) => {
               </Radio.Group>
             </Form.Item>
             {/* 预览界面 */}
-            <Form.Item style={{ marginTop: -20 }}>
-              <Divider orientation="left" style={{ fontSize: 'small' }}>
+            <Form.Item style={{marginTop: -20}}>
+              <Divider orientation="left" style={{fontSize: 'small'}}>
                 预览
               </Divider>
-              <div style={{ marginTop: -20 }}>
+              <div style={{marginTop: -20}}>
                 <Form.Item>{'{'}</Form.Item>
                 <Form.Item
                   label={'"UpgradeIntroDate"'}
                   name="UpgradeIntroDate"
                   className={'marginStyle'}
                 >
-                  <Input disabled bordered={false} style={{ color: 'black' }}></Input>
+                  <Input disabled bordered={false} style={{color: 'black'}}></Input>
                 </Form.Item>
                 <Form.Item
                   label={'"UpgradeDescription"'}
                   name="UpgradeDescription"
                   className={'marginStyle'}
                 >
-                  <Input disabled bordered={false} style={{ color: 'black' }}></Input>
+                  <Input disabled bordered={false} style={{color: 'black'}}></Input>
                 </Form.Item>
                 <Form.Item label={'"isUpdated"'} name="isUpdated" className={'marginStyle'}>
-                  <Input disabled bordered={false} style={{ color: 'black' }}></Input>
+                  <Input disabled bordered={false} style={{color: 'black'}}></Input>
                 </Form.Item>
-                <Form.Item style={{ marginTop: -25 }}>{'}'}</Form.Item>
+                <Form.Item style={{marginTop: -25}}>{'}'}</Form.Item>
               </div>
-              <Divider orientation="left" style={{ marginTop: -20 }}></Divider>
+              <Divider orientation="left" style={{marginTop: -20}}></Divider>
             </Form.Item>
           </Form>
 
           {/* 保存按钮 */}
-          <div style={{ float: 'right' }}>
+          <div style={{float: 'right'}}>
             <Button
               type="primary"
               className={'saveButtonStyle'}
@@ -311,7 +314,7 @@ const Announce: React.FC<any> = (props: any) => {
               <Button
                 type="primary"
                 className={buttonDisable.buttonStyle}
-                style={{ marginLeft: 10 }}
+                style={{marginLeft: 10}}
                 disabled={buttonDisable.disable || !hasPermission?.push}
               >
                 {`一键挂起升级${buttonDisable.title}公告`}

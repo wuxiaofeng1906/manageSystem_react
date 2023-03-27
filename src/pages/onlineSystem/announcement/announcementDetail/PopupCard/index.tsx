@@ -20,7 +20,7 @@ import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-import {imgUrlHeader, defaultImgsUrl, picType} from "../uploadPic/index";
+import {imgUrlHeader, defaultImgsUrl, picType, getImageToBackend} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
 
@@ -71,6 +71,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   const [picUpLoading, setPicUpLoading] = useState(false);
 
   useEffect(() => {
+    debugger
     currentTab = 1;
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
@@ -121,7 +122,8 @@ const PopupCard: React.FC<any> = (props: any) => {
   const getPopupSource = (currentKey: number) => {
 
     const specialList = dtForm.getFieldsValue();
-    specialList.uploadPic = picModalState.checkedImg;
+    specialList.uploadPic = getImageToBackend(picModalState.checkedImg, anPopData.picLayout);
+    // specialList.uploadPic = picModalState.checkedImg;
     const result = getChanedData(currentKey, commonData, anPopData, specialList);
     setAnnPopData(result);
     return result;
@@ -152,7 +154,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     let result: any;
     //  重新对tab排序
-    const sortedFinalData = changeTabSort(commonData,finalData, tabOrder);
+    const sortedFinalData = changeTabSort(commonData, finalData, tabOrder);
     if (type === "detail") {
       result = await updateAnnouncement(releaseID, commonData, sortedFinalData,);
     } else {
@@ -181,7 +183,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       finalData = getPopupSource(currentTab);
     } else {
       // 不是轮播，需要把图片路径放进去.如果是修改的话还需要轮播旧数据的id
-      popData.uploadPic = picModalState.checkedImg;
+      popData.uploadPic = getImageToBackend(picModalState.checkedImg, popData.picLayout);
       finalData.push(popData);
     }
     if (vertifyFieldForPopup(finalData)) {
@@ -230,6 +232,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     // 这个是保存自己上传的图片
     if (fileList.length) { // 如果大于0 则已手动上传了数据，如果小于0则看有没有以前的数据
       const s3Info = await getS3Key(fileList[0].name);
+      debugger
       if (s3Info) {
         // 再上传到服务器
         const upResult = await uploadPicToS3(s3Info, fileList[0]);
@@ -449,7 +452,11 @@ const PopupCard: React.FC<any> = (props: any) => {
                 {defaultImgsUrl.map(item => (
                   <li key={item} data-value={item}
                       className={picModalState.checkedImg === item ? style.activeChose : ''}>
-                    <img key={item} data-value={item} src={`${imgUrlHeader}${item}`} alt="默认图"/>
+                    <img key={item} data-value={item}
+                         src={`${imgUrlHeader}${item}`}
+                      // src={require('../../../../../../public/77Logo.png')}
+                         alt="默认图"/>
+
                   </li>))}
               </ul>
             </div>

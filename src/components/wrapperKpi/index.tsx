@@ -1,15 +1,17 @@
-import { isNumber } from 'lodash';
+import {isNumber} from 'lodash';
 
 const WrapperKpi = ({
-  params,
-  showSplit = false,
-  len,
-  onClick,
-}: {
+                      params,
+                      showSplit = false,
+                      len,
+                      onClick,
+                      valueShowEmpty
+                    }: {
   params: any;
   showSplit?: boolean;
   onClick?: Function;
   len?: number;
+  valueShowEmpty?: boolean
 }) => {
   const node = params.data;
   const result = params.value;
@@ -26,8 +28,8 @@ const WrapperKpi = ({
     if (showSplit)
       return (
         <span>
-          <label style={{ fontWeight: weight }}>{data}</label>
-          <label style={{ color: 'gray' }}>
+          <label style={{fontWeight: weight}}>{data}</label>
+          <label style={{color: 'gray'}}>
             ({numerator},{denominator})
           </label>
         </span>
@@ -48,6 +50,12 @@ const WrapperKpi = ({
       </span>
     );
   }
-  return <span style={{ fontWeight: weight, color: node?.isDept ? '#181d1f' : 'silver' }}> 0</span>;
+  // null 值是显示空
+  if (valueShowEmpty) {
+    return "-";
+  }
+
+  // null 显示为0
+  return <span style={{fontWeight: weight, color: node?.isDept ? '#181d1f' : 'silver'}}> 0</span>;
 };
 export default WrapperKpi;

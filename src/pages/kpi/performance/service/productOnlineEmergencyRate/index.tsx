@@ -1,19 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
-import type { IRuleData } from '@/components/IStaticAgTable';
+import React, {useEffect, useRef, useState} from 'react';
+import type {IRuleData} from '@/components/IStaticAgTable';
 import StatisticServices from '@/services/statistic';
-import { AgGridReact } from 'ag-grid-react';
-import { getFourQuarterTime, getTwelveMonthTime, getYearsTime } from '@/publicMethods/timeMethods';
+import {AgGridReact} from 'ag-grid-react';
+import {getFourQuarterTime, getTwelveMonthTime, getYearsTime} from '@/publicMethods/timeMethods';
 import moment from 'moment';
-import { GridApi } from 'ag-grid-community';
-import { Button, Spin } from 'antd';
-import { QuestionCircleTwoTone } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-layout';
-import { useGqlClient } from '@/hooks';
-import { ConditionHeader, IDrawer } from '@/components/IStaticAgTable';
-import { isEmpty } from 'lodash';
-import { aggFunc } from '@/utils/statistic';
-import { initGridTable } from '@/utils/utils';
+import {GridApi} from 'ag-grid-community';
+import {Button, Spin} from 'antd';
+import {QuestionCircleTwoTone} from '@ant-design/icons';
+import {PageContainer} from '@ant-design/pro-layout';
+import {useGqlClient} from '@/hooks';
+import {ConditionHeader, IDrawer} from '@/components/IStaticAgTable';
+import {isEmpty} from 'lodash';
+import {aggFunc} from '@/utils/statistic';
+import {initGridTable} from '@/utils/utils';
 
+// 服务-上线引入emergency占比 需求链接： https://shimo.im/docs/XKq4MJdn7RfmpBkN#anchor-4Dvv 《研发过程数据统计2022-2023年》
 const ruleData: IRuleData[] = [
   {
     title: '发布日期统计',
@@ -63,7 +64,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
     setLoading(true);
     try {
       const ends = getDate();
-      const { data } = await StatisticServices.onlineEmergency({
+      const {data} = await StatisticServices.onlineEmergency({
         client,
         params: {
           kind: category == 'month' ? 2 : category == 'quarter' ? 3 : 4,
@@ -80,7 +81,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
                 ? moment(it.range.start).format('YYYY年')
                 : moment(it.range.start).format('MM月YYYY年');
 
-            if (isEmpty(it.datas)) return { title: title, total: 0 };
+            if (isEmpty(it.datas)) return {title: title, total: 0};
 
             return it.datas.map((child: any) => ({
               subTitle: moment(child.date).format('YYYYMMDD'),
@@ -103,25 +104,25 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   return (
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
-        <div style={{ background: 'white' }}>
+        <div style={{background: 'white'}}>
           <ConditionHeader
             initFilter={['month', 'quarter', 'year']}
             onChange={(v) => setCategory(v)}
           />
-          <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+          <label style={{fontWeight: 'bold'}}>(统计单位：%)</label>
           <Button
             type="text"
-            style={{ color: '#1890FF', float: 'right' }}
-            icon={<QuestionCircleTwoTone />}
+            style={{color: '#1890FF', float: 'right'}}
+            icon={<QuestionCircleTwoTone/>}
             size={'large'}
             onClick={() => setVisible(true)}
           >
             计算规则
           </Button>
         </div>
-        <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
+        <div className={'ag-theme-alpine'} style={{width: '100%', height: 400}}>
           <AgGridReact
-            {...initGridTable({ ref: gridRef, height: 32 })}
+            {...initGridTable({ref: gridRef, height: 32})}
             pivotMode={true}
             rowData={data}
             suppressAggFuncInHeader={true}
@@ -131,12 +132,12 @@ const ProductOnlineEmergencyRate: React.FC = () => {
                 headerName: 'emergency占比',
                 aggFunc: (data) => aggFunc(data, 2, true),
               },
-              { field: 'title', pivot: true, pivotComparator: () => 1 },
-              { field: 'subTitle', pivot: true },
+              {field: 'title', pivot: true, pivotComparator: () => 1},
+              {field: 'subTitle', pivot: true},
             ]}
           />
         </div>
-        <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
+        <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData}/>
       </Spin>
     </PageContainer>
   );

@@ -145,7 +145,6 @@ const Check = (props: any, ref: any) => {
   };
 
   const init = async (isFresh = false, showLoading = true) => {
-
     setSpin(showLoading);
     setSelected([]);
     let autoCheck: string[] = [];
@@ -161,11 +160,12 @@ const Check = (props: any, ref: any) => {
         );
       }
       Promise.all(
-        uniq(autoCheck).map((type) =>
-          OnlineSystemServices.checkOpts(
-            {release_num, user_id: user?.userid, api_url: type},
-            type as ICheckType,
-          ),
+        uniq(autoCheck).map((type) => {
+          }
+          // OnlineSystemServices.checkOpts(
+          //   {release_num, user_id: user?.userid, api_url: type},
+          //   type as ICheckType,
+          // ),
         ),
       ).finally(async () => {
         // 存在值班人员为空
@@ -371,7 +371,8 @@ const Check = (props: any, ref: any) => {
     };
   }, [JSON.stringify(list), subTab, tab, globalState]);
 
-  const hasEdit = useMemo(
+  // 确定是否可以编辑
+  const hasEdit: boolean = useMemo(
     () => !onlineSystemPermission().checkStatus || globalState.locked || globalState.finished,
     [globalState, user?.group],
   );
@@ -589,6 +590,7 @@ const Check = (props: any, ref: any) => {
             }
             setShow({visible: false, data: null});
           }}
+          editMode={hasEdit}
         />
 
         {/* 说明弹窗 */}
@@ -605,7 +607,8 @@ const Check = (props: any, ref: any) => {
 export default forwardRef(Check);
 
 // 检查参数弹窗
-const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any } }) => {
+const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; data: any }, editMode: boolean }) => {
+
   const [form] = Form.useForm();
   const [getLogInfo] = useModel('onlineSystem', (online) => [online.getLogInfo]);
 
@@ -689,7 +692,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
       footer={[
         <Button onClick={showLog}>查看日志</Button>,
         <Button onClick={() => props.onOk?.()}>取消</Button>,
-        <Button type={'primary'} disabled={disabled || loading} onClick={onConfirm}>
+        <Button type={'primary'} disabled={disabled || loading || props.editMode} onClick={onConfirm}>
           确定
         </Button>,
       ]}
@@ -702,18 +705,22 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
             name={'main_branch'}
             rules={[{message: '请选择对比分支', required: true}]}
           >
-            <Select options={compareBranch} allowClear showSearch mode={'multiple'}/>
+            <Select
+              options={compareBranch} allowClear showSearch mode={'multiple'}
+              disabled={props.editMode}
+            />
           </Form.Item>
           <Form.Item
             label={'对比起始时间'}
             name={'main_since'}
             rules={[{message: '请选择对比起始时间', required: true}]}
           >
-            <DatePicker style={{width: '100%'}} format={'YYYY-MM-DD'}/>
+            <DatePicker style={{width: '100%'}} format={'YYYY-MM-DD'} disabled={props.editMode}/>
           </Form.Item>
           <h4>二、升级前自动化检查是否通过</h4>
           <Form.Item name={'auto_data'}>
             <Checkbox.Group
+              disabled={props.editMode}
               options={Object.keys(AutoCheckType).map((v) => ({
                 label: AutoCheckType[v],
                 value: v,

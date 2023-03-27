@@ -834,10 +834,10 @@ const StatisticServices = {
         }
       }
   `);
-    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', multiNumber: 100}), loading};
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', percent: 100}), loading};
   },
 
-  // 计划偏差率
+  // 开发（测试）-计划偏差率
   async planDeviationRate({client, params, identity}: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
@@ -867,7 +867,7 @@ const StatisticServices = {
       }
   `);
 
-    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', multiNumber: 100}), loading};
+    return {data: formatTreeData({origin: data.data, isTest: identity == 'TESTER', percent: 100}), loading};
   },
 
   // 自动化单元测试覆盖率
@@ -1123,6 +1123,50 @@ const StatisticServices = {
       }
   `);
     return data.data;
+  },
+
+//   开发/测试 实际产出率
+  async devTestActualOutputRate({client, params, identity}: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const {data, loading} = await client.query(`
+      {
+         data:devTestActualProdPropDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity: ${identity})
+          {
+              total {
+                dept
+                deptName
+                kpi
+                __typename
+              }
+              range {
+                start
+                end
+                __typename
+              }
+              datas {
+                dept
+                deptName
+                parent {
+                  dept
+                  deptName
+                  __typename
+                }
+                kpi
+                users {
+                  userId
+                  userName
+                  kpi
+                  hired
+                  __typename
+                }
+                __typename
+              }
+              __typename
+            }
+      }
+  `);
+    return {loading, data: formatTreeData({origin: data.data, isTest: identity === 'TESTER', showEmpty: true})};
   },
 };
 export default StatisticServices;

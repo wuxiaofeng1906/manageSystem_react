@@ -7,15 +7,16 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
-import {Button, Drawer} from "antd";
+import {Button, Drawer, Table} from "antd";
 import {
   ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone, AppstoreTwoTone
 } from "@ant-design/icons";
 import {getHeight} from "@/publicMethods/pageSet";
 import {columsForWeeks, columsForMonths, columsForQuarters, columsForYears} from "./gridConfigure/columns";
 import {queryDevDefectExcRate} from "./gridConfigure/data";
+import {prjPlanDevRateRuleColumns, prjPlanDevRateRuleDatas} from "../../developer/devCommonRules";
 
-const BugRateTableList: React.FC<any> = () => {
+const PlanDeviationRate: React.FC<any> = () => {
 
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
@@ -149,23 +150,13 @@ const BugRateTableList: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>一、统计周期</strong></p>
-          <p style={cssIndent}>按周、按月、按季、按年统计（查bug创建日期，落在对应区间的；周/月/季/年的规则参考2021年度量指标的规则）；</p>
-          <p style={cssIndent}>只展示部门数据（不展示人员数据）；</p>
 
-          <p style={{color: "#1890FF"}}><strong>二、计算公式说明</strong></p>
-          <p style={cssIndent}> 开发缺陷排除率 = 开发自测加权bug数/（开发自测加权bug数 + 测试发现加权bug数）*100；</p>
-          <p> 1.分子：开发自测加权bug数的bug范围。 </p>
-          <p style={cssIndent}>（1）bug创建人是开发；</p>
-          <p style={cssIndent}>（2）bug来源是'概设评审、详设评审、CodeReview、开发自测、开发联调、内部演示、外部演示’；</p>
-          <p style={cssIndent}>（3）解决方案为“空”“已解决”“延期处理”“后续版本”“转为需求”的；</p>
-          <p style={cssIndent}>（4）bug加权取bug严重程度 =P0*5+P1*2+P2*1+P3*0.1；</p>
+          <p style={cssIndent}>1.周期：按周、按月、按季、按年统计（灰度实际结束时间或项目计划的实际结束时间落在哪个周期，就算到对应周期）;</p>
+          <p style={cssIndent}>2.只展示部门数据（不展示人员数据）；</p>
+          <p style={cssIndent}>3.计算公式：项目计划偏差率 = Average（各项目计划偏差率）；</p>
+          <p
+            style={cssIndent}>4.优先查新表zt_executionplan，没有数据再去查‘计划’类任务单个项目计划偏差率直接取新表zt_executionplan中该执行的‘项目计划--基线偏差率’；</p>
 
-          <p> 2.分母：开发自测加权bug数取上面分子的结果，测试发现加权bug数的bug范围。 </p>
-          <p style={cssIndent}>（1）bug创建人是测试；</p>
-          <p style={cssIndent}>（2）bug来源是'系统测试，提测演示，测试环境自动化发现，线上环境自动化发现，灰度测试验证发现，线上发版回归发现，灰度验收；</p>
-          <p style={cssIndent}>（3）解决方案为“空”“已解决”“延期处理”“后续版本”“转为需求”“代码未合并”的；</p>
-          <p style={cssIndent}>（4）bug加权取bug严重程度 = 1*5+2*2+3*1+4*0.1；</p>
 
         </Drawer>
       </div>
@@ -173,4 +164,4 @@ const BugRateTableList: React.FC<any> = () => {
   );
 };
 
-export default BugRateTableList;
+export default PlanDeviationRate;

@@ -411,7 +411,7 @@ export default [
                 icon: 'table',
                 path: 'devShowTestPlanDeviationRate',
                 component: './kpi/performance/developer/devShowTestPlanDeviationRate',
-                // hideInMenu: true,
+                hideInMenu: true, // 修改后的页面叫做“计划偏差率”
                 wrappers: ['../wrappers/auth'],
               },
               {
@@ -524,10 +524,10 @@ export default [
               },
               {
                 name: '实际产出率',
-                path: 'actualRate',
-                component: './kpi/performance/developer/actualRate',
+                path: 'actualOutputRate',
+                component: './kpi/performance/developer/actualOutputRate',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true, // 接口未开发
+                // hideInMenu: true, // 接口未开发
               },
             ],
           },
@@ -618,8 +618,8 @@ export default [
               {
                 name: '计划偏差率',
                 icon: 'table',
-                path: 'palnDeviationRate',
-                component: './kpi/performance/testers/palnDeviationRate',
+                path: 'planDeviationRate',
+                component: './kpi/performance/testers/planDeviationRate',
                 wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
@@ -814,10 +814,10 @@ export default [
               },
               {
                 name: '实际产出率',
-                path: 'actualRate',
-                component: './kpi/performance/testers/actualRate',
+                path: 'actualOutputRate',
+                component: './kpi/performance/testers/actualOutputRate',
                 wrappers: ['../wrappers/auth'],
-                hideInMenu: true, // 接口未开发
+                // hideInMenu: true, // 接口未开发
               },
             ],
           },
@@ -852,7 +852,7 @@ export default [
                 name: '项目计划偏差率',
                 icon: 'table',
                 path: 'projectPlanDeviationRate',
-                component: './kpi/performance/developer/projectPlanDeviationRate',
+                component: './kpi/performance/project/projectPlanDeviationRate',
                 wrappers: ['../wrappers/auth'],
               },
               {

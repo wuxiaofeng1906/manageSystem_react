@@ -18,7 +18,7 @@ const ruleData: IRuleData[] = [
       '需求阶段=已发布  或 需求状态=已关闭',
       '且需求创建人是顾问或客服',
       '或需求创建人是产品、UED、开发、测试的，且需求创建日期>=2021-7-16 00:00:00的，且需求所属计划或需求关联执行名称包含“emergency/hotfix/sprint/stage-patch”的，名称包含“emergency/hotfix/sprint/stage-patch”的，且frombug != 0 ',
-      '或需求创建人是产品、UED的，且需求创建日期>=2021-7-16 00:00:00的，且需求所属计划或需求关联执行名称包含“emergency/hotfix/sprint/stage-patch”的，且“需求来源”的值不为bug，且条目类型字段值为线上bug（listtype = "onlinebug")',
+      '或需求创建人是产品、UED的，且需求创建日期>=2021-7-16 00:00:00的，且条目类型字段值为线上bug（listtype = "onlinebug")',
       '且需求关联的测试任务完成人是测试的（没有完成人的取关闭人为测试的），当一个需求有多个测试人员时，每个测试人员都算1个，当多个测试人员在1个部门时需要按部门去重',
     ],
   },

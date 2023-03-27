@@ -37,7 +37,7 @@ const ReleaseOrder = () => {
   const {id} = useParams() as { id: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
-  const [envList] = useModel('env', (env) => [env.globalEnv]);
+  const [envList] = useModel('env', (env) => [env.releaseOrderEnv]);
   const gridRef = useRef<GridApi>();
   const gridCompareRef = useRef<GridApi>();
   const devOpsOrderRef = useRef<GridApi>();

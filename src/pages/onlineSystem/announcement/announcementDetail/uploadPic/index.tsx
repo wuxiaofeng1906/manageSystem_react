@@ -43,6 +43,7 @@ export const getImageToBackend = (imgId: string, laout: string) => {
 
 // 通过后端的传给前端的图片来判定前端展示的图片是哪张
 export const getImageForFront = (imgId: string) => {
+
   let resultIgm = "";
   switch (imgId) {
 

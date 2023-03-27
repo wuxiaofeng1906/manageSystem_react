@@ -71,7 +71,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   const [picUpLoading, setPicUpLoading] = useState(false);
 
   useEffect(() => {
-    debugger
+
     currentTab = 1;
     // 需要先判断anPopData有没有数据
     if (anPopData && anPopData.length) {
@@ -83,12 +83,11 @@ const PopupCard: React.FC<any> = (props: any) => {
         } else {
 
           // 还要对应上传的图片ID
-
           const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
           // 展示第一个tab的数据即可。
           const formData = anPopData[0]?.tabsContent;
-
-          dtForm.setFieldsValue(anPopData[0]?.tabsContent);
+          formData.uploadPic = picString;
+          dtForm.setFieldsValue(formData);
           setPicModalState({
             ...picModalState,
             checkedImg: picString
@@ -142,8 +141,10 @@ const PopupCard: React.FC<any> = (props: any) => {
     for (let i = 0; i < list.length; i++) {
       const v = list[i];
       if (v.tabPage === Number(key) && JSON.stringify(v.tabsContent) !== "{}") {
-        dtForm.setFieldsValue(v.tabsContent);
-        setPicModalState({...picModalState, checkedImg: v.tabsContent.uploadPic});
+        const fromData = v.tabsContent
+        const imgString = getImageForFront(fromData.uploadPic);
+        dtForm.setFieldsValue({...fromData, uploadPic: imgString});
+        setPicModalState({...picModalState, checkedImg: imgString});
         break;
       } else {
         dtForm.resetFields();

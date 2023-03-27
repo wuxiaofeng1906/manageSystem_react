@@ -228,6 +228,7 @@ const SheetInfo = (props: any, ref: any) => {
       })),
     );
     const announce = await AnnouncementServices.preAnnouncement();
+    debugger
     setAnnouncementList(
       announce.map((it: any) => ({
         label: it.announcement_name,
@@ -248,6 +249,7 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const onSaveBeforeCheck = (isAuto = false) => {
+    debugger
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;

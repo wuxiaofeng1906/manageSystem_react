@@ -1,4 +1,5 @@
-import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import type {ColDef, ColGroupDef} from 'ag-grid-community/dist/lib/entities/colDef';
+import dayjs from "dayjs";
 
 export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   {
@@ -17,16 +18,16 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
     field: 'announcement_name',
     minWidth: 150,
   },
-  {
-    headerName: '升级前公告时间',
-    field: 'before_upgrade_time',
-    minWidth: 160,
-  },
-  {
-    headerName: '升级前公告内容',
-    field: 'before_upgrade_description',
-    minWidth: 130,
-  },
+  // {
+  //   headerName: '升级前公告时间',
+  //   field: 'before_upgrade_time',
+  //   minWidth: 160,
+  // },
+  // {
+  //   headerName: '升级前公告内容',
+  //   field: 'before_upgrade_description',
+  //   minWidth: 130,
+  // },
   {
     headerName: '升级后公告时间',
     field: 'after_upgrade_time',
@@ -47,6 +48,9 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
     headerName: '创建时间',
     field: 'create_time',
     minWidth: 160,
+    cellRenderer: (v: any) => {
+      return dayjs(v.value).add(8, 'h').format("YYYY-MM-DD HH:mm:ss")
+    }
   },
   {
     headerName: '编辑人',

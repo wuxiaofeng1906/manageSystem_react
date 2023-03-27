@@ -32,7 +32,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
   const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
   const [branchs, setBranchs] = useState<any[]>();
-
+  const [releaseCluster, setReleaseCluster] = useState(globalEnv);
   useEffect(() => {
     if (!props.visible) {
       form.resetFields();
@@ -56,6 +56,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         baseForm.setFieldsValue(result);
         setComputed(result);
       }
+
+      // 根据发布环境类型展示发布集群
+      getReleseCluster(props.data.release_env_type);
     }
     getTenantGlobalApps();
   }, [props.visible, props.data]);
@@ -66,6 +69,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       getTableList();
     }
   }, [computed?.branch]);
+
+
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();
     setAppServers(res);
@@ -171,7 +176,23 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
   };
 
+  const getReleseCluster = (v: string) => {
+    const filtered: any = [];
+    [...globalEnv].forEach((cluster: any) => {
+      if (v === "tenant") {
+        if (cluster.key !== "cn-northwest-global") {
+          filtered.push(cluster);
+        }
+      } else {
+        filtered.push(cluster);
+      }
+    });
+
+    setReleaseCluster(filtered);
+  };
   const onChange = (v: string) => {
+    // debugger
+
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
@@ -206,6 +227,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           ? ['cn-northwest-0'] : []
       // : uniq(selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : []))),
     });
+
+    // 当“发布环境类型”选择“租户集群发布”时，发布集群列表要过滤掉global集群---需求：15086
+    getReleseCluster(v);
+
     setSelected(
       selectedData?.filter(
         (o) => intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0,
@@ -609,7 +634,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                           >
                             <Select
                               mode={'multiple'}
-                              options={globalEnv}
+                              options={releaseCluster}
                               placeholder={'发布集群'}
                               disabled={
                                 (memoEdit.update ? memoEdit.global : memoEdit.update) || env == 'global' || (memoColumn()?.isSprint && env == 'tenant')

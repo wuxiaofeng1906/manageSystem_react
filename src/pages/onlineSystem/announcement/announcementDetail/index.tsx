@@ -92,7 +92,7 @@ const Announce: React.FC<any> = (props: any) => {
       errorMessage('公告详情不能为空！');
       return;
     }
-    debugger
+
     const result = await postAnnouncement(
       {
         ...formDatas,
@@ -135,7 +135,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   const showFormData = (resData: any) => {
-    debugger
+
     //   有数据的时候需要显示在界面上
     if (resData.code === 4001 || isEmpty(resData.data)) {
       // 没有发布公告，需要显示默认信息。

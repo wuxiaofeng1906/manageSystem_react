@@ -56,6 +56,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         baseForm.setFieldsValue(result);
         setComputed(result);
       }
+
+      // 根据发布环境类型展示发布集群
+      getReleseCluster(props.data.release_env_type);
     }
     getTenantGlobalApps();
   }, [props.visible, props.data]);
@@ -66,6 +69,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       getTableList();
     }
   }, [computed?.branch]);
+
+
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();
     setAppServers(res);
@@ -171,6 +176,20 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
   };
 
+  const getReleseCluster = (v: string) => {
+    const filtered: any = [];
+    [...globalEnv].forEach((cluster: any) => {
+      if (v === "tenant") {
+        if (cluster.key !== "cn-northwest-global") {
+          filtered.push(cluster);
+        }
+      } else {
+        filtered.push(cluster);
+      }
+    });
+
+    setReleaseCluster(filtered);
+  };
   const onChange = (v: string) => {
     // debugger
 
@@ -210,18 +229,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     });
 
     // 当“发布环境类型”选择“租户集群发布”时，发布集群列表要过滤掉global集群---需求：15086
-    const filtered: any = [];
-    [...globalEnv].forEach((cluster: any) => {
-      if (v === "tenant") {
-        if (cluster.key !== "cn-northwest-global") {
-          filtered.push(cluster);
-        }
-      } else {
-        filtered.push(cluster);
-      }
-    });
-
-    setReleaseCluster(filtered);
+    getReleseCluster(v);
 
     setSelected(
       selectedData?.filter(

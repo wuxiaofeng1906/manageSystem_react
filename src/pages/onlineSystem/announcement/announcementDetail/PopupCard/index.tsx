@@ -20,7 +20,7 @@ import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-import {imgUrlHeader, defaultImgsUrl, picType, getImageToBackend} from "../uploadPic/index";
+import {imgUrlHeader, defaultImgsUrl, picType, getImageToBackend, getImageForFront} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
 
@@ -81,11 +81,17 @@ const PopupCard: React.FC<any> = (props: any) => {
         if (commonData.clearTabContent) { // 修改时，tabpage变小，用户选择清空所有tab重建
           setEmptyForm();
         } else {
+
+          // 还要对应上传的图片ID
+
+          const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
           // 展示第一个tab的数据即可。
+          const formData = anPopData[0]?.tabsContent;
+
           dtForm.setFieldsValue(anPopData[0]?.tabsContent);
           setPicModalState({
             ...picModalState,
-            checkedImg: (anPopData[0]?.tabsContent).uploadPic
+            checkedImg: picString
           });
         }
 

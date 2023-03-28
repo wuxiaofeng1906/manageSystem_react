@@ -59,17 +59,17 @@ const getSpecialListForUpdate = (ptyGroup: any) => {
 
 // 不轮播时的数据
 const notCarouselDataForUpdate = (popupData: any, oldPopData: any = []) => {
-
+  debugger
   // 相当于只有一个轮播页面
-  const {ptyGroup} = popupData;
+  const {ptyGroup, uploadPic, picLayout, yuQueUrl} = popupData.tabsContent[0];
   const data = {
     pages: [
       {
         id: oldPopData[0].tabsContent.id, // 非轮播的page id在界面拿不到。
-        image: popupData.uploadPic,
+        image: uploadPic,
         pageNum: 0, // 所属轮播页码
-        layoutTypeId: popupData.picLayout,
-        yuQue: popupData.yuQueUrl,
+        layoutTypeId: picLayout,
+        yuQue: yuQueUrl,
         contents: getSpecialListForUpdate(ptyGroup)
       }
     ]
@@ -101,6 +101,7 @@ const carouselDataForUpdate = (popupData: any) => {
 
 // 常规的修改：不涉及新增
 const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) => {
+  debugger
   const data: any = {
     id: formData.releaseId,
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
@@ -272,32 +273,34 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
   }
   let updateValue = false;
   for (let i = 0; i < carouselNum; i++) {
-    let newPopTemp: any = {};
-    // 查找对应的page数据
-    newPopData.map((v: any) => {
-      if (v.oldPage === i + 1) {
-        newPopTemp = v;
-      }
-    });
-    let oldPopTemp: any = {};
-    oldPopData.map((v: any) => {
-      if (v.tabPage === i + 1) {
-        oldPopTemp = v;
-      }
-    });
+    // 默认是不轮播的数据（即第一条数据）
+    let newPopTemp: any = newPopData[0];
+    let oldPopTemp: any = oldPopData[0];
+
+    //  是轮播
+    if (newCommonData.announce_carousel === 1) {
+      // 查找对应的page数据
+      newPopData.map((v: any) => {
+        if (v.oldPage === i + 1) {
+          newPopTemp = v;
+        }
+      });
+
+      oldPopData.map((v: any) => {
+        if (v.tabPage === i + 1) {
+          oldPopTemp = v;
+        }
+      });
+    }
+
 
     const oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
-    // 如果是轮播的数据
+    // 默认是轮播的数据
     let newPtGroup = newPopTemp.tabsContent?.ptyGroup;
     // 如果不是轮播
     if (!newPopTemp.tabPage) {
-      newPtGroup = newPopTemp.ptyGroup;
+      newPtGroup = newPopTemp.tabsContent[0]?.ptyGroup;
     }
-
-    // if ((!newPtGroup && oldPtGroup) || (newPtGroup && !oldPtGroup)) {
-    //   updateValue = true;
-    //   break;
-    // }
 
     if (newPtGroup && oldPtGroup) {
       if (newPtGroup.length !== oldPtGroup.length) { // 如果一级特性个数不同，也不同
@@ -322,26 +325,32 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
 
   for (let i = 0; i < carouselNum; i++) {
 
-    let newPopTemp: any = {};
-    // 查找对应的page数据
-    newPopData.map((v: any) => {
-      if (v.oldPage === i + 1) {
-        newPopTemp = v;
-      }
-    });
-    let oldPopTemp: any = {};
-    oldPopData.map((v: any) => {
-      if (v.tabPage === i + 1) {
-        oldPopTemp = v;
-      }
-    });
+    // 默认是不轮播的数据（即第一条数据）
+    let newPopTemp: any = newPopData[0];
+    let oldPopTemp: any = oldPopData[0];
+
+    //  是轮播
+    if (newCommonData.announce_carousel === 1) {
+      // 查找对应的page数据
+      newPopData.map((v: any) => {
+        if (v.oldPage === i + 1) {
+          newPopTemp = v;
+        }
+      });
+
+      oldPopData.map((v: any) => {
+        if (v.tabPage === i + 1) {
+          oldPopTemp = v;
+        }
+      });
+    }
 
     // 如果是轮播的数据
     let newPtGroup = newPopTemp.tabsContent?.ptyGroup;
     const oldPtGroup = oldPopTemp.tabsContent?.ptyGroup;
     // 如果不是轮播  ,轮播页数至少是1个，不轮播也有一页特性
     if (!newPopTemp.tabPage) {
-      newPtGroup = newPopTemp.ptyGroup;
+      newPtGroup = newPopTemp.tabsContent[0]?.ptyGroup;
     }
 
     if (JSON.stringify(newPtGroup) !== JSON.stringify(oldPtGroup)) {
@@ -349,6 +358,7 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
       break
     }
 
+    // 下面这个可能有用到，可能没有被用到，因为上一个判断大部分都能判断出来
     for (let m = 0; m < newPtGroup.length; m++) {
       const newFirstSp = newPtGroup[m];
       const oldFirstSp = oldPtGroup[m];
@@ -371,6 +381,7 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
 
 // 二级特性修改
 const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
+  debugger
   const children: any = [];
   const newIds: any = []; // 记录旧数据的id，拿来对比新数据用作删除，如果在新数据里找不到，则删除
   // 先添加新特性。记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id
@@ -441,6 +452,7 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
 
 // 一级特性修改
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
+  debugger
   const pages: any = [];
   modifyPopData.forEach((v1: any) => {
     const v1_ptyGroup = v1.tabsContent?.ptyGroup;
@@ -623,6 +635,7 @@ const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any)
 
 // 其他数据发生改变
 const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
+  debugger
   let page: any = [];
   //  轮播页减少,1.删除最后几张的轮播页数(特性可能会被修改) 2.删除所有的页面重建
   if (newCommonData.clearTabContent) {
@@ -656,10 +669,12 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
         }
       }
     } else {
+      const tabsData = {...newPopData[0].tabsContent};
       // 不轮播时候构建相同的数据结构
       modifyPopData.push({
         tabPage: 0,
-        tabsContent: {...newPopData[0], id: oldPopData[0].tabsContent.id}
+        oldPage: 0,
+        tabsContent: {...tabsData[0], id: oldPopData[0].tabsContent.id}
       });
     }
 
@@ -668,6 +683,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
       page = page.concat(specialItem);
     }
   }
+  debugger
   return {
     id: oldCommonData.id,
     pageSize: newCommonData.carouselNum,

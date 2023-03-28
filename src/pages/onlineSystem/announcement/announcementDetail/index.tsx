@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Modal, Space} from 'antd';
+import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Modal, Space, Spin} from 'antd';
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
 import moment from 'moment';
@@ -23,6 +23,7 @@ const Announce: React.FC<any> = (props: any) => {
   const {
     commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData
   } = useModel('announcement');
+  const [loading, setLoading] = useState(false);
   // 轮播页面改小的选择
   const [pageChoice, setPageChoice] = useState(false);
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
@@ -131,6 +132,7 @@ const Announce: React.FC<any> = (props: any) => {
 
 
   useEffect(() => {
+    setLoading(true);
 
     // 一键发布按钮是否展示
     pulishButtonVisible();
@@ -185,6 +187,9 @@ const Announce: React.FC<any> = (props: any) => {
     } else {
       errorMessage("数据获取错误！")
     }
+
+    setLoading(false);
+
   }, []);
   // 保存数据
   const saveMsgInfo = async () => {
@@ -226,125 +231,128 @@ const Announce: React.FC<any> = (props: any) => {
         when={false}
         message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
       />
-      <div style={{marginTop: -15, background: 'white', padding: 10}}>
-        <Form form={announcementForm} autoComplete={"off"}
-              onFieldsChange={() => {
-                // if (!leaveShow) setLeaveShow(true);
-              }}>
-          <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
-            {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
-            <Radio.Group onChange={cardChanged}>
-              <Radio.Button value={"1"} style={{width: 140, height: 100}}>
-                <img
-                  {...SIZE}
-                  src={require('../../../../../public/msgCard.png')}
-                />
-                <span style={{marginLeft: 25}}>消息卡片</span>
-              </Radio.Button>
-              <Radio.Button value={"2"} style={{width: 140, height: 100, marginLeft: 25}}>
-                <img
-                  {...SIZE}
-                  src={require('../../../../../public/popCard.png')}
-                />
-                <span style={{marginLeft: 30}}>弹窗</span>
-              </Radio.Button>
-            </Radio.Group>
-          </Form.Item>
+      <Spin size={"large"} spinning={loading} tip={"数据加载中..."}>
+        <div style={{marginTop: -15, background: 'white', padding: 10}}>
+          <Form form={announcementForm} autoComplete={"off"}
+                onFieldsChange={() => {
+                  // if (!leaveShow) setLeaveShow(true);
+                }}>
+            <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
+              {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
+              <Radio.Group onChange={cardChanged}>
+                <Radio.Button value={"1"} style={{width: 140, height: 100}}>
+                  <img
+                    {...SIZE}
+                    src={require('../../../../../public/msgCard.png')}
+                  />
+                  <span style={{marginLeft: 25}}>消息卡片</span>
+                </Radio.Button>
+                <Radio.Button value={"2"} style={{width: 140, height: 100, marginLeft: 25}}>
+                  <img
+                    {...SIZE}
+                    src={require('../../../../../public/popCard.png')}
+                  />
+                  <span style={{marginLeft: 30}}>弹窗</span>
+                </Radio.Button>
+              </Radio.Group>
+            </Form.Item>
 
-          <Form.Item label={'公告名称'} name={'announce_name'}
-                     rules={[{
-                       required: true,
-                       validator: (r, v, callback) => {
-                         if (isEmpty(v?.trim())) callback('请填写公告名称！');
-                         else callback();
-                       },
-                     },]}>
-            <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"}/>
-          </Form.Item>
+            <Form.Item label={'公告名称'} name={'announce_name'}
+                       rules={[{
+                         required: true,
+                         validator: (r, v, callback) => {
+                           if (isEmpty(v?.trim())) callback('请填写公告名称！');
+                           else callback();
+                         },
+                       },]}>
+              <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"}/>
+            </Form.Item>
 
-          <Form.Item label={'升级时间'} name={'announce_time'}
-                     rules={[{
-                       required: true, validator: (r, v, callback) => {
-                         if (v === undefined) callback('请填写升级时间！');
-                         else callback();
-                       }
-                     }]}>
-            <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
-                        onChange={(e, time) => {
-                          debugger
+            <Form.Item label={'升级时间'} name={'announce_time'}
+                       rules={[{
+                         required: true, validator: (r, v, callback) => {
+                           if (v === undefined) callback('请填写升级时间！');
+                           else callback();
+                         }
+                       }]}>
+              <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
+                          onChange={(e, time) => {
+                            debugger
 
-                          // 先获取原始数据，再改变数据
-                          let source = announcementForm.getFieldValue("announce_content");
-                          const updateFunc = source.split("更新升级。更新功能：");
-                          // 用原来的时间替换选中的时间
-                          announcementForm.setFieldsValue({
-                            announce_content: `亲爱的用户：您好，企企经营管理平台已于${time}更新升级。更新功能：${updateFunc[1]}`
-                          });
-                          setReleaseTime(time);
-                        }}/>
-          </Form.Item>
+                            // 先获取原始数据，再改变数据
+                            let source = announcementForm.getFieldValue("announce_content");
+                            const updateFunc = source.split("更新升级。更新功能：");
+                            // 用原来的时间替换选中的时间
+                            announcementForm.setFieldsValue({
+                              announce_content: `亲爱的用户：您好，企企经营管理平台已于${time}更新升级。更新功能：${updateFunc[1]}`
+                            });
+                            setReleaseTime(time);
+                          }}/>
+            </Form.Item>
 
-          <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-            {/*<div id={"announceContent"} contentEditable={"true"}*/}
-            {/*     style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>*/}
-            {/*  <label*/}
-            {/*    contentEditable={"false"}*/}
-            {/*    style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：*/}
-            {/*  </label>*/}
-            {/*</div>*/}
+            <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
+              {/*<div id={"announceContent"} contentEditable={"true"}*/}
+              {/*     style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>*/}
+              {/*  <label*/}
+              {/*    contentEditable={"false"}*/}
+              {/*    style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：*/}
+              {/*  </label>*/}
+              {/*</div>*/}
 
-            <TextArea rows={2} style={{minWidth: 300, width: "50%"}}/>
-          </Form.Item>
+              <TextArea rows={2} style={{minWidth: 300, width: "50%"}}/>
+            </Form.Item>
 
-          <div id={"popup"} style={{display: stepShow.popCard}}>
-            <Row>
-              <Col>
-                <Form.Item label={'是否轮播'} name="announce_carousel" rules={[{required: true}]}>
-                  <Radio.Group onChange={(e: RadioChangeEvent) => {
-                    if (e.target?.value === 1) {
-                      setCarouselNumShow("inline");
-                      announcementForm.setFieldsValue({carouselNum: 5});
-                    } else {
-                      setCarouselNumShow("none");
-                    }
-                  }}>
-                    <Radio value={1}>是</Radio>
-                    <Radio value={0}>否</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
-              <Col>
-                <Form.Item name="carouselNum" rules={[{required: true}]} style={{display: carouselNumShow}}>
-                  <InputNumber></InputNumber>
-                </Form.Item>
-              </Col>
-            </Row>
-          </div>
-        </Form>
-        {/* 我是一条分割线 */}
-        <Divider/>
-        {/* 一键发布、保存、下一步 */}
-        <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
-          {/* 弹窗操作 */}
-          <div id={"popup"} style={{display: stepShow.popCard}}>
-            <Button
-              type="primary" className={style.saveButtonStyle}
-              style={{marginLeft: 10}} onClick={nextPageClick}>下一步
-            </Button>
-          </div>
-          {/* 消息卡片操作 */}
-          <div id={"message"} style={{display: stepShow.msgCard}}>
-            <Button
-              type="primary" className={style.saveButtonStyle}
-              style={{marginLeft: 10}} onClick={saveMsgInfo}>保存
-            </Button>
-            <Button
-              className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
-              onClick={releaseMsgInfo}>一键发布
-            </Button>
-          </div>
-        </Footer>
-      </div>
+            <div id={"popup"} style={{display: stepShow.popCard}}>
+              <Row>
+                <Col>
+                  <Form.Item label={'是否轮播'} name="announce_carousel" rules={[{required: true}]}>
+                    <Radio.Group onChange={(e: RadioChangeEvent) => {
+                      if (e.target?.value === 1) {
+                        setCarouselNumShow("inline");
+                        announcementForm.setFieldsValue({carouselNum: 5});
+                      } else {
+                        setCarouselNumShow("none");
+                      }
+                    }}>
+                      <Radio value={1}>是</Radio>
+                      <Radio value={0}>否</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+                <Col>
+                  <Form.Item name="carouselNum" rules={[{required: true}]} style={{display: carouselNumShow}}>
+                    <InputNumber></InputNumber>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
+          </Form>
+          {/* 我是一条分割线 */}
+          <Divider/>
+          {/* 一键发布、保存、下一步 */}
+          <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
+            {/* 弹窗操作 */}
+            <div id={"popup"} style={{display: stepShow.popCard}}>
+              <Button
+                type="primary" className={style.saveButtonStyle}
+                style={{marginLeft: 10}} onClick={nextPageClick}>下一步
+              </Button>
+            </div>
+            {/* 消息卡片操作 */}
+            <div id={"message"} style={{display: stepShow.msgCard}}>
+              <Button
+                type="primary" className={style.saveButtonStyle}
+                style={{marginLeft: 10}} onClick={saveMsgInfo}>保存
+              </Button>
+              <Button
+                className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
+                onClick={releaseMsgInfo}>一键发布
+              </Button>
+            </div>
+          </Footer>
+        </div>
+      </Spin>
+
 
       <Modal title="轮播页操作" visible={pageChoice}
              centered maskClosable={false} destroyOnClose={true}

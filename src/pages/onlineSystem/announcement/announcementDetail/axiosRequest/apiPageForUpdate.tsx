@@ -264,6 +264,7 @@ const carouseNumIsUpdate = (newCommonData: any, oldCommonData: any) => {
 
 // 判断一级特性是否被修改
 const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
+  debugger
   let {carouselNum} = newCommonData;
   // 轮播页数至少是1个，不是轮播也有一页特性
   if (newCommonData.announce_carousel === 0) {
@@ -314,9 +315,11 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
 
 // 判断二级特性是否被修改
 const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
-  let updateValue = false;
+  debugger
   // 如果是轮播，那么轮播页数就是所填写的数量，如果不是轮播，则只有一页
-  const carouselNum = newCommonData.announce_carousel === 1 ? newCommonData.carouselNum : 1;
+  const carouselNum = newCommonData.announce_carousel === 0 ? 1 : newCommonData.carouselNum;
+  let updateValue = false;
+
   for (let i = 0; i < carouselNum; i++) {
 
     let newPopTemp: any = {};
@@ -679,6 +682,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
+  debugger
   // 构造基础数据
   const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
   // 是否轮播

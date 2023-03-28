@@ -430,7 +430,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                           onClick={releaseAnnounceInfo}>一键发布</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}} onClick={onPreView}>预览</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}}
-                          onClick={() => history.push(`/onlineSystem/announcementDetail`)}>上一步</Button>
+                          onClick={() => history.goBack()}>上一步</Button>
                 </div>
               </Footer>
             </Form.Item>

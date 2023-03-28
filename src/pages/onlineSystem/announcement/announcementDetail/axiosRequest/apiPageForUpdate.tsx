@@ -101,7 +101,7 @@ const carouselDataForUpdate = (popupData: any) => {
 
 // 常规的修改：不涉及新增
 const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) => {
-  debugger
+
   const data: any = {
     id: formData.releaseId,
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
@@ -235,21 +235,27 @@ const updateForModulesAndCarousel = async (newCommonData: any, newPopData: any, 
 //判断特性名称是否被改过(特性名称跟下面的一级特性是同一类型，是一级特性的上一层)
 const specialNameIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
 
+
   // 是否轮播(不轮播的话就没有最上层的特性名称)
   if (newCommonData.announce_carousel === 0) {
     return false
   }
-
   let state = false;
-  const pageCount = newPopData.length > oldPopData.length ? newPopData.length : oldPopData.length;
-  for (let i = 0; i < pageCount; i++) {
-    const newContent = newPopData[i].tabsContent;
-    const oldContent = oldPopData[i].tabsContent;
 
-    if (newContent.specialName !== oldContent.specialName) {
-      state = true;
-      break;
+  try {
+    const pageCount = newPopData.length > oldPopData.length ? newPopData.length : oldPopData.length;
+    for (let i = 0; i < pageCount; i++) {
+      debugger
+      const newContent = newPopData[i]?.tabsContent;
+      const oldContent = oldPopData[i]?.tabsContent;
+
+      if (newContent?.specialName !== oldContent?.specialName) {
+        state = true;
+        break;
+      }
     }
+  } catch (e) {
+    console.log("特性判断错误：", e)
   }
   return state;
 };
@@ -659,7 +665,13 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
     let modifyPopData = [];
     // 轮播的时候轮播页数才>0
     if (newCommonData.announce_carousel === 1) {
-      for (let i = 0; i < oldCommonData.carouselNum; i++) {
+      let finalCarouselNum = newCommonData.carouselNum;
+      // 判断减少了页数还是增加了页数(最终页数取最多的)
+      if (oldCommonData.carouselNum > newCommonData.carouselNum) {
+        //   减少了页数
+        finalCarouselNum = oldCommonData.carouselNum
+      }
+      for (let i = 0; i < finalCarouselNum; i++) {
         const pageDt = newPopData[i].tabsContent;
         if (i > newCommonData.carouselNum - 1 && pageDt.id) {
           // 需要删除的page

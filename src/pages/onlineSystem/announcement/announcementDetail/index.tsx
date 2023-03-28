@@ -98,7 +98,6 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {
-    debugger
     const dts = await queryAnnounceDetail(releaseID);
     const {NoticeEdition} = dts;
     if (NoticeEdition && NoticeEdition.length) {
@@ -278,8 +277,6 @@ const Announce: React.FC<any> = (props: any) => {
                        }]}>
               <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
                           onChange={(e, time) => {
-                            debugger
-
                             // 先获取原始数据，再改变数据
                             let source = announcementForm.getFieldValue("announce_content");
                             const updateFunc = source.split("更新升级。更新功能：");

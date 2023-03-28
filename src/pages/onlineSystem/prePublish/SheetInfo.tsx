@@ -228,7 +228,6 @@ const SheetInfo = (props: any, ref: any) => {
       })),
     );
     const announce = await AnnouncementServices.preAnnouncement();
-    debugger
     setAnnouncementList(
       announce.map((it: any) => ({
         label: it.announcement_name,

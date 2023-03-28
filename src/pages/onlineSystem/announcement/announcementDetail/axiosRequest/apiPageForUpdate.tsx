@@ -59,7 +59,6 @@ const getSpecialListForUpdate = (ptyGroup: any) => {
 
 // 不轮播时的数据
 const notCarouselDataForUpdate = (popupData: any, oldPopData: any = []) => {
-  debugger
   // 相当于只有一个轮播页面
   const {ptyGroup, uploadPic, picLayout, yuQueUrl} = popupData.tabsContent[0];
   const data = {
@@ -245,7 +244,6 @@ const specialNameIsUpdate = (newCommonData: any, newPopData: any, oldPopData: an
   try {
     const pageCount = newPopData.length > oldPopData.length ? newPopData.length : oldPopData.length;
     for (let i = 0; i < pageCount; i++) {
-      debugger
       const newContent = newPopData[i]?.tabsContent;
       const oldContent = oldPopData[i]?.tabsContent;
 
@@ -271,7 +269,6 @@ const carouseNumIsUpdate = (newCommonData: any, oldCommonData: any) => {
 
 // 判断一级特性是否被修改
 const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
-  debugger
   let {carouselNum} = newCommonData;
   // 轮播页数至少是1个，不是轮播也有一页特性
   if (newCommonData.announce_carousel === 0) {
@@ -324,7 +321,6 @@ const firstSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: a
 
 // 判断二级特性是否被修改
 const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: any) => {
-  debugger
   // 如果是轮播，那么轮播页数就是所填写的数量，如果不是轮播，则只有一页
   const carouselNum = newCommonData.announce_carousel === 0 ? 1 : newCommonData.carouselNum;
   let updateValue = false;
@@ -390,7 +386,6 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
 
 // 二级特性修改
 const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
-  debugger
   const children: any = [];
   const newIds: any = []; // 记录旧数据的id，拿来对比新数据用作删除，如果在新数据里找不到，则删除
   // 先添加新特性。记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id
@@ -461,7 +456,6 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
 
 // 一级特性修改
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
-  debugger
   const pages: any = [];
   modifyPopData.forEach((v1: any) => {
     const v1_ptyGroup = v1.tabsContent?.ptyGroup;
@@ -644,7 +638,6 @@ const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any)
 
 // 其他数据发生改变
 const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
-  debugger
   let page: any = [];
   //  轮播页减少,1.删除最后几张的轮播页数(特性可能会被修改) 2.删除所有的页面重建
   if (newCommonData.clearTabContent) {
@@ -698,7 +691,6 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
       page = page.concat(specialItem);
     }
   }
-  debugger
   return {
     id: oldCommonData.id,
     pageSize: newCommonData.carouselNum,
@@ -713,7 +705,6 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
-  debugger
   // 构造基础数据
   const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
   // 是否轮播

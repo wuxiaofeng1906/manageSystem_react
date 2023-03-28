@@ -125,7 +125,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
-    debugger
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = getImageToBackend(picModalState.checkedImg, anPopData.picLayout);
     // specialList.uploadPic = picModalState.checkedImg;
@@ -135,7 +134,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // tab切换
   const onTabsChange = (key: string) => {
-    debugger
     // 保存切换前的tab数据，
     const list = getPopupSource(currentTab);
     // 后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
@@ -190,7 +188,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any) => {
-    debugger
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {
@@ -246,7 +243,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     // 这个是保存自己上传的图片
     if (fileList.length) { // 如果大于0 则已手动上传了数据，如果小于0则看有没有以前的数据
       const s3Info = await getS3Key(fileList[0].name);
-      debugger
       if (s3Info) {
         // 再上传到服务器
         const upResult = await uploadPicToS3(s3Info, fileList[0]);

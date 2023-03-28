@@ -371,7 +371,6 @@ const ReleaseOrder = () => {
   };
 
   const onSuccessConfirm = async (data: any) => {
-    debugger
     const announcement_num = orderForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});

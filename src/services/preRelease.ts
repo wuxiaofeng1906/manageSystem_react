@@ -148,7 +148,7 @@ const PreReleaseServices = {
   // 升级公告挂起
   async saveAnnouncement(params: any) {
     console.log("公告挂起参数", params)
-    return request(`${baseUrl}/latest-release/announcement`, {params});
+    // return request(`${baseUrl}/latest-release/announcement`, {params});
   },
   // 所有集群组合情况
   async clusterGroup() {

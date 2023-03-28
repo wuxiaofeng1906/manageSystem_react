@@ -349,6 +349,7 @@ const SheetInfo = (props: any, ref: any) => {
 
   const onSuccessConfirm = async (data: any) => {
     const announce = baseForm.getFieldValue('announcement_num');
+    debugger
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});
       setSuccessModal(false);
@@ -365,21 +366,22 @@ const SheetInfo = (props: any, ref: any) => {
           ready_release_num: release_num ?? '',
         });
       });
-      await onSave(true);
+      // await onSave(true);
       agFinished = true;
       setFinished(true);
-      await PreReleaseServices.automation(params);
+      // await PreReleaseServices.automation(params);
       // 获取集群
       const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
+      const clusters = isString(release_app?.[0]?.cluster)
+        ? release_app?.[0]?.cluster
+        : release_app?.[0]?.cluster?.join(',');
       // 关联公告并勾选挂起公告
       if (!isEmpty(announce) && announce !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),
           // announcement_time: 'after',
-          cluster_ids: isString(release_app?.[0]?.cluster)
-            ? release_app?.[0]?.cluster
-            : release_app?.[0]?.cluster?.join(','),
+          cluster_ids: clusters,
         });
       }
       setSuccessModal(false);

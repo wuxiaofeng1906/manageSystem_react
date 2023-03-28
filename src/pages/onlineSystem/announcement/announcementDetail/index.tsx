@@ -90,7 +90,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 判断是否有上线，有上线才会进行一键发布
   const pulishButtonVisible = async () => {
-    const result = await announceIsOnlined(releaseName);
+    const result = await announceIsOnlined(releaseID);
     if (result.ok) {
       setShowPulishButton(true);
     }

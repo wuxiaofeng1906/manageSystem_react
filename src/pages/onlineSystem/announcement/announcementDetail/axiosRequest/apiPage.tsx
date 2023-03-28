@@ -131,8 +131,8 @@ export const getYuQueContent = async (Url: string) => {
 };
 
 // 判断该公告是否已被上线，若没有上线，则不显示一键发布，若已上线才显示，位置在保存的左边。
-export const announceIsOnlined = async (announceName: string) => {
-  const result = await axiosGet_TJ('/api/77hub/notice/be-online', {iteration: announceName});
+export const announceIsOnlined = async (noticeId: string) => {
+  const result = await axiosGet_TJ('/api/77hub/notice/be-online', {noticeId: noticeId, isDetail: false});
   return result;
 }
 

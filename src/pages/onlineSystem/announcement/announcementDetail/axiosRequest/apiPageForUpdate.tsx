@@ -353,6 +353,9 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
       newPtGroup = newPopTemp.tabsContent[0]?.ptyGroup;
     }
 
+    if (newPtGroup === undefined && oldPtGroup === undefined) {
+      continue;
+    }
     if (JSON.stringify(newPtGroup) !== JSON.stringify(oldPtGroup)) {
       updateValue = true;
       break

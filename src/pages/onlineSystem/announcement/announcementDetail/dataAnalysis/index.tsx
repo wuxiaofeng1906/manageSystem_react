@@ -193,6 +193,7 @@ const getSpecialData = (data: any, isCarousel: boolean, updateGet: boolean) => {
 
 // 获取特性树
 const getSpecialList = (contents: any, isCarousel: boolean, updateGet: boolean) => {
+  debugger
   const contentData: any = {
     ptyGroup: [],
     specialName: ""
@@ -211,6 +212,7 @@ const getSpecialList = (contents: any, isCarousel: boolean, updateGet: boolean) 
 };
 // 处理从服务器获取过来的弹窗数据放到state中(updateGet 在修改时的数据获取)
 export const dealPopDataFromService = (NoticeEdition: any, updateGet: any = false) => {
+  debugger
   if (!NoticeEdition || NoticeEdition.length === 0 || !NoticeEdition[0]) {
     return [];
   }

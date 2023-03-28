@@ -125,7 +125,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
-
+    debugger
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = getImageToBackend(picModalState.checkedImg, anPopData.picLayout);
     // specialList.uploadPic = picModalState.checkedImg;
@@ -135,6 +135,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // tab切换
   const onTabsChange = (key: string) => {
+    debugger
     // 保存切换前的tab数据，
     const list = getPopupSource(currentTab);
     // 后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
@@ -148,7 +149,13 @@ const PopupCard: React.FC<any> = (props: any) => {
         break;
       } else {
         dtForm.resetFields();
-        dtForm.setFieldsValue({"picLayout": "1"});
+        dtForm.setFieldsValue({
+          picLayout: "1", // 默认上下布局
+          ptyGroup: [{ // 默认一组特性
+            first: "",
+            seconds: [{first: ""}]
+          }]
+        });
         setPicModalState({...picModalState, checkedImg: ""})
       }
     }

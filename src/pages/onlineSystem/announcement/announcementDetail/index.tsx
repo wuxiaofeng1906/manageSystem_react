@@ -98,6 +98,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {
+    debugger
     const dts = await queryAnnounceDetail(releaseID);
     const {NoticeEdition} = dts;
     if (NoticeEdition && NoticeEdition.length) {

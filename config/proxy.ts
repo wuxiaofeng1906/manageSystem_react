@@ -15,7 +15,7 @@ export default {
       pathRewrite: {'^': ''},
     },
     '/api/': {
-      target: 'http://10.0.144.53:8380/', // 原始端口：8300
+      target: 'http://10.0.144.53:8300/', // 原始端口：8300
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
@@ -34,14 +34,24 @@ export default {
   // 本地测试地址
   test: {
     '/api/verify/': {
-      target: 'http://192.168.31.239:5001/',
+      target: 'http://10.0.144.53:5000/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
     '/api/': {
-      target: 'http://10.0.144.53:8300/',
+      target: 'http://10.0.144.53:8380/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
+    },
+    '/identity/Attachment/': {
+      target: 'http://identity.nx-temp1-k8s.e7link.com/',
+      changeOrigin: true,
+      pathRewrite: {'^': ''},
+    },
+    '/postImage/': {
+      target: 'http://s3.cn-northwest-1.amazonaws.com.cn/',
+      changeOrigin: true,
+      pathRewrite: {'/postImage/': ''},
     },
   },
 
@@ -57,6 +67,16 @@ export default {
       target: 'http://rd.q7link.com:8300/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
+    },
+    '/identity/Attachment/': {
+      target: 'http://identity.nx-temp1-k8s.e7link.com/',
+      changeOrigin: true,
+      pathRewrite: {'^': ''},
+    },
+    '/postImage/': {
+      target: 'http://s3.cn-northwest-1.amazonaws.com.cn/',
+      changeOrigin: true,
+      pathRewrite: {'/postImage/': ''},
     },
   },
 };

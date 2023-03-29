@@ -93,6 +93,8 @@ const Announce: React.FC<any> = (props: any) => {
     const result = await announceIsOnlined(releaseID);
     if (result.ok) {
       setShowPulishButton(true);
+    } else {
+      setShowPulishButton(false);
     }
   }
 

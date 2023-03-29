@@ -191,8 +191,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setReleaseCluster(filtered);
   };
   const onChange = (v: string) => {
-    // debugger
-
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story

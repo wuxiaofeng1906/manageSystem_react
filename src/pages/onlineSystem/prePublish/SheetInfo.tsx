@@ -349,7 +349,6 @@ const SheetInfo = (props: any, ref: any) => {
 
   const onSuccessConfirm = async (data: any) => {
     const announce = baseForm.getFieldValue('announcement_num');
-    debugger
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});
       setSuccessModal(false);
@@ -366,10 +365,10 @@ const SheetInfo = (props: any, ref: any) => {
           ready_release_num: release_num ?? '',
         });
       });
-      // await onSave(true);
+      await onSave(true);
       agFinished = true;
       setFinished(true);
-      // await PreReleaseServices.automation(params);
+      await PreReleaseServices.automation(params);
       // 获取集群
       const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
       const clusters = (release_app?.[0]?.cluster).split(",")

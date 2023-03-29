@@ -89,7 +89,14 @@ const Announce: React.FC<any> = (props: any) => {
   }
 
   // 判断是否有上线，有上线才会进行一键发布
+  // 判断是否有上线，有上线才会进行一键发布
   const pulishButtonVisible = async () => {
+    debugger
+    if (isEmpty(releaseID)) {
+      setShowPulishButton(false);
+      return;
+    }
+
     const result = await announceIsOnlined(releaseID);
     if (result.ok) {
       setShowPulishButton(true);
@@ -97,6 +104,7 @@ const Announce: React.FC<any> = (props: any) => {
       setShowPulishButton(false);
     }
   }
+
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {

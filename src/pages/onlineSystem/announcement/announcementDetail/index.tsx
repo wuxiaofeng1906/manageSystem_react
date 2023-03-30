@@ -94,7 +94,7 @@ const Announce: React.FC<any> = (props: any) => {
   // 判断是否有上线，有上线才会进行一键发布
   // 判断是否有上线，有上线才会进行一键发布
   const pulishButtonVisible = async () => {
-    debugger
+
     if (isEmpty(releaseID)) {
       setShowPulishButton(false);
       return;
@@ -111,6 +111,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {
+    setShowPreView(true);
     const dts = await queryAnnounceDetail(releaseID);
     const {NoticeEdition} = dts;
     if (NoticeEdition && NoticeEdition.length) {
@@ -140,12 +141,13 @@ const Announce: React.FC<any> = (props: any) => {
 
       return;
     }
+    setShowPreView(false);
     errorMessage("明细获取失败！");
+
   }
 
 
   useEffect(() => {
-    setLoading(true);
 
     // 一键发布按钮是否展示
     pulishButtonVisible();
@@ -168,7 +170,6 @@ const Announce: React.FC<any> = (props: any) => {
     } else if (type === "detail") {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
       getDataByReleaseId();
-      setShowPreView(true)
     } else if (commonData && !type) { // 下一页返回上来的数据
 
       // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
@@ -202,7 +203,6 @@ const Announce: React.FC<any> = (props: any) => {
       errorMessage("数据获取错误！")
     }
 
-    setLoading(false);
 
   }, []);
   // 保存数据

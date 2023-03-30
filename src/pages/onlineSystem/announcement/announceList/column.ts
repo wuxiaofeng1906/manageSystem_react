@@ -50,6 +50,7 @@ export const announcementListColumn: any = [
   {
     headerName: '创建时间',
     field: 'create_time',
+    // sort: "desc",
     minWidth: 160,
     cellRenderer: (v: any) => {
       if (v.value) {

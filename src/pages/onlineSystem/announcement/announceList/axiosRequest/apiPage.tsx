@@ -1,4 +1,6 @@
 import {axiosGet_TJ, axiosPost, axiosDelete} from '@/publicMethods/axios';
+import {objectArraySortByDesc} from "@/publicMethods/arrayMethod";
+
 
 // 获取公告列表
 export const getAnnounceList = async (page: number, size: number, createdUser: any, createdTime: string, description: string) => {
@@ -29,7 +31,7 @@ export const getAnnounceList = async (page: number, size: number, createdUser: a
   }
 
   return {
-    results: data,
+    results: data.sort(objectArraySortByDesc('create_time')),  // 按照时间排序
     page: page || 1,
     page_size: size || 20,
     total: result.count || 0,

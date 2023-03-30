@@ -41,6 +41,9 @@ const Announce: React.FC<any> = (props: any) => {
   const [carouselNumShow, setCarouselNumShow] = useState<string>("none");
   // 发布时间
   const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm"));
+
+  // 预览的状态
+  const [showPreView, setShowPreView] = useState<boolean>(false);
   // 设置显示哪个模板(消息或者弹窗)
   const cardChanged = (e: RadioChangeEvent) => {
     if (e.target.value === "1") { // 1 是消息弹窗
@@ -164,7 +167,8 @@ const Announce: React.FC<any> = (props: any) => {
       setAnnPopData([]);
     } else if (type === "detail") {
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
-      getDataByReleaseId()
+      getDataByReleaseId();
+      setShowPreView(true)
     } else if (commonData && !type) { // 下一页返回上来的数据
 
       // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
@@ -249,7 +253,7 @@ const Announce: React.FC<any> = (props: any) => {
         <div style={{marginTop: -15, background: 'white', padding: 10}}>
           <Form form={announcementForm} autoComplete={"off"}
                 onFieldsChange={() => {
-                  // if (!leaveShow) setLeaveShow(true);
+                  setShowPreView(false);
                 }}>
             <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
               {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
@@ -360,7 +364,8 @@ const Announce: React.FC<any> = (props: any) => {
                 className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
                 onClick={releaseMsgInfo}>一键发布
               </Button>
-              <Button className={style.commonBtn} style={{marginLeft: 10}} onClick={onPreView}>预览</Button>
+              <Button className={style.commonBtn} style={{marginLeft: 10, display: showPreView ? "inline" : "none"}}
+                      onClick={onPreView}>预览</Button>
 
             </div>
           </Footer>

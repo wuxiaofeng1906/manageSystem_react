@@ -261,20 +261,23 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 预览
   const onPreView = async () => {
+    window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
     //   需要需要校验不能为空
-    let finalData = [];
-    // 如果是轮播则先放到state中再保存
-    if (commonData?.announce_carousel === 1) {
-      finalData = getPopupSource(currentTab);
-    } else {
-      // 不是轮播，需要把图片路径放进去
-      const popData = dtForm.getFieldsValue();
-      popData.uploadPic = picModalState.checkedImg;
-      finalData.push(popData);
-    }
-    if (vertifyFieldForPopup(finalData)) {
-      //    commonData, finalData  进行预览的数据
-    }
+    // let finalData = [];
+    // // 如果是轮播则先放到state中再保存
+    // if (commonData?.announce_carousel === 1) {
+    //   finalData = getPopupSource(currentTab);
+    // } else {
+    //   // 不是轮播，需要把图片路径放进去
+    //   const popData = dtForm.getFieldsValue();
+    //   popData.uploadPic = picModalState.checkedImg;
+    //   finalData.push(popData);
+    // }
+    // if (vertifyFieldForPopup(finalData)) {
+    //   //    commonData, finalData  进行预览的数据
+    // }
+
+    //
   };
   // 一键发布
   const releaseAnnounceInfo = async () => {

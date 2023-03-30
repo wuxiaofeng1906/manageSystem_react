@@ -188,6 +188,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any) => {
+    debugger
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {
@@ -195,6 +196,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     } else {
       // 不是轮播，需要把图片路径放进去.如果是修改的话还需要轮播旧数据的id
       popData.uploadPic = getImageToBackend(picModalState.checkedImg, popData.picLayout);
+      // 不是轮播还需要将公告名称保存到特性名称
+      popData.specialName = commonData.announce_name;
       finalData.push(popData);
     }
     if (vertifyFieldForPopup(finalData)) {

@@ -234,6 +234,10 @@ const Announce: React.FC<any> = (props: any) => {
     }
   };
 
+  // 预览
+  const onPreView = () => {
+    window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+  };
 
   return (
     <PageContainer>
@@ -356,6 +360,8 @@ const Announce: React.FC<any> = (props: any) => {
                 className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
                 onClick={releaseMsgInfo}>一键发布
               </Button>
+              <Button className={style.commonBtn} style={{marginLeft: 10}} onClick={onPreView}>预览</Button>
+
             </div>
           </Footer>
         </div>

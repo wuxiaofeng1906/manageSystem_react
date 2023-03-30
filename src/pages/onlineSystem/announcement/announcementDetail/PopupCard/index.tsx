@@ -42,10 +42,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     visible: false,
     checkedImg: ""
   });
-
   // 语雀数据导入（加载）使用
   const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
-
   const setEmptyForm = () => {
     // 轮播时记录Tab数据用
     if (commonData?.announce_carousel === 1) {
@@ -69,38 +67,8 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 上传图片的进度
   const [picUpLoading, setPicUpLoading] = useState(false);
-
-  useEffect(() => {
-
-    currentTab = 1;
-    // 需要先判断anPopData有没有数据
-    if (anPopData && anPopData.length) {
-      // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
-      if (oldCommonData.announce_carousel === commonData.announce_carousel) {
-        // 如果清空所有page页面为true，则也清空所有page数据，直接显示空数据
-        if (commonData.clearTabContent) { // 修改时，tabpage变小，用户选择清空所有tab重建
-          setEmptyForm();
-        } else {
-
-          // 还要对应上传的图片ID
-          const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
-          // 展示第一个tab的数据即可。
-          const formData = anPopData[0]?.tabsContent;
-          formData.uploadPic = picString;
-          dtForm.setFieldsValue(formData);
-          setPicModalState({
-            ...picModalState,
-            checkedImg: picString
-          });
-        }
-
-      } else {
-        setEmptyForm();
-      }
-    } else {
-      setEmptyForm();
-    }
-  }, []);
+  // 预览的状态
+  const [showPreView, setShowPreView] = useState<boolean>(false);
 
   // 同步语雀信息
   const syncYuqueInfo = async () => {
@@ -121,7 +89,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     setYuQueSpinLoading(false);
   };
-
 
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
@@ -184,7 +151,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     errorMessage("保存失败！");
   };
-
 
   // 保存数据
   const onFinish = async (popData: any) => {
@@ -290,6 +256,40 @@ const PopupCard: React.FC<any> = (props: any) => {
   const setPicImgSource = (file: string) => {
     document.getElementById("file_img")!.src = file;
   };
+
+  useEffect(() => {
+
+    currentTab = 1;
+    // 需要先判断anPopData有没有数据
+    if (anPopData && anPopData.length) {
+      // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
+      if (oldCommonData.announce_carousel === commonData.announce_carousel) {
+        // 如果清空所有page页面为true，则也清空所有page数据，直接显示空数据
+        if (commonData.clearTabContent) { // 修改时，tabpage变小，用户选择清空所有tab重建
+          setEmptyForm();
+        } else {
+
+          // 还要对应上传的图片ID
+          const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
+          // 展示第一个tab的数据即可。
+          const formData = anPopData[0]?.tabsContent;
+          formData.uploadPic = picString;
+          dtForm.setFieldsValue(formData);
+          setPicModalState({
+            ...picModalState,
+            checkedImg: picString
+          });
+          setShowPreView(true);
+        }
+
+      } else {
+        setEmptyForm();
+      }
+    } else {
+      setEmptyForm();
+    }
+  }, []);
+
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -307,7 +307,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
           <DragTabs onChange={onTabsChange}/>
 
-          <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}>
+          <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}
+                onFieldsChange={() => setShowPreView(false)}>
             {/* 特性名称只针对轮播功能 */}
             <Row style={{display: commonData?.announce_carousel === 1 ? "inline-block" : "none"}}>
               <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>
@@ -438,7 +439,8 @@ const PopupCard: React.FC<any> = (props: any) => {
                   <Button className={style.commonBtn}
                           style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
                           onClick={releaseAnnounceInfo}>一键发布</Button>
-                  <Button className={style.commonBtn} style={{marginLeft: 10}} onClick={onPreView}>预览</Button>
+                  <Button className={style.commonBtn} style={{marginLeft: 10, display: showPreView ? "inline" : "none"}}
+                          onClick={onPreView}>预览</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}}
                           onClick={() => history.goBack()}>上一步</Button>
                 </div>

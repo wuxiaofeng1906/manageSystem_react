@@ -247,6 +247,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         // 再上传到服务器
         const upResult = await uploadPicToS3(s3Info, fileList[0]);
         if (upResult.result && upResult.result.status === 204) {
+          // alert("id：" + s3Info.fields?.key)
           setPicModalState({checkedImg: s3Info.fields?.key, visible: false});
         } else {
           errorMessage("图片上传失败");

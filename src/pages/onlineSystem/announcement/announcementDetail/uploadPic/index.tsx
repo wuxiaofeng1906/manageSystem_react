@@ -22,7 +22,7 @@ export const getImageToBackend = (imgId: string, laout: string) => {
       resultIgm = laout === "1" ? "0/2023/03/9103625c-5d0d-4c2a-9a3f-9a4640c77feb.png" : "0/2023/03/9e24c058-4754-480a-a548-6c96da642b70.png";
       break;
     case "0/2023/03/4bef829b-a368-47ab-bc34-5701fa6d0be1.jpg":
-      resultIgm = laout === "1" ? "0/2023/03/1f9414e8-02f8-4f10-b2a0-5b60d87bb7af.png" : "0/2023/03/8f062779-bb59-46c7-944d-85bf0eb39ae7.png";
+      resultIgm = laout === "1" ? "0/2023/03/1f9414e8-02f8-4f10-b2a0-5b60d87bb7af.png" : "0/2023/03/f0dd4610-408f-452e-a079-83bbe3671b91.png";
       break;
     case "0/2023/03/8249dc6c-bab6-4304-b037-054e2bcf7dda.jpg":
       resultIgm = laout === "1" ? "0/2023/03/1be0bcc8-6e6a-4a2e-861c-69976189f9dd.png" : "0/2023/03/955009c8-63c9-40c0-93ba-223c4724efaf.png";
@@ -51,7 +51,7 @@ export const getImageForFront = (imgId: string) => {
       break;
 
     case "0/2023/03/1f9414e8-02f8-4f10-b2a0-5b60d87bb7af.png":
-    case  "0/2023/03/8f062779-bb59-46c7-944d-85bf0eb39ae7.png":
+    case  "0/2023/03/f0dd4610-408f-452e-a079-83bbe3671b91.png":
       resultIgm = "0/2023/03/4bef829b-a368-47ab-bc34-5701fa6d0be1.jpg";
       break;
 

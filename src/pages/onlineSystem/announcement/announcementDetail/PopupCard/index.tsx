@@ -321,6 +321,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     debugger
     // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
     let newHead: any = {...commonData};
+    debugger
     if (!newHead || JSON.stringify(newHead) === "{}") {
       // 获取上一页的数据（缓存了）
       const storage = localStorage.getItem("noticeHeader");
@@ -332,7 +333,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     // 如果没有 type=add 的话，则新增
     if (type === "add") {
       debugger
-      // 如果又返回了上一页，那么这个add界面可能有数据
+      // 如果又返回了上一页，那么这个add界面可能有数据,或者是否轮播改变  || newHead.announce_carousel  这里还要改
       if (anPopData.length === 0) {
         setEmptyForm();
       } else {

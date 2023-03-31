@@ -32,8 +32,8 @@ const {confirm} = Modal;
 
 const PopupCard: React.FC<any> = (props: any) => {
   const {
-    commonData, anPopData, setAnnPopData,
-    showPulishButton, oldCommonData, setCommonData, setOldCommonData, tabOrder
+    commonData, anPopData, setAnnPopData, getAnnounceContent,
+    showPulishButton, setCommonData, setOldCommonData, tabOrder
   } = useModel('announcement');
   const {releaseID, type} = props.location?.query;
   const [dtForm] = Form.useForm();
@@ -269,40 +269,49 @@ const PopupCard: React.FC<any> = (props: any) => {
     document.getElementById("file_img")!.src = file;
   };
 
-  useEffect(() => {
+  const prePage = () => {
+    // 上一步之前也要保存本页数据
+    history.push('/onlineSystem/announcementDetail' + props.location?.search + "&back=true");
+  }
+  const showPageDt = async () => {
     debugger
-
-    currentTab = 1;
-    // 需要先判断anPopData有没有数据
-    if (anPopData && anPopData.length) {
-      // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，
-      if (oldCommonData.announce_carousel === commonData.announce_carousel) {
-        // 如果清空所有page页面为true，则也清空所有page数据，直接显示空数据
-        if (commonData.clearTabContent) { // 修改时，tabpage变小，用户选择清空所有tab重建
-          setEmptyForm();
-        } else {
-
-          // 还要对应上传的图片ID
-          const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
-          // 展示第一个tab的数据即可。
-          const formData = anPopData[0]?.tabsContent;
-          formData.uploadPic = picString;
-          dtForm.setFieldsValue(formData);
-          setPicModalState({
-            ...picModalState,
-            checkedImg: picString
-          });
-          setShowPreView(true);
-        }
-
-      } else {
-        setEmptyForm();
+    // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
+    let newHead: any = {...commonData};
+    if (!newHead || JSON.stringify(newHead) === "{}") {
+      // 获取上一页的数据（缓存了）
+      const storage = localStorage.getItem("noticeHeader");
+      if (storage) {
+        newHead = JSON.parse(storage);
       }
-    } else {
+      setCommonData(newHead);
+    }
 
-      // 还要根据ID获取原始数据（解决刷新时候没有数据的bug）
+    // 获取弹窗页的数据
+    const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
+    setAnnPopData(body);
+    setOldCommonData(head);
+
+    // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，// 修改时，如果清空所有page页面为true，则也清空所有page数据，直接显示空数据
+    if (head.announce_carousel === newHead.announce_carousel && !newHead.clearTabContent) {
+      // 还要对应上传的图片ID
+      const picString = getImageForFront((body[0]?.tabsContent).uploadPic);
+      // 展示第一个tab的数据即可。
+      const formData = body[0]?.tabsContent;
+      formData.uploadPic = picString;
+      dtForm.setFieldsValue(formData);
+      setPicModalState({
+        ...picModalState,
+        checkedImg: picString
+      });
+      setShowPreView(true);
+    } else {
       setEmptyForm();
     }
+  }
+  useEffect(() => {
+    currentTab = 1;
+    showPageDt();
+
   }, []);
 
   return (
@@ -457,7 +466,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                   <Button className={style.commonBtn} style={{marginLeft: 10, display: showPreView ? "inline" : "none"}}
                           onClick={onPreView}>预览</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}}
-                          onClick={() => history.goBack()}>上一步</Button>
+                          onClick={prePage}>上一步</Button>
                 </div>
               </Footer>
             </Form.Item>

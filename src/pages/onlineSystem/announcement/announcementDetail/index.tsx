@@ -23,7 +23,8 @@ const {Footer} = Layout;
 const {confirm} = Modal;
 const Announce: React.FC<any> = (props: any) => {
   const {
-    commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData
+    commonData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData,
+    getAnnounceContent
   } = useModel('announcement');
   const [loading, setLoading] = useState(false);
   // 轮播页面改小的选择
@@ -31,7 +32,7 @@ const Announce: React.FC<any> = (props: any) => {
   // 是否可以离开这个页面（只有在数据已经保存了才能离开）
   // const [leaveShow, setLeaveShow] = useState(false);
   // 公告列表过来的数据（releaseName:公告名称, releaseID：公告id, type：新增还是删除）
-  const {releaseName, releaseID, type} = props.location?.query;
+  const {releaseName, releaseID, type, back} = props.location?.query;
   const [announcementForm] = Form.useForm();
   const [carousePageForm] = Form.useForm();
   // 如果是消息卡片，则显示一键发布和保存按钮，如果是弹窗卡片，则显示下一步按钮
@@ -63,8 +64,9 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   const goToNext = (formInfo: any, isClearAllTab: any = undefined) => {
+    localStorage.setItem("noticeHeader", JSON.stringify({...formInfo, clearTabContent: isClearAllTab}));
     setCommonData({...formInfo, clearTabContent: isClearAllTab});
-    history.push('/onlineSystem/PopupCard' + props.location?.search);
+    history.push(`/onlineSystem/PopupCard?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}`);
   };
 
   // 跳转到下一页
@@ -113,39 +115,27 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {
-    setShowPreView(true);
-    const dts = await queryAnnounceDetail(releaseID);
-    const {NoticeEdition} = dts;
-    if (NoticeEdition && NoticeEdition.length) {
-      const noticeDetails = NoticeEdition[0];
-      const formdata = {
-        announce_carousel: noticeDetails.isCarousel ? 1 : 0,
-        announce_content: noticeDetails.description,
-        announce_name: noticeDetails.iteration,
-        announce_time: moment(noticeDetails.updatedTime),
-        carouselNum: noticeDetails.pageSize,
-        modules: noticeDetails.templateTypeId
-      };
-      // setReleaseTime(dayjs(noticeDetails.updatedTime).format("YYYY-MM-DD HH:mm"))
-      setCommonData(formdata);
-      setOldCommonData({...formdata, releaseID});
-      announcementForm.setFieldsValue(formdata);
+
+    const {head} = await getAnnounceContent(releaseID);
+    setCommonData(head);
+    setOldCommonData({...head, releaseID});
+    if (head) {
+      setShowPreView(true);
+
+      announcementForm.setFieldsValue(head);
       // 显示下一步按钮还是保存按钮
-      if (formdata.modules === "2") { // 如果是弹窗的话，格式化
-        // 还需要在state中保存弹窗的数据
-        setAnnPopData(dealPopDataFromService(NoticeEdition))
+      if (head.modules === "2") { // 如果是弹窗的话，格式化
+
         setStepShow({
           msgCard: "none",
           popCard: "inline"
         });
-        if (formdata.announce_carousel === 1) setCarouselNumShow("inline");
+        if (head.announce_carousel === 1) setCarouselNumShow("inline");
       }
-
-      return;
+    } else {
+      setShowPreView(false);
+      errorMessage("明细获取失败！");
     }
-    setShowPreView(false);
-    errorMessage("明细获取失败！");
-
   }
 
 
@@ -168,11 +158,12 @@ const Announce: React.FC<any> = (props: any) => {
       setCarouselNumShow("none");
       setCommonData(null);
       setOldCommonData(null);
-      setAnnPopData([]);
-    } else if (type === "detail") {
+      localStorage.setItem("noticeHeader", "");
+
+    } else if (type === "detail" && !back) { // 不为下一页返回的数据才调用原始接口
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
       getDataByReleaseId();
-    } else if (commonData && !type) { // 下一页返回上来的数据
+    } else if (commonData && back) { // 下一页返回上来的数据
 
       // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
       // 以下是已有的数据（下一页返回或者历史记录）

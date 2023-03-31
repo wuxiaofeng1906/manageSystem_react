@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 import {queryAnnounceDetail} from "@/pages/onlineSystem/announcement/announcementDetail/axiosRequest/gqlPage";
+import moment from "moment";
+import {dealPopDataFromService} from "@/pages/onlineSystem/announcement/announcementDetail/dataAnalysis";
 
 export default () => {
   // 升级公告详情界面数据（公共数据）
@@ -17,9 +19,30 @@ export default () => {
   // 记录tabs的排序
   const [tabOrder, setTabOrder] = useState<React.Key[]>([]);
 
+  // 获取原数据
+  const getAnnounceContent = async (releaseID: string, showNextPage: boolean = false) => {
 
-  const getAnnounceContent = async (releaseID: string) => {
+    let head: any;
+    let body: any;
     const dts = await queryAnnounceDetail(releaseID);
+    const {NoticeEdition} = dts;
+    if (NoticeEdition && NoticeEdition.length) {
+      const noticeDetails = NoticeEdition[0];
+      head = {
+        announce_carousel: noticeDetails.isCarousel ? 1 : 0,
+        announce_content: noticeDetails.description,
+        announce_name: noticeDetails.iteration,
+        announce_time: moment(noticeDetails.updatedTime),
+        carouselNum: noticeDetails.pageSize,
+        modules: noticeDetails.templateTypeId
+      };
+      if (head.modules === "2" && showNextPage) { // 如果是弹窗，并且需要获取弹窗数据，获取弹窗数据
+        // 还需要在state中保存弹窗的数据
+        body = dealPopDataFromService(NoticeEdition);
+      }
+    }
+
+    return {head, body}
   };
 
   return {
@@ -27,8 +50,7 @@ export default () => {
     anPopData, setAnnPopData,
     showPulishButton, setShowPulishButton,
     oldCommonData, setOldCommonData,
-    tabOrder, setTabOrder
-    // oldAnPopData, setOldAnnPopData
-
+    tabOrder, setTabOrder,
+    getAnnounceContent
   };
 };

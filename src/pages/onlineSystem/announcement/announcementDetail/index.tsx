@@ -71,6 +71,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 跳转到下一页
   const nextPageClick = () => {
+    debugger
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
@@ -82,6 +83,7 @@ const Announce: React.FC<any> = (props: any) => {
       if (oldCommonData && oldCommonData.carouselNum > formInfo.carouselNum) {
         setPageChoice(true);
       } else {
+
         goToNext(formInfo);
       }
     }
@@ -112,6 +114,25 @@ const Announce: React.FC<any> = (props: any) => {
     }
   }
 
+  // 设置下一步、轮播页数是否展示
+  const setStep = (head: any) => {
+    if (head.modules === "1") { // 如果是消息卡片
+      // 显示预览
+      setShowPreView(true);
+      setStepShow({
+        msgCard: "inline",
+        popCard: "none"
+      });
+    } else {
+      setStepShow({
+        msgCard: "none",
+        popCard: "inline"
+      });
+
+      // 是否轮播
+      head.announce_carousel === 0 ? setCarouselNumShow("none") : setCarouselNumShow("inline");
+    }
+  };
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {
@@ -120,84 +141,69 @@ const Announce: React.FC<any> = (props: any) => {
     setCommonData(head);
     setOldCommonData({...head, releaseID});
     if (head) {
-      setShowPreView(true);
-
       announcementForm.setFieldsValue(head);
-      // 显示下一步按钮还是保存按钮
-      if (head.modules === "2") { // 如果是弹窗的话，格式化
-
-        setStepShow({
-          msgCard: "none",
-          popCard: "inline"
-        });
-        if (head.announce_carousel === 1) setCarouselNumShow("inline");
-      }
+      // 展示升级模板选择框和是否显示下一步按钮
+      setStep(head);
     } else {
       setShowPreView(false);
-      errorMessage("明细获取失败！");
+      setEmptyForm();
     }
   }
+  // 设置默认表单
+  const setEmptyForm = () => {
+    announcementForm.setFieldsValue({
+      announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
+      modules: "1",
+      announce_carousel: 0, // 默认为否
+      carouselNum: 5
+    });
+    setCarouselNumShow("none");
+    setCommonData(null);
+    setOldCommonData(null);
+    localStorage.setItem("noticeHeader", "");
+  }
+  const showPageData = async () => {
+    // 如果是下一页返回上来的数据
+    if (back) {
+      // 默认是之前设置的commondata
+      let head = {...commonData};
+      // 先判断有没有存在原始数据（commonData），有的话则显示原始数据,没有的话从后端获取原始数据
+      if (commonData && JSON.stringify(commonData) !== "{}") {      // 以下是已有的数据（下一页返回或者历史记录）
+        announcementForm.setFieldsValue(head);
+        setStep(head);
+      } else {
+        // 获取后端原始数据
+        await getDataByReleaseId();
+      }
+      return;
+    }
 
+    // 如果是新增,并且不是下一页返回，则初始化界面
+    if (type === "add" && !back) {
+      // 默认展示的数据
+      setEmptyForm();
+      return;
+    }
+
+    // 如果修改，并且不是上一页返回
+    if (type === "detail" && !back) { // 不为下一页返回的数据才调用原始接口
+      // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
+      await getDataByReleaseId();
+      return;
+    }
+    setEmptyForm();
+  }
 
   useEffect(() => {
 
     // 一键发布按钮是否展示
     pulishButtonVisible();
 
-    // 先设置数据源（commonData：当前页面的数据）
-    if (type === "add") {
-      // 默认展示的数据
-      announcementForm.setFieldsValue({
-        announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
-        modules: "1",
-        // announce_name: `${releaseName}升级公告`,
-        // announce_time: moment(),
-        announce_carousel: 0, // 默认为否
-        carouselNum: 5
-      });
-      setCarouselNumShow("none");
-      setCommonData(null);
-      setOldCommonData(null);
-      localStorage.setItem("noticeHeader", "");
-
-    } else if (type === "detail" && !back) { // 不为下一页返回的数据才调用原始接口
-      // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
-      getDataByReleaseId();
-    } else if (commonData && back) { // 下一页返回上来的数据
-
-      // 先判断有没有存在原始数据（commonData），有的话则显示原始数据(存储的之前编辑的数据，跳转到下一页后又返回来了)
-      // 以下是已有的数据（下一页返回或者历史记录）
-      announcementForm.setFieldsValue({
-        announce_name: commonData.announce_name,
-        modules: commonData.modules,
-        announce_time: moment(commonData.announce_time),
-        announce_content: commonData.announce_content,
-        announce_carousel: commonData.announce_carousel,
-        carouselNum: commonData.carouselNum
-      });
-      if (commonData.modules === 1) { // 如果是消息卡片
-        setStepShow({
-          msgCard: "inline",
-          popCard: "none"
-        });
-      } else {
-        if (commonData.announce_carousel === 0) {
-          //   不轮播，不展示轮播页数
-          setCarouselNumShow("none");
-        } else {
-          setCarouselNumShow("inline");
-        }
-        setStepShow({
-          msgCard: "none",
-          popCard: "inline"
-        });
-      }
-    } else {
-      errorMessage("数据获取错误！")
-    }
-
+    // 展示界面数据
+    showPageData();
 
   }, []);
+
   // 保存数据
   const saveMsgInfo = async () => {
     // const announceMsg = document.getElementById("announceContent")?.innerText;

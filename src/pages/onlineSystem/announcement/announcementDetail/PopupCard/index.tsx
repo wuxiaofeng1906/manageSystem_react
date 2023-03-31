@@ -274,6 +274,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     history.push('/onlineSystem/announcementDetail' + props.location?.search + "&back=true");
   }
   const showPageDt = async () => {
+
     debugger
     // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
     let newHead: any = {...commonData};
@@ -285,7 +286,14 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
       setCommonData(newHead);
     }
+    // 如果没有 releaseID，并且type=add 的话，则新增
+    if (type === "add") {
+      if (isEmpty(releaseID)) {
+        setEmptyForm();
+      }
 
+      return;
+    }
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setAnnPopData(body);

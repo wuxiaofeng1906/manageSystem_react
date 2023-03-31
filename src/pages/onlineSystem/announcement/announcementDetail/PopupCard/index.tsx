@@ -154,7 +154,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any) => {
-    debugger
+
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {
@@ -264,7 +264,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
     });
   };
-
+  // 展示上传的图片
   const setPicImgSource = (file: string) => {
     document.getElementById("file_img")!.src = file;
   };
@@ -273,27 +273,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     // 上一步之前也要保存本页数据
     history.push('/onlineSystem/announcementDetail' + props.location?.search + "&back=true");
   }
-  const showPageDt = async () => {
 
-    debugger
-    // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
-    let newHead: any = {...commonData};
-    if (!newHead || JSON.stringify(newHead) === "{}") {
-      // 获取上一页的数据（缓存了）
-      const storage = localStorage.getItem("noticeHeader");
-      if (storage) {
-        newHead = JSON.parse(storage);
-      }
-      setCommonData(newHead);
-    }
-    // 如果没有 releaseID，并且type=add 的话，则新增
-    if (type === "add") {
-      if (isEmpty(releaseID)) {
-        setEmptyForm();
-      }
-
-      return;
-    }
+  const showOldPage = async (newHead: any) => {
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setAnnPopData(body);
@@ -315,6 +296,43 @@ const PopupCard: React.FC<any> = (props: any) => {
     } else {
       setEmptyForm();
     }
+  }
+  const showPageDt = async () => {
+
+    debugger
+    // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
+    let newHead: any = {...commonData};
+    if (!newHead || JSON.stringify(newHead) === "{}") {
+      // 获取上一页的数据（缓存了）
+      const storage = localStorage.getItem("noticeHeader");
+      if (storage) {
+        newHead = JSON.parse(storage);
+      }
+      setCommonData(newHead);
+    }
+    // 如果没有 type=add 的话，则新增
+    if (type === "add") {
+      debugger
+      // 如果又返回了上一页，那么这个add界面可能有数据
+      if (anPopData.length === 0) {
+        setEmptyForm();
+      } else {
+        // 展示之前的数据  不能用 showOldPage 因为没有release ID
+        // 还要对应上传的图片ID
+        const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
+        // 展示第一个tab的数据即可。
+        const formData = anPopData[0]?.tabsContent;
+        formData.uploadPic = picString;
+        dtForm.setFieldsValue(formData); // 表单数据
+        setPicModalState({ // 图片
+          ...picModalState,
+          checkedImg: picString
+        });
+      }
+    } else {
+      showOldPage(newHead)
+    }
+
   }
   useEffect(() => {
     currentTab = 1;

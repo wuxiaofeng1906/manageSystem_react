@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {queryAnnounceDetail} from "@/pages/onlineSystem/announcement/announcementDetail/axiosRequest/gqlPage";
 
 export default () => {
   // 升级公告详情界面数据（公共数据）
@@ -15,6 +16,11 @@ export default () => {
 
   // 记录tabs的排序
   const [tabOrder, setTabOrder] = useState<React.Key[]>([]);
+
+
+  const getAnnounceContent = async (releaseID: string) => {
+    const dts = await queryAnnounceDetail(releaseID);
+  };
 
   return {
     commonData, setCommonData,

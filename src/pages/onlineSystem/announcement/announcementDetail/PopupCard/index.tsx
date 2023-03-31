@@ -245,12 +245,24 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     //
   };
+
+
   // 一键发布
   const releaseAnnounceInfo = async () => {
-    const releaseResult = await oneKeyToRelease("");
-    if (releaseResult.ok) {
-      sucMessage("公告发布成功！")
-    }
+    confirm({
+      title: '发布确认',
+      icon: <ExclamationCircleFilled/>,
+      content: '确定发布这条公告吗？',
+      centered: true,
+      onOk: async () => {
+        const releaseResult = await oneKeyToRelease(releaseID);
+        if (releaseResult.ok) {
+          sucMessage("公告发布成功！");
+        } else {
+          errorMessage(releaseResult.message);
+        }
+      }
+    });
   };
 
   const setPicImgSource = (file: string) => {
@@ -258,6 +270,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   useEffect(() => {
+    debugger
 
     currentTab = 1;
     // 需要先判断anPopData有没有数据
@@ -286,6 +299,8 @@ const PopupCard: React.FC<any> = (props: any) => {
         setEmptyForm();
       }
     } else {
+
+      // 还要根据ID获取原始数据（解决刷新时候没有数据的bug）
       setEmptyForm();
     }
   }, []);

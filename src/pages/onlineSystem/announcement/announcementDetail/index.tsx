@@ -15,10 +15,12 @@ import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon, dealPopDataFromService} from "./dataAnalysis";
 import {Prompt} from "react-router-dom";
+import {ExclamationCircleFilled} from "@ant-design/icons";
 
 const {TextArea} = Input;
 // 重新合并公告数据
 const {Footer} = Layout;
+const {confirm} = Modal;
 const Announce: React.FC<any> = (props: any) => {
   const {
     commonData, setAnnPopData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData
@@ -229,13 +231,21 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   // 一键发布
-  const releaseMsgInfo = async () => {
-    const releaseResult = await oneKeyToRelease("");
-    if (releaseResult.ok) {
-      sucMessage("公告发布成功！")
-    } else {
-      errorMessage(releaseResult.message);
-    }
+  const releaseNoticeInfo = async () => {
+    confirm({
+      title: '发布确认',
+      icon: <ExclamationCircleFilled/>,
+      content: '确定发布这条公告吗？',
+      centered: true,
+      onOk: async () => {
+        const releaseResult = await oneKeyToRelease(releaseID);
+        if (releaseResult.ok) {
+          sucMessage("公告发布成功！");
+        } else {
+          errorMessage(releaseResult.message);
+        }
+      }
+    });
   };
 
   // 预览
@@ -362,7 +372,7 @@ const Announce: React.FC<any> = (props: any) => {
               </Button>
               <Button
                 className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
-                onClick={releaseMsgInfo}>一键发布
+                onClick={releaseNoticeInfo}>一键发布
               </Button>
               <Button className={style.commonBtn} style={{marginLeft: 10, display: showPreView ? "inline" : "none"}}
                       onClick={onPreView}>预览</Button>

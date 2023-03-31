@@ -136,9 +136,7 @@ export const announceIsOnlined = async (noticeId: string) => {
 
 // 一键发布
 export const oneKeyToRelease = (id: any) => {
-  return axiosPost('/api/77hub/notice/released/', {
-    sid: id
-  });
+  return axiosPost('/api/77hub/notice/released/' + id);
 };
 
 

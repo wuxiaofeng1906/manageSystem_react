@@ -269,11 +269,30 @@ const PopupCard: React.FC<any> = (props: any) => {
     document.getElementById("file_img")!.src = file;
   };
 
+  // 上一页
   const prePage = () => {
+
     // 上一步之前也要保存本页数据
+    // 跟 保存功能一样
+    let finalData = [];
+    // 如果是轮播则先放到state中再保存
+    if (commonData?.announce_carousel === 1) {
+      finalData = getPopupSource(currentTab);
+    } else {
+      // 不是轮播，需要把图片路径放进去
+      const popData = dtForm.getFieldsValue();
+      popData.uploadPic = getImageToBackend(picModalState.checkedImg, popData.picLayout);
+      finalData.push({
+        tabPage: 0,
+        tabsContent: popData
+      });
+    }
+
+    setAnnPopData(finalData);
     history.push('/onlineSystem/announcementDetail' + props.location?.search + "&back=true");
   }
 
+  // 显示旧数据
   const showOldPage = async (newHead: any) => {
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。

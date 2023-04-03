@@ -1,6 +1,6 @@
 export const SIZE = {
-  width: 110,
-  height: 100,
+  width: 105,
+  height: 60,
 };
 
 export const RELEASE_MODULE = {

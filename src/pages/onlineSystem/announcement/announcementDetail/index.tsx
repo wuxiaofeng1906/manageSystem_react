@@ -264,17 +264,19 @@ const Announce: React.FC<any> = (props: any) => {
                 }}>
             <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
               {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
-              <Radio.Group onChange={cardChanged}>
-                <Radio.Button value={"1"} style={{width: 140, height: 100}}>
+              <Radio.Group className={style.antRadioGroup} onChange={cardChanged}>
+                <Radio.Button value={"1"} style={{width: 122, height: 116, border: "none"}}>
                   <img
                     {...SIZE}
                     src={require('../../../../../public/msgCard.png')}
+                    style={{marginLeft: -8, marginTop: 14}}
                   />
                   <span style={{marginLeft: 25}}>消息卡片</span>
                 </Radio.Button>
-                <Radio.Button value={"2"} style={{width: 140, height: 100, marginLeft: 25}}>
+                <Radio.Button value={"2"} style={{width: 122, height: 116, marginLeft: 25}}>
                   <img
                     {...SIZE}
+                    style={{marginLeft: -8, marginTop: 14}}
                     src={require('../../../../../public/popCard.png')}
                   />
                   <span style={{marginLeft: 30}}>弹窗</span>

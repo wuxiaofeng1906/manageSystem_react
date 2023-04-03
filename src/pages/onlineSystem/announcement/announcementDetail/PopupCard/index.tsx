@@ -270,7 +270,8 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   // 上一页
-  const prePage = () => {
+  const goToPrePage = () => {
+    debugger
 
     // 上一步之前也要保存本页数据
     // 跟 保存功能一样
@@ -294,6 +295,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 显示旧数据
   const showOldPage = async (newHead: any) => {
+
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setAnnPopData(body);
@@ -349,8 +351,28 @@ const PopupCard: React.FC<any> = (props: any) => {
           checkedImg: picString
         });
       }
+    } else if (type === "detail") {
+      // 有之前的数据
+      if (!anPopData || anPopData.length === 0) {
+        // 如果没有才获取后端保存的数据
+        showOldPage(newHead)
+      } else {
+        const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
+        // 展示第一个tab的数据。
+        const formData = anPopData[0]?.tabsContent;
+        formData.uploadPic = picString;
+        dtForm.setFieldsValue(formData);
+        setPicModalState({
+          ...picModalState,
+          checkedImg: picString
+        });
+        setShowPreView(true);
+
+
+      }
+
     } else {
-      showOldPage(newHead)
+      setEmptyForm();
     }
 
   }
@@ -512,7 +534,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                   <Button className={style.commonBtn} style={{marginLeft: 10, display: showPreView ? "inline" : "none"}}
                           onClick={onPreView}>预览</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}}
-                          onClick={prePage}>上一步</Button>
+                          onClick={goToPrePage}>上一步</Button>
                 </div>
               </Footer>
             </Form.Item>

@@ -74,7 +74,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   const syncYuqueInfo = async () => {
     const yuQueUrl = dtForm.getFieldValue("yuQueUrl");
     if (isEmpty(yuQueUrl) || !matchYuQueUrl(yuQueUrl)) {
-      errorMessage("请输入语雀迭代版本地址！");
+      errorMessage("请输入语雀迭代版本地址！", 1.5, "0vh");
       return;
     }
     // 加载中进度显示

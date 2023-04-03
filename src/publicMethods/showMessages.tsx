@@ -1,12 +1,12 @@
 import {message} from "antd";
 
 // 错误信息
-const errorMessage = (errMsg: string, dutationTime: number = 1.5) => {
+const errorMessage = (errMsg: string, dutationTime: number = 1.5, position: string = '50vh') => {
   message.error({
     content: errMsg,
     duration: dutationTime,
     style: {
-      marginTop: '50vh',
+      marginTop: position,
     },
   });
 };

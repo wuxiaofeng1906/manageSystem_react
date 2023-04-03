@@ -127,6 +127,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     //  需要最后再赋值当前tab页码
     currentTab = Number(key);
+    setShowUpload(true);
+    setFileList([])
   };
 
   const saveTabPages = async (finalData: any) => {

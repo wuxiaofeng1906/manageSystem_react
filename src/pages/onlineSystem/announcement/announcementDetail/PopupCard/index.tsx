@@ -294,7 +294,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   }
 
   // 显示旧数据
-  const showOldPage = async (newHead: any) => {
+  const showServiceData = async (newHead: any) => {
 
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
@@ -353,24 +353,26 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
     } else if (type === "detail") {
       // 有之前的数据
-      if (!anPopData || anPopData.length === 0) {
-        // 如果没有才获取后端保存的数据
-        showOldPage(newHead)
+      if (anPopData && anPopData.length > 0) {
+        //   如果ID相同，则展示原有数据，如果不同，则获取服务器数据
+        if (anPopData[0]?.tabsContent?.id === releaseID) {
+          const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
+          // 展示第一个tab的数据。
+          const formData = anPopData[0]?.tabsContent;
+          formData.uploadPic = picString;
+          dtForm.setFieldsValue(formData);
+          setPicModalState({
+            ...picModalState,
+            checkedImg: picString
+          });
+          setShowPreView(true);
+        } else {
+          showServiceData(newHead)
+        }
       } else {
-        const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
-        // 展示第一个tab的数据。
-        const formData = anPopData[0]?.tabsContent;
-        formData.uploadPic = picString;
-        dtForm.setFieldsValue(formData);
-        setPicModalState({
-          ...picModalState,
-          checkedImg: picString
-        });
-        setShowPreView(true);
-
-
+        // 如果没有才获取后端保存的数据
+        showServiceData(newHead)
       }
-
     } else {
       setEmptyForm();
     }

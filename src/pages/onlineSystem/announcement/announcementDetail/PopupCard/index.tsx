@@ -128,7 +128,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     //  需要最后再赋值当前tab页码
     currentTab = Number(key);
     setShowUpload(true);
-    setFileList([])
+    // setFileList([])
   };
 
   const saveTabPages = async (finalData: any, preView: boolean) => {
@@ -615,7 +615,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                   <Upload
                     listType="picture-card"
                     showUploadList={{showPreviewIcon: false, showRemoveIcon: false}}
-                    fileList={fileList}
+                    // fileList={fileList}
                     beforeUpload={() => {
                       return false;
                     }}

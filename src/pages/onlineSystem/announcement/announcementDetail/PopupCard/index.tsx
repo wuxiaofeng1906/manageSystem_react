@@ -307,14 +307,33 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 显示旧数据
   const showServiceData = async (newHead: any) => {
-
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
-    setAnnPopData(body);
     setOldCommonData(head);
 
-    // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据，// 修改时，如果清空所有page页面为true，则也清空所有page数据，直接显示空数据
-    if (head.announce_carousel === newHead.announce_carousel && !newHead.clearTabContent) {
+    // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据
+    if (head.announce_carousel === newHead.announce_carousel) {
+      // 如果是轮播，并且轮播页数有发生改变
+      if (newHead.announce_carousel === 1 && newHead.carouselNum < head.carouselNum) {
+        // 轮播页数改变了:======>>>>>>是否清空轮播页数,是的话则全部清空，否的话则删除后面几张页数
+        if (newHead.clearTabContent) {
+          setEmptyForm();
+          return;
+        } else {
+          //
+          const filtered: any = [];
+          body.map((v: any, i: number) => {
+            if (i < newHead.carouselNum) {
+              filtered.push(v);
+            }
+          });
+          setAnnPopData(filtered);
+        }
+      } else {
+        setAnnPopData(body);
+      }
+
+
       // 还要对应上传的图片ID
       const picString = getImageForFront((body[0]?.tabsContent).uploadPic);
       // 展示第一个tab的数据即可。
@@ -326,6 +345,8 @@ const PopupCard: React.FC<any> = (props: any) => {
         checkedImg: picString
       });
       setShowPreView(true);
+
+
     } else {
       setEmptyForm();
     }
@@ -364,6 +385,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         });
       }
     } else if (type === "detail") {
+      debugger
       // 有之前的数据
       if (anPopData && anPopData.length > 0) {
         //   如果ID相同，则展示原有数据，如果不同，则获取服务器数据

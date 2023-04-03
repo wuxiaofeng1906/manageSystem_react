@@ -335,7 +335,7 @@ const Announce: React.FC<any> = (props: any) => {
               {/*  </label>*/}
               {/*</div>*/}
 
-              <TextArea rows={2} style={{minWidth: 300, width: "50%"}}/>
+              <TextArea rows={6} style={{minWidth: 300, width: "50%"}}/>
             </Form.Item>
 
             <div id={"popup"} style={{display: stepShow.popCard}}>

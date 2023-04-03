@@ -131,7 +131,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     setFileList([])
   };
 
-  const saveTabPages = async (finalData: any) => {
+  const saveTabPages = async (finalData: any, preView: boolean) => {
 
     let result: any;
     //  重新对tab排序
@@ -143,6 +143,9 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
 
     if (result.ok) {
+      if (preView) {
+        window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+      }
       sucMessage("保存成功！");
       // 清空state中原始数据
       setAnnPopData([]);
@@ -155,7 +158,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   // 保存数据
-  const onFinish = async (popData: any) => {
+  const onFinish = async (popData: any, preView: boolean = false) => {
 
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
@@ -179,7 +182,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           content: `第${notFinishedPage.join(",")}页轮播页没有填写，确认要保存吗？`,
           centered: true,
           onOk() {
-            saveTabPages(finalData);
+            saveTabPages(finalData, preView);
           },
           onCancel() {
             return;
@@ -187,7 +190,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         });
       } else {
         // 填写完了则直接保存。
-        saveTabPages(finalData);
+        saveTabPages(finalData, preView);
       }
 
     }
@@ -229,7 +232,14 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // 预览
   const onPreView = async () => {
-    window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+    if (showPreView) {
+      window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+      return;
+    }
+
+    const formData = dtForm.getFieldsValue();
+    debugger
+    onFinish(formData, true);
     //   需要需要校验不能为空
     // let finalData = [];
     // // 如果是轮播则先放到state中再保存
@@ -535,7 +545,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                   <Button className={style.commonBtn}
                           style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
                           onClick={releaseAnnounceInfo}>一键发布</Button>
-                  <Button className={style.commonBtn} style={{marginLeft: 10, display: showPreView ? "inline" : "none"}}
+                  <Button className={style.commonBtn} style={{marginLeft: 10}}
                           onClick={onPreView}>预览</Button>
                   <Button className={style.commonBtn} style={{marginLeft: 10}}
                           onClick={goToPrePage}>上一步</Button>

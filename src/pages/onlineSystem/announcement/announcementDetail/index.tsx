@@ -205,7 +205,7 @@ const Announce: React.FC<any> = (props: any) => {
   }, []);
 
   // 保存数据
-  const saveMsgInfo = async () => {
+  const saveMsgInfo = async (preview: boolean = false) => {
     // const announceMsg = document.getElementById("announceContent")?.innerText;
     const formInfo = announcementForm.getFieldsValue();
     // 这个点击保存的，模板一定是消息卡片
@@ -218,11 +218,15 @@ const Announce: React.FC<any> = (props: any) => {
         result = await saveAnnounceContent({...formInfo});
       }
       if (result.ok) {
+        if (preview) {
+          //   保存成功之后预览
+          window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+        }
         sucMessage("保存成功！");
-        history.push('./announceList')
+        history.push('./announceList');
         return;
       } else {
-        result.message ? errorMessage(result.message) : errorMessage("保存失败！");
+        result.message ? errorMessage(result.message) : errorMessage("数据保存失败！");
       }
     }
   };
@@ -247,7 +251,14 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 预览
   const onPreView = () => {
-    window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+
+    if (showPreView) {
+      window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+      return;
+    }
+
+    //如果有修改过内容，则要先保存再预览。
+    saveMsgInfo(true);
   };
 
   return (
@@ -373,7 +384,7 @@ const Announce: React.FC<any> = (props: any) => {
                 className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
                 onClick={releaseNoticeInfo}>一键发布
               </Button>
-              <Button className={style.commonBtn} style={{marginLeft: 10, display: showPreView ? "inline" : "none"}}
+              <Button className={style.commonBtn} style={{marginLeft: 10}}
                       onClick={onPreView}>预览</Button>
 
             </div>

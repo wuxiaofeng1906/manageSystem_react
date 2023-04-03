@@ -836,7 +836,7 @@ export default [
               },
             ],
           },
-          // ...ProjectKpiRoute,
+          ...ProjectKpiRoute,
           {
             name: '项目',
             path: '/kpi/performance/project',

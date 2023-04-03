@@ -284,7 +284,7 @@ const Announce: React.FC<any> = (props: any) => {
                   />
                   <span style={{marginLeft: 25}}>消息卡片</span>
                 </Radio.Button>
-                <Radio.Button value={"2"} style={{width: 122, height: 116, marginLeft: 25}}>
+                <Radio.Button value={"2"} style={{width: 122, height: 116, marginLeft: 25, border: "none"}}>
                   <img
                     {...SIZE}
                     style={{marginLeft: -8, marginTop: 14}}

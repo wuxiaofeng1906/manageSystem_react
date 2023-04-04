@@ -145,13 +145,22 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (result.ok) {
       if (preView) {
         window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+        if (type === "add") {
+          // 清空state中原始数据
+          setAnnPopData([]);
+          setCommonData(null);
+          setOldCommonData(null);
+          history.push('./announceList');
+        }
+      } else {
+        sucMessage("保存成功！");
+        // 清空state中原始数据
+        setAnnPopData([]);
+        setCommonData(null);
+        setOldCommonData(null);
+        history.push('./announceList');
       }
-      sucMessage("保存成功！");
-      // 清空state中原始数据
-      setAnnPopData([]);
-      setCommonData(null);
-      setOldCommonData(null);
-      history.push('./announceList');
+
       return;
     }
     errorMessage("保存失败！");

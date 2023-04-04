@@ -221,9 +221,14 @@ const Announce: React.FC<any> = (props: any) => {
         if (preview) {
           //   保存成功之后预览
           window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+          if (type === "add") { // 如果是新增的话，预览之后需要先返回列表
+            history.push('./announceList');
+          }
+        } else {
+          sucMessage("保存成功！");
+          history.push('./announceList');
         }
-        sucMessage("保存成功！");
-        history.push('./announceList');
+
         return;
       } else {
         result.message ? errorMessage(result.message) : errorMessage("数据保存失败！");

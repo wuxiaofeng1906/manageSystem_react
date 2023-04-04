@@ -69,6 +69,9 @@ const PopupCard: React.FC<any> = (props: any) => {
   const [picUpLoading, setPicUpLoading] = useState(false);
   // 预览的状态
   const [showPreView, setShowPreView] = useState<boolean>(false);
+  // upload 组件使用上传图片
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [showUpload, setShowUpload] = useState<boolean>(true);
 
   // 同步语雀信息
   const syncYuqueInfo = async () => {
@@ -204,9 +207,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     }
   };
-  // upload 组件使用上传图片
-  const [fileList, setFileList] = useState<any[]>([]);
-  const [showUpload, setShowUpload] = useState<boolean>(true);
+
 
   // 选择图片时
   const picChecked = (e: any) => {

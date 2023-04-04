@@ -294,8 +294,11 @@ const Announce: React.FC<any> = (props: any) => {
     saveMsgInfo(true);
   };
 
+
   window.onbeforeunload = function () {
-    alert(`删除缓存：${localStorage.getItem("first_noticeHeader")}`)
+    debugger
+    //注：alert在这里面不起作用，不会弹出消息
+    // alert(`删除缓存：${localStorage.getItem("first_noticeHeader")}`)
     localStorage.removeItem("first_noticeHeader");
     localStorage.removeItem("second_noticeHeader");
 

@@ -28,6 +28,7 @@ export const getImageToBackend = (imgId: string, laout: string) => {
       resultIgm = laout === "1" ? "0/2023/03/1be0bcc8-6e6a-4a2e-861c-69976189f9dd.png" : "0/2023/03/955009c8-63c9-40c0-93ba-223c4724efaf.png";
       break;
     default:
+      resultIgm = imgId; // 手动上传的图片没有对应的后端图片
       break;
   }
 
@@ -61,6 +62,7 @@ export const getImageForFront = (imgId: string) => {
       break;
 
     default:
+      resultIgm = imgId; // 手动上传的图片没有对应的后端图片
       break;
   }
 

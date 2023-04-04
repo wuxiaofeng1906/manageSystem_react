@@ -71,8 +71,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   const [showPreView, setShowPreView] = useState<boolean>(false);
   // upload 组件使用上传图片
   const [fileList, setFileList] = useState<any[]>([]);
-  const [showUpload, setShowUpload] = useState<boolean>(true);
-  const [uploadPic, setUploadPic] = useState<boolean>(true);
+  const [uploadPics, setUploadPics] = useState<any>([]);
 
   // 同步语雀信息
   const syncYuqueInfo = async () => {
@@ -96,6 +95,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
   const getPopupSource = (currentKey: number) => {
+    debugger
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = getImageToBackend(picModalState.checkedImg, specialList.picLayout);
     // specialList.uploadPic = picModalState.checkedImg;
@@ -105,6 +105,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
   // tab切换
   const onTabsChange = (key: string) => {
+    debugger
     // 保存切换前的tab数据，
     const list = getPopupSource(currentTab);
     // 后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
@@ -131,8 +132,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     //  需要最后再赋值当前tab页码
     currentTab = Number(key);
-    setShowUpload(true);
-    // setFileList([])
   };
 
   const saveTabPages = async (finalData: any, preView: boolean) => {
@@ -240,6 +239,8 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
     }
     setPicUpLoading(false);
+    setUploadPics([]);
+    setFileList([])
   };
   // 预览
   const onPreView = async () => {
@@ -597,7 +598,6 @@ const PopupCard: React.FC<any> = (props: any) => {
              onCancel={() => {
                setPicModalState({checkedImg: "", visible: false});
                setPicImgSource("");
-               setShowUpload(true);
                setFileList([]);
              }}
              closable={false}
@@ -624,11 +624,13 @@ const PopupCard: React.FC<any> = (props: any) => {
             <div className={style.setBox}>
               <h5 className={style.titlew7}>从本地上传</h5>
               <div className={style.antPicUpload} style={{backgroundColor: "transparent", marginTop: 13}}>
-                <div style={{display: showUpload ? "inline" : "none"}}>
+                <div
+                  style={{display: uploadPics.length === 0 ? "inline" : "none"}}
+                >
                   <Upload
                     listType="picture-card"
                     showUploadList={{showPreviewIcon: false, showRemoveIcon: false}}
-                    // fileList={fileList}
+                    fileList={fileList}
                     beforeUpload={() => {
                       return false;
                     }}
@@ -640,13 +642,14 @@ const PopupCard: React.FC<any> = (props: any) => {
                         return;
                       }
                       setFileList(fileList);
+                      setUploadPics(fileList);
                       // 清空之前选的图片
                       setPicModalState({...picModalState, checkedImg: ""});
                       //   在界面展示图片
                       const picString: any = await getBase64(fileList[0].originFileObj);
                       setPicImgSource(picString);
                       // document.getElementById("file_img")!.src = picString;
-                      setShowUpload(false);
+                      // setShowUpload(false);
                     }}
                   >
                     {fileList.length >= 1 ? null :
@@ -657,8 +660,8 @@ const PopupCard: React.FC<any> = (props: any) => {
                 {/* 用于上传的图片选择后来展示已选择的照片，原始组件不支持图片展示的大小 */}
                 <img width={'100%'}
                      height={77}
+                     style={{display: uploadPics.length > 0 ? "inline" : "none"}}
                      id={"file_img"}
-                     style={{display: !showUpload ? "inline" : "none"}}
                      onContextMenu={(e: any) => {
                        e.preventDefault();
                        confirm({
@@ -667,12 +670,13 @@ const PopupCard: React.FC<any> = (props: any) => {
                          centered: true,
                          onOk() {
                            // 显示上传框
-                           setShowUpload(true);
+                           // setShowUpload(true);
                            //   清空展示的图片
                            setPicImgSource("")
                            // document.getElementById("file_img")!.src = "";
                            //   清空fileList
                            setFileList([]);
+                           setUploadPics([])
                          },
                          onCancel() {
                            return;

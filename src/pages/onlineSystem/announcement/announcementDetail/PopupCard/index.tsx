@@ -24,7 +24,6 @@ import {imgUrlHeader, defaultImgsUrl, picType, getImageToBackend, getImageForFro
 import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
 
-
 // 当前的tab页面
 let currentTab = 1;
 const {Footer} = Layout;
@@ -32,8 +31,8 @@ const {confirm} = Modal;
 
 const PopupCard: React.FC<any> = (props: any) => {
   const {
-    commonData, anPopData, setAnnPopData, getAnnounceContent,
-    showPulishButton, setCommonData, setOldCommonData, tabOrder
+    commonData, anPopData, setAnnPopData, getAnnounceContent, showPulishButton,
+    setCommonData, setOldCommonData, tabOrder
   } = useModel('announcement');
   const {releaseName, releaseID, type, back} = props.location?.query;
   const [dtForm] = Form.useForm();
@@ -93,19 +92,18 @@ const PopupCard: React.FC<any> = (props: any) => {
     setYuQueSpinLoading(false);
   };
 
-  // 如果时轮播则保存轮播数据 ，动态保存编辑数据（点击保存时保存当前页面），切换页面时保存已有数据的页面
+  // 轮播时候的动态编辑数据(使用地方：Tab切换，上一页按钮点击，保存按钮点击)
   const getPopupSource = (currentKey: number) => {
-    debugger
     const specialList = dtForm.getFieldsValue();
     specialList.uploadPic = getImageToBackend(picModalState.checkedImg, specialList.picLayout);
-    // specialList.uploadPic = picModalState.checkedImg;
     const result = getChanedData(currentKey, commonData, anPopData, specialList);
     setAnnPopData(result);
     return result;
   };
+
   // tab切换
   const onTabsChange = (key: string) => {
-    debugger
+
     // 保存切换前的tab数据，
     const list = getPopupSource(currentTab);
     // 后看下一个tab有没有存数据，若有则展示，若没有则赋值为空
@@ -134,6 +132,76 @@ const PopupCard: React.FC<any> = (props: any) => {
     currentTab = Number(key);
   };
 
+  // 图片选择确认按钮
+  const uploadPicClick = async () => {
+    // 判断是不是手动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
+    // 之前就选择了图片
+    if (picModalState.checkedImg) {
+      setPicModalState({...picModalState, visible: false})
+      return;
+    }
+    setPicUpLoading(true);
+    // 这个是保存自己上传的图片
+    if (fileList.length) { // 如果大于0 则已手动上传了数据，如果小于0则看有没有以前的数据
+      const s3Info = await getS3Key(fileList[0].name);
+      if (s3Info) {
+        // 再上传到服务器
+        const upResult = await uploadPicToS3(s3Info, fileList[0]);
+        if (upResult.result && upResult.result.status === 204) {
+          // alert("id：" + s3Info.fields?.key)
+          setPicModalState({checkedImg: s3Info.fields?.key, visible: false});
+        } else {
+          errorMessage("图片上传失败");
+        }
+      }
+    }
+    setPicUpLoading(false);
+    setUploadPics([]);
+    setFileList([])
+  };
+
+  // 一键发布
+  const releaseAnnounceInfo = async () => {
+    confirm({
+      title: '发布确认',
+      icon: <ExclamationCircleFilled/>,
+      content: '确定发布这条公告吗？',
+      centered: true,
+      onOk: async () => {
+        const releaseResult = await oneKeyToRelease(releaseID);
+        if (releaseResult.ok) {
+          sucMessage("公告发布成功！");
+        } else {
+          errorMessage(releaseResult.message);
+        }
+      }
+    });
+  };
+
+  // 上一页
+  const goToPrePage = () => {
+    // 上一步之前也要保存本页数据
+    // 跟 保存功能一样
+    let finalData = [];
+    // 如果是轮播则先放到state中再保存
+    if (commonData?.announce_carousel === 1) {
+      finalData = getPopupSource(currentTab);
+    } else {
+      // 不是轮播，需要把图片路径放进去
+      const popData = dtForm.getFieldsValue();
+      popData.uploadPic = getImageToBackend(picModalState.checkedImg, popData.picLayout);
+      finalData.push({
+        tabPage: 0,
+        tabsContent: popData
+      });
+    }
+
+    setAnnPopData(finalData);
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&back=true`);
+  }
+
+  // region =======>>>>>>>>>>>>>>>>>保存数据和预览
+  // 点击保存按钮保存数据
   const saveTabPages = async (finalData: any, preView: boolean) => {
 
     let result: any;
@@ -208,40 +276,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
   };
 
-
-  // 选择图片时
-  const picChecked = (e: any) => {
-    if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
-      setPicModalState({...picModalState, checkedImg: e.target.dataset.value});
-    }
-  };
-  // 点击确定按钮
-  const uploadPicClick = async () => {
-    // 判断是不是手动上传的数据，如果是则需要先调用上传接口，如果不是则直接保存
-    // 之前就选择了图片
-    if (picModalState.checkedImg) {
-      setPicModalState({...picModalState, visible: false})
-      return;
-    }
-    setPicUpLoading(true);
-    // 这个是保存自己上传的图片
-    if (fileList.length) { // 如果大于0 则已手动上传了数据，如果小于0则看有没有以前的数据
-      const s3Info = await getS3Key(fileList[0].name);
-      if (s3Info) {
-        // 再上传到服务器
-        const upResult = await uploadPicToS3(s3Info, fileList[0]);
-        if (upResult.result && upResult.result.status === 204) {
-          // alert("id：" + s3Info.fields?.key)
-          setPicModalState({checkedImg: s3Info.fields?.key, visible: false});
-        } else {
-          errorMessage("图片上传失败");
-        }
-      }
-    }
-    setPicUpLoading(false);
-    setUploadPics([]);
-    setFileList([])
-  };
   // 预览
   const onPreView = async () => {
     if (showPreView) {
@@ -268,53 +302,11 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     //
   };
+  // endregion
 
+  // region =======>>>>>>>>>>>>>>>>>界面初始化展示
 
-  // 一键发布
-  const releaseAnnounceInfo = async () => {
-    confirm({
-      title: '发布确认',
-      icon: <ExclamationCircleFilled/>,
-      content: '确定发布这条公告吗？',
-      centered: true,
-      onOk: async () => {
-        const releaseResult = await oneKeyToRelease(releaseID);
-        if (releaseResult.ok) {
-          sucMessage("公告发布成功！");
-        } else {
-          errorMessage(releaseResult.message);
-        }
-      }
-    });
-  };
-  // 展示上传的图片
-  const setPicImgSource = (file: string) => {
-    document.getElementById("file_img")!.src = file;
-  };
-
-  // 上一页
-  const goToPrePage = () => {
-    // 上一步之前也要保存本页数据
-    // 跟 保存功能一样
-    let finalData = [];
-    // 如果是轮播则先放到state中再保存
-    if (commonData?.announce_carousel === 1) {
-      finalData = getPopupSource(currentTab);
-    } else {
-      // 不是轮播，需要把图片路径放进去
-      const popData = dtForm.getFieldsValue();
-      popData.uploadPic = getImageToBackend(picModalState.checkedImg, popData.picLayout);
-      finalData.push({
-        tabPage: 0,
-        tabsContent: popData
-      });
-    }
-
-    setAnnPopData(finalData);
-    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&back=true`);
-  }
-
-  // 显示旧数据
+  // 获取服务端旧数据
   const showServiceData = async (newHead: any) => {
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
@@ -338,11 +330,56 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
   };
 
+  // 修改数据时候
+  const showForDetail = (newHead: any) => {
+    // 有之前的数据
+    if (anPopData && anPopData.length > 0) {
+      //   如果ID相同，则展示原有数据，如果不同，则获取服务器数据
+      if (newHead.releaseID === releaseID) {
+        const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
+        // 展示第一个tab的数据。
+        const formData = anPopData[0]?.tabsContent;
+        formData.uploadPic = picString;
+        dtForm.setFieldsValue(formData);
+        setPicModalState({
+          ...picModalState,
+          checkedImg: picString
+        });
+        setShowPreView(true);
+      } else {
+        showServiceData(newHead)
+      }
+    } else {
+      // 如果没有才获取后端保存的数据
+      showServiceData(newHead)
+    }
+  };
+  // 新增数据时候
+  const showForAdd = () => {
+    if (back === "undefined" || !back || anPopData.length === 0) {
+      setEmptyForm();
+      return;
+    }
+
+    // 展示之前的数据  不能用 showOldPage 因为没有release ID
+    // 还要对应上传的图片ID
+    const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
+    // 展示第一个tab的数据即可。
+    const formData = anPopData[0]?.tabsContent;
+    formData.uploadPic = picString;
+    dtForm.setFieldsValue(formData); // 表单数据
+    setPicModalState({ // 图片
+      ...picModalState,
+      checkedImg: picString
+    });
+  };
+
   // 展示界面数据
-  const showPageDt = async () => {
+  useEffect(() => {
+    currentTab = 1;
+
     // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
     let newHead: any = {...commonData};
-
     if (!newHead || JSON.stringify(newHead) === "{}") {
       // 获取上一页的数据（缓存了）
       const storage = localStorage.getItem("first_noticeHeader");
@@ -351,56 +388,18 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
       setCommonData(newHead);
     }
+
+
     // 如果没有 type=add 的话，则新增
     if (type === "add") {
-      if (back === "undefined" || !back || anPopData.length === 0) {
-        setEmptyForm();
-        return;
-      }
-
-      // 展示之前的数据  不能用 showOldPage 因为没有release ID
-      // 还要对应上传的图片ID
-      const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
-      // 展示第一个tab的数据即可。
-      const formData = anPopData[0]?.tabsContent;
-      formData.uploadPic = picString;
-      dtForm.setFieldsValue(formData); // 表单数据
-      setPicModalState({ // 图片
-        ...picModalState,
-        checkedImg: picString
-      });
+      showForAdd();
 
     } else if (type === "detail") {
+      showForDetail(newHead);
 
-      // 有之前的数据
-      if (anPopData && anPopData.length > 0) {
-        //   如果ID相同，则展示原有数据，如果不同，则获取服务器数据
-        if (newHead.releaseID === releaseID) {
-          const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
-          // 展示第一个tab的数据。
-          const formData = anPopData[0]?.tabsContent;
-          formData.uploadPic = picString;
-          dtForm.setFieldsValue(formData);
-          setPicModalState({
-            ...picModalState,
-            checkedImg: picString
-          });
-          setShowPreView(true);
-        } else {
-          showServiceData(newHead)
-        }
-      } else {
-        // 如果没有才获取后端保存的数据
-        showServiceData(newHead)
-      }
     } else {
       setEmptyForm();
     }
-
-  }
-  useEffect(() => {
-    currentTab = 1;
-    showPageDt();
 
   }, []);
 
@@ -422,6 +421,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
     }
   }, [commonData, anPopData]);
+  // endregion
 
   window.onbeforeunload = function () {
     debugger
@@ -597,7 +597,8 @@ const PopupCard: React.FC<any> = (props: any) => {
              onOk={uploadPicClick}
              onCancel={() => {
                setPicModalState({checkedImg: "", visible: false});
-               setPicImgSource("");
+               document.getElementById("file_img")!.src = "";
+
                setFileList([]);
              }}
              closable={false}
@@ -608,7 +609,11 @@ const PopupCard: React.FC<any> = (props: any) => {
               <div className={style.titleBox}>
                 <h5 className={style.titlew}>选择默认图片</h5>
               </div>
-              <ul className={style.imgList} onClick={picChecked}>
+              <ul className={style.imgList} onClick={(e: any) => {
+                if (e.target.tagName === 'LI' || e.target.tagName === 'IMG') {
+                  setPicModalState({...picModalState, checkedImg: e.target.dataset.value});
+                }
+              }}>
                 {defaultImgsUrl.map(item => (
                   <li key={item} data-value={item}
                       className={picModalState.checkedImg === item ? style.activeChose : ''}>
@@ -647,7 +652,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                       setPicModalState({...picModalState, checkedImg: ""});
                       //   在界面展示图片
                       const picString: any = await getBase64(fileList[0].originFileObj);
-                      setPicImgSource(picString);
+                      document.getElementById("file_img")!.src = picString;
                       // document.getElementById("file_img")!.src = picString;
                       // setShowUpload(false);
                     }}
@@ -672,8 +677,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                            // 显示上传框
                            // setShowUpload(true);
                            //   清空展示的图片
-                           setPicImgSource("")
-                           // document.getElementById("file_img")!.src = "";
+                           document.getElementById("file_img")!.src = "";
                            //   清空fileList
                            setFileList([]);
                            setUploadPics([])

@@ -26,15 +26,15 @@ const Announce: React.FC<any> = (props: any) => {
     commonData, setCommonData, showPulishButton, setShowPulishButton, oldCommonData, setOldCommonData,
     getAnnounceContent
   } = useModel('announcement');
-  const [loading, setLoading] = useState(false);
-  // 轮播页面改小的选择
-  const [pageChoice, setPageChoice] = useState(false);
-  // 是否可以离开这个页面（只有在数据已经保存了才能离开）
-  // const [leaveShow, setLeaveShow] = useState(false);
   // 公告列表过来的数据（releaseName:公告名称, releaseID：公告id, type：新增还是删除）
   const {releaseName, releaseID, type, back} = props.location?.query;
   const [announcementForm] = Form.useForm();
   const [carousePageForm] = Form.useForm();
+
+  // 数据加载
+  const [loading, setLoading] = useState(false);
+  // 轮播页面改小的选择
+  const [pageChoice, setPageChoice] = useState(false);
   // 如果是消息卡片，则显示一键发布和保存按钮，如果是弹窗卡片，则显示下一步按钮
   const [stepShow, setStepShow] = useState<any>({
     msgCard: "inline",
@@ -44,11 +44,11 @@ const Announce: React.FC<any> = (props: any) => {
   const [carouselNumShow, setCarouselNumShow] = useState<string>("none");
   // 发布时间
   const [releaseTime, setReleaseTime] = useState<string>(dayjs().format("YYYY-MM-DD HH:mm"));
-
   // 预览的状态
   const [showPreView, setShowPreView] = useState<boolean>(false);
-  // 设置显示哪个模板(消息或者弹窗)
-  const cardChanged = (e: RadioChangeEvent) => {
+
+  // 升级模板点击改变
+  const onModuleChanged = (e: RadioChangeEvent) => {
     if (e.target.value === "1") { // 1 是消息弹窗
       setStepShow({
         msgCard: "inline",
@@ -63,6 +63,7 @@ const Announce: React.FC<any> = (props: any) => {
     if (announcementForm.getFieldValue("announce_carousel") === 1) setCarouselNumShow("inline");
   };
 
+  // 下一页
   const goToNext = (formInfo: any, isClearAllTab: any = undefined) => {
     // 做两个缓存，以防多次上一步操作。
 
@@ -79,23 +80,17 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   // 跳转到下一页
-  const nextPageClick = () => {
+  const onNextPageClick = () => {
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
-      // 如果轮播页数减少，需要进行提示，是删除那些页。
-      // 轮播图张数已改小，请选择删除轮播页面
-      // 删除全部内容，重新创建
-      // 删除后面多余张数的内容
-      // 取消/确定
-
+      // 如果轮播页数减少，需要进行提示，是删除那些页。轮播图张数已改小，请选择删除轮播页面。删除全部内容；重新创建：删除后面多余张数的内容
       // 如果是下一页返回的数据，则跟缓存的数据做对比，如果不是，则跟服务器获取的旧数据做对比。
       if (back) {
         const first_localdata = JSON.parse(localStorage.getItem("first_noticeHeader") as string);
         const second_localdata = JSON.parse(localStorage.getItem("first_noticeHeader") as string);
         if (first_localdata.carouselNum !== undefined && second_localdata.carouselNum !== undefined && first_localdata.carouselNum > second_localdata.carouselNum) {
           setPageChoice(true);
-
         } else if (first_localdata.carouselNum > formInfo.carouselNum) {
           setPageChoice(true);
         } else {
@@ -111,128 +106,27 @@ const Announce: React.FC<any> = (props: any) => {
     }
   };
 
-  // 监听删除键是否用于删除公告详情中的数据
-  document.onkeydown = function (event: KeyboardEvent) {
-    if (event?.code === "Backspace" && event.target?.value.endsWith("更新升级。更新功能：")) {
-      return false;
-    }
-    return true;
-  }
-
-  // 判断是否有上线，有上线才会进行一键发布
-  // 判断是否有上线，有上线才会进行一键发布
-  const pulishButtonVisible = async () => {
-
-    if (isEmpty(releaseID)) {
-      setShowPulishButton(false);
-      return;
-    }
-
-    const result = await announceIsOnlined(releaseID);
-    if (result.ok) {
-      setShowPulishButton(true);
-    } else {
-      setShowPulishButton(false);
-    }
-  }
-
-  // 设置下一步、轮播页数是否展示
-  const setStep = (head: any) => {
-    if (head.modules === "1") { // 如果是消息卡片
-      // 显示预览
-      setShowPreView(true);
-      setStepShow({
-        msgCard: "inline",
-        popCard: "none"
-      });
-    } else {
-      setStepShow({
-        msgCard: "none",
-        popCard: "inline"
-      });
-
-      // 是否轮播
-      head.announce_carousel === 0 ? setCarouselNumShow("none") : setCarouselNumShow("inline");
-    }
-  };
-
-  // 根据公告ID获取对应的详细数据
-  const getDataByReleaseId = async () => {
-    const {head} = await getAnnounceContent(releaseID);
-    setCommonData(head);
-    setOldCommonData({...head, releaseID});
-    if (head) {
-      announcementForm.setFieldsValue(head);
-      // 展示升级模板选择框和是否显示下一步按钮
-      setStep(head);
-    } else {
-      setShowPreView(false);
-      setEmptyForm();
-    }
-  }
-  // 设置默认表单
-  const setEmptyForm = () => {
-    announcementForm.setFieldsValue({
-      announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
-      modules: "1",
-      announce_carousel: 0, // 默认为否
-      carouselNum: 5
-    });
-    setCarouselNumShow("none");
-    setCommonData(null);
-    setOldCommonData(null);
-    localStorage.setItem("first_noticeHeader", "");
-    localStorage.setItem("second_noticeHeader", "");
-  };
-
-  // 展示数据
-  const showPageData = async () => {
-    // 如果是下一页返回上来的数据
-    if (back) {
-      // 默认是之前设置的commondata
-      let head = {...commonData};
-      // 先判断有没有存在原始数据（commonData），有的话则显示原始数据,没有的话从后端获取原始数据
-      if (commonData && JSON.stringify(commonData) !== "{}") {      // 以下是已有的数据（下一页返回或者历史记录）
-
-        // 里面的时间需要转一下。。
-        announcementForm.setFieldsValue({...head, announce_time: dayjs(head.announce_time)});
-        setStep(head);
-      } else {
-        // 获取后端原始数据
-        await getDataByReleaseId();
+  // 一键发布
+  const releaseNoticeInfo = async () => {
+    confirm({
+      title: '发布确认',
+      icon: <ExclamationCircleFilled/>,
+      content: '确定发布这条公告吗？',
+      centered: true,
+      onOk: async () => {
+        const releaseResult = await oneKeyToRelease(releaseID);
+        if (releaseResult.ok) {
+          sucMessage("公告发布成功！");
+        } else {
+          errorMessage(releaseResult.message);
+        }
       }
-      return;
-    }
+    });
+  };
 
-    // 如果是新增,并且不是下一页返回，则初始化界面
-    if (type === "add" && !back) {
-      // 默认展示的数据
-      setEmptyForm();
-      return;
-    }
-
-    // 如果修改，并且不是上一页返回
-    if (type === "detail" && !back) { // 不为下一页返回的数据才调用原始接口
-      // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
-      await getDataByReleaseId();
-      return;
-    }
-    setEmptyForm();
-  }
-
-  useEffect(() => {
-
-    // 一键发布按钮是否展示
-    pulishButtonVisible();
-
-    // 展示界面数据
-    showPageData();
-
-  }, []);
-
+  // region ===========>>>>>>>>>>>>点击保存按钮和预览按钮
   // 保存数据
   const saveMsgInfo = async (preview: boolean = false) => {
-    // const announceMsg = document.getElementById("announceContent")?.innerText;
     const formInfo = announcementForm.getFieldsValue();
     // 这个点击保存的，模板一定是消息卡片
     if (vertifyFieldForCommon(formInfo)) {
@@ -262,24 +156,6 @@ const Announce: React.FC<any> = (props: any) => {
     }
   };
 
-  // 一键发布
-  const releaseNoticeInfo = async () => {
-    confirm({
-      title: '发布确认',
-      icon: <ExclamationCircleFilled/>,
-      content: '确定发布这条公告吗？',
-      centered: true,
-      onOk: async () => {
-        const releaseResult = await oneKeyToRelease(releaseID);
-        if (releaseResult.ok) {
-          sucMessage("公告发布成功！");
-        } else {
-          errorMessage(releaseResult.message);
-        }
-      }
-    });
-  };
-
   // 预览
   const onPreView = () => {
 
@@ -292,7 +168,130 @@ const Announce: React.FC<any> = (props: any) => {
     saveMsgInfo(true);
   };
 
+  // endregion
 
+  // region ===========>>>>>>>>>>>>展示界面初始化数据
+  // 判断是否有上线，有上线才会进行一键发布
+  const pulishButtonVisible = async () => {
+
+    if (isEmpty(releaseID)) {
+      setShowPulishButton(false);
+      return;
+    }
+    const result = await announceIsOnlined(releaseID);
+    if (result.ok) {
+      setShowPulishButton(true);
+    } else {
+      setShowPulishButton(false);
+    }
+  };
+
+  // 设置默认表单
+  const setEmptyForm = () => {
+    announcementForm.setFieldsValue({
+      announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
+      modules: "1",
+      announce_carousel: 0, // 默认为否
+      carouselNum: 5
+    });
+    setCarouselNumShow("none");
+    setCommonData(null);
+    setOldCommonData(null);
+    localStorage.setItem("first_noticeHeader", "");
+    localStorage.setItem("second_noticeHeader", "");
+  };
+
+  // 设置下一步、轮播页数是否展示
+  const setStep = (head: any) => {
+    if (head.modules === "1") { // 如果是消息卡片
+      // 显示预览
+      setShowPreView(true);
+      setStepShow({
+        msgCard: "inline",
+        popCard: "none"
+      });
+    } else {
+      setStepShow({
+        msgCard: "none",
+        popCard: "inline"
+      });
+
+      // 是否轮播
+      head.announce_carousel === 0 ? setCarouselNumShow("none") : setCarouselNumShow("inline");
+    }
+  };
+
+
+  // 根据公告ID获取对应的详细数据
+  const getDataByReleaseId = async () => {
+    const {head} = await getAnnounceContent(releaseID);
+    setCommonData(head);
+    setOldCommonData({...head, releaseID});
+    if (head) {
+      announcementForm.setFieldsValue(head);
+      // 展示升级模板选择框和是否显示下一步按钮
+      setStep(head);
+    } else {
+      setShowPreView(false);
+      setEmptyForm();
+    }
+  };
+
+  // 展示数据
+  const showPageData = async () => {
+    setLoading(true);
+    // 如果是下一页返回上来的数据
+    if (back) {
+      // 默认是之前设置的commondata
+      let head = {...commonData};
+      // 先判断有没有存在原始数据（commonData），有的话则显示原始数据,没有的话从后端获取原始数据
+      if (commonData && JSON.stringify(commonData) !== "{}") {      // 以下是已有的数据（下一页返回或者历史记录）
+
+        // 里面的时间需要转一下。。
+        announcementForm.setFieldsValue({...head, announce_time: dayjs(head.announce_time)});
+        setStep(head);
+      } else {
+        // 获取后端原始数据
+        await getDataByReleaseId();
+      }
+      setLoading(false);
+      return;
+    }
+
+    // 如果是新增,并且不是下一页返回，则初始化界面
+    if (type === "add" && !back) {
+      // 默认展示的数据
+      setEmptyForm();
+      setLoading(false);
+      return;
+    }
+
+    // 如果修改，并且不是上一页返回
+    if (type === "detail" && !back) { // 不为下一页返回的数据才调用原始接口
+      // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
+      await getDataByReleaseId();
+      setLoading(false);
+      return;
+    }
+    setEmptyForm();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+
+
+    // 一键发布按钮是否展示
+    pulishButtonVisible();
+
+    // 展示界面数据
+    showPageData();
+
+
+  }, []);
+
+  // endregion
+
+  // 页面关闭，清除缓存
   window.onbeforeunload = function () {
     debugger
     //注：alert在这里面不起作用，不会弹出消息
@@ -301,12 +300,16 @@ const Announce: React.FC<any> = (props: any) => {
     localStorage.removeItem("second_noticeHeader");
 
   };
+  // 监听删除键是否用于删除公告详情中的数据
+  document.onkeydown = function (event: KeyboardEvent) {
+    if (event?.code === "Backspace" && event.target?.value.endsWith("更新升级。更新功能：")) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <PageContainer>
-      <Prompt
-        when={false}
-        message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
-      />
       <Spin size={"large"} spinning={loading} tip={"数据加载中..."}>
         <div style={{marginTop: -15, background: 'white', padding: 10}}>
           <Form form={announcementForm} autoComplete={"off"}
@@ -315,7 +318,7 @@ const Announce: React.FC<any> = (props: any) => {
                 }}>
             <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
               {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
-              <Radio.Group className={style.antRadioGroup} onChange={cardChanged}>
+              <Radio.Group className={style.antRadioGroup} onChange={onModuleChanged}>
                 <Radio.Button value={"1"} style={{width: 122, height: 116, border: "none"}}>
                   <img
                     {...SIZE}
@@ -411,14 +414,14 @@ const Announce: React.FC<any> = (props: any) => {
             <div id={"popup"} style={{display: stepShow.popCard}}>
               <Button
                 type="primary" className={style.saveButtonStyle}
-                style={{marginLeft: 10}} onClick={nextPageClick}>下一步
+                style={{marginLeft: 10}} onClick={onNextPageClick}>下一步
               </Button>
             </div>
             {/* 消息卡片操作 */}
             <div id={"message"} style={{display: stepShow.msgCard}}>
               <Button
                 type="primary" className={style.saveButtonStyle}
-                style={{marginLeft: 10}} onClick={saveMsgInfo}>保存
+                style={{marginLeft: 10}} onClick={() => saveMsgInfo(false)}>保存
               </Button>
               <Button
                 className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}

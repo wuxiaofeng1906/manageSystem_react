@@ -75,9 +75,7 @@ const Announce: React.FC<any> = (props: any) => {
     }));
 
     setCommonData({...formInfo, clearTabContent: isClearAllTab, releaseID: releaseID});
-    history.push(`/onlineSystem/PopupCard?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}`);
-
-
+    history.push(`/onlineSystem/PopupCard?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&back=${back}`);
   };
 
   // 跳转到下一页

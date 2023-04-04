@@ -35,7 +35,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     commonData, anPopData, setAnnPopData, getAnnounceContent,
     showPulishButton, setCommonData, setOldCommonData, tabOrder
   } = useModel('announcement');
-  const {releaseID, type} = props.location?.query;
+  const {releaseName, releaseID, type, back} = props.location?.query;
   const [dtForm] = Form.useForm();
   // 图片上传弹出层显示
   const [picModalState, setPicModalState] = useState({
@@ -311,7 +311,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
 
     setAnnPopData(finalData);
-    history.push('/onlineSystem/announcementDetail' + props.location?.search + "&back=true");
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&back=true`);
   }
 
   // 显示旧数据
@@ -353,23 +353,23 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     // 如果没有 type=add 的话，则新增
     if (type === "add") {
-
-      // 如果又返回了上一页，那么这个add界面可能有数据,或者是否轮播改变  || newHead.announce_carousel  这里还要改
-      if (anPopData.length === 0) {
+      if (back === "undefined" || !back || anPopData.length === 0) {
         setEmptyForm();
-      } else {
-        // 展示之前的数据  不能用 showOldPage 因为没有release ID
-        // 还要对应上传的图片ID
-        const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
-        // 展示第一个tab的数据即可。
-        const formData = anPopData[0]?.tabsContent;
-        formData.uploadPic = picString;
-        dtForm.setFieldsValue(formData); // 表单数据
-        setPicModalState({ // 图片
-          ...picModalState,
-          checkedImg: picString
-        });
+        return;
       }
+
+      // 展示之前的数据  不能用 showOldPage 因为没有release ID
+      // 还要对应上传的图片ID
+      const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
+      // 展示第一个tab的数据即可。
+      const formData = anPopData[0]?.tabsContent;
+      formData.uploadPic = picString;
+      dtForm.setFieldsValue(formData); // 表单数据
+      setPicModalState({ // 图片
+        ...picModalState,
+        checkedImg: picString
+      });
+
     } else if (type === "detail") {
 
       // 有之前的数据

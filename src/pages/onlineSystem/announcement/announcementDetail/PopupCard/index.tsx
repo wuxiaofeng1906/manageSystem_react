@@ -309,6 +309,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 获取服务端旧数据
   const showServiceData = async (newHead: any) => {
+    debugger
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setOldCommonData(head);
@@ -404,13 +405,13 @@ const PopupCard: React.FC<any> = (props: any) => {
   }, []);
 
   useEffect(() => {
-    debugger
+
     // 按照轮播页数减少anPopData中的数据
     const head = {...commonData};
     if (head.announce_carousel === 1) {
       if (head.clearTabContent) {
         setEmptyForm();
-      } else if (head.carouselNum < anPopData.length) {
+      } else if (anPopData && head.carouselNum < anPopData.length) {
 
         const filtered: any = [];
         anPopData.map((v: any, i: number) => {

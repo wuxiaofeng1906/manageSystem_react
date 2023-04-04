@@ -78,6 +78,7 @@ const carouselData = (popupData: any) => {
 
 // 公告改版后的保存公告内容
 export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
+
   const data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗

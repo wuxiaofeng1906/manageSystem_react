@@ -239,6 +239,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any, preView: boolean = false) => {
+    debugger
 
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
@@ -313,7 +314,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     setOldCommonData(head);
     setAnnPopData(body);
     // 如果是否轮播不改变，才显示原有的数据，否则清空原弹窗中的数据
-    if (head.announce_carousel === newHead.announce_carousel) {
+    if (head.announce_carousel === newHead.announce_carousel && body) {
       // 还要对应上传的图片ID
       const picString = getImageForFront((body[0]?.tabsContent).uploadPic);
       // 展示第一个tab的数据即可。
@@ -388,8 +389,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
       setCommonData(newHead);
     }
-
-
+    debugger
     // 如果没有 type=add 的话，则新增
     if (type === "add") {
       showForAdd();
@@ -404,6 +404,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   }, []);
 
   useEffect(() => {
+    debugger
     // 按照轮播页数减少anPopData中的数据
     const head = {...commonData};
     if (head.announce_carousel === 1) {

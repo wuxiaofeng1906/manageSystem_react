@@ -247,7 +247,6 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
 
     const formData = dtForm.getFieldsValue();
-    debugger
     onFinish(formData, true);
     //   需要需要校验不能为空
     // let finalData = [];
@@ -292,8 +291,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 上一页
   const goToPrePage = () => {
-    debugger
-
     // 上一步之前也要保存本页数据
     // 跟 保存功能一样
     let finalData = [];
@@ -316,6 +313,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 显示旧数据
   const showServiceData = async (newHead: any) => {
+    debugger
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setOldCommonData(head);
@@ -359,13 +357,15 @@ const PopupCard: React.FC<any> = (props: any) => {
     } else {
       setEmptyForm();
     }
-  }
-  const showPageDt = async () => {
+  };
 
+  // 展示界面数据
+  const showPageDt = async () => {
     debugger
+
     // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
     let newHead: any = {...commonData};
-    debugger
+
     if (!newHead || JSON.stringify(newHead) === "{}") {
       // 获取上一页的数据（缓存了）
       const storage = localStorage.getItem("noticeHeader");
@@ -376,7 +376,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     // 如果没有 type=add 的话，则新增
     if (type === "add") {
-      debugger
+
       // 如果又返回了上一页，那么这个add界面可能有数据,或者是否轮播改变  || newHead.announce_carousel  这里还要改
       if (anPopData.length === 0) {
         setEmptyForm();
@@ -394,11 +394,11 @@ const PopupCard: React.FC<any> = (props: any) => {
         });
       }
     } else if (type === "detail") {
-      debugger
+
       // 有之前的数据
       if (anPopData && anPopData.length > 0) {
         //   如果ID相同，则展示原有数据，如果不同，则获取服务器数据
-        if (anPopData[0]?.tabsContent?.id === releaseID) {
+        if (newHead.releaseID === releaseID) {
           const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
           // 展示第一个tab的数据。
           const formData = anPopData[0]?.tabsContent;

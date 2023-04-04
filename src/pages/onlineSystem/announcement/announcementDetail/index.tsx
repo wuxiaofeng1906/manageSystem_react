@@ -64,14 +64,18 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   const goToNext = (formInfo: any, isClearAllTab: any = undefined) => {
-    localStorage.setItem("noticeHeader", JSON.stringify({...formInfo, clearTabContent: isClearAllTab}));
-    setCommonData({...formInfo, clearTabContent: isClearAllTab});
+    localStorage.setItem("noticeHeader", JSON.stringify({
+      ...formInfo,
+      clearTabContent: isClearAllTab,
+      releaseID: releaseID
+    }));
+    setCommonData({...formInfo, clearTabContent: isClearAllTab, releaseID: releaseID});
     history.push(`/onlineSystem/PopupCard?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}`);
   };
 
   // 跳转到下一页
   const nextPageClick = () => {
-    debugger
+
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
@@ -136,6 +140,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {
+    debugger
 
     const {head} = await getAnnounceContent(releaseID);
     setCommonData(head);
@@ -161,15 +166,20 @@ const Announce: React.FC<any> = (props: any) => {
     setCommonData(null);
     setOldCommonData(null);
     localStorage.setItem("noticeHeader", "");
-  }
+  };
+
+  // 展示数据
   const showPageData = async () => {
+    debugger
     // 如果是下一页返回上来的数据
     if (back) {
       // 默认是之前设置的commondata
       let head = {...commonData};
       // 先判断有没有存在原始数据（commonData），有的话则显示原始数据,没有的话从后端获取原始数据
       if (commonData && JSON.stringify(commonData) !== "{}") {      // 以下是已有的数据（下一页返回或者历史记录）
-        announcementForm.setFieldsValue(head);
+
+        // 里面的时间需要转一下。。
+        announcementForm.setFieldsValue({...head, announce_time: dayjs(head.announce_time)});
         setStep(head);
       } else {
         // 获取后端原始数据

@@ -313,7 +313,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 显示旧数据
   const showServiceData = async (newHead: any) => {
-    debugger
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setOldCommonData(head);
@@ -338,8 +337,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   const showPageDt = async () => {
-    debugger
-
     // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
     let newHead: any = {...commonData};
 

@@ -64,8 +64,6 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   const goToNext = (formInfo: any, isClearAllTab: any = undefined) => {
-    debugger
-
     // 做两个缓存，以防多次上一步操作。
 
     // 第二个缓存始终保存第一个缓存的上一个值
@@ -84,8 +82,6 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 跳转到下一页
   const nextPageClick = () => {
-    debugger
-
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
@@ -164,8 +160,6 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 根据公告ID获取对应的详细数据
   const getDataByReleaseId = async () => {
-    debugger
-
     const {head} = await getAnnounceContent(releaseID);
     setCommonData(head);
     setOldCommonData({...head, releaseID});
@@ -195,7 +189,6 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 展示数据
   const showPageData = async () => {
-    debugger
     // 如果是下一页返回上来的数据
     if (back) {
       // 默认是之前设置的commondata
@@ -301,6 +294,12 @@ const Announce: React.FC<any> = (props: any) => {
     saveMsgInfo(true);
   };
 
+  window.onbeforeunload = function () {
+    alert(`删除缓存：${localStorage.getItem("first_noticeHeader")}`)
+    localStorage.removeItem("first_noticeHeader");
+    localStorage.removeItem("second_noticeHeader");
+
+  };
   return (
     <PageContainer>
       <Prompt

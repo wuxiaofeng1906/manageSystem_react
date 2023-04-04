@@ -1,10 +1,27 @@
-import {axiosGet_TJ, axiosPost, axiosPut} from '@/publicMethods/axios';
+import {axiosGet_TJ, axiosPost} from '@/publicMethods/axios';
 import {getCurrentUserInfo} from '@/publicMethods/authorityJudge';
 import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
-import {sucMessage} from "@/publicMethods/showMessages";
 
 const users = getCurrentUserInfo();
+
+// 发送（保存）公告(旧的发布过程在用)
+export const postAnnouncementForOtherPage = async (formData: any) => {
+  const data: any = {
+    user_name: users.name,
+    user_id: users.userid,
+    announcement_id: formData.announcement_id,
+    // ready_release_num: formData.ready_release_num,
+    upgrade_time: formData.upgrade_time,
+    upgrade_description: formData.upgrade_description,
+    is_upgrade: formData.is_upgrade,
+    announcement_status: 'release',
+    announcement_time: formData.announcement_time,
+    announcement_num: formData.announcement_num,
+    announcement_name: formData.announcement_name,
+  };
+  return axiosPost('/api/verify/release/announcement', data);
+};
 
 //根据编号获取公告内容
 export const getAnnouncement = async (readyReleaseNum: string, releaseType: string) => {
@@ -15,6 +32,26 @@ export const getAnnouncement = async (readyReleaseNum: string, releaseType: stri
   const result = await axiosGet_TJ('/api/verify/release/announcement', data);
   return result;
 };
+
+// 获取语雀内容
+export const getYuQueContent = async (Url: string) => {
+  return axiosPost('/api/77hub/yuque/docs/headings', {
+    yuQue: Url
+  });
+};
+
+// 判断该公告是否已被上线，若没有上线，则不显示一键发布，若已上线才显示，位置在保存的左边。
+export const announceIsOnlined = async (noticeId: string) => {
+  const result = await axiosGet_TJ('/api/77hub/notice/be-online', {noticeId: noticeId, isDetail: false});
+  return result;
+}
+
+// 一键发布
+export const oneKeyToRelease = (id: any) => {
+  return axiosPost('/api/77hub/notice/released/' + id);
+};
+
+// region 保存功能
 
 // 获取特性列表list
 const getSpecialList = (ptyGroup: any) => {
@@ -35,6 +72,7 @@ const getSpecialList = (ptyGroup: any) => {
   });
   return specialList;
 }
+
 // 不轮播时的数据
 const notCarouselData = (popupData: any) => {
 
@@ -104,41 +142,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
   return axiosPost('/api/77hub/notice', relData);
 };
 
-// 发送（保存）公告(旧的发布过程在用)
-export const postAnnouncementForOtherPage = async (formData: any) => {
-  const data: any = {
-    user_name: users.name,
-    user_id: users.userid,
-    announcement_id: formData.announcement_id,
-    // ready_release_num: formData.ready_release_num,
-    upgrade_time: formData.upgrade_time,
-    upgrade_description: formData.upgrade_description,
-    is_upgrade: formData.is_upgrade,
-    announcement_status: 'release',
-    announcement_time: formData.announcement_time,
-    announcement_num: formData.announcement_num,
-    announcement_name: formData.announcement_name,
-  };
-  return axiosPost('/api/verify/release/announcement', data);
-};
-
-// 公告改版后的保存公告内容
-export const getYuQueContent = async (Url: string) => {
-  return axiosPost('/api/77hub/yuque/docs/headings', {
-    yuQue: Url
-  });
-};
-
-// 判断该公告是否已被上线，若没有上线，则不显示一键发布，若已上线才显示，位置在保存的左边。
-export const announceIsOnlined = async (noticeId: string) => {
-  const result = await axiosGet_TJ('/api/77hub/notice/be-online', {noticeId: noticeId, isDetail: false});
-  return result;
-}
-
-// 一键发布
-export const oneKeyToRelease = (id: any) => {
-  return axiosPost('/api/77hub/notice/released/' + id);
-};
+// endregion
 
 
 

@@ -64,17 +64,27 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   const goToNext = (formInfo: any, isClearAllTab: any = undefined) => {
-    localStorage.setItem("noticeHeader", JSON.stringify({
+    debugger
+
+    // 做两个缓存，以防多次上一步操作。
+
+    // 第二个缓存始终保存第一个缓存的上一个值
+    localStorage.setItem("second_noticeHeader", localStorage.getItem("first_noticeHeader") as string);
+    localStorage.setItem("first_noticeHeader", JSON.stringify({
       ...formInfo,
       clearTabContent: isClearAllTab,
       releaseID: releaseID
     }));
+
     setCommonData({...formInfo, clearTabContent: isClearAllTab, releaseID: releaseID});
     history.push(`/onlineSystem/PopupCard?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}`);
+
+
   };
 
   // 跳转到下一页
   const nextPageClick = () => {
+    debugger
 
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
@@ -84,7 +94,21 @@ const Announce: React.FC<any> = (props: any) => {
       // 删除全部内容，重新创建
       // 删除后面多余张数的内容
       // 取消/确定
-      if (oldCommonData && oldCommonData.carouselNum > formInfo.carouselNum) {
+
+      // 如果是下一页返回的数据，则跟缓存的数据做对比，如果不是，则跟服务器获取的旧数据做对比。
+      if (back) {
+        const first_localdata = JSON.parse(localStorage.getItem("first_noticeHeader") as string);
+        const second_localdata = JSON.parse(localStorage.getItem("first_noticeHeader") as string);
+        if (first_localdata.carouselNum !== undefined && second_localdata.carouselNum !== undefined && first_localdata.carouselNum > second_localdata.carouselNum) {
+          setPageChoice(true);
+
+        } else if (first_localdata.carouselNum > formInfo.carouselNum) {
+          setPageChoice(true);
+        } else {
+          goToNext(formInfo);
+        }
+
+      } else if (oldCommonData && oldCommonData.carouselNum > formInfo.carouselNum) {
         setPageChoice(true);
       } else {
 
@@ -165,7 +189,8 @@ const Announce: React.FC<any> = (props: any) => {
     setCarouselNumShow("none");
     setCommonData(null);
     setOldCommonData(null);
-    localStorage.setItem("noticeHeader", "");
+    localStorage.setItem("first_noticeHeader", "");
+    localStorage.setItem("second_noticeHeader", "");
   };
 
   // 展示数据

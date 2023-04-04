@@ -368,7 +368,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     if (!newHead || JSON.stringify(newHead) === "{}") {
       // 获取上一页的数据（缓存了）
-      const storage = localStorage.getItem("noticeHeader");
+      const storage = localStorage.getItem("first_noticeHeader");
       if (storage) {
         newHead = JSON.parse(storage);
       }

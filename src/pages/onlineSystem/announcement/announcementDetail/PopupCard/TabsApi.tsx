@@ -154,6 +154,9 @@ export const DragTabs: React.FC = (props: {}) => {
   const {commonData, anPopData, setAnnPopData, tabOrder, setTabOrder} = useModel('announcement');
 
   if (!commonData) return <div></div>;
+
+  // 这里可以处理实际多少页面的数据
+
   return (
     <DraggableTabs
       items={getItem(commonData.carouselNum)}

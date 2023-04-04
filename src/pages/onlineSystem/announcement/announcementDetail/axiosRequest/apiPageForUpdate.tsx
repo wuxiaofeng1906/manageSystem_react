@@ -709,43 +709,53 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
+
   debugger
   // 构造基础数据
   const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
   // 是否轮播
   const isCarsousel = oldCommonData?.isCarousel ? 1 : 0;
-  // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
-  if (newCommonData.modules !== oldCommonData?.templateTypeId
-    || newCommonData?.announce_carousel !== isCarsousel) {
-    debugger
-    // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
-    return await updateForModulesAndCarousel(newCommonData, newPopData, oldCommonData, oldPopData);
-  } else if (newCommonData.modules === "1") {  // 1.2 如果模板类型没有改变、
-    debugger
-    // 1.2.1 如果是消息模板，则直接调用常规修改接口
-    const relData = normalUpdate({...newCommonData, releaseId: oldCommonData.id});
-    return await updateApi(relData);
 
-  } else {
-    debugger
-    // 1.2.2 如果是弹窗模板，还要看其他修改方向
-    let relData: any;
-    const specialNameState = specialNameIsUpdate(newCommonData, newPopData, oldPopData);
-    const carouseNumState = carouseNumIsUpdate(newCommonData, oldCommonData);  // 轮播页数是否修改
-    const firstLevelState = firstSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 一级特性是否增加或者删除
-    const secondLevelState = secondSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 二级特性是否增加或者删除
-    //  轮播页数，一级特性和二级特性被修改过
-    if (carouseNumState || firstLevelState || secondLevelState || specialNameState) {
-      relData = otherInfoUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
+  try {
+    // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
+    if (newCommonData.modules !== oldCommonData?.templateTypeId
+      || newCommonData?.announce_carousel !== isCarsousel) {
+      debugger
+      // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
+      return await updateForModulesAndCarousel(newCommonData, newPopData, oldCommonData, oldPopData);
+    } else if (newCommonData.modules === "1") {  // 1.2 如果模板类型没有改变、
+      debugger
+      // 1.2.1 如果是消息模板，则直接调用常规修改接口
+      const relData = normalUpdate({...newCommonData, releaseId: oldCommonData.id});
+      return await updateApi(relData);
+
     } else {
-      // 如果都没有被增加或者删除，则调用常规修改接口
-      relData = normalUpdate(
-        {...newCommonData, releaseId: oldCommonData.id},
-        [...newPopData], [...oldPopData]);
-    }
-    return await updateApi(relData);
-    // return {ok: false}
+      debugger
+      // 1.2.2 如果是弹窗模板，还要看其他修改方向
+      let relData: any;
+      const specialNameState = specialNameIsUpdate(newCommonData, newPopData, oldPopData);
+      const carouseNumState = carouseNumIsUpdate(newCommonData, oldCommonData);  // 轮播页数是否修改
+      const firstLevelState = firstSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 一级特性是否增加或者删除
+      const secondLevelState = secondSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 二级特性是否增加或者删除
+      //  轮播页数，一级特性和二级特性被修改过
+      if (carouseNumState || firstLevelState || secondLevelState || specialNameState) {
+        relData = otherInfoUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
+      } else {
+        // 如果都没有被增加或者删除，则调用常规修改接口
+        relData = normalUpdate(
+          {...newCommonData, releaseId: oldCommonData.id},
+          [...newPopData], [...oldPopData]);
+      }
+      return await updateApi(relData);
+      // return {ok: false}
 
+    }
+  } catch (e: any) {
+    return {
+      ok: false,
+      message: e.toString(),
+    }
   }
+
 };
 

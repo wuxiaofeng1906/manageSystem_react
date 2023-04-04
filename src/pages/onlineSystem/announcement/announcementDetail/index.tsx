@@ -148,11 +148,10 @@ const Announce: React.FC<any> = (props: any) => {
           sucMessage("保存成功！");
           history.push('./announceList');
         }
-
         return;
-      } else {
-        result.message ? errorMessage(result.message) : errorMessage("数据保存失败！");
       }
+
+      result.message ? errorMessage(`数据保存失败:${result.message}`) : errorMessage("数据保存失败！");
     }
   };
 

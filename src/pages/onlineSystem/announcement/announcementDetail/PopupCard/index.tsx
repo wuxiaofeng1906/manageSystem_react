@@ -234,7 +234,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
       return;
     }
-    errorMessage("保存失败！");
+    result.message ? errorMessage(`数据保存失败:${result.message}`) : errorMessage("数据保存失败！");
   };
 
   // 保存数据
@@ -378,50 +378,57 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   useEffect(() => {
-    currentTab = 1;
-
-    // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
-    let newHead: any = {...commonData};
-    if (!newHead || JSON.stringify(newHead) === "{}") {
-      // 获取上一页的数据（缓存了）
-      const storage = localStorage.getItem("first_noticeHeader");
-      if (storage) {
-        newHead = JSON.parse(storage);
+    try {
+      currentTab = 1;
+      // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
+      let newHead: any = {...commonData};
+      if (!newHead || JSON.stringify(newHead) === "{}") {
+        // 获取上一页的数据（缓存了）
+        const storage = localStorage.getItem("first_noticeHeader");
+        if (storage) {
+          newHead = JSON.parse(storage);
+        }
+        setCommonData(newHead);
       }
-      setCommonData(newHead);
+
+      // 如果没有 type=add 的话，则新增
+      if (type === "add") {
+        showForAdd();
+
+      } else if (type === "detail") {
+        showForDetail(newHead);
+
+      } else {
+        setEmptyForm();
+      }
+    } catch (e: any) {
+      errorMessage(`错误：${e.toString()}`);
     }
-    debugger
-    // 如果没有 type=add 的话，则新增
-    if (type === "add") {
-      showForAdd();
-
-    } else if (type === "detail") {
-      showForDetail(newHead);
-
-    } else {
-      setEmptyForm();
-    }
-
   }, []);
 
   useEffect(() => {
+    try {
+      // 按照轮播页数减少anPopData中的数据
+      const head = {...commonData};
+      if (head.announce_carousel === 1) {
+        if (head.clearTabContent) {
+          setEmptyForm();
+        } else if (anPopData && head.carouselNum < anPopData.length) {
 
-    // 按照轮播页数减少anPopData中的数据
-    const head = {...commonData};
-    if (head.announce_carousel === 1) {
-      if (head.clearTabContent) {
-        setEmptyForm();
-      } else if (anPopData && head.carouselNum < anPopData.length) {
-
-        const filtered: any = [];
-        anPopData.map((v: any, i: number) => {
-          if (i < head.carouselNum) {
-            filtered.push(v);
-          }
-        });
-        setAnnPopData(filtered);
+          const filtered: any = [];
+          anPopData.map((v: any, i: number) => {
+            if (i < head.carouselNum) {
+              filtered.push(v);
+            }
+          });
+          setAnnPopData(filtered);
+        }
       }
+    } catch (e: any) {
+      errorMessage(`错误：${e.toString()}`);
     }
+
+
   }, [commonData, anPopData]);
   // endregion
 

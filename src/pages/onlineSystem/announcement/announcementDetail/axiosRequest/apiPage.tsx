@@ -116,30 +116,37 @@ const carouselData = (popupData: any) => {
 
 // 公告改版后的保存公告内容
 export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
+  try {
+    const data: any = {
+      iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
+      templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
+      updatedTime: dayjs(formData.announce_time).subtract(8, 'h').format('YYYY-MM-DD HH:mm'), // 升级时间：手动选择时间，必填
+      description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
+    };
+    let specialData = {};
+    if (data.templateTypeId === "2") { // 弹窗保存数据
+      // 共同属性
+      data["isCarousel"] = formData.announce_carousel === 0 ? false : true; // 是否轮播
+      // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
+      if (formData.announce_carousel === 1) {
+        data["pageSize"] = formData.carouselNum; // 轮播总页数
+        specialData = carouselData(popupData);// 轮播
+      } else {
+        data["pageSize"] = 0; // 不轮播的时候总页数为0
+        specialData = notCarouselData(popupData[0].tabsContent); // 不轮播
+      }
+    }
 
-  const data: any = {
-    iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
-    templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
-    updatedTime: dayjs(formData.announce_time).subtract(8, 'h').format('YYYY-MM-DD HH:mm'), // 升级时间：手动选择时间，必填
-    description: formData.announce_content, // 升级公告详情：默认带入“亲爱的用户：您好，企企经营管理平台已于 xx 时间更新升级。更新功能：”必填
-  };
-
-  let specialData = {};
-  if (data.templateTypeId === "2") { // 弹窗保存数据
-    // 共同属性
-    data["isCarousel"] = formData.announce_carousel === 0 ? false : true; // 是否轮播
-    // 还要判断是否轮播(轮播还要分轮播页面是否全部填写完)
-    if (formData.announce_carousel === 1) {
-      data["pageSize"] = formData.carouselNum; // 轮播总页数
-      specialData = carouselData(popupData);// 轮播
-    } else {
-      data["pageSize"] = 0; // 不轮播的时候总页数为0
-      specialData = notCarouselData(popupData[0].tabsContent); // 不轮播
+    const relData = {...data, ...specialData};
+    return axiosPost('/api/77hub/notice', relData);
+  } catch (e: any) {
+    return {
+      ok: false,
+      message: e.toString(),
     }
   }
 
-  const relData = {...data, ...specialData};
-  return axiosPost('/api/77hub/notice', relData);
+
 };
 
 // endregion

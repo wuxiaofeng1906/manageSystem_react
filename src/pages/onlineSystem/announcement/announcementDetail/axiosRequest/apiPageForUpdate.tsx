@@ -458,7 +458,7 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
   const pages: any = [];
   modifyPopData.forEach((v1: any) => {
-    const v1_ptyGroup = v1.tabsContent?.ptyGroup;
+    const v1_ptyGroup = v1?.tabsContent?.ptyGroup;
     // 用于记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id，不存在的id应该删除
     const newIds: any = [];
     if (v1_ptyGroup && v1_ptyGroup.length) {
@@ -665,14 +665,14 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
         finalCarouselNum = oldCommonData.carouselNum
       }
       for (let i = 0; i < finalCarouselNum; i++) {
-        const pageDt = newPopData[i].tabsContent;
-        if (i > newCommonData.carouselNum - 1 && pageDt.id) {
+        const pageDt = newPopData[i]?.tabsContent;
+        if (i > newCommonData.carouselNum - 1 && pageDt?.id) {
           // 需要删除的page
           page.push({
             id: pageDt.id,
             editFlag: "delete",
           });
-        } else {
+        } else if (newPopData[i]) {
           modifyPopData.push(newPopData[i]);
         }
       }

@@ -239,7 +239,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any, preView: boolean = false) => {
-    debugger
+    // debugger
 
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
@@ -309,7 +309,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 获取服务端旧数据
   const showServiceData = async (newHead: any) => {
-    debugger
+    // debugger
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setOldCommonData(head);
@@ -433,7 +433,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   // endregion
 
   window.onbeforeunload = function () {
-    debugger
+    // debugger
     //注：alert在这里面不起作用，不会弹出消息
     // alert(`删除缓存：${localStorage.getItem("first_noticeHeader")}`)
     localStorage.removeItem("first_noticeHeader");

@@ -130,7 +130,7 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
 
 //  region 修改时候调用的新增（比如修改模板类型，是否轮播）
 const getSpecialListForAdd = (ptyGroup: any) => {
-  debugger
+  // debugger
   const specialList: any = [];
   ptyGroup.map((v: any) => {
     const childList: any = [];
@@ -148,7 +148,7 @@ const getSpecialListForAdd = (ptyGroup: any) => {
 
 // 不轮播时的数据
 const notCarouselDataForAdd = (details: any) => {
-  debugger
+  // debugger
   // 相当于只有一个轮播页面
   const popupData = details?.tabsContent[0];
   const data = {
@@ -188,7 +188,7 @@ const carouselDataForAdd = (popupData: any) => {
 
 // 更新公告内容
 const updateAnnounceContentForAdd = async (formData: any, popupData: object = {}) => {
-  debugger
+  // debugger
   const data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
@@ -221,7 +221,7 @@ const updateAnnounceContentForAdd = async (formData: any, popupData: object = {}
 
 // 切换升级模板--调用新增接口（会删除原有公告）调用新增接口，多传一个参数 "$id":"Q8G383618N7003B",
 const updateForModulesAndCarousel = async (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
-  debugger
+  // debugger
   //  此应用场景：弹窗模板变为消息模板
   if (newCommonData?.modules === "1") {
     return await updateAnnounceContentForAdd({...newCommonData, releaseID: oldCommonData?.id})
@@ -710,7 +710,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
 
-  debugger
+  // debugger
   // 构造基础数据
   const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
   // 是否轮播
@@ -720,17 +720,17 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
     // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
     if (newCommonData.modules !== oldCommonData?.templateTypeId
       || newCommonData?.announce_carousel !== isCarsousel) {
-      debugger
+      // debugger
       // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
       return await updateForModulesAndCarousel(newCommonData, newPopData, oldCommonData, oldPopData);
     } else if (newCommonData.modules === "1") {  // 1.2 如果模板类型没有改变、
-      debugger
+      // debugger
       // 1.2.1 如果是消息模板，则直接调用常规修改接口
       const relData = normalUpdate({...newCommonData, releaseId: oldCommonData.id});
       return await updateApi(relData);
 
     } else {
-      debugger
+      // debugger
       // 1.2.2 如果是弹窗模板，还要看其他修改方向
       let relData: any;
       const specialNameState = specialNameIsUpdate(newCommonData, newPopData, oldPopData);

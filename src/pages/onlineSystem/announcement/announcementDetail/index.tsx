@@ -292,7 +292,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 页面关闭，清除缓存
   window.onbeforeunload = function () {
-    debugger
+    // debugger
     //注：alert在这里面不起作用，不会弹出消息
     // alert(`删除缓存：${localStorage.getItem("first_noticeHeader")}`)
     localStorage.removeItem("first_noticeHeader");

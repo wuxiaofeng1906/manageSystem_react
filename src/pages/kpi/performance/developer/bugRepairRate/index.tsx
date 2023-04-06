@@ -128,6 +128,7 @@ const queryBugRepaireRate = async (client: GqlClient<object>, params: string) =>
       {
          bugRepairRateDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
           total{
+            dept
             deptName
             kpi
           }
@@ -143,6 +144,7 @@ const queryBugRepaireRate = async (client: GqlClient<object>, params: string) =>
             dept
             deptName
             parent{
+              dept
               deptName
             }
             side{

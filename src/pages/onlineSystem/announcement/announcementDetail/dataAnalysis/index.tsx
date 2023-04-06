@@ -1,6 +1,6 @@
 // 解析从语雀获取的数据，返回界面可以展示的格式
 import {isEmpty} from "lodash";
-import {errorMessage} from "@/publicMethods/showMessages";
+import {customMessage} from "@/publicMethods/showMessages";
 import {Tabs} from "antd";
 import React from "react";
 
@@ -28,17 +28,20 @@ export const analysisSpecialTitle = (source: any) => {
 export const vertifyFieldForCommon = (formInfo: any) => {
 
   if (!formInfo.announce_name || isEmpty(formInfo.announce_name.trim())) {
-    errorMessage("公告名称不能为空！");
+    customMessage({type: "error", msg: "公告名称不能为空！", position: "0vh"});
+    // errorMessage("公告名称不能为空！");
     return false;
   }
 
   if (!formInfo.announce_time) {
-    errorMessage("升级时间不能为空！");
+    customMessage({type: "error", msg: "升级时间不能为空！", position: "0vh"});
+    // errorMessage("升级时间不能为空！");
     return false;
   }
 
   if (formInfo.announce_content && isEmpty(((formInfo.announce_content).split("更新功能：")[1]).trim())) {
-    errorMessage("请完善公告详情！");
+    customMessage({type: "error", msg: "请完善公告详情！", position: "0vh"});
+    // errorMessage("请完善公告详情！");
     return false;
   }
   return true;
@@ -59,13 +62,16 @@ export const vertifyFieldForPopup = (popDataArray: any) => {
 
         const v = (popData.ptyGroup)[i2];
         if (!v || !v.first) {
-          firstLevelEmpty = true
-          errorMessage("一级特性不能为空！");
+          firstLevelEmpty = true;
+          customMessage({type: "error", msg: "一级特性不能为空！", position: "0vh"});
+
+          // errorMessage("一级特性不能为空！");
           value = false;
           break;
         } else if (isEmpty((v.first).trim())) {
-          firstLevelEmpty = true
-          errorMessage("一级特性不能为空！");
+          firstLevelEmpty = true;
+          customMessage({type: "error", msg: "一级特性不能为空！", position: "0vh"});
+          // errorMessage("一级特性不能为空！");
           value = false;
           break
         }
@@ -77,7 +83,9 @@ export const vertifyFieldForPopup = (popDataArray: any) => {
     // 除了图文布局，其他只要有一个不为空，就需要判断图片是否为空
     if (popData.specialName || popData.yuQueUrl || !firstLevelEmpty) {
       if (!popData.uploadPic) {
-        errorMessage("图片不能为空！");
+        customMessage({type: "error", msg: "图片不能为空！", position: "0vh"});
+
+        // errorMessage("图片不能为空！");
         value = false;
         break;
       }

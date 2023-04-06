@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout,
-  Spin, Image, Tabs
+  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin
 } from 'antd';
 import {history} from "@@/core/history";
 import style from '../style.less';
@@ -16,7 +15,7 @@ import {
   analysisSpecialTitle, vertifyFieldForPopup, getChanedData,
   vertifyPageAllFinished, changeTabSort
 } from "../dataAnalysis";
-import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+import {customMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
@@ -76,7 +75,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   const syncYuqueInfo = async () => {
     const yuQueUrl = dtForm.getFieldValue("yuQueUrl");
     if (isEmpty(yuQueUrl) || !matchYuQueUrl(yuQueUrl)) {
-      errorMessage("请输入语雀迭代版本地址！", 1.5, "0vh");
+      customMessage({type: "error", msg: "请输入语雀迭代版本地址！", position: "0vh"})
       return;
     }
     // 加载中进度显示
@@ -87,7 +86,8 @@ const PopupCard: React.FC<any> = (props: any) => {
         ptyGroup: analysisSpecialTitle(specialTitles?.data)
       });
     } else {
-      errorMessage("从语雀获取信息失败！")
+      customMessage({type: "error", msg: "从语雀获取信息失败！", position: "0vh"})
+
     }
     setYuQueSpinLoading(false);
   };
@@ -151,7 +151,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           // alert("id：" + s3Info.fields?.key)
           setPicModalState({checkedImg: s3Info.fields?.key, visible: false});
         } else {
-          errorMessage("图片上传失败");
+          customMessage({type: "error", msg: "图片上传失败", position: "0vh"});
         }
       }
     }
@@ -170,9 +170,9 @@ const PopupCard: React.FC<any> = (props: any) => {
       onOk: async () => {
         const releaseResult = await oneKeyToRelease(releaseID);
         if (releaseResult.ok) {
-          sucMessage("公告发布成功！");
+          customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
         } else {
-          errorMessage(releaseResult.message);
+          customMessage({type: "error", msg: releaseResult.message, position: "0vh"});
         }
       }
     });
@@ -224,7 +224,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           history.push('./announceList');
         }
       } else {
-        sucMessage("保存成功！");
+        customMessage({type: "success", msg: "保存成功！", position: "0vh"});
         // 清空state中原始数据
         setAnnPopData([]);
         setCommonData(null);
@@ -234,7 +234,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
       return;
     }
-    result.message ? errorMessage(`数据保存失败:${result.message}`) : errorMessage("数据保存失败！");
+    customMessage({type: "error", msg: `数据保存失败:${result.message}`, position: "0vh"});
+
   };
 
   // 保存数据
@@ -402,7 +403,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         setEmptyForm();
       }
     } catch (e: any) {
-      errorMessage(`错误：${e.toString()}`);
+      customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
     }
   }, []);
 
@@ -425,7 +426,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         }
       }
     } catch (e: any) {
-      errorMessage(`错误：${e.toString()}`);
+      customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
     }
 
 
@@ -554,7 +555,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                         onClick={() => {
                                           // 仅有一个二级属性时不能删
                                           if (!secondFields || secondFields.length <= 1) {
-                                            errorMessage("只有一个二级特性时不能删除！")
+                                            customMessage({type: "error", msg: "只有一个二级特性时不能删除！", position: "0vh"});
                                             return;
                                           }
                                           removeSeond(secondField.name);
@@ -652,7 +653,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                       const {file, fileList} = v;
                       // 判断文件类型，文件大小，和裁剪
                       if (!picType.includes(file.type)) {
-                        errorMessage('仅支持上传jpg、jpeg、png、gif、svg、psd格式的图片！');
+                        customMessage({type: "error", msg: "仅支持上传jpg、jpeg、png、gif、svg、psd格式的图片！", position: "0vh"});
                         return;
                       }
                       setFileList(fileList);

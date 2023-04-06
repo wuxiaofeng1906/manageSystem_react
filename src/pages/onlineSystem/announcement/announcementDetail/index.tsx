@@ -3,18 +3,15 @@ import {PageContainer} from '@ant-design/pro-layout';
 import {Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Modal, Space, Spin} from 'antd';
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
-import moment from 'moment';
 import {history} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
 import {SIZE} from "../constant";
 import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease} from "./axiosRequest/apiPage";
 import {updateAnnouncement} from "./axiosRequest/apiPageForUpdate";
-import {queryAnnounceDetail} from "./axiosRequest/gqlPage";
-import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+import {customMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
-import {vertifyFieldForCommon, dealPopDataFromService} from "./dataAnalysis";
-import {Prompt} from "react-router-dom";
+import {vertifyFieldForCommon} from "./dataAnalysis";
 import {ExclamationCircleFilled} from "@ant-design/icons";
 
 const {TextArea} = Input;
@@ -116,9 +113,10 @@ const Announce: React.FC<any> = (props: any) => {
       onOk: async () => {
         const releaseResult = await oneKeyToRelease(releaseID);
         if (releaseResult.ok) {
-          sucMessage("公告发布成功！");
+          customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
+
         } else {
-          errorMessage(releaseResult.message);
+          customMessage({type: "error", msg: releaseResult.message, position: "0vh"})
         }
       }
     });
@@ -145,13 +143,14 @@ const Announce: React.FC<any> = (props: any) => {
             history.push('./announceList');
           }
         } else {
-          sucMessage("保存成功！");
+          customMessage({type: "success", msg: "保存成功！", position: "0vh"});
+
           history.push('./announceList');
         }
         return;
       }
 
-      result.message ? errorMessage(`数据保存失败:${result.message}`) : errorMessage("数据保存失败！");
+      customMessage({type: "error", msg: `数据保存失败:${result.message}`, position: "0vh"});
     }
   };
 

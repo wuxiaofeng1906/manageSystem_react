@@ -12,7 +12,7 @@ import {isEmpty} from 'lodash';
 import IPagination from '@/components/IPagination';
 import {useModel, history} from 'umi';
 import usePermission from '@/hooks/permission';
-import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessages';
+import {customMessage} from '@/publicMethods/showMessages';
 import {deleteList, getAnnounceList} from "./axiosRequest/apiPage";
 import dayjs from "dayjs";
 
@@ -60,7 +60,8 @@ const announceList = () => {
 
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
-    if (!isEmpty(params) && !announcePermission?.().check) return infoMessage('您无查看公告权限！');
+    if (!isEmpty(params) && !announcePermission?.().check)
+      return customMessage({type: "info", msg: "您无查看公告权限！", position: "0vh"});
 
     // 新增
     if (isEmpty(params) && !announcePermission?.().add) return;
@@ -88,7 +89,7 @@ const announceList = () => {
   const onDelete = async (params: CellClickedEvent) => {
     if (!announcePermission?.().delete) return;
     // 判断是否关联了发布过程公告
-    if (isEmpty(params.data.id)) return infoMessage('数据异常');
+    if (isEmpty(params.data.id)) return customMessage({type: "info", msg: '数据异常', position: "0vh"});
     // const res = await AnnouncementServices.checkDeleteAnnouncement(params.data.announcement_num);
     let content = '请确认是否删除该公告?';
     // if (res.data == false) {
@@ -102,10 +103,10 @@ const announceList = () => {
       onOk: async () => {
         const delResult = await deleteList(params.data.id);
         if (delResult.ok) {
-          sucMessage("删除成功！")
+          customMessage({type: "success", msg: "删除成功！", position: "0vh"});
           getList();
         } else {
-          errorMessage("删除失败，失败原因：" + delResult.message)
+          customMessage({type: "error", msg: "删除失败，失败原因：" + delResult.message, position: "0vh"})
         }
       },
     });

@@ -102,6 +102,7 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
       return res?.data;
     })
     .catch((e) => {
+      errorMessage(`请求异常信息:${e.status.toString()} ${e.statusText.toString()}`);
       return Promise.reject(e);
     });
 }
@@ -123,16 +124,19 @@ export const irregularRequest = async (url: string, options: IAxios) => {
     const errTip = JSON.parse(error.response.request.response);
     if (errTip.code == 403) {
       message.info('对不起，您无权操作');
-    } else if (options.msg || options.warn)
+    } else if (options.msg || options.warn) {
       errorMessage(
         options.msg == true || options.warn == true
           ? errTip.message
           : options.msg || options.warn || '操作失败',
       );
-    else if (errTip?.ok == false && errTip.code !== 200)
+    } else if (errTip?.ok == false && errTip.code !== 200) {
       errorMessage(
         errTip.message || errTip.msg || errTip?.datas?.[0]?.message || '操作失败，请刷新重试',
       );
+    } else {
+      errorMessage(errTip.toString());
+    }
     throw errTip;
   }
 };

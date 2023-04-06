@@ -437,8 +437,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     // debugger
     //注：alert在这里面不起作用，不会弹出消息
     // alert(`删除缓存：${localStorage.getItem("first_noticeHeader")}`)
-    localStorage.removeItem("first_noticeHeader");
-    localStorage.removeItem("second_noticeHeader");
+    // localStorage.removeItem("first_noticeHeader");
+    // localStorage.removeItem("second_noticeHeader");
 
   };
 

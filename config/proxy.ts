@@ -19,8 +19,8 @@ export default {
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
-    '/identity/Attachment/': {
-      target: 'http://identity.nx-temp1-k8s.e7link.com/',
+    '/identity/Attachment/': {  // 上传图片之前获取相应的key
+      target: 'http://identity.nx-hotfix-k8s.e7link.com/',   // 正式发布需要换地址 hotfix
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
@@ -42,17 +42,7 @@ export default {
       target: 'http://10.0.144.53:8380/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
-    },
-    '/identity/Attachment/': {
-      target: 'http://identity.nx-temp1-k8s.e7link.com/',
-      changeOrigin: true,
-      pathRewrite: {'^': ''},
-    },
-    '/postImage/': {
-      target: 'http://s3.cn-northwest-1.amazonaws.com.cn/',
-      changeOrigin: true,
-      pathRewrite: {'/postImage/': ''},
-    },
+    }
   },
 
   // 正式环境地址
@@ -67,16 +57,6 @@ export default {
       target: 'http://rd.q7link.com:8300/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
-    },
-    '/identity/Attachment/': {
-      target: 'http://identity.nx-temp1-k8s.e7link.com/',
-      changeOrigin: true,
-      pathRewrite: {'^': ''},
-    },
-    '/postImage/': {
-      target: 'http://s3.cn-northwest-1.amazonaws.com.cn/',
-      changeOrigin: true,
-      pathRewrite: {'/postImage/': ''},
-    },
+    }
   },
 };

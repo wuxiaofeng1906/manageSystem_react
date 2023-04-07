@@ -3,7 +3,8 @@ import {errorMessage} from './showMessages';
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
-// 设置get请求头的Content-Type总是失效，后来发现原来是一般get请求不需要设置Content-Type   所以axios内部会自动删除掉,解决办法是给get方法添加data（写一个空值都行，不能不要）
+// 设置get请求头的Content-Type总是失效，后来发现原来是一般get请求不需要设置Content-Type
+// 所以axios内部会自动删除掉,解决办法是给get方法添加data（写一个空值都行，不能不要）
 
 
 // axios中常见的get/delete请求，也称作query请求：
@@ -47,8 +48,11 @@ const axiosGet_TJ = async (url: string, queryData: any = {}) => {
 const axiosGet_77Service = async (url: string, queryData: any = {}) => {
   // axios.defaults.headers.contentType = "application/json";
   let result: any = {};
-  await axios
-    .get(url, {params: queryData, data: {}, headers: {"contentType": "application/json"}})
+  await axios.get(url,
+    {
+      params: queryData, data: {},
+      headers: {"contentType": "application/json", "Authorization": ""}  // 备注：77服务的请求一定不能带token,否则会报权限问题
+    })
     .then((res: any) => {
       result = res.data;
     }).catch((error: string) => {

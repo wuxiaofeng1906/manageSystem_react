@@ -8,7 +8,7 @@ export class ExternalGqlClient<T> {
   static async noticeGQLQuery(gqlString: string) {
     const apolloClient = new ApolloClient({
       cache: new InMemoryCache(),
-      uri: 'http://identity.nx-temp1-k8s.e7link.com/identity/graphql/withoutAuth',
+      uri: 'http://identity.nx-hotfix-k8s.e7link.com/identity/graphql/withoutAuth', //  // 正式发布需要换地址 hotfix
       defaultOptions: {
         watchQuery: {
           fetchPolicy: 'no-cache',

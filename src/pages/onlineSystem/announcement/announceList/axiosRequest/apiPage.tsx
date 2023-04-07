@@ -3,7 +3,7 @@ import {objectArraySortByDesc} from "@/publicMethods/arrayMethod";
 
 
 // 获取公告列表
-export const getAnnounceList = async (page: number, size: number, createdUser: any, createdTime: string, description: string) => {
+export const getAnnounceList = async (page: number, size: number, createdUser: any, createdTime: string, iteration: string) => {
 
   let params = {page, size};
   if (createdUser && createdUser.length) {
@@ -12,8 +12,8 @@ export const getAnnounceList = async (page: number, size: number, createdUser: a
   if (createdTime) {
     params["createdTime"] = createdTime;
   }
-  if (description) {
-    params["description"] = description;
+  if (iteration) {
+    params["iteration"] = iteration;
   }
   const result = await axiosGet_TJ('/api/77hub/notice/list', params);
   const data: any = [];

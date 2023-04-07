@@ -44,7 +44,7 @@ const announceList = () => {
     let createTime = condition.create_time ? dayjs(condition.create_time).format("YYYY-MM-DD") : "";
     setSpinning(true);
     try {
-      const res = await getAnnounceList(page, page_size, condition.create_user, createTime, condition.content);
+      const res = await getAnnounceList(page, page_size, condition.create_user, createTime, condition.iteration);
       setSpinning(false);
 
       setList(res?.results);
@@ -148,6 +148,11 @@ const announceList = () => {
                 </Button>
               </Col>
               <Col span={7}>
+                <Form.Item label={'公告名称'} name={'iteration'}>
+                  <Input style={{width: '100%'}} onBlur={() => getList()}/>
+                </Form.Item>
+              </Col>
+              <Col span={7}>
                 <Form.Item label={'创建人'} name={'create_user'}>
                   <Select
                     options={persons}
@@ -165,11 +170,7 @@ const announceList = () => {
                   <DatePicker style={{width: '100%'}} onChange={() => getList()}/>
                 </Form.Item>
               </Col>
-              <Col span={7}>
-                <Form.Item label={'公告内容'} name={'content'}>
-                  <Input style={{width: '100%'}} onBlur={() => getList()}/>
-                </Form.Item>
-              </Col>
+
             </Row>
           </Form>
           <div style={{height: gridHeight}}>

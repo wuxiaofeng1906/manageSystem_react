@@ -209,7 +209,7 @@ const Check = (props: any, ref: any) => {
             source: currentKey?.data_from || it.source,
             // contact: orignDuty?.[it.contact] || '',
             check_person: currentKey?.[it.check_person] || '',
-            desc: currentKey?.[it.desc] || '',
+            desc: flag ? currentKey[0][it.desc] : currentKey?.[it.desc] || '',
           };
         });
         if (refresh) {

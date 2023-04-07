@@ -215,7 +215,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     if (result.ok) {
       if (preView) {
-        window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+        // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+        window.open("https://app.77hub.com/cn-global/login");
         if (type === "add") {
           // 清空state中原始数据
           setAnnPopData([]);
@@ -281,7 +282,8 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 预览
   const onPreView = async () => {
     if (showPreView) {
-      window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+      // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+      window.open("https://app.77hub.com/cn-global/login");
       return;
     }
 

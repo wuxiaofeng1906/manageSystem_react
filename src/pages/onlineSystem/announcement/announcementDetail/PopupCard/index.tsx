@@ -22,6 +22,7 @@ import {useModel} from "@@/plugin-model/useModel";
 import {imgUrlHeader, defaultImgsUrl, picType, getImageToBackend, getImageForFront} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
+import {Notice_Preview} from "../../../../../../config/qqServiceEnv";
 
 // 当前的tab页面
 let currentTab = 1;
@@ -215,8 +216,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     if (result.ok) {
       if (preView) {
-        // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
-        window.open("https://app.77hub.com/cn-global/login");
+        window.open(Notice_Preview);
         if (type === "add") {
           // 清空state中原始数据
           setAnnPopData([]);
@@ -283,7 +283,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   const onPreView = async () => {
     if (showPreView) {
       // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
-      window.open("https://app.77hub.com/cn-global/login");
+      window.open(Notice_Preview);
       return;
     }
 

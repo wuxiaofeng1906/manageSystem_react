@@ -13,6 +13,7 @@ import {customMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
 import {ExclamationCircleFilled} from "@ant-design/icons";
+import {Notice_Preview} from "../../../../../config/qqServiceEnv";
 
 const {TextArea} = Input;
 // 重新合并公告数据
@@ -139,7 +140,7 @@ const Announce: React.FC<any> = (props: any) => {
         if (preview) {
           //   保存成功之后预览
           // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
-          window.open("https://app.77hub.com/cn-global/login");
+          window.open(Notice_Preview);
           if (type === "add") { // 如果是新增的话，预览之后需要先返回列表
             history.push('./announceList');
           }
@@ -160,7 +161,7 @@ const Announce: React.FC<any> = (props: any) => {
 
     if (showPreView) {
       // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
-      window.open("https://app.77hub.com/cn-global/login");
+      window.open(Notice_Preview);
       return;
     }
 

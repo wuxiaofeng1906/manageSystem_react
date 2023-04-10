@@ -45,7 +45,7 @@ const Layout = () => {
 
   useEffect(() => {
     if (!release_num) return;
-    const status = ['success', 'failure'];
+    const status = ['success', 'failure', 'unknown']; // 添加发布失败的结果到数组，判断这个单子是否结束
     let step = 0;
     OnlineSystemServices.getReleaseStatus({release_num}).then((res) => {
       step = status.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;

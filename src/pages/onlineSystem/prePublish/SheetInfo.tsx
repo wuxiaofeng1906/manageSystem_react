@@ -155,7 +155,7 @@ const SheetInfo = (props: any, ref: any) => {
       getDetail();
       getDevOpsOrderInfo({release_num}); // 获取运维工单信息
     }
-  }, [subTab, tab, release_num]);
+  }, [subTab, tab, release_num,globalState.finished]);
 
   useEffect(() => {
     if (!isEmpty(sqlList)) {
@@ -166,7 +166,12 @@ const SheetInfo = (props: any, ref: any) => {
   const getDetail = async () => {
     setSpinning(true);
     try {
-      let res = await OnlineSystemServices.getOrderDetail({release_num});
+      debugger
+      let param: any = {release_num};
+      if (globalState.finished) {
+        param = {release_num, include_deleted: true}
+      }
+      let res = await OnlineSystemServices.getOrderDetail(param);
       const basicInfo = res?.basic_data;
       orderForm.setFieldsValue({
         ...basicInfo,
@@ -738,7 +743,7 @@ const SheetInfo = (props: any, ref: any) => {
                 onRowDragEnd={onDrag}
                 columnDefs={PublishUpgradeColumn}
                 rowData={upgradeData?.upgrade_api ?? []}
-                 // 超出范围换行显示
+                // 超出范围换行显示
                 {...initGridTable({ref: upgradeRef, height: 30, otherDefault: {wrapText: true, autoHeight: true}})}
                 frameworkComponents={{
                   operation: (p: CellClickedEvent) => (

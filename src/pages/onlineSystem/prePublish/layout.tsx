@@ -45,15 +45,15 @@ const Layout = () => {
 
   useEffect(() => {
     if (!release_num) return;
-    const status = ['success', 'failure', 'unknown']; // 添加发布失败的结果到数组，判断这个单子是否结束
+    const status = ['success', 'failure'];
     let step = 0;
     OnlineSystemServices.getReleaseStatus({release_num}).then((res) => {
-      step = status.includes(res?.release_result) || res?.release_sealing == 'yes' ? 2 : 0;
+      step = status.includes(res?.release_result) || res?.release_sealing == 'yes' || res.is_delete ? 2 : 0;// 添加发布失败的结果到数组，判断这个单子是否结束
       setGlobalState({
         ...globalState,
         step,
         locked: res?.release_sealing == 'yes',
-        finished: status.includes(res?.release_result),
+        finished: status.includes(res?.release_result) || res.is_delete,
       });
       updateHref(Step[step]);
     });

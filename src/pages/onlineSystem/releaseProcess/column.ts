@@ -57,12 +57,17 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     field: 'release_result',
     minWidth: 120,
     hide: type == 'pre',
-    cellRenderer: (p: any) =>
-      `<span style="color:${
-        p.value == 'success' ? '#2BF541' : p.value == 'failure' ? 'red' : p.value === "unknown" ? "gray" : 'initial'
+    cellRenderer: (p: any) => {
+      if (p.data.is_delete) {
+        return `<span style="color:${"gray"}">取消发布</span>`
+      }
+      return `<span style="color:${
+        p.value === 'success' ? '#2BF541' : p.value === 'failure' ? 'red' : 'initial'
       }">${
-        p.value == 'success' ? '发布成功' : p.value == 'failure' ? '发布失败' : p.value === "unknown" ? "取消发布" : ''
-      }</span>`,
+        p.value === 'success' ? '发布成功' : p.value === 'failure' ? '发布失败' : ''
+      }</span>`;
+    }
+    ,
   },
   {
     headerName: '发布方式',

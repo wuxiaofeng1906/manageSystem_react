@@ -87,7 +87,6 @@ const ReleaseOrder = () => {
     /* 注意：ag-grid中，列的渲染是没法用usestate中的数据来进行动态渲染的，解决方案：需要定义一个全局变量来动态记录需要改变的数据，渲染中使用这个全局变量 */
     releateOrderInfo.SQL = await PreReleaseServices.getRelatedInfo({order_type: "SQL"});
     releateOrderInfo.INTER = await PreReleaseServices.getRelatedInfo({order_type: "DeployApi"});
-
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
     const devopsInfo = await OnlineSystemServices.getDevOpsOrderInfo({release_num: id});
@@ -110,9 +109,14 @@ const ReleaseOrder = () => {
   };
 
   const getOrderDetail = async (clusterMap = clusters) => {
+    debugger
     try {
       setSpinning(true);
-      const res = await PreReleaseServices.orderDetail({release_num: id});
+      let param: any = {release_num: id};
+      if (finished) {
+        param = {release_num: id, include_deleted: true}
+      }
+      const res = await PreReleaseServices.orderDetail(param);
       if (isEmpty(res)) {
         initForm();
       } else

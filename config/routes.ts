@@ -257,7 +257,7 @@ export default [
       // },
       {
         name: '发布过程单',
-        path: 'prePublish/:release_num/:branch',
+        path: 'prePublish/:release_num/:branch/:is_delete',
         component: './onlineSystem/prePublish',
         wrappers: ['../wrappers/auth'],
         hideInMenu: true,

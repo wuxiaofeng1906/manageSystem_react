@@ -218,7 +218,7 @@ export default [
       },
       {
         name: '灰度推生产', // 新版本积压工单
-        path: 'releaseOrder/:id',
+        path: 'releaseOrder/:id/:is_delete',
         hideInMenu: true,
         component: './onlineSystem/releaseProcess/ReleaseOrder',
         wrappers: ['../wrappers/auth'],

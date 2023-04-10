@@ -34,7 +34,7 @@ let releateOrderInfo: any = {
   INTER: []
 }; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
 const ReleaseOrder = () => {
-  const {id} = useParams() as { id: string };
+  const {id, is_delete} = useParams() as { id: string, is_delete: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const [envList] = useModel('env', (env) => [env.releaseOrderEnv]);
@@ -112,11 +112,7 @@ const ReleaseOrder = () => {
     debugger
     try {
       setSpinning(true);
-      let param: any = {release_num: id};
-      if (finished) {
-        param = {release_num: id, include_deleted: true}
-      }
-      const res = await PreReleaseServices.orderDetail(param);
+      const res = await PreReleaseServices.orderDetail({release_num: id, include_deleted: true});
       if (isEmpty(res)) {
         initForm();
       } else
@@ -132,7 +128,7 @@ const ReleaseOrder = () => {
         ...res,
         cluster: res.cluster ?? [],
       });
-      agFinished = res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
+      agFinished = is_delete === "true" ? true : res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
       setFinished(agFinished);
       setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);

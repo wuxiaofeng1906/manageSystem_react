@@ -44,6 +44,7 @@ const Layout = () => {
   }>;
 
   useEffect(() => {
+    debugger
     if (!release_num) return;
     const status = ['success', 'failure'];
     let step = 0;

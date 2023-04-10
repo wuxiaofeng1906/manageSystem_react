@@ -143,7 +143,8 @@ const HistoryList = ({ height }: { height: number }) => {
                   onClick={() => {
                     let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}`;
                     if (p.data.release_type == 'backlog_release') {
-                      href = `/onlineSystem/releaseOrder/${p.data.release_num}`;
+                      // href = `/onlineSystem/releaseOrder/${p.data.release_num}`;
+                      href = `/onlineSystem/releaseOrder/${p.data.release_num}/${p.data.is_delete}`;
                     }
                     history.push(href);
                   }}

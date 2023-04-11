@@ -155,7 +155,7 @@ const Announce: React.FC<any> = (props: any) => {
           if (preRt.ok) {
             window.open(`https://${preViewEnv}.e7link.com/cn-global/login`);
           } else {
-            errorMessage("预览数据保存失败！")
+            errorMessage("预览数据保存失败，无法预览！")
           }
 
         } else {
@@ -198,7 +198,7 @@ const Announce: React.FC<any> = (props: any) => {
           if (result.ok) {
             window.open(`https://${preViewEnv}.e7link.com/cn-global/login`);
           } else {
-            errorMessage("预览数据保存失败！")
+            errorMessage("预览数据保存失败，无法预览！")
           }
 
           return;

@@ -617,6 +617,7 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
   const [loading, setLoading] = useState(false);
 
   const getDetail = async () => {
+    debugger
     setLoading(true);
     try {
       const res = await OnlineSystemServices.getCheckSettingDetail({

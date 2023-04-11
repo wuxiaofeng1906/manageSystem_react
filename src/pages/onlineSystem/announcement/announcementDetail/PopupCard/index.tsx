@@ -32,7 +32,7 @@ const {confirm} = Modal;
 const PopupCard: React.FC<any> = (props: any) => {
   const {
     commonData, anPopData, setAnnPopData, getAnnounceContent, showPulishButton,
-    setCommonData, setOldCommonData, tabOrder
+    setCommonData, setOldCommonData, tabOrder,setTabOrder
   } = useModel('announcement');
   const {releaseName, releaseID, type, back} = props.location?.query;
   const [dtForm] = Form.useForm();
@@ -232,7 +232,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         setOldCommonData(null);
         history.push('./announceList');
       }
-
+      setTabOrder([]);
       return;
     }
     customMessage({type: "error", msg: `数据保存失败:${result.message}`, position: "0vh"});

@@ -8,7 +8,7 @@ import type {RadioChangeEvent} from 'antd';
 import {history} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
-import {SIZE, PRE_ENV} from "../constant";
+import {SIZE, preEnv} from "../constant";
 import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease} from "./axiosRequest/apiPage";
 import {updateAnnouncement} from "./axiosRequest/apiPageForUpdate";
 import {customMessage} from "@/publicMethods/showMessages";
@@ -16,6 +16,7 @@ import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
 import {ExclamationCircleFilled} from "@ant-design/icons";
 import {Notice_Preview} from "../../../../../config/qqServiceEnv";
+import {OnlineSystemServices} from "@/services/onlineSystem";
 
 const {TextArea} = Input;
 // 重新合并公告数据
@@ -139,8 +140,10 @@ const Announce: React.FC<any> = (props: any) => {
         result = await saveAnnounceContent({...formInfo});
       }
       if (result.ok) {
+        debugger
         if (preview) {
           //   保存成功之后预览
+          // 预览ID result.data
           window.open(preViewEnv);
           if (type === "add") { // 如果是新增的话，预览之后需要先返回列表
             history.push('./announceList');
@@ -157,42 +160,47 @@ const Announce: React.FC<any> = (props: any) => {
     }
   };
 
+
   // 预览
-  const onPreView = () => {  // PRE_ENV
+  const onPreView = async () => {  // PRE_ENV
+
     let preViewEnv = "https://app.77hub.com/cn-global/login";
     const _content = <div>
       <Select
         style={{width: '100%'}}
         onChange={(v: any) => preViewEnv = v}
-        options={PRE_ENV}
+        options={await preEnv()}
       />
     </div>
 
-    if (location.origin?.includes('rd.q7link.com')) {
-      // 正式环境直接跳转正式环境，不用选择对应的环境
-      if (showPreView) {
-        window.open(preViewEnv);
-        return;
-      }
-      //如果有修改过内容，则要先保存再预览。
-      saveMsgInfo(true, preViewEnv);
-    } else {
-      // 测试环境需要选择环境
-      confirm({
-        title: '选择预览环境',
-        icon: <ExclamationCircleFilled/>,
-        content: _content,
-        centered: true,
-        maskClosable: true,
-        onOk: async () => {
-          if (showPreView) {
-            window.open(preViewEnv);
-            return;
-          }
-          saveMsgInfo(true, preViewEnv);
+    // 测试环境需要选择环境
+    confirm({
+      title: '选择预览环境',
+      icon: <ExclamationCircleFilled/>,
+      content: _content,
+      centered: true,
+      maskClosable: true,
+      onOk: async () => {
+        if (showPreView) {
+          // 如果是
+          window.open(preViewEnv);
+          return;
         }
-      });
-    }
+        saveMsgInfo(true, preViewEnv);
+      }
+    });
+
+    // if (location.origin?.includes('rd.q7link.com')) {
+    //   // 正式环境直接跳转正式环境，不用选择对应的环境
+    //   if (showPreView) {
+    //     window.open(preViewEnv);
+    //     return;
+    //   }
+    //   //如果有修改过内容，则要先保存再预览。
+    //   saveMsgInfo(true, preViewEnv);
+    // } else {
+    //
+    // }
   };
 
   // endregion

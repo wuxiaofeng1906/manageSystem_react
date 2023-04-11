@@ -395,7 +395,7 @@ const Announce: React.FC<any> = (props: any) => {
                           onChange={(e, time) => {
                             // 先获取原始数据，再改变数据
                             let source = announcementForm.getFieldValue("announce_content");
-                            const updateFunc = source.split("更新升级。更新功能：");
+                            const updateFunc = source.split("更新功能：");
                             // 用原来的时间替换选中的时间
                             announcementForm.setFieldsValue({
                               announce_content: `亲爱的用户：您好，企企经营管理平台已于${time}更新升级。更新功能：${updateFunc[1]}`

@@ -147,6 +147,8 @@ const Announce: React.FC<any> = (props: any) => {
           window.open(preViewEnv);
           if (type === "add") { // 如果是新增的话，预览之后需要先返回列表
             history.push('./announceList');
+          }else{
+
           }
         } else {
           customMessage({type: "success", msg: "保存成功！", position: "0vh"});
@@ -181,7 +183,7 @@ const Announce: React.FC<any> = (props: any) => {
       centered: true,
       maskClosable: true,
       onOk: async () => {
-        if (showPreView) {
+        if (showPreView && type==="detail") {
           // 如果是
           window.open(preViewEnv);
           return;

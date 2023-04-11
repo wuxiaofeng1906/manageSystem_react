@@ -140,16 +140,24 @@ const Announce: React.FC<any> = (props: any) => {
         result = await saveAnnounceContent({...formInfo});
       }
       if (result.ok) {
-        debugger
+
         if (preview) {
+          let noticeId = releaseID;
           //   保存成功之后预览
           // 预览ID result.data
-          window.open(preViewEnv);
           if (type === "add") { // 如果是新增的话，预览之后需要先返回列表
             history.push('./announceList');
-          } else {
-
+            noticeId = result?.data.toString();
           }
+
+          // 如果是明细数据，且没有被改变过
+          const preRt = await preViewNotice(noticeId, preViewEnv);
+          if (preRt.ok) {
+            window.open(`https://${preViewEnv}.e7link.com/cn-global/login`);
+          } else {
+            errorMessage("预览数据保存失败！")
+          }
+
         } else {
           customMessage({type: "success", msg: "保存成功！", position: "0vh"});
 

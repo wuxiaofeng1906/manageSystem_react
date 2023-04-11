@@ -141,10 +141,8 @@ const HistoryList = ({height}: { height: number }) => {
                     textOverflow: 'ellipsis',
                   }}
                   onClick={() => {
-                    // let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}`;
                     let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/${p.data.is_delete}`;
                     if (p.data.release_type == 'backlog_release') {
-                      // href = `/onlineSystem/releaseOrder/${p.data.release_num}`;
                       href = `/onlineSystem/releaseOrder/${p.data.release_num}/${p.data.is_delete}`;
                     }
                     history.push(href);

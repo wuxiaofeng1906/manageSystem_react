@@ -99,8 +99,8 @@ const ICard = (params: {
                 onClick={(e) => {
                   e.stopPropagation();
                   const backlogType = params.data.release_type == 'backlog_release';
-                  let href = `/onlineSystem/prePublish/${params.data.release_num}/${params.data.branch}`;
-                  if (backlogType) href = `/onlineSystem/releaseOrder/${params.data.release_num}`;
+                  let href = `/onlineSystem/prePublish/${params.data.release_num}/${params.data.branch}/false`;
+                  if (backlogType) href = `/onlineSystem/releaseOrder/${params.data.release_num}/false`;
                   history.push(href);
                 }}
               />

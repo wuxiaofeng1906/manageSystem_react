@@ -51,6 +51,11 @@ export const oneKeyToRelease = (id: any) => {
   return axiosPost('/api/77hub/notice/released/' + id);
 };
 
+// 预览功能
+export const preViewNotice = (noticeEditionId: string, targetEnv: string) => {
+  return axiosPost('/api/77hub/notice/publish/preview', {noticeEditionId, targetEnv});
+}
+
 // region 保存功能
 
 // 获取特性列表list

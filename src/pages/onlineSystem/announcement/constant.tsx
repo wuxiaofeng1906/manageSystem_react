@@ -21,7 +21,7 @@ export const preEnv = async () => {
   const branchEnv = await OnlineSystemServices.branchEnv({branch: ""});
   const branchs: any = [];
   branchEnv.map((it: any) => {
-    branchs.push({label: it, value: `https://${it}.e7link.com/cn-global/login`});
+    branchs.push({label: it, value: it});
   });
   return branchs;
 

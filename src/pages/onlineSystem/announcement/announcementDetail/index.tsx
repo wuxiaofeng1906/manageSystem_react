@@ -9,9 +9,9 @@ import {history} from 'umi';
 import {isEmpty} from 'lodash';
 import dayjs from "dayjs";
 import {SIZE, preEnv} from "../constant";
-import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease} from "./axiosRequest/apiPage";
+import {saveAnnounceContent, announceIsOnlined, oneKeyToRelease, preViewNotice} from "./axiosRequest/apiPage";
 import {updateAnnouncement} from "./axiosRequest/apiPageForUpdate";
-import {customMessage} from "@/publicMethods/showMessages";
+import {customMessage, errorMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
 import {ExclamationCircleFilled} from "@ant-design/icons";
@@ -147,7 +147,7 @@ const Announce: React.FC<any> = (props: any) => {
           window.open(preViewEnv);
           if (type === "add") { // 如果是新增的话，预览之后需要先返回列表
             history.push('./announceList');
-          }else{
+          } else {
 
           }
         } else {
@@ -165,8 +165,8 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 预览
   const onPreView = async () => {  // PRE_ENV
-
-    let preViewEnv = "https://app.77hub.com/cn-global/login";
+    // `https://${it}.e7link.com/cn-global/login`
+    let preViewEnv = "";
     const _content = <div>
       <Select
         style={{width: '100%'}}
@@ -183,9 +183,16 @@ const Announce: React.FC<any> = (props: any) => {
       centered: true,
       maskClosable: true,
       onOk: async () => {
-        if (showPreView && type==="detail") {
-          // 如果是
-          window.open(preViewEnv);
+        debugger
+        if (showPreView && type === "detail") {
+          // 如果是明细数据，且没有被改变过
+          const result = await preViewNotice(releaseID, preViewEnv);
+          if (result.ok) {
+            window.open(`https://${preViewEnv}.e7link.com/cn-global/login`);
+          } else {
+            errorMessage("预览数据保存失败！")
+          }
+
           return;
         }
         saveMsgInfo(true, preViewEnv);

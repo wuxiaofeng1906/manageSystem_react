@@ -82,6 +82,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 跳转到下一页
   const onNextPageClick = () => {
+    debugger
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {

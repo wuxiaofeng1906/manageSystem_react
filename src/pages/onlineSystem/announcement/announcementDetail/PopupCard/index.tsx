@@ -45,10 +45,12 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 语雀数据导入（加载）使用
   const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
   const setEmptyForm = () => {
+    const storage: any = JSON.parse(localStorage.getItem("first_noticeHeader") as string);
+    debugger
     // 轮播时记录Tab数据用
-    if (commonData?.announce_carousel === 1) {
+    if (storage?.announce_carousel === 1) {
       const tabsContent: any = [];
-      for (let i = 0; i < commonData?.carouselNum; i++) {
+      for (let i = 0; i < storage?.carouselNum; i++) {
         tabsContent.push({
           tabPage: i + 1,
           tabsContent: {}
@@ -251,7 +253,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any, preView: boolean = false, preViewEnv: string = "") => {
-    // debugger
+    debugger
 
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
@@ -361,7 +363,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 获取服务端旧数据
   const showServiceData = async (newHead: any) => {
-    // debugger
+    debugger
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setOldCommonData(head);
@@ -385,7 +387,12 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   // 修改数据时候
-  const showForDetail = (newHead: any) => {
+  const showForDetail = async (newHead: any) => {
+    const {head} = await getAnnounceContent(releaseID);
+    if (head.announce_carousel !== newHead.announce_carousel) {
+      setEmptyForm();
+      return;
+    }
     // 有之前的数据
     if (anPopData && anPopData.length > 0) {
       //   如果ID相同，则展示原有数据，如果不同，则获取服务器数据
@@ -430,24 +437,26 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   useEffect(() => {
+    debugger
     try {
       currentTab = 1;
       // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据
       let newHead: any = {...commonData};
-      if (!newHead || JSON.stringify(newHead) === "{}") {
-        // 获取上一页的数据（缓存了）
-        const storage = localStorage.getItem("first_noticeHeader");
-        if (storage) {
-          newHead = JSON.parse(storage);
-        }
-        setCommonData(newHead);
+      // if (!newHead || JSON.stringify(newHead) === "{}") {
+      // 获取上一页的数据（缓存了）
+      const storage = localStorage.getItem("first_noticeHeader");
+      if (storage) {
+        newHead = JSON.parse(storage);
       }
+      setCommonData(newHead);
+      // }
 
       // 如果没有 type=add 的话，则新增
       if (type === "add") {
         showForAdd();
 
       } else if (type === "detail") {
+
         showForDetail(newHead);
 
       } else {

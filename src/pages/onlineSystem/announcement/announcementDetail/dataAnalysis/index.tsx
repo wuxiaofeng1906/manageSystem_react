@@ -372,6 +372,7 @@ const isPageImpty = (specialList: any) => {
 
 // 切换tab后的数据
 export const getChanedData = (currentKey: number, commonData: any, anPopData: any, specialList: any) => {
+  debugger
 
   // 覆盖已有当前页的数据或者添加新数据
   const oldList = [...anPopData];

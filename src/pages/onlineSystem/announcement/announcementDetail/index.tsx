@@ -196,7 +196,8 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv);
           if (result.ok) {
-            window.open(`https://${preViewEnv}.e7link.com/cn-global/login`);
+            const goUrl = `https://${preViewEnv}.e7link.com/cn-global/login`;
+            window.open(goUrl);
           } else {
             errorMessage("预览数据保存失败，无法预览！")
           }

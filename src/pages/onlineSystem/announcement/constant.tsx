@@ -23,6 +23,17 @@ export const preEnv = async () => {
   branchEnv.map((it: any) => {
     branchs.push({label: it, value: it});
   });
+
+  if (!location.origin.includes("rd.q7link.com")) {
+    branchs.push(
+      {label: "hotfix-inte-aws-1", value: "hotfix-inte-aws-1"},
+      {label: "hotfix-inte-aws-1-global", value: "hotfix-inte-aws-1-global"},
+      {label: "hotfix-aws-1", value: "hotfix-aws-1"},
+      {label: "hotfix-aws-1-global", value: "hotfix-aws-1-global"}
+    );
+  }
+
+
   return branchs;
 
 }

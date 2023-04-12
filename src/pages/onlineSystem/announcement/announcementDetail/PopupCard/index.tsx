@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin
+  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select
 } from 'antd';
 import {history} from "@@/core/history";
 import style from '../style.less';
@@ -9,13 +9,13 @@ import {
   PlusCircleOutlined, UploadOutlined, MinusCircleOutlined,
   PlusOutlined, ExclamationCircleFilled
 } from '@ant-design/icons';
-import {getYuQueContent, oneKeyToRelease, saveAnnounceContent} from '../axiosRequest/apiPage';
+import {getYuQueContent, oneKeyToRelease, preViewNotice, saveAnnounceContent} from '../axiosRequest/apiPage';
 import {updateAnnouncement} from "../axiosRequest/apiPageForUpdate";
 import {
   analysisSpecialTitle, vertifyFieldForPopup, getChanedData,
   vertifyPageAllFinished, changeTabSort
 } from "../dataAnalysis";
-import {customMessage} from "@/publicMethods/showMessages";
+import {customMessage, errorMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
@@ -23,6 +23,7 @@ import {imgUrlHeader, defaultImgsUrl, picType, getImageToBackend, getImageForFro
 import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
 import {Notice_Preview} from "../../../../../../config/qqServiceEnv";
+import {preEnv} from "@/pages/onlineSystem/announcement/constant";
 
 // 当前的tab页面
 let currentTab = 1;
@@ -32,7 +33,7 @@ const {confirm} = Modal;
 const PopupCard: React.FC<any> = (props: any) => {
   const {
     commonData, anPopData, setAnnPopData, getAnnounceContent, showPulishButton,
-    setCommonData, setOldCommonData, tabOrder,setTabOrder
+    setCommonData, setOldCommonData, tabOrder, setTabOrder
   } = useModel('announcement');
   const {releaseName, releaseID, type, back} = props.location?.query;
   const [dtForm] = Form.useForm();
@@ -203,7 +204,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // region =======>>>>>>>>>>>>>>>>>保存数据和预览
   // 点击保存按钮保存数据
-  const saveTabPages = async (finalData: any, preView: boolean) => {
+  const saveTabPages = async (finalData: any, preView: boolean, preViewEnv: string) => {
 
     let result: any;
     //  重新对tab排序
@@ -216,14 +217,23 @@ const PopupCard: React.FC<any> = (props: any) => {
 
     if (result.ok) {
       if (preView) {
-        window.open(Notice_Preview);
+        let noticeId = releaseID;
         if (type === "add") {
+          noticeId = result.data.toString();
           // 清空state中原始数据
           setAnnPopData([]);
           setCommonData(null);
           setOldCommonData(null);
           history.push('./announceList');
         }
+        // 如果是明细数据，且没有被改变过
+        const preRt = await preViewNotice(noticeId, preViewEnv);
+        if (preRt.ok) {
+          window.open(`https://${preViewEnv}.e7link.com/cn-global/login`);
+        } else {
+          errorMessage("预览数据保存失败，无法预览！")
+        }
+
       } else {
         customMessage({type: "success", msg: "保存成功！", position: "0vh"});
         // 清空state中原始数据
@@ -240,7 +250,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   // 保存数据
-  const onFinish = async (popData: any, preView: boolean = false) => {
+  const onFinish = async (popData: any, preView: boolean = false, preViewEnv: string = "") => {
     // debugger
 
     let finalData: any = [];
@@ -265,7 +275,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           content: `第${notFinishedPage.join(",")}页轮播页没有填写，确认要保存吗？`,
           centered: true,
           onOk() {
-            saveTabPages(finalData, preView);
+            saveTabPages(finalData, preView, preViewEnv);
           },
           onCancel() {
             return;
@@ -273,7 +283,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         });
       } else {
         // 填写完了则直接保存。
-        saveTabPages(finalData, preView);
+        saveTabPages(finalData, preView, preViewEnv);
       }
 
     }
@@ -281,14 +291,53 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 预览
   const onPreView = async () => {
-    if (showPreView) {
-      // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
-      window.open(Notice_Preview);
-      return;
-    }
+    debugger
 
-    const formData = dtForm.getFieldsValue();
-    onFinish(formData, true);
+    let preViewEnv = "";
+    const _content = <div>
+      <Select
+        style={{width: '100%'}}
+        onChange={(v: any) => preViewEnv = v}
+        options={await preEnv()}
+      />
+    </div>
+
+    // 测试环境需要选择环境
+    confirm({
+      title: '选择预览环境',
+      icon: <ExclamationCircleFilled/>,
+      content: _content,
+      centered: true,
+      maskClosable: true,
+      onOk: async () => {
+        debugger
+        if (showPreView && type === "detail") {
+          // 如果是明细数据，且没有被改变过
+          const result = await preViewNotice(releaseID, preViewEnv);
+          if (result.ok) {
+            const goUrl = `https://${preViewEnv}.e7link.com/cn-global/login`;
+            window.open(goUrl);
+          } else {
+            errorMessage("预览数据保存失败，无法预览！")
+          }
+
+          return;
+        }
+        const formData = dtForm.getFieldsValue();
+        onFinish(formData, true, preViewEnv);
+      }
+    });
+
+
+    // if (showPreView) {
+    //   // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
+    //   window.open(Notice_Preview);
+    //   return;
+    // }
+
+    // const formData = dtForm.getFieldsValue();
+    // onFinish(formData, true);
+
     //   需要需要校验不能为空
     // let finalData = [];
     // // 如果是轮播则先放到state中再保存

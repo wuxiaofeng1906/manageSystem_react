@@ -66,7 +66,9 @@ const getSpecialList = (ptyGroup: any) => {
     const childList: any = [];
     if (v.seconds) {
       (v.seconds).map((v2: any) => {
-        if (!isEmpty(v2.first)) childList.push({speciality: v2.first});
+        if (v2) {
+          if (!isEmpty(v2.first)) childList.push({speciality: v2.first});
+        }
       })
     }
 
@@ -104,6 +106,7 @@ const carouselData = (popupData: any) => {
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
   popupData.map((v: any) => {
+    debugger
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {

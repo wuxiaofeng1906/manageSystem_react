@@ -395,18 +395,20 @@ const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
   // 先添加新特性。记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id
   if (newSecondArray && newSecondArray.length) {
     newSecondArray.forEach((v1: any) => {
-      if (v1.id) {
-        newIds.push(v1.id);
-        children.push({
-          id: v1.id,
-          speciality: v1.first,
-        });
-      } else if (v1.first && !isEmpty((v1.first).trim())) {
-        // 没有ID的话就是新增的特性，同时也要判断是值是否为空
-        children.push({
-          speciality: v1.first,
-          editFlag: "add",
-        })
+      if (v1) {
+        if (v1.id) {
+          newIds.push(v1.id);
+          children.push({
+            id: v1.id,
+            speciality: v1.first,
+          });
+        } else if (v1.first && !isEmpty((v1.first).trim())) {
+          // 没有ID的话就是新增的特性，同时也要判断是值是否为空
+          children.push({
+            speciality: v1.first,
+            editFlag: "add",
+          })
+        }
       }
     });
   }

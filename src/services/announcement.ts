@@ -9,7 +9,6 @@ const AnnouncementServices = {
   },
   // 发布过程 公告列表
   async preAnnouncement() {
-    debugger
     return request(`${baseUrl}/release/announcement_name`, {params: {size: 50}});
   },
   // 发布过程 公告关联

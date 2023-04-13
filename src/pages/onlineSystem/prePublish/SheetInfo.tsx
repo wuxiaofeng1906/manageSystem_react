@@ -472,6 +472,7 @@ const SheetInfo = (props: any, ref: any) => {
           style={{width: '100%'}}
           disabled={agFinished}
           allowClear={['batch', 'database_version'].includes(field)}
+          dropdownMatchSelectWidth={false}
           options={
             field == 'database_version'
               ? databaseVersion
@@ -706,7 +707,7 @@ const SheetInfo = (props: any, ref: any) => {
                 },
               ]
             }
-            {...initGridTable({ref: serverRef, height: 30})}
+            {...initGridTable({ref: serverRef, height: 30, otherDefault: {wrapText: true, autoHeight: true}})}
             frameworkComponents={{
               select: renderSelect,
               ICluster: (p: any) => <ICluster data={p.value}/>,
@@ -738,7 +739,7 @@ const SheetInfo = (props: any, ref: any) => {
                 onRowDragEnd={onDrag}
                 columnDefs={PublishUpgradeColumn}
                 rowData={upgradeData?.upgrade_api ?? []}
-                 // 超出范围换行显示
+                // 超出范围换行显示
                 {...initGridTable({ref: upgradeRef, height: 30, otherDefault: {wrapText: true, autoHeight: true}})}
                 frameworkComponents={{
                   operation: (p: CellClickedEvent) => (

@@ -1,4 +1,4 @@
-export const imgUrlHeader = "http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-test/"
+// export const imgUrlHeader = "http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-test/"
 export const defaultImgsUrl = [
   "0/2023/03/0b2feb96-0295-4e2b-8179-1326ff072625.jpg",
   "0/2023/03/7e413865-f78d-4dff-be2c-8e5ff1cd3f46.jpg",

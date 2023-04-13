@@ -15,7 +15,6 @@ import {customMessage, errorMessage} from "@/publicMethods/showMessages";
 import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
 import {ExclamationCircleFilled} from "@ant-design/icons";
-import {Notice_Preview} from "../../../../../config/qqServiceEnv";
 import {OnlineSystemServices} from "@/services/onlineSystem";
 
 const {TextArea} = Input;

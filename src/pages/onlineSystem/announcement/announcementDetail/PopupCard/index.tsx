@@ -15,7 +15,7 @@ import {
   analysisSpecialTitle, vertifyFieldForPopup, getChanedData,
   vertifyPageAllFinished, changeTabSort
 } from "../dataAnalysis";
-import {customMessage, errorMessage} from "@/publicMethods/showMessages";
+import {customMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
@@ -233,7 +233,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         if (preRt.ok) {
           window.open(`https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`);
         } else {
-          errorMessage("预览数据保存失败，无法预览！")
+          customMessage({type: "error", msg: "预览数据保存失败，无法预览！", position: "0vh"});
         }
 
       } else {
@@ -299,17 +299,20 @@ const PopupCard: React.FC<any> = (props: any) => {
       viewEnv: "" // 预览效果的环境
     };
 
-    const _content = <div>
-      <Select
-        style={{width: '100%'}}
-        showSearch
-        onChange={(v: any, v2: any) => {
-          preViewEnv.dataEnv = v2.value;
-          preViewEnv.viewEnv = v2.viewKey;
-        }}
-        options={await preEnv()}
-      />
-    </div>
+    const _content = <Spin spinning={true}>
+      <div>
+
+        <Select
+          style={{width: '100%'}}
+          showSearch
+          onChange={(v: any, v2: any) => {
+            preViewEnv.dataEnv = v2.value;
+            preViewEnv.viewEnv = v2.viewKey;
+          }}
+          options={await preEnv()}
+        />
+      </div>
+    </Spin>
 
     // 测试环境需要选择环境
     confirm({
@@ -319,7 +322,10 @@ const PopupCard: React.FC<any> = (props: any) => {
       centered: true,
       maskClosable: true,
       onOk: async () => {
-        debugger
+        if (isEmpty(preViewEnv.dataEnv)) {
+          customMessage({type: "error", msg: "预览环境不能为空！", position: "0vh"});
+          return;
+        }
         if (showPreView && type === "detail") {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
@@ -327,7 +333,7 @@ const PopupCard: React.FC<any> = (props: any) => {
             const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
             window.open(goUrl);
           } else {
-            errorMessage("预览数据保存失败，无法预览！")
+            customMessage({type: "error", msg: "预览数据保存失败，无法预览！", position: "0vh"});
           }
 
           return;

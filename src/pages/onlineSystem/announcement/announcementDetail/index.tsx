@@ -155,12 +155,11 @@ const Announce: React.FC<any> = (props: any) => {
           if (preRt.ok) {
             window.open(`https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`);
           } else {
-            errorMessage("预览数据保存失败，无法预览！")
+            customMessage({type: "error", msg: "预览数据保存失败，无法预览！", position: "0vh"});
           }
 
         } else {
           customMessage({type: "success", msg: "保存成功！", position: "0vh"});
-
           history.push('./announceList');
         }
         return;
@@ -170,7 +169,7 @@ const Announce: React.FC<any> = (props: any) => {
     }
   };
 
-
+  const [selectLoading, setSelectLoading] = useState(false);
   // 预览
   const onPreView = async () => {  // PRE_ENV
     // `https://${it}.e7link.com/cn-global/login`
@@ -178,19 +177,22 @@ const Announce: React.FC<any> = (props: any) => {
       dataEnv: "", // 保存数据的环境
       viewEnv: "" // 预览效果的环境
     };
-    const _content = <div>
-      <Select
-        style={{width: '100%'}}
-        showSearch
-        onChange={(v: any, v2: any) => {
-          debugger
-          preViewEnv.dataEnv = v2.value;
-          preViewEnv.viewEnv = v2.viewKey;
-        }}
-        options={await preEnv()}
-      />
-    </div>
+    setSelectLoading(true);
+    const _content =
+      <div>
+        <Spin spinning={selectLoading}> </Spin>
+        <Select
+          style={{width: '100%'}}
+          showSearch
+          onChange={(v: any, v2: any) => {
+            preViewEnv.dataEnv = v2.value;
+            preViewEnv.viewEnv = v2.viewKey;
+          }}
+          options={await preEnv()}
+        />
+      </div>
 
+    setSelectLoading(false);
     // 测试环境需要选择环境
     confirm({
       title: '选择预览环境',
@@ -199,6 +201,10 @@ const Announce: React.FC<any> = (props: any) => {
       centered: true,
       maskClosable: true,
       onOk: async () => {
+        if (isEmpty(preViewEnv.dataEnv)) {
+          customMessage({type: "error", msg: "预览环境不能为空！", position: "0vh"})
+          return;
+        }
         if (showPreView && type === "detail") {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
@@ -206,7 +212,7 @@ const Announce: React.FC<any> = (props: any) => {
             const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
             window.open(goUrl);
           } else {
-            errorMessage("预览数据保存失败，无法预览！")
+            customMessage({type: "error", msg: "预览数据保存失败，无法预览！", position: "0vh"});
           }
 
           return;

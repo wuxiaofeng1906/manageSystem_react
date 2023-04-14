@@ -169,7 +169,6 @@ const Announce: React.FC<any> = (props: any) => {
     }
   };
 
-  const [selectLoading, setSelectLoading] = useState(false);
   // 预览
   const onPreView = async () => {  // PRE_ENV
     // `https://${it}.e7link.com/cn-global/login`
@@ -177,10 +176,8 @@ const Announce: React.FC<any> = (props: any) => {
       dataEnv: "", // 保存数据的环境
       viewEnv: "" // 预览效果的环境
     };
-    setSelectLoading(true);
     const _content =
       <div>
-        <Spin spinning={selectLoading}> </Spin>
         <Select
           style={{width: '100%'}}
           showSearch
@@ -190,9 +187,9 @@ const Announce: React.FC<any> = (props: any) => {
           }}
           options={await preEnv()}
         />
-      </div>
+      </div>;
 
-    setSelectLoading(false);
+
     // 测试环境需要选择环境
     confirm({
       title: '选择预览环境',

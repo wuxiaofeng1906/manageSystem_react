@@ -206,7 +206,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // region =======>>>>>>>>>>>>>>>>>保存数据和预览
   // 点击保存按钮保存数据
-  const saveTabPages = async (finalData: any, preView: boolean, preViewEnv: string) => {
+  const saveTabPages = async (finalData: any, preView: boolean, preViewEnv: any) => {
 
     let result: any;
     //  重新对tab排序
@@ -229,9 +229,9 @@ const PopupCard: React.FC<any> = (props: any) => {
           history.push('./announceList');
         }
         // 如果是明细数据，且没有被改变过
-        const preRt = await preViewNotice(noticeId, preViewEnv);
+        const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
         if (preRt.ok) {
-          window.open(`https://${preViewEnv}.e7link.com/cn-global/login`);
+          window.open(`https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`);
         } else {
           errorMessage("预览数据保存失败，无法预览！")
         }
@@ -252,7 +252,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   // 保存数据
-  const onFinish = async (popData: any, preView: boolean = false, preViewEnv: string = "") => {
+  const onFinish = async (popData: any, preView: boolean = false, preViewEnv: any = {}) => {
     debugger
 
     let finalData: any = [];
@@ -294,12 +294,19 @@ const PopupCard: React.FC<any> = (props: any) => {
   // 预览
   const onPreView = async () => {
     debugger
+    let preViewEnv = {
+      dataEnv: "", // 保存数据的环境
+      viewEnv: "" // 预览效果的环境
+    };
 
-    let preViewEnv = "";
     const _content = <div>
       <Select
         style={{width: '100%'}}
-        onChange={(v: any) => preViewEnv = v}
+        showSearch
+        onChange={(v: any, v2: any) => {
+          preViewEnv.dataEnv = v2.value;
+          preViewEnv.viewEnv = v2.viewKey;
+        }}
         options={await preEnv()}
       />
     </div>
@@ -315,9 +322,9 @@ const PopupCard: React.FC<any> = (props: any) => {
         debugger
         if (showPreView && type === "detail") {
           // 如果是明细数据，且没有被改变过
-          const result = await preViewNotice(releaseID, preViewEnv);
+          const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
-            const goUrl = `https://${preViewEnv}.e7link.com/cn-global/login`;
+            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
             window.open(goUrl);
           } else {
             errorMessage("预览数据保存失败，无法预览！")

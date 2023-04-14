@@ -299,9 +299,8 @@ const PopupCard: React.FC<any> = (props: any) => {
       viewEnv: "" // 预览效果的环境
     };
 
-    const _content = <Spin spinning={true}>
+    const _content =
       <div>
-
         <Select
           style={{width: '100%'}}
           showSearch
@@ -311,8 +310,8 @@ const PopupCard: React.FC<any> = (props: any) => {
           }}
           options={await preEnv()}
         />
-      </div>
-    </Spin>
+      </div>;
+
 
     // 测试环境需要选择环境
     confirm({

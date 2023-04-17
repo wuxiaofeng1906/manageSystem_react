@@ -116,10 +116,12 @@ const Announce: React.FC<any> = (props: any) => {
       centered: true,
       onOk: async () => {
         const releaseResult = await oneKeyToRelease(releaseID);
+        debugger
         if (releaseResult.ok) {
           customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
 
         } else {
+          debugger
           customMessage({type: "error", msg: releaseResult.message, position: "0vh"})
         }
       }
@@ -487,7 +489,7 @@ const Announce: React.FC<any> = (props: any) => {
                 style={{marginLeft: 10}} onClick={() => saveMsgInfo(false)}>保存
               </Button>
               <Button
-                className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
+                className={style.commonBtn} style={{marginLeft: 10, display: "inline"}}
                 onClick={releaseNoticeInfo}>一键发布
               </Button>
 

@@ -10,7 +10,8 @@ interface Iparam {
 }
 
 // 自定义错误信息展示
-export const customMessage = ({type = "info", msg = "", dutationTime = 1.5, position = '50vh'}: Iparam) => {
+export const customMessage = ({type = "info", msg = "错误", dutationTime = 1.5, position = '50vh'}: Iparam) => {
+
   const msgConfig = {
     content: msg,
     duration: dutationTime,

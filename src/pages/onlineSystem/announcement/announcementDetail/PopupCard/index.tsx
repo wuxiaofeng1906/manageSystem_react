@@ -176,6 +176,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         if (releaseResult.ok) {
           customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
         } else {
+          debugger
           customMessage({type: "error", msg: releaseResult.message, position: "0vh"});
         }
       }

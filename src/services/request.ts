@@ -54,12 +54,14 @@ interface IAxios extends AxiosRequestConfig {
 }
 
 function request(url: string, ioptions: IOption = {}) {
+
   const {dealRes = true, warn = true, forceLogin = true, msg, localCache, ...options} = ioptions;
   let mRequest;
   if (localCache) mRequest = localCacheWrap(url, options);
   // 统一结构接口
   if (!mRequest) mRequest = _request(url, options);
   if (dealRes) mRequest = dealResWrap(mRequest, warn, forceLogin, msg);
+
   return mRequest;
 }
 
@@ -89,6 +91,7 @@ function localCacheWrap(url: string, options: any) {
 function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg?: any) {
   return mRequest
     .then((res) => {
+      debugger
       if (res?.code !== 200) {
         if (warn) {
           if (warn === true) warn = '';
@@ -101,7 +104,9 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
       }
       return res?.data;
     })
-    .catch((e) => {
+    .catch(async (e: any) => {
+      const a = await e.json()
+      errorMessage(a.error);
       return Promise.reject(e);
     });
 }

@@ -2,11 +2,12 @@ import {axiosPost, axiosPut} from '@/publicMethods/axios';
 import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
 import {queryAnnounceDetail} from "@/pages/onlineSystem/announcement/announcementDetail/axiosRequest/gqlPage";
-import {dealPopDataFromService} from "../dataAnalysis/index"
+import {dealPopDataFromService} from "../dataAnalysis/index";
+import {Notice_Env} from "../../../../../../config/qqServiceEnv";
 
 // 修改的api
 const updateApi = async (data: any) => {
-  const result = await axiosPut('/api/77hub/notice', data);
+  const result = await axiosPut('/api/77hub/notice', data, {envName: Notice_Env});
   return result;
 }
 

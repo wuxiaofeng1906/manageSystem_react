@@ -331,6 +331,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         if (showPreView && type === "detail") {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
+          debugger
           if (result.ok) {
             const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${releaseID}`;
             console.log("预览跳转地址", goUrl);

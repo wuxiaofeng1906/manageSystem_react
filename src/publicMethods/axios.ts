@@ -122,6 +122,7 @@ const axiosDelete = async (url: string, queryData: any = {}) => {
 
 // post
 const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) => {
+  debugger
   let result: any = {};
 
   await axios
@@ -132,6 +133,8 @@ const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) =
     .catch((error) => {
       if (error.toString().includes('403')) {
         errorMessage('您无操作权限！');
+      } else if (error && error.response) {
+        result = error.response?.data;
       } else {
         errorMessage(`异常信息:${error.toString()}`);
       }

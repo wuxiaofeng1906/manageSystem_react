@@ -50,7 +50,8 @@ export const announceIsOnlined = async (noticeId: string) => {
 
 // 一键发布
 export const oneKeyToRelease = async (id: any) => {
-  return request(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`, {method: "POST"});
+return await  axiosPost(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`);
+  // return request(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`, {method: "POST"});
 };
 
 // 预览功能

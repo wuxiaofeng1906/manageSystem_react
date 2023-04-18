@@ -122,7 +122,7 @@ const Announce: React.FC<any> = (props: any) => {
 
         } else {
           debugger
-          customMessage({type: "error", msg: releaseResult.message, position: "0vh"})
+          customMessage({type: "error", msg: "公告发布失败", position: "0vh"})
         }
       }
     });
@@ -210,6 +210,7 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
+            debugger
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
             const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${releaseID}`;
             console.log("预览跳转地址", goUrl);

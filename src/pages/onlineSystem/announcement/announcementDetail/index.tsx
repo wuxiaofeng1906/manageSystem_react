@@ -16,6 +16,7 @@ import {useModel} from "@@/plugin-model/useModel";
 import {vertifyFieldForCommon} from "./dataAnalysis";
 import {ExclamationCircleFilled} from "@ant-design/icons";
 import {OnlineSystemServices} from "@/services/onlineSystem";
+import moment from 'moment';
 
 const {TextArea} = Input;
 // 重新合并公告数据
@@ -317,8 +318,10 @@ const Announce: React.FC<any> = (props: any) => {
       // 先判断有没有存在原始数据（commonData），有的话则显示原始数据,没有的话从后端获取原始数据
       if (commonData && JSON.stringify(commonData) !== "{}") {      // 以下是已有的数据（下一页返回或者历史记录）
 
+
+        debugger
         // 里面的时间需要转一下。。
-        announcementForm.setFieldsValue({...head, announce_time: dayjs(head.announce_time)});
+        announcementForm.setFieldsValue({...head, announce_time: moment(head.announce_time)});
         setStep(head);
       } else {
         // 获取后端原始数据

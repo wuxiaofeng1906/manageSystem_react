@@ -155,7 +155,7 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
           if (preRt.ok) {
-            window.open(`https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`);
+            window.open(`https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${noticeId}`);
           } else {
             customMessage({type: "error", msg: "预览数据保存失败，无法预览！", position: "0vh"});
           }
@@ -208,7 +208,8 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
-            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
+            // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
+            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${releaseID}`;
             window.open(goUrl);
           } else {
             customMessage({type: "error", msg: "预览数据保存失败，无法预览！", position: "0vh"});

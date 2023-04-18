@@ -58,7 +58,8 @@ const axiosGet = async (url: string, queryData: any = {}) => {
   return result;
 };
 
-const axiosGet_TJ = async (url: string, queryData: any = {}) => {
+const axiosGet_TJ = async (url: string, queryData: any = {}, module: string = "") => {
+  debugger
   let result: any = {};
   await axios
     .get(url, {params: queryData})
@@ -68,6 +69,8 @@ const axiosGet_TJ = async (url: string, queryData: any = {}) => {
     .catch((error: string) => {
       if (error.toString().includes('403')) {
         errorMessage('您无操作权限！');
+      } else if (error.toString().includes('503') && module === "Notice") {
+        errorMessage('服务正在部署，请稍后！');
       } else {
         errorMessage(`异常信息:${error.toString()}`);
       }

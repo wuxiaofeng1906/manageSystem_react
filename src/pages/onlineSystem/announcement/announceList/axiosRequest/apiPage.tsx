@@ -16,7 +16,7 @@ export const getAnnounceList = async (page: number, size: number, createdUser: a
   if (iteration) {
     params["iteration"] = iteration;
   }
-  const result = await axiosGet_TJ('/api/77hub/notice/list', params);
+  const result = await axiosGet_TJ('/api/77hub/notice/list', params, "Notice");
   const data: any = [];
   if ((result.results) && (result.results).length) {
     (result.results).map((v: any) => {

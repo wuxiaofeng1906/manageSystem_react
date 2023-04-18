@@ -19,25 +19,15 @@ export const RELEASE_MODULE = {
 
 // 获取镜像环境
 export const preEnv = async () => {
-  debugger
+
   const branchEnv = await axiosGet(Notice_PreviewEnv);
   const branchs: any = [];
   branchEnv.map((it: any) => {
     // 展示不是global的选项
-    if (!it.isGlobal) {
+    if (!it.isGlobal && it.type !== "prod") {
       branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
     }
   });
-  debugger
-  // if (!location.origin.includes("rd.q7link.com")) {
-  //   branchs.push(
-  //     {label: "hotfix-inte-aws-1", value: "hotfix-inte-aws-1"},
-  //     {label: "hotfix-inte-aws-1-global", value: "hotfix-inte-aws-1-global"},
-  //     {label: "hotfix-aws-1", value: "hotfix-aws-1"},
-  //     {label: "hotfix-aws-1-global", value: "hotfix-aws-1-global"}
-  //   );
-  // }
-
 
   return branchs;
 

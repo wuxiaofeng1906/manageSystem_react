@@ -105,8 +105,10 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
       return res?.data;
     })
     .catch(async (e: any) => {
-      const a = await e.json()
-      errorMessage(a.error);
+      debugger
+      //
+      // const a = await e.json()
+      // errorMessage(a.error);
       return Promise.reject(e);
     });
 }

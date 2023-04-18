@@ -260,7 +260,7 @@ const Announce: React.FC<any> = (props: any) => {
     announcementForm.setFieldsValue({
       announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
       modules: "1",
-      announce_carousel: 0, // 默认为否
+      announce_carousel: 1, // 默认为是
       carouselNum: 5
     });
     setCarouselNumShow("none");

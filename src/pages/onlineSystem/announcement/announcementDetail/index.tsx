@@ -489,7 +489,7 @@ const Announce: React.FC<any> = (props: any) => {
                 style={{marginLeft: 10}} onClick={() => saveMsgInfo(false)}>保存
               </Button>
               <Button
-                className={style.commonBtn} style={{marginLeft: 10, display: "inline"}}
+                className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
                 onClick={releaseNoticeInfo}>一键发布
               </Button>
 

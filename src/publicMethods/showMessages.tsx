@@ -44,7 +44,7 @@ export const customMessage = ({type = "info", msg = "错误", dutationTime = 1.5
 
 
 // 错误信息
-const errorMessage = (errMsg: string, dutationTime: number = 1.5, position: string = '50vh') => {
+const errorMessage = (errMsg: string = "错误", dutationTime: number = 1.5, position: string = '50vh') => {
   message.error({
     content: errMsg,
     duration: dutationTime,

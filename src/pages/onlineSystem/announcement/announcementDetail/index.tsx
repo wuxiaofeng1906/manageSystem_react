@@ -155,7 +155,7 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
           if (preRt.ok) {
-            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${noticeId}`;
+            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
             console.log("预览跳转地址", goUrl);
             window.open(goUrl);
           } else {
@@ -212,7 +212,7 @@ const Announce: React.FC<any> = (props: any) => {
           if (result.ok) {
             debugger
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
-            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${releaseID}`;
+            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
             console.log("预览跳转地址", goUrl);
             window.open(goUrl);
           } else {

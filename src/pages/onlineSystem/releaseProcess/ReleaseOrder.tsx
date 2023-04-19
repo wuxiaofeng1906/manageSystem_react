@@ -35,7 +35,7 @@ let releateOrderInfo: any = {
   INTER: []
 }; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
 const ReleaseOrder = () => {
-
+  debugger
   const {id, is_delete} = useParams() as { id: string, is_delete: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
@@ -66,7 +66,7 @@ const ReleaseOrder = () => {
     params.api.sizeColumnsToFit();
   };
   useEffect(() => {
-
+    debugger
     agFinished = false;
     Modal.destroyAll();
     getBaseList();
@@ -82,7 +82,7 @@ const ReleaseOrder = () => {
     return () => {
       window.onresize = null;
     };
-  }, []);
+  }, [id]);
 
 
   const getBaseList = async () => {

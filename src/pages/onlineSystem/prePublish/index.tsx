@@ -6,6 +6,7 @@ import styles from '../config/common.less';
 import ZentaoDetail from './ZentaoDetail';
 import {SyncOutlined} from '@ant-design/icons';
 import ProcessLayout from './layout';
+import {ProcessTabs} from "../components/ProcessTabs";
 
 const PrePublish = () => {
   const refreshRef = useRef() as React.MutableRefObject<{ onRefresh: Function }>;
@@ -23,7 +24,8 @@ const PrePublish = () => {
     });
 
   return (
-    <PageContainer title={query.tab == 'profile' ? '禅道概况' : '发布过程单'}>
+    // <PageContainer title={query.tab == 'profile' ? '禅道概况' : '发布过程单'}>
+    <PageContainer title={<ProcessTabs/>}>
 
       <div className={styles.profileAndProcess}>
 

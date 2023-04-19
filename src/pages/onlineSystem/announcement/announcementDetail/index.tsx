@@ -152,7 +152,7 @@ const Announce: React.FC<any> = (props: any) => {
             history.push('./announceList');
             noticeId = result?.data.toString();
           }
-
+          debugger
           // 如果是明细数据，且没有被改变过
           const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
           if (preRt.ok) {

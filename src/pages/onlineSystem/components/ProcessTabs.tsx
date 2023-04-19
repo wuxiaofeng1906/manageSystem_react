@@ -8,16 +8,19 @@ import {history} from "@@/core/history";
 export const ProcessTabs = () => {
   const [list, setList] = useState<any>([]);
   const {globalState} = useModel('onlineSystem');
-  const {release_num, branch} = useParams() as { release_num: string; branch: string };
-  const {subTab, tab} = useLocation()?.query as { tab: string; subTab: string };
-  debugger
+  const {release_num} = useParams() as { release_num: string; branch: string };
 
   const onTabChange = (v: any) => {
     // 跳转链接需要找到下一个数据的subtab和tab
-    history.replace({
-      pathname: history.location.pathname,
-      query: {tab: tab ?? 'process', subTab: subTab},
+    let p = list.find((e: any) => {
+      return e.release_num === v
     });
+
+    let replaceUrl = `/onlineSystem/prePublish/${p.release_num}/${p.branch}/${p.is_delete}`;
+    if (p.release_type == 'backlog_release') {  // 灰度推生产
+      replaceUrl = `/onlineSystem/releaseOrder/${p.release_num}/${p.is_delete}`;
+    }
+    history.replace(replaceUrl);
   };
 
   //获取发布列表
@@ -42,7 +45,7 @@ export const ProcessTabs = () => {
     // onEdit={(key, type) => onRemoveTab(key)}
     hideAdd={true}
     onChange={(v) => onTabChange(v)}
-    style={{background: 'white', paddingBottom: 5, marginTop: 15}}
+    // style={{background: 'red'}}
   >
     {list.map((it: any) => (  //
       <Tabs.TabPane tab={it.release_name} key={it.release_num} closable={false}/>

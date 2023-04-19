@@ -27,6 +27,7 @@ import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 import {pushType} from "@/pages/onlineSystem/config/constant";
 import {isTestService} from "@/publicMethods/webMethod";
+import {ProcessTabs} from "@/pages/onlineSystem/components/ProcessTabs";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 let releateOrderInfo: any = {
@@ -564,7 +565,7 @@ const ReleaseOrder = () => {
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <PageContainer title={<div/>}>
+      <PageContainer title={<ProcessTabs/>}>
         <div className={styles.releaseOrder}>
           <div className={styles.header}>
             <div className={styles.title}>工单基本信息</div>

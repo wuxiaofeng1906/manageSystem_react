@@ -85,6 +85,7 @@ const ProcessDetail = (props: any, ref: any) => {
   );
 
   const init = async (refresh = false) => {
+    debugger
     try {
       setLoading(true);
       reset();
@@ -92,7 +93,7 @@ const ProcessDetail = (props: any, ref: any) => {
         {release_num},
         refresh ? {release_num, user_id: user?.userid ?? ''} : null,
       );
-      await OnlineSystemServices.abnormalApi({release_num});
+      await OnlineSystemServices.abnormalApi({release_num, include_deleted: true});
       const res = await OnlineSystemServices.initDataBranch({branch});
       setHasBranch(res?.have_branch == 'yes');
       setLoading(false);

@@ -37,7 +37,7 @@ let databaseVersion: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
-  const {release_num} = useParams() as { release_num: string };
+  const {release_num, is_delete} = useParams() as { release_num: string, is_delete: string };
   const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [envs] = useModel('env', (env) => [env.globalEnv]);
@@ -155,7 +155,7 @@ const SheetInfo = (props: any, ref: any) => {
       getDetail();
       getDevOpsOrderInfo({release_num}); // 获取运维工单信息
     }
-  }, [subTab, tab, release_num]);
+  }, [subTab, tab, release_num, globalState.finished]);
 
   useEffect(() => {
     if (!isEmpty(sqlList)) {
@@ -166,7 +166,12 @@ const SheetInfo = (props: any, ref: any) => {
   const getDetail = async () => {
     setSpinning(true);
     try {
-      let res = await OnlineSystemServices.getOrderDetail({release_num});
+      debugger
+      let param: any = {release_num};
+      if (globalState.finished) {
+        param = {release_num, include_deleted: true}
+      }
+      let res = await OnlineSystemServices.getOrderDetail(param);
       const basicInfo = res?.basic_data;
       orderForm.setFieldsValue({
         ...basicInfo,
@@ -196,8 +201,7 @@ const SheetInfo = (props: any, ref: any) => {
             : [],
         need_auto: basicInfo?.need_auto || undefined,
       });
-      agFinished =
-        !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
+      agFinished = is_delete === "true" ? true : !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
 
       setDraft(res?.status !== 'save');
       setGlobalState({
@@ -738,7 +742,7 @@ const SheetInfo = (props: any, ref: any) => {
                 onRowDragEnd={onDrag}
                 columnDefs={PublishUpgradeColumn}
                 rowData={upgradeData?.upgrade_api ?? []}
-                 // 超出范围换行显示
+                // 超出范围换行显示
                 {...initGridTable({ref: upgradeRef, height: 30, otherDefault: {wrapText: true, autoHeight: true}})}
                 frameworkComponents={{
                   operation: (p: CellClickedEvent) => (

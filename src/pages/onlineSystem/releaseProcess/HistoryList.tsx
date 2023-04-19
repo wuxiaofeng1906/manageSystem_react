@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Form, Select, DatePicker, Spin, Col, Row } from 'antd';
-import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
-import { releaseListColumn } from '@/pages/onlineSystem/releaseProcess/column';
+import React, {useEffect, useRef, useState} from 'react';
+import {Form, Select, DatePicker, Spin, Col, Row} from 'antd';
+import {AgGridReact} from 'ag-grid-react';
+import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
+import {releaseListColumn} from '@/pages/onlineSystem/releaseProcess/column';
 import IPagination from '@/components/IPagination';
 import PreReleaseServices from '@/services/preRelease';
-import { useLocation } from 'umi';
-import { isEmpty } from 'lodash';
+import {useLocation} from 'umi';
+import {isEmpty} from 'lodash';
 import moment from 'moment';
-import { history } from '@@/core/history';
+import {history} from '@@/core/history';
 
-const HistoryList = ({ height }: { height: number }) => {
+const HistoryList = ({height}: { height: number }) => {
   const gridRef = useRef<GridApi>();
   const query = useLocation()?.query;
 
@@ -39,7 +39,7 @@ const HistoryList = ({ height }: { height: number }) => {
         key: it.project_id,
       })),
     );
-    setOrders(order?.flatMap((num: string) => (num ? [{ label: num, value: num, key: num }] : [])));
+    setOrders(order?.flatMap((num: string) => (num ? [{label: num, value: num, key: num}] : [])));
   };
 
   const getTableList = async (page = 1, page_size = pages.page_size) => {
@@ -64,7 +64,7 @@ const HistoryList = ({ height }: { height: number }) => {
           project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
         })) ?? [],
       );
-      setPages({ page: res.page, total: res.total, page_size: res.page_size });
+      setPages({page: res.page, total: res.total, page_size: res.page_size});
       setSpinning(false);
     } catch (e) {
       setSpinning(false);
@@ -87,7 +87,7 @@ const HistoryList = ({ height }: { height: number }) => {
               <Select
                 options={projects}
                 optionFilterProp={'label'}
-                style={{ width: '100%' }}
+                style={{width: '100%'}}
                 mode={'multiple'}
                 showSearch
               />
@@ -98,7 +98,7 @@ const HistoryList = ({ height }: { height: number }) => {
               <Select
                 options={orders ?? []}
                 optionFilterProp={'label'}
-                style={{ width: '100%' }}
+                style={{width: '100%'}}
                 mode={'multiple'}
                 showSearch
               />
@@ -106,14 +106,14 @@ const HistoryList = ({ height }: { height: number }) => {
           </Col>
           <Col span={8}>
             <Form.Item name={'time'} label={'发布日期'}>
-              <DatePicker.RangePicker style={{ width: '100%' }} />
+              <DatePicker.RangePicker style={{width: '100%'}}/>
             </Form.Item>
           </Col>
         </Row>
       </Form>
       <div
         className="ag-theme-alpine"
-        style={{ height: height - 150, width: '100%', marginTop: 8 }}
+        style={{height: height - 150, width: '100%', marginTop: 8}}
       >
         <AgGridReact
           columnDefs={releaseListColumn('history')}
@@ -123,7 +123,7 @@ const HistoryList = ({ height }: { height: number }) => {
             filter: true,
             flex: 1,
             suppressMenu: true,
-            cellStyle: { 'line-height': '28px' },
+            cellStyle: {'line-height': '28px'},
           }}
           rowHeight={28}
           headerHeight={30}
@@ -141,9 +141,9 @@ const HistoryList = ({ height }: { height: number }) => {
                     textOverflow: 'ellipsis',
                   }}
                   onClick={() => {
-                    let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}`;
+                    let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/${p.data.is_delete}`;
                     if (p.data.release_type == 'backlog_release') {
-                      href = `/onlineSystem/releaseOrder/${p.data.release_num}`;
+                      href = `/onlineSystem/releaseOrder/${p.data.release_num}/${p.data.is_delete}`;
                     }
                     history.push(href);
                   }}

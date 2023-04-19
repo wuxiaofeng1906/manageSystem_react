@@ -29,7 +29,6 @@ export default () => {
   const [sqlList, setSqlList] = useState<any[]>([]);
 
   const getReleaseInfo = async (data: any, refreshData: any = null) => {
-    debugger
     if (refreshData) {
       await OnlineSystemServices.refreshProjectInfo(refreshData);
     }

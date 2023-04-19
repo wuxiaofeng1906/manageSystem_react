@@ -157,7 +157,6 @@ export const OnlineSystemServices = {
 
   // 数据修复读取异常提示
   async abnormalApi(params: any) {
-    debugger
     return request(`${baseUrl}/online/abnormal-api`, { params, warn: false });
   },
   // 获取工单状态

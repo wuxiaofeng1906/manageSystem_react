@@ -166,7 +166,6 @@ const SheetInfo = (props: any, ref: any) => {
   const getDetail = async () => {
     setSpinning(true);
     try {
-      debugger
       let param: any = {release_num};
       if (globalState.finished) {
         param = {release_num, include_deleted: true}

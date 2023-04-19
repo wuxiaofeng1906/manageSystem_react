@@ -35,6 +35,7 @@ let releateOrderInfo: any = {
   INTER: []
 }; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
 const ReleaseOrder = () => {
+
   const {id, is_delete} = useParams() as { id: string, is_delete: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
@@ -110,7 +111,6 @@ const ReleaseOrder = () => {
   };
 
   const getOrderDetail = async (clusterMap = clusters) => {
-    debugger
     try {
       setSpinning(true);
       const res = await PreReleaseServices.orderDetail({release_num: id, include_deleted: true});

@@ -85,7 +85,6 @@ const ProcessDetail = (props: any, ref: any) => {
   );
 
   const init = async (refresh = false) => {
-    debugger
     try {
       setLoading(true);
       reset();

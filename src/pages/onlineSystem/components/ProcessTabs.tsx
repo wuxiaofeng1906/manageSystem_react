@@ -8,9 +8,11 @@ import {history} from "@@/core/history";
 export const ProcessTabs = () => {
   const [list, setList] = useState<any>([]);
   const {globalState} = useModel('onlineSystem');
-  const {release_num} = useParams() as { release_num: string; branch: string };
+  const {release_num} = useParams() as { release_num: string; }; // 非积压发布获取参数
+  const {id} = useParams() as { id: string; }; // 灰度推线上获取参数
 
   const onTabChange = (v: any) => {
+    debugger
     // 跳转链接需要找到下一个数据的subtab和tab
     let p = list.find((e: any) => {
       return e.release_num === v
@@ -25,27 +27,22 @@ export const ProcessTabs = () => {
 
   //获取发布列表
   const getTabsList = async () => {
-    debugger
     let tabList = [{release_num, release_name: "测试的历史数据，等发布失败问题解决后，需要继续添加名字"}];
     // 如果是历史记录，则只展示一个Tab
     if (!globalState.finished) {
       tabList = await PreReleaseServices.releaseList();
     }
-
-
     setList(tabList);
   }
   useEffect(() => {
     getTabsList();
-  }, [globalState]);
+  }, [release_num,id]);
 
   return (<Tabs
-    activeKey={release_num || list?.[0]?.release_num}
+    activeKey={release_num || id || list?.[0]?.release_num}
     type="editable-card"
-    // onEdit={(key, type) => onRemoveTab(key)}
     hideAdd={true}
     onChange={(v) => onTabChange(v)}
-    // style={{background: 'red'}}
   >
     {list.map((it: any) => (  //
       <Tabs.TabPane tab={it.release_name} key={it.release_num} closable={false}/>

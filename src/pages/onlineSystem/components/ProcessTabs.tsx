@@ -7,10 +7,10 @@ import {history} from "@@/core/history";
 
 export const ProcessTabs = () => {
   const [list, setList] = useState<any>([]);
-  const {globalState} = useModel('onlineSystem');
-  const {release_num} = useParams() as { release_num: string; }; // 非积压发布获取参数
+  const {globalState, basic} = useModel('onlineSystem');
+  const {release_num, release_name} = useParams() as { release_num: string; release_name: string }; // 非积压发布获取参数
   const {id} = useParams() as { id: string; }; // 灰度推线上获取参数
-
+  console.log(basic)
   const onTabChange = (v: any) => {
     debugger
     // 跳转链接需要找到下一个数据的subtab和tab
@@ -18,16 +18,16 @@ export const ProcessTabs = () => {
       return e.release_num === v
     });
 
-    let replaceUrl = `/onlineSystem/prePublish/${p.release_num}/${p.branch}/${p.is_delete}`;
+    let replaceUrl = `/onlineSystem/prePublish/${p.release_num}/${p.branch}/${p.is_delete}/${p.release_name}`;
     if (p.release_type == 'backlog_release') {  // 灰度推生产
-      replaceUrl = `/onlineSystem/releaseOrder/${p.release_num}/${p.is_delete}`;
+      replaceUrl = `/onlineSystem/releaseOrder/${p.release_num}/${p.is_delete}/${p.release_name}`;
     }
     history.replace(replaceUrl);
   };
 
   //获取发布列表
   const getTabsList = async () => {
-    let tabList = [{release_num, release_name: "测试的历史数据，等发布失败问题解决后，需要继续添加名字"}];
+    let tabList = [{release_num, release_name}];
     // 如果是历史记录，则只展示一个Tab
     if (!globalState.finished) {
       tabList = await PreReleaseServices.releaseList();

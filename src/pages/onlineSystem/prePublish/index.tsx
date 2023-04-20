@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Tabs} from 'antd';
 import {useLocation, history, Link} from 'umi';
 import {PageContainer} from '@ant-design/pro-layout';
@@ -7,10 +7,12 @@ import ZentaoDetail from './ZentaoDetail';
 import {SyncOutlined} from '@ant-design/icons';
 import ProcessLayout from './layout';
 import {ProcessTabs} from "../components/ProcessTabs";
+import {useModel} from "@@/plugin-model/useModel";
 
 const PrePublish = () => {
   const refreshRef = useRef() as React.MutableRefObject<{ onRefresh: Function }>;
   const query = useLocation()?.query;
+  const {globalState} = useModel('onlineSystem');
 
   useEffect(() => {
     let init = query.tab;
@@ -25,7 +27,7 @@ const PrePublish = () => {
 
   return (
     // <PageContainer title={query.tab == 'profile' ? '禅道概况' : '发布过程单'}>
-    <PageContainer title={<ProcessTabs/>}>
+    <PageContainer title={<ProcessTabs finished={globalState.finished}/>}>
 
       <div className={styles.profileAndProcess}>
 

@@ -2,15 +2,14 @@ import {Spin, Tabs} from "antd";
 import React, {useEffect, useState} from "react";
 import PreReleaseServices from "@/services/preRelease";
 import {useLocation, useParams} from "umi";
-import {useModel} from "@@/plugin-model/useModel";
 import {history} from "@@/core/history";
 
-export const ProcessTabs = () => {
+export const ProcessTabs = ({finished}: { finished: boolean }) => {
+
   const [list, setList] = useState<any>([]);
-  const {globalState, basic} = useModel('onlineSystem');
   const {release_num, release_name} = useParams() as { release_num: string; release_name: string }; // 非积压发布获取参数
   const {id} = useParams() as { id: string; }; // 灰度推线上获取参数
-  console.log(basic)
+
   const onTabChange = (v: any) => {
     debugger
     // 跳转链接需要找到下一个数据的subtab和tab
@@ -29,14 +28,14 @@ export const ProcessTabs = () => {
   const getTabsList = async () => {
     let tabList = [{release_num, release_name}];
     // 如果是历史记录，则只展示一个Tab
-    if (!globalState.finished) {
+    if (!finished) {
       tabList = await PreReleaseServices.releaseList();
     }
     setList(tabList);
   }
   useEffect(() => {
     getTabsList();
-  }, [release_num, id, globalState]);
+  }, [release_num, id, finished]);
 
   return (<Tabs
     activeKey={release_num || id || list?.[0]?.release_num}

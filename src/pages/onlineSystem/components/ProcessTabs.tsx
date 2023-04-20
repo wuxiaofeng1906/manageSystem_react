@@ -36,7 +36,7 @@ export const ProcessTabs = () => {
   }
   useEffect(() => {
     getTabsList();
-  }, [release_num,id]);
+  }, [release_num, id, globalState]);
 
   return (<Tabs
     activeKey={release_num || id || list?.[0]?.release_num}

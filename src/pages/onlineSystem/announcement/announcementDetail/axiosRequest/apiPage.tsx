@@ -50,7 +50,7 @@ export const announceIsOnlined = async (noticeId: string) => {
 
 // 一键发布
 export const oneKeyToRelease = async (id: any) => {
-return await  axiosPost(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`);
+  return await axiosPost(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`);
   // return request(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`, {method: "POST"});
 };
 
@@ -85,7 +85,8 @@ const getSpecialList = (ptyGroup: any) => {
 }
 
 // 不轮播时的数据
-const notCarouselData = (popupData: any) => {
+const notCarouselData = (popupData: any, announceName: string) => {
+  debugger
 
   const popData = popupData[0];
   // 相当于只有一个轮播页面
@@ -97,7 +98,9 @@ const notCarouselData = (popupData: any) => {
         pageNum: 0, // 所属轮播页码
         layoutTypeId: picLayout,
         yuQue: yuQueUrl,
+        featureName: announceName, // 非轮播的特性名称要保存为公告名称
         contents: getSpecialList(ptyGroup)
+
       }
     ]
   }
@@ -144,7 +147,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
         specialData = carouselData(popupData);// 轮播
       } else {
         data["pageSize"] = 0; // 不轮播的时候总页数为0
-        specialData = notCarouselData(popupData[0].tabsContent); // 不轮播
+        specialData = notCarouselData(popupData[0].tabsContent, formData.announce_name); // 不轮播
       }
     }
 

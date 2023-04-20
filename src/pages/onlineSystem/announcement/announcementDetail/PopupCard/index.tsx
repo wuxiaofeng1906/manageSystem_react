@@ -404,8 +404,8 @@ const PopupCard: React.FC<any> = (props: any) => {
       setEmptyForm();
       return;
     }
-    // 有之前的数据
-    if (anPopData && anPopData.length > 0 && back) {
+    // 有之前的数据,点击过上一步才有之前的保存数据
+    if (anPopData && anPopData.length > 0 && back !== "undefined") {
       //   如果ID相同，则展示原有数据，如果不同，则获取服务器数据
       if (newHead.releaseID === releaseID) {
         const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);

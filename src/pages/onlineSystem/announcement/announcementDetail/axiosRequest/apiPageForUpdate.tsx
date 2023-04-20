@@ -712,6 +712,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
+  debugger
 
   // debugger
   // 构造基础数据
@@ -720,20 +721,15 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
   const isCarsousel = oldCommonData?.isCarousel ? 1 : 0;
 
   try {
-    // 1 进行判断，首先判断模板类型和是否轮播选项有没有被改变。
+    // 1 判断【模板类型】  和  【是否轮播】  选项有没有被改变。
     if (newCommonData.modules !== oldCommonData?.templateTypeId
       || newCommonData?.announce_carousel !== isCarsousel) {
-      // debugger
       // 1.1 如果改变了，直接调用新增接口，需要把旧公告ID一并传到后端
       return await updateForModulesAndCarousel(newCommonData, newPopData, oldCommonData, oldPopData);
-    } else if (newCommonData.modules === "1") {  // 1.2 如果模板类型没有改变、
-      // debugger
-      // 1.2.1 如果是消息模板，则直接调用常规修改接口
+    } else if (newCommonData.modules === "1") {  // 1.2 如果模板类型没有改变、并且是【消息模板】，则直接调用常规修改接口
       const relData = normalUpdate({...newCommonData, releaseId: oldCommonData.id});
       return await updateApi(relData);
-
     } else {
-      // debugger
       // 1.2.2 如果是弹窗模板，还要看其他修改方向
       let relData: any;
       const specialNameState = specialNameIsUpdate(newCommonData, newPopData, oldPopData);

@@ -63,6 +63,7 @@ export const preViewNotice = (noticeEditionId: string, targetEnv: string) => {
 
 // 获取特性列表list
 const getSpecialList = (ptyGroup: any) => {
+  debugger
   if (!ptyGroup) return [];
   const specialList: any = [];
   ptyGroup.map((v: any) => {

@@ -91,7 +91,7 @@ function localCacheWrap(url: string, options: any) {
 function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg?: any) {
   return mRequest
     .then((res) => {
-      debugger
+
       if (res?.code !== 200) {
         if (warn) {
           if (warn === true) warn = '';
@@ -105,7 +105,7 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
       return res?.data;
     })
     .catch(async (e: any) => {
-      debugger
+
       //
       // const a = await e.json()
       // errorMessage(a.error);

@@ -202,7 +202,6 @@ const TaskDecompose: React.FC<any> = () => {
 
   // 点击创建任务按钮
   const createZentaoTask = async () => {
-    debugger
     // 需要验证禅道需求不能为空（所属执行不需要判断，因为要选择禅道需求就必须选额所属执行）
     if (
       !formForTaskQuery.getFieldValue('ztStory') ||

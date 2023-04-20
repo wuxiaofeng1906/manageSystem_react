@@ -82,7 +82,6 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 跳转到下一页
   const onNextPageClick = () => {
-    debugger
     if (stepShow.popCard !== "inline") return;
     const formInfo = announcementForm.getFieldsValue();
     if (vertifyFieldForCommon(formInfo)) {
@@ -117,12 +116,10 @@ const Announce: React.FC<any> = (props: any) => {
       centered: true,
       onOk: async () => {
         const releaseResult = await oneKeyToRelease(releaseID);
-        debugger
         if (releaseResult.ok) {
           customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
 
         } else {
-          debugger
           customMessage({type: "error", msg: "公告发布失败", position: "0vh"})
         }
       }
@@ -152,7 +149,6 @@ const Announce: React.FC<any> = (props: any) => {
             history.push('./announceList');
             noticeId = result?.data.toString();
           }
-          debugger
           // 如果是明细数据，且没有被改变过
           const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
           if (preRt.ok) {
@@ -211,7 +207,6 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
-            debugger
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
             const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
             console.log("预览跳转地址", goUrl);
@@ -319,7 +314,6 @@ const Announce: React.FC<any> = (props: any) => {
       if (commonData && JSON.stringify(commonData) !== "{}") {      // 以下是已有的数据（下一页返回或者历史记录）
 
 
-        debugger
         // 里面的时间需要转一下。。
         announcementForm.setFieldsValue({...head, announce_time: moment(head.announce_time)});
         setStep(head);

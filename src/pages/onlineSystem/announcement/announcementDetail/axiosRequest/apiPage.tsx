@@ -109,7 +109,6 @@ const carouselData = (popupData: any) => {
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
   popupData.map((v: any) => {
-    debugger
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
@@ -127,7 +126,6 @@ const carouselData = (popupData: any) => {
 
 // 公告改版后的保存公告内容
 export const saveAnnounceContent = async (formData: any, popupData: object = {}) => {
-  debugger
   try {
     const data: any = {
       iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)

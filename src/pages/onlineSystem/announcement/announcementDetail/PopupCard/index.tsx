@@ -46,7 +46,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   const [yuQueSpinLoading, setYuQueSpinLoading] = useState(false);
   const setEmptyForm = () => {
     const storage: any = JSON.parse(localStorage.getItem("first_noticeHeader") as string);
-    debugger
     // 轮播时记录Tab数据用
     if (storage?.announce_carousel === 1) {
       const tabsContent: any = [];
@@ -176,7 +175,6 @@ const PopupCard: React.FC<any> = (props: any) => {
         if (releaseResult.ok) {
           customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
         } else {
-          debugger
           customMessage({type: "error", msg: releaseResult.message, position: "0vh"});
         }
       }
@@ -256,7 +254,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any, preView: boolean = false, preViewEnv: any = {}) => {
-    debugger
 
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
@@ -296,7 +293,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 预览
   const onPreView = async () => {
-    debugger
     let preViewEnv = {
       dataEnv: "", // 保存数据的环境
       viewEnv: "" // 预览效果的环境
@@ -331,7 +327,6 @@ const PopupCard: React.FC<any> = (props: any) => {
         if (showPreView && type === "detail") {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
-          debugger
           if (result.ok) {
             const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
             console.log("预览跳转地址", goUrl);
@@ -380,7 +375,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 获取服务端旧数据
   const showServiceData = async (newHead: any) => {
-    debugger
     // 获取弹窗页的数据
     const {head, body} = await getAnnounceContent(releaseID, true); // 现在的head 是旧数据，新数据可能被编辑过了。
     setOldCommonData(head);
@@ -411,7 +405,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       return;
     }
     // 有之前的数据
-    if (anPopData && anPopData.length > 0) {
+    if (anPopData && anPopData.length > 0 && back) {
       //   如果ID相同，则展示原有数据，如果不同，则获取服务器数据
       if (newHead.releaseID === releaseID) {
         const picString = getImageForFront((anPopData[0]?.tabsContent).uploadPic);
@@ -454,7 +448,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   useEffect(() => {
-    debugger
     try {
       currentTab = 1;
       // 先判断commondata有没有数据，如果有，则直接展示，如果没有（界面可能手动刷新过），则获取缓存的数据

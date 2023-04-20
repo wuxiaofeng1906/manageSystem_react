@@ -14,7 +14,6 @@ interface IParams {
 }
 
 export const axiosCommon = async ({methods = "GET", url = "", params = {}, data = {}}: IParams) => {
-  debugger
   let result: any = {};
   axios.request({
     method: methods,
@@ -23,10 +22,10 @@ export const axiosCommon = async ({methods = "GET", url = "", params = {}, data 
     data: data,
     headers: {"contentType": "application/x-www-form-urlencoded",}
   }).then((res: any) => {
-    debugger
+
     result = res.data.data;
   }).catch(async (error: any) => {
-    debugger
+
     console.log(await error)
     if (error.toString().includes('403')) {
       errorMessage('您无操作权限！');
@@ -59,7 +58,7 @@ const axiosGet = async (url: string, queryData: any = {}) => {
 };
 
 const axiosGet_TJ = async (url: string, queryData: any = {}, module: string = "") => {
-  debugger
+
   let result: any = {};
   await axios
     .get(url, {params: queryData})
@@ -122,7 +121,7 @@ const axiosDelete = async (url: string, queryData: any = {}) => {
 
 // post
 const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) => {
-  debugger
+
   let result: any = {};
 
   await axios
@@ -148,10 +147,10 @@ export const axiosPostTest = async (url: string) => {
   await axios
     .post(url)
     .then((res: any) => {
-      debugger
+
       result = res.data;
     }).catch(async (error: any) => {
-      debugger
+
       const a = await error;
 
       console.log(a)

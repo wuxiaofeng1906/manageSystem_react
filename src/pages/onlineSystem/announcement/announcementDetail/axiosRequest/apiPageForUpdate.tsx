@@ -7,7 +7,6 @@ import {Notice_Env} from "../../../../../../config/qqServiceEnv";
 
 // 修改的api
 const updateApi = async (data: any) => {
-  debugger
   const result = await axiosPut('/api/77hub/notice', data, {envName: Notice_Env});
   return result;
 }

@@ -236,7 +236,20 @@ export default [
         hideInMenu: true,
       },
       {
-        name: '升级公告',
+        name: '升级公告（旧）',
+        path: 'AnnouncementList',
+        component: './onlineSystem/oldAnnonuncement/AnnouncementList',
+        wrappers: ['../wrappers/auth'],
+      },
+      {
+        name: '升级公告详情（旧）',
+        path: 'oldAnnounceDetails',
+        component: './onlineSystem/oldAnnonuncement/oldAnnounceDetails',
+        // hideInMenu: true,
+        // wrappers: ['../wrappers/auth'],
+      },
+      {
+        name: '升级公告（新）',
         path: 'announceList',
         component: './onlineSystem/announcement/announceList',
         wrappers: ['../wrappers/auth'],

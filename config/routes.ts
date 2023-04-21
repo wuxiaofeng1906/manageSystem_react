@@ -243,10 +243,10 @@ export default [
       },
       {
         name: '升级公告详情（旧）',
-        path: 'oldAnnounceDetails',
+        path: 'oldAnnounceDetails/:id/:type/:status',
         component: './onlineSystem/oldAnnonuncement/oldAnnounceDetails',
-        // hideInMenu: true,
-        // wrappers: ['../wrappers/auth'],
+        hideInMenu: true,
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '升级公告（新）',

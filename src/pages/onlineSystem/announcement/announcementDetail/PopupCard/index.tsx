@@ -37,6 +37,8 @@ const PopupCard: React.FC<any> = (props: any) => {
   } = useModel('announcement');
   const {releaseName, releaseID, type, back} = props.location?.query;
   const [dtForm] = Form.useForm();
+  // 点击预览按钮过后进度展示
+  const [preview, setPreview] = useState(false);
   // 图片上传弹出层显示
   const [picModalState, setPicModalState] = useState({
     visible: false,
@@ -294,6 +296,7 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 预览
   const onPreView = async () => {
+    setPreview(true);
     let preViewEnv = {
       dataEnv: "", // 保存数据的环境
       viewEnv: "" // 预览效果的环境
@@ -312,7 +315,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         />
       </div>;
 
-
+    setPreview(false);
     // 测试环境需要选择环境
     confirm({
       title: '选择预览环境',
@@ -657,15 +660,17 @@ const PopupCard: React.FC<any> = (props: any) => {
             <Form.Item>
               <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
                 <div id={"message"}>
-                  <Button className={style.saveButtonStyle} type="primary" style={{marginLeft: 10}}
-                          htmlType="submit">保存</Button>
-                  <Button className={style.commonBtn}
-                          style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
-                          onClick={releaseAnnounceInfo}>一键发布</Button>
-                  <Button className={style.commonBtn} style={{marginLeft: 10}}
-                          onClick={onPreView}>预览</Button>
-                  <Button className={style.commonBtn} style={{marginLeft: 10}}
-                          onClick={goToPrePage}>上一步</Button>
+                  <Spin spinning={preview} tip={"预览环境加载中，请稍后..."}>
+                    <Button className={style.saveButtonStyle} type="primary" style={{marginLeft: 10}}
+                            htmlType="submit">保存</Button>
+                    <Button className={style.commonBtn}
+                            style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
+                            onClick={releaseAnnounceInfo}>一键发布</Button>
+                    <Button className={style.commonBtn} style={{marginLeft: 10}}
+                            onClick={onPreView}>预览</Button>
+                    <Button className={style.commonBtn} style={{marginLeft: 10}}
+                            onClick={goToPrePage}>上一步</Button>
+                  </Spin>
                 </div>
               </Footer>
             </Form.Item>

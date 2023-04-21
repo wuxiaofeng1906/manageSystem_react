@@ -31,7 +31,8 @@ const Announce: React.FC<any> = (props: any) => {
   const {releaseName, releaseID, type, back} = props.location?.query;
   const [announcementForm] = Form.useForm();
   const [carousePageForm] = Form.useForm();
-
+  // 点击预览按钮过后进度展示
+  const [preview, setPreview] = useState(false);
   // 数据加载
   const [loading, setLoading] = useState(false);
   // 轮播页面改小的选择
@@ -172,6 +173,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 预览
   const onPreView = async () => {  // PRE_ENV
+    setPreview(true);
     // `https://${it}.e7link.com/cn-global/login`
     let preViewEnv = {
       dataEnv: "", // 保存数据的环境
@@ -190,7 +192,7 @@ const Announce: React.FC<any> = (props: any) => {
         />
       </div>;
 
-
+    setPreview(false);
     // 测试环境需要选择环境
     confirm({
       title: '选择预览环境',
@@ -486,17 +488,19 @@ const Announce: React.FC<any> = (props: any) => {
             </div>
             {/* 消息卡片操作 */}
             <div id={"message"} style={{display: stepShow.msgCard}}>
-              <Button
-                type="primary" className={style.saveButtonStyle}
-                style={{marginLeft: 10}} onClick={() => saveMsgInfo(false)}>保存
-              </Button>
-              <Button
-                className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
-                onClick={releaseNoticeInfo}>一键发布
-              </Button>
+              <Spin spinning={preview} tip={"预览环境加载中，请稍后..."}>
+                <Button
+                  type="primary" className={style.saveButtonStyle}
+                  style={{marginLeft: 10}} onClick={() => saveMsgInfo(false)}>保存
+                </Button>
+                <Button
+                  className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
+                  onClick={releaseNoticeInfo}>一键发布
+                </Button>
 
-              <Button className={style.commonBtn} style={{marginLeft: 10}}
-                      onClick={onPreView}>预览</Button>
+                <Button className={style.commonBtn} style={{marginLeft: 10}}
+                        onClick={onPreView}>预览</Button>
+              </Spin>
             </div>
           </Footer>
         </div>

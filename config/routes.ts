@@ -240,6 +240,7 @@ export default [
         path: 'AnnouncementList',
         component: './onlineSystem/oldAnnonuncement/AnnouncementList',
         wrappers: ['../wrappers/auth'],
+        hideInMenu: true,
       },
       {
         name: '升级公告详情（旧）',
@@ -252,21 +253,21 @@ export default [
         name: '升级公告（新）',
         path: 'announceList',
         component: './onlineSystem/announcement/announceList',
-        wrappers: ['../wrappers/auth'],
+        // wrappers: ['../wrappers/auth'],
       },
       {
         name: '升级公告详情',
         path: 'announcementDetail',
         component: './onlineSystem/announcement/announcementDetail',
         hideInMenu: true,
-        wrappers: ['../wrappers/auth'],
+        // wrappers: ['../wrappers/auth'],
       },
       {
         name: '升级公告详情(弹窗)',
         path: 'PopupCard',
         component: './onlineSystem/announcement/announcementDetail/PopupCard',
         hideInMenu: true,
-        wrappers: ['../wrappers/auth'],
+        // wrappers: ['../wrappers/auth'],
       },
       // {
       //   name: '上线日历',

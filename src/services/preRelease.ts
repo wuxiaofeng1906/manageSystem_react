@@ -1,5 +1,5 @@
 import request from './request';
-import {Notice_Env} from "../../config/qqServiceEnv";
+import {Notice_Env, Notice_Env_Test} from "../../config/qqServiceEnv";
 
 const baseUrl = '/api/verify';
 // 发布过程
@@ -149,7 +149,12 @@ const PreReleaseServices = {
   // 升级公告挂起
   async saveAnnouncement(data: any) {
     // console.log("公告挂起参数", data)
-    return request(`${baseUrl}/latest-release/announcement`, {data: {...data, env_name: Notice_Env}, method: 'post'});
+    return request(`${baseUrl}/latest-release/announcement`, {
+      data: {
+        ...data,
+        env_name: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test
+      }, method: 'post'
+    });
   },
   // 所有集群组合情况
   async clusterGroup() {

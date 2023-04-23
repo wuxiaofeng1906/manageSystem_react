@@ -1,12 +1,12 @@
 import {axiosGet_TJ, axiosPost, axiosDelete} from '@/publicMethods/axios';
 import {objectArraySortByDesc} from "@/publicMethods/arrayMethod";
-import {Notice_Env} from "../../../../../../config/qqServiceEnv";
+import {Notice_Env, Notice_Env_Test} from "../../../../../../config/qqServiceEnv";
 
 
 // 获取公告列表
 export const getAnnounceList = async (page: number, size: number, createdUser: any, createdTime: string, iteration: string) => {
 
-  let params = {page, size, envName: Notice_Env};
+  let params = {page, size, envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test};
   if (createdUser && createdUser.length) {
     params["createdUser"] = createdUser;
   }
@@ -60,7 +60,11 @@ export const oneKeyToRelease = (id: any) => {
 
 // 删除公告
 export const deleteList = (id: any) => {
-  return axiosDelete(`/api/77hub/notice/${id}`, {data: {id}, params: {envName: Notice_Env}});
+
+  return axiosDelete(`/api/77hub/notice/${id}`, {
+    data: {id},
+    params: {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test}
+  });
   // return axiosDelete(`/api/77hub/notice/${id}`, {});
   // return axiosDelete(`/api/77hub/notice`, {data: {id: id}});
 };

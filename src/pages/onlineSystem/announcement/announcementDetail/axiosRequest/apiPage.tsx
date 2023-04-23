@@ -1,9 +1,8 @@
-import {axiosGet_TJ, axiosPost, axiosPostTest, axiosCommon} from '@/publicMethods/axios';
+import {axiosGet_TJ, axiosPost} from '@/publicMethods/axios';
 import {getCurrentUserInfo} from '@/publicMethods/authorityJudge';
 import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
-import {Notice_Env} from "../../../../../../config/qqServiceEnv";
-import request from '../../../../../services/request';
+import {Notice_Env, Notice_Env_Test} from "../../../../../../config/qqServiceEnv";
 
 const users = getCurrentUserInfo();
 
@@ -50,20 +49,23 @@ export const announceIsOnlined = async (noticeId: string) => {
 
 // 一键发布
 export const oneKeyToRelease = async (id: any) => {
-  return await axiosPost(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`);
+  return await axiosPost(`/api/77hub/notice/released/${id}?envName=${location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test}`);
   // return request(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`, {method: "POST"});
 };
 
 // 预览功能
 export const preViewNotice = (noticeEditionId: string, targetEnv: string) => {
-  return axiosPost('/api/77hub/notice/publish/preview', {noticeEditionId, targetEnv}, {envName: Notice_Env});
+  return axiosPost('/api/77hub/notice/publish/preview', {
+    noticeEditionId,
+    targetEnv
+  }, {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test});
 }
 
 // region 保存功能
 
 // 获取特性列表list
 const getSpecialList = (ptyGroup: any) => {
-  debugger
+
   if (!ptyGroup) return [];
   const specialList: any = [];
   ptyGroup.map((v: any) => {
@@ -86,8 +88,6 @@ const getSpecialList = (ptyGroup: any) => {
 
 // 不轮播时的数据
 const notCarouselData = (popupData: any, announceName: string) => {
-  debugger
-
   const popData = popupData[0];
   // 相当于只有一个轮播页面
   const {ptyGroup, uploadPic, picLayout, yuQueUrl} = popData;
@@ -152,7 +152,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
     }
 
     const relData = {...data, ...specialData};
-    return axiosPost('/api/77hub/notice', relData, {envName: Notice_Env});
+    return axiosPost('/api/77hub/notice', relData, {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test});
   } catch (e: any) {
     return {
       ok: false,

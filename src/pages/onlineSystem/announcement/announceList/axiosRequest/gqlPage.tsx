@@ -5,7 +5,7 @@ import {ExternalGqlClient} from '@/hooks/externalGql';
 export const queryAnnounceList = async (page: number, pageSize: number) => {
   const {data} = await ExternalGqlClient.noticeGQLQuery(`
   {
-    NoticeEdition(firstResult: ${page-1}, maxResult: ${pageSize}) {
+    NoticeEdition(firstResult: ${page - 1}, maxResult: ${pageSize}) {
         id
         iteration
         updatedTime
@@ -20,9 +20,7 @@ export const queryAnnounceList = async (page: number, pageSize: number) => {
     }
   }`);
 
-  // console.log(data);
-  // debugger
-return data;
+  return data;
 };
 
 

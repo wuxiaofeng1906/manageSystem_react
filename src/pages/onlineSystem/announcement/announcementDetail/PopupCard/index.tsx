@@ -256,8 +256,6 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   // 保存数据
   const onFinish = async (popData: any, preView: boolean = false, preViewEnv: any = {}) => {
-    debugger
-
     let finalData: any = [];
     // 如果是轮播则先放到state中再保存
     if (commonData?.announce_carousel === 1) {
@@ -508,7 +506,7 @@ const PopupCard: React.FC<any> = (props: any) => {
   // endregion
 
   window.onbeforeunload = function () {
-    // debugger
+
     //注：alert在这里面不起作用，不会弹出消息
     // alert(`删除缓存：${localStorage.getItem("first_noticeHeader")}`)
     // localStorage.removeItem("first_noticeHeader");

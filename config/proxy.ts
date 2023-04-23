@@ -6,7 +6,7 @@
  * https://pro.ant.design/docs/deploy
  */
 
-import {Notice_Common, Notice_PostImage} from "./qqServiceEnv";
+import {Notice_Common, Notice_Common_Test, Notice_PostImage} from "./qqServiceEnv";
 // 测试服务器地址
 export default {
   dev: {
@@ -21,7 +21,7 @@ export default {
       pathRewrite: {'^': ''},
     },
     '/identity/Attachment/': {  // 上传图片之前获取相应的key
-      target: Notice_Common,
+      target: Notice_Common_Test,
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
@@ -58,6 +58,16 @@ export default {
       target: 'http://rd.q7link.com:8300/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
-    }
+    },
+    '/identity/Attachment/': {  // 上传图片之前获取相应的key
+      target: Notice_Common,
+      changeOrigin: true,
+      pathRewrite: {'^': ''},
+    },
+    '/postImage/': {
+      target: Notice_PostImage,
+      changeOrigin: true,
+      pathRewrite: {'/postImage/': ''},
+    },
   },
 };

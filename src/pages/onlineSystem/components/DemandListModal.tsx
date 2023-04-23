@@ -295,7 +295,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
   // const memoColumn = useMemo(() => {
   //   const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
-  //   debugger
   //   const disableValue = user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update);
   //   console.log("user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update", disableValue);
   //

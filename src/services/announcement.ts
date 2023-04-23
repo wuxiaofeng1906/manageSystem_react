@@ -1,5 +1,5 @@
 import request from './request';
-import {Notice_Env} from "../../config/qqServiceEnv";
+import {Notice_Env, Notice_Env_Test} from "../../config/qqServiceEnv";
 
 const baseUrl = '/api/verify';
 // 发布过程
@@ -10,7 +10,12 @@ const AnnouncementServices = {
   },
   // 发布过程 公告列表
   async preAnnouncement() {
-    return request(`${baseUrl}/release/announcement_name`, {params: {size: 50, envName: Notice_Env}});
+    return request(`${baseUrl}/release/announcement_name`, {
+      params: {
+        size: 50,
+        envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test
+      }
+    });
   },
   // 发布过程 公告关联
   async preReleaseAssociation(data: any) {

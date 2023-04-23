@@ -3,11 +3,11 @@ import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
 import {queryAnnounceDetail} from "@/pages/onlineSystem/announcement/announcementDetail/axiosRequest/gqlPage";
 import {dealPopDataFromService} from "../dataAnalysis/index";
-import {Notice_Env} from "../../../../../../config/qqServiceEnv";
+import {Notice_Env, Notice_Env_Test} from "../../../../../../config/qqServiceEnv";
 
 // 修改的api
 const updateApi = async (data: any) => {
-  const result = await axiosPut('/api/77hub/notice', data, {envName: Notice_Env});
+  const result = await axiosPut('/api/77hub/notice', data, {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test});
   return result;
 }
 
@@ -131,7 +131,7 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
 
 //  region 修改时候调用的新增（比如修改模板类型，是否轮播）
 const getSpecialListForAdd = (ptyGroup: any) => {
-  // debugger
+
   const specialList: any = [];
   ptyGroup.map((v: any) => {
     const childList: any = [];
@@ -149,7 +149,6 @@ const getSpecialListForAdd = (ptyGroup: any) => {
 
 // 不轮播时的数据
 const notCarouselDataForAdd = (details: any) => {
-  // debugger
   // 相当于只有一个轮播页面
   const popupData = details?.tabsContent[0];
   const data = {
@@ -189,7 +188,7 @@ const carouselDataForAdd = (popupData: any) => {
 
 // 更新公告内容
 const updateAnnounceContentForAdd = async (formData: any, popupData: object = {}) => {
-  // debugger
+
   const data: any = {
     iteration: formData.announce_name, // 公告名称：默认带入当前时间，可修改，必填(string)
     templateTypeId: formData.modules, // 通知模板：1.消息卡片，2.弹窗
@@ -216,13 +215,13 @@ const updateAnnounceContentForAdd = async (formData: any, popupData: object = {}
   }
 
   const relData = {...data, ...specialData};
-  return axiosPost('/api/77hub/notice', relData, {envName: Notice_Env});
+  return axiosPost('/api/77hub/notice', relData, {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test});
   // return {ok: false, message: "ssssss"}
 };
 
 // 切换升级模板--调用新增接口（会删除原有公告）调用新增接口，多传一个参数 "$id":"Q8G383618N7003B",
 const updateForModulesAndCarousel = async (newCommonData: any, newPopData: any, oldCommonData: any, oldPopData: any) => {
-  // debugger
+
   //  此应用场景：弹窗模板变为消息模板
   if (newCommonData?.modules === "1") {
     return await updateAnnounceContentForAdd({...newCommonData, releaseID: oldCommonData?.id})
@@ -712,9 +711,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
-  debugger
 
-  // debugger
   // 构造基础数据
   const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
   // 是否轮播

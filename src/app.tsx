@@ -1,20 +1,20 @@
 import React from 'react';
-import { Settings as LayoutSettings, PageLoading } from '@ant-design/pro-layout';
-import { notification, message } from 'antd';
-import { history } from 'umi';
+import {Settings as LayoutSettings, PageLoading} from '@ant-design/pro-layout';
+import {notification, message} from 'antd';
+import {history} from 'umi';
 import RightContent from '@/components/RightContent';
 // import Footer from '@/components/Footer';
-import { ResponseError } from 'umi-request';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { GqlClient } from '@/hooks';
-import { queryCurrent } from './services/user';
+import {ResponseError} from 'umi-request';
+import {ApolloClient, InMemoryCache} from '@apollo/client';
+import {GqlClient} from '@/hooks';
+import {queryCurrent} from './services/user';
 import defaultSettings from '../config/defaultSettings';
 
 /**
  * 获取用户信息比较慢的时候会展示一个 loading
  */
 export const initialStateConfig = {
-  loading: <PageLoading />,
+  loading: <PageLoading/>,
 };
 
 const apolloClient = new ApolloClient({
@@ -82,14 +82,26 @@ export async function getInitialState(): Promise<{
     gqlClient,
   };
 }
-message.config({ maxCount: 1 });
-export const layout = ({ initialState }: any) => {
+
+message.config({maxCount: 1});
+export const layout = ({initialState}: any) => {
   return {
-    rightContentRender: () => <RightContent />,
+    rightContentRender: () => <RightContent/>,
     disableContentMargin: false,
     // footerRender: () => <Footer />,
-    onPageChange: () => {
-      const { location } = history;
+
+    onPageChange: (param: any) => {
+
+      // 当页面切换，或者改变时候触发
+      // 这里可以清缓存
+      // 清除公告里面的缓存(如果不是公告页面的话，则清除公告页面的缓存)
+      const noticePage = ["/onlineSystem/announcementDetail", "/onlineSystem/PopupCard"];
+      if (!noticePage.includes(param.pathname)) {
+        localStorage.removeItem("first_noticeHeader");
+        localStorage.removeItem("second_noticeHeader");
+      }
+
+      const {location} = history;
       // 如果没有登录，重定向到 login
       // if (!initialState?.currentUser && location.pathname !== '/user/login') {
       //   history.push('/user/login');
@@ -130,10 +142,10 @@ const codeMessage = {
  * 异常处理程序
  */
 const errorHandler = (error: ResponseError) => {
-  const { response } = error;
+  const {response} = error;
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
+    const {status, url} = response;
 
     notification.error({
       message: `请求错误 ${status}: ${url}`,

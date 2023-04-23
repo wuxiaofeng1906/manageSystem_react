@@ -191,8 +191,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setReleaseCluster(filtered);
   };
   const onChange = (v: string) => {
-    // debugger
-
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
@@ -297,7 +295,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
   // const memoColumn = useMemo(() => {
   //   const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
-  //   debugger
   //   const disableValue = user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update);
   //   console.log("user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update", disableValue);
   //

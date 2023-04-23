@@ -19,7 +19,6 @@ export const RELEASE_MODULE = {
 
 // 获取镜像环境
 export const preEnv = async () => {
-
   const branchEnv = await axiosGet(Notice_PreviewEnv);
   const branchs: any = [];
   branchEnv.map((it: any) => {
@@ -27,6 +26,11 @@ export const preEnv = async () => {
     if (!it.isGlobal && it.type !== "prod") {
       branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
     }
+    //   添加集群0的数据 envName:"cn-northwest-0"  暂时放出来以后可能会屏蔽，
+    if (it.envName === "cn-northwest-0") {
+      branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
+    }
+
   });
 
   return branchs;

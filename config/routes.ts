@@ -240,6 +240,7 @@ export default [
         path: 'AnnouncementList',
         component: './onlineSystem/oldAnnonuncement/AnnouncementList',
         wrappers: ['../wrappers/auth'],
+        hideInMenu: true,
       },
       {
         name: '升级公告详情（旧）',

@@ -2,7 +2,7 @@ import {axiosGet_TJ, axiosPost} from '@/publicMethods/axios';
 import {getCurrentUserInfo} from '@/publicMethods/authorityJudge';
 import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
-import {Notice_Env, Notice_Env_Test} from "../../../../../../config/qqServiceEnv";
+import {noticeUrl} from "../../../../../../config/qqServiceEnv";
 
 const users = getCurrentUserInfo();
 
@@ -49,7 +49,7 @@ export const announceIsOnlined = async (noticeId: string) => {
 
 // 一键发布
 export const oneKeyToRelease = async (id: any) => {
-  return await axiosPost(`/api/77hub/notice/released/${id}?envName=${location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test}`);
+  return await axiosPost(`/api/77hub/notice/released/${id}?envName=${noticeUrl(location.origin).noticeEnv}`);
   // return request(`/api/77hub/notice/released/${id}?envName=${Notice_Env}`, {method: "POST"});
 };
 
@@ -58,7 +58,7 @@ export const preViewNotice = (noticeEditionId: string, targetEnv: string) => {
   return axiosPost('/api/77hub/notice/publish/preview', {
     noticeEditionId,
     targetEnv
-  }, {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test});
+  }, {envName: noticeUrl(location.origin).noticeEnv});
 }
 
 // region 保存功能
@@ -152,7 +152,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
     }
 
     const relData = {...data, ...specialData};
-    return axiosPost('/api/77hub/notice', relData, {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test});
+    return axiosPost('/api/77hub/notice', relData, {envName: noticeUrl(location.origin).noticeEnv});
   } catch (e: any) {
     return {
       ok: false,

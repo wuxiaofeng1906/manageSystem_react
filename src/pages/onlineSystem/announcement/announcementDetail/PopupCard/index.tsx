@@ -561,7 +561,7 @@ const PopupCard: React.FC<any> = (props: any) => {
             <Form.Item label={"上传图片"} name={"uploadPic"} required>
               {picModalState.checkedImg ?
                 <img key={picModalState.checkedImg} data-value={picModalState.checkedImg}
-                     src={`${noticeUrl(location.origin).imagePreview}${picModalState.checkedImg}`}
+                     src={`${noticeUrl(location.origin).imageUpload}${picModalState.checkedImg}`}
                      alt="默认图" style={{height: 100, width: 150}}
                      onClick={() => {
                        setFileList([]);
@@ -706,7 +706,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                   <li key={item} data-value={item}
                       className={picModalState.checkedImg === item ? style.activeChose : ''}>
                     <img key={item} data-value={item}
-                         src={`${noticeUrl(location.origin).imagePreview}${item}`}
+                         src={`${noticeUrl(location.origin).imageUpload}${item}`}
                       // src={require('../../../../../../public/77Logo.png')}
                          alt="默认图"/>
 

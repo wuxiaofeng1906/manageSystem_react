@@ -21,15 +21,15 @@ export default {
       pathRewrite: {'^': ''},
     },
     '/identity/Attachment/': {  // 上传图片之前获取相应的key
-      target: noticeUrl().noticeEnvQuery,
+      target: noticeUrl("").noticeEnvQuery,
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
-    '/postImage/': {
-      target: "http://s3.cn-northwest-1.amazonaws.com.cn/",
-      changeOrigin: true,
-      pathRewrite: {'/postImage/': ''},
-    },
+    // '/postImage/': {
+    //   target: "http://s3.cn-northwest-1.amazonaws.com.cn/",
+    //   changeOrigin: true,
+    //   pathRewrite: {'/postImage/': ''},
+    // },
   },
 
   // 本地测试地址
@@ -64,10 +64,10 @@ export default {
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
-    '/postImage/': {
-      target: "http://s3.cn-northwest-1.amazonaws.com.cn/",
-      changeOrigin: true,
-      pathRewrite: {'/postImage/': ''},
-    },
+    // '/postImage/': {
+    //   target: "http://s3.cn-northwest-1.amazonaws.com.cn/",
+    //   changeOrigin: true,
+    //   pathRewrite: {'/postImage/': ''},
+    // },
   },
 };

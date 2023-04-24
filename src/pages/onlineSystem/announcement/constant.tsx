@@ -22,12 +22,12 @@ export const preEnv = async () => {
   const branchEnv = await axiosGet(Notice_PreviewEnv);
   const branchs: any = [];
   branchEnv.map((it: any) => {
-    // 展示不是global的选项
-    if (!it.isGlobal && it.type !== "prod") {
+    // 展示不是global的选项,正式环境不展示测试预览环境
+    if (!it.isGlobal && it.type !== "prod" && !location.origin.includes("rd.q7link.com")) {
       branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
     }
-    //   添加集群0的数据 envName:"cn-northwest-0"  暂时放出来以后可能会屏蔽，
-    if (it.envName === "cn-northwest-0") {
+    //  正式环境添加集群0，正式环境不要集群0。。   envName:"cn-northwest-0"  暂时放出来以后可能会屏蔽，
+    if (it.envName === "cn-northwest-0" && location.origin.includes("rd.q7link.com")) {
       branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
     }
 

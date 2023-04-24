@@ -6,7 +6,7 @@
  * https://pro.ant.design/docs/deploy
  */
 
-import {Notice_Common, Notice_Common_Test, Notice_PostImage} from "./qqServiceEnv";
+import {noticeUrl} from "./qqServiceEnv";
 // 测试服务器地址
 export default {
   dev: {
@@ -21,12 +21,12 @@ export default {
       pathRewrite: {'^': ''},
     },
     '/identity/Attachment/': {  // 上传图片之前获取相应的key
-      target: Notice_Common_Test,
+      target: noticeUrl().noticeEnvQuery,
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
     '/postImage/': {
-      target: Notice_PostImage,
+      target: "http://s3.cn-northwest-1.amazonaws.com.cn/",
       changeOrigin: true,
       pathRewrite: {'/postImage/': ''},
     },
@@ -60,12 +60,12 @@ export default {
       pathRewrite: {'^': ''},
     },
     '/identity/Attachment/': {  // 上传图片之前获取相应的key
-      target: Notice_Common,
+      target: noticeUrl("rd.q7link.com").noticeEnvQuery,
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
     '/postImage/': {
-      target: Notice_PostImage,
+      target: "http://s3.cn-northwest-1.amazonaws.com.cn/",
       changeOrigin: true,
       pathRewrite: {'/postImage/': ''},
     },

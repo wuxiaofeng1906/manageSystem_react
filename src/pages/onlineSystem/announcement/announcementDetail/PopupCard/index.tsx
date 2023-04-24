@@ -162,7 +162,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     setPicUpLoading(false);
     setUploadPics([]);
-    setFileList([])
+    setFileList([]);
+    setShowPreView(true);
   };
 
   // 一键发布
@@ -328,7 +329,8 @@ const PopupCard: React.FC<any> = (props: any) => {
           customMessage({type: "error", msg: "预览环境不能为空！", position: "0vh"});
           return;
         }
-        if (showPreView && type === "detail") {
+
+        if (!showPreView && type === "detail") {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
@@ -348,32 +350,6 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
     });
 
-
-    // if (showPreView) {
-    //   // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
-    //   window.open(Notice_Preview);
-    //   return;
-    // }
-
-    // const formData = dtForm.getFieldsValue();
-    // onFinish(formData, true);
-
-    //   需要需要校验不能为空
-    // let finalData = [];
-    // // 如果是轮播则先放到state中再保存
-    // if (commonData?.announce_carousel === 1) {
-    //   finalData = getPopupSource(currentTab);
-    // } else {
-    //   // 不是轮播，需要把图片路径放进去
-    //   const popData = dtForm.getFieldsValue();
-    //   popData.uploadPic = picModalState.checkedImg;
-    //   finalData.push(popData);
-    // }
-    // if (vertifyFieldForPopup(finalData)) {
-    //   //    commonData, finalData  进行预览的数据
-    // }
-
-    //
   };
   // endregion
 
@@ -536,7 +512,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           <DragTabs onChange={onTabsChange}/>
 
           <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}
-                onFieldsChange={() => setShowPreView(false)}>
+                onFieldsChange={() => setShowPreView(true)}>
             {/* 特性名称只针对轮播功能 */}
             <Row style={{display: commonData?.announce_carousel === 1 ? "inline-block" : "none"}}>
               <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>

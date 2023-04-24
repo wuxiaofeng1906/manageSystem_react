@@ -233,7 +233,7 @@ const PopupCard: React.FC<any> = (props: any) => {
         const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
         if (preRt.ok) {
           // const goUrls = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
-          const goUrl = location.origin?.includes('rd.q7link.com') ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`
+          const goUrl = preViewEnv.dataEnv === "cn-northwest-0" ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`
             : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
           console.log("预览跳转地址", goUrl);
           window.open(goUrl);
@@ -332,7 +332,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
-            const goUrl = location.origin?.includes('rd.q7link.com') ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`
+            const goUrl = preViewEnv.dataEnv === "cn-northwest-0" ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`
               : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
             console.log("预览跳转地址", goUrl);

@@ -153,7 +153,7 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
           if (preRt.ok) {
-            const goUrl = location.origin?.includes('rd.q7link.com') ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`
+            const goUrl =preViewEnv.dataEnv === "cn-northwest-0" ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`
               : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
 
@@ -213,7 +213,7 @@ const Announce: React.FC<any> = (props: any) => {
           if (result.ok) {
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
 
-            const goUrl = location.origin?.includes('rd.q7link.com') ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`
+            const goUrl = preViewEnv.dataEnv === "cn-northwest-0" ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`
               : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
 
             window.open(goUrl);

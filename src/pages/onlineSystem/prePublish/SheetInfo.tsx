@@ -251,6 +251,7 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const onSaveBeforeCheck = (isAuto = false) => {
+
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
@@ -371,12 +372,16 @@ const SheetInfo = (props: any, ref: any) => {
       agFinished = true;
       setFinished(true);
       await PreReleaseServices.automation(params);
+      // 获取集群
+      const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
+      const clusters = (release_app?.[0]?.cluster).split(",")
       // 关联公告并勾选挂起公告
       if (!isEmpty(announce) && announce !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),
-          announcement_time: 'after',
+          // announcement_time: 'after',
+          cluster_ids: clusters,
         });
       }
       setSuccessModal(false);
@@ -475,6 +480,7 @@ const SheetInfo = (props: any, ref: any) => {
           style={{width: '100%'}}
           disabled={agFinished}
           allowClear={['batch', 'database_version'].includes(field)}
+          dropdownMatchSelectWidth={false}
           options={
             field == 'database_version'
               ? databaseVersion
@@ -709,7 +715,7 @@ const SheetInfo = (props: any, ref: any) => {
                 },
               ]
             }
-            {...initGridTable({ref: serverRef, height: 30})}
+            {...initGridTable({ref: serverRef, height: 30, otherDefault: {wrapText: true, autoHeight: true}})}
             frameworkComponents={{
               select: renderSelect,
               ICluster: (p: any) => <ICluster data={p.value}/>,

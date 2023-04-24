@@ -89,6 +89,7 @@ function localCacheWrap(url: string, options: any) {
 function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg?: any) {
   return mRequest
     .then((res) => {
+
       if (res?.code !== 200) {
         if (warn) {
           if (warn === true) warn = '';

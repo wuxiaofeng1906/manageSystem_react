@@ -36,7 +36,6 @@ const objectArraySortByDesc = (prop: string) => {
       return 1;
     }
     return 0;
-
   };
 };
 
@@ -55,5 +54,8 @@ const objectArraySortByAsc = (prop: string) => {
 
   };
 };
+
+
+
 
 export {removeElement, addOrRemoveElement, objectArraySortByDesc, objectArraySortByAsc};

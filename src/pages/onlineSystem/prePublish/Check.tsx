@@ -570,7 +570,6 @@ const Check = (props: any, ref: any) => {
           //   if (!(hasEdit || row.disabled)) {
           //     return {
           //       onDoubleClick: () => {
-          //         debugger
           //         setDescShow({visible: true, data: row, param: {index, e: row.open}});
           //       }
           //     }

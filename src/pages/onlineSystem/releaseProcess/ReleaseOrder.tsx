@@ -393,12 +393,15 @@ const ReleaseOrder = () => {
       setFinished(true);
       await PreReleaseServices.automation(params);
 
+      const clusterArray = baseForm.getFieldValue('cluster');  // 获取集群
       // 关联公告并勾选挂起公告
       if (!isEmpty(announcement_num) && announcement_num !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),
-          announcement_time: 'after',
+          // announcement_time: 'after',
+          cluster_ids: clusterArray
+
         });
       }
       setVisible(false);

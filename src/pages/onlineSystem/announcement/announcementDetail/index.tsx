@@ -153,8 +153,10 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
           if (preRt.ok) {
-            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
-            console.log("预览跳转地址", goUrl);
+            const goUrl = location.origin?.includes('rd.q7link.com') ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`
+              : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
+            // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
+
             window.open(goUrl);
           } else {
             customMessage({type: "error", msg: "预览数据保存失败，无法预览！", position: "0vh"});
@@ -210,8 +212,10 @@ const Announce: React.FC<any> = (props: any) => {
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
-            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
-            console.log("预览跳转地址", goUrl);
+
+            const goUrl = location.origin?.includes('rd.q7link.com') ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`
+              : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
+
             window.open(goUrl);
           } else {
             customMessage({type: "error", msg: "预览数据保存失败，无法预览！", position: "0vh"});

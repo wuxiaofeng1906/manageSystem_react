@@ -1,4 +1,5 @@
 import {axiosPost_77Service, axiosGet_77Service} from '@/publicMethods/axios';
+import {noticeUrl} from "../../../../../../config/qqServiceEnv";
 
 export const getS3Key = async (fileName: string) => {
   const result = await axiosGet_77Service(`/identity/Attachment/signature/post`, {
@@ -35,7 +36,7 @@ export const uploadPicToS3 = async (s3Data: any, picFile: any) => {
   formdata.append("policy", data["policy"]);
 
   formdata.append("file", picFile.originFileObj);
-  const result = await axiosPost_77Service(`/postImage/cn-northwest-1-q7link-test`, formdata);
+  const result = await axiosPost_77Service(noticeUrl(location.origin).imageUpload, formdata);
   return {result};
 
 };

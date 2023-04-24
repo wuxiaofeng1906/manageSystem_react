@@ -3,11 +3,11 @@ import dayjs from 'dayjs';
 import {isEmpty} from "lodash";
 import {queryAnnounceDetail} from "@/pages/onlineSystem/announcement/announcementDetail/axiosRequest/gqlPage";
 import {dealPopDataFromService} from "../dataAnalysis/index";
-import {Notice_Env, Notice_Env_Test} from "../../../../../../config/qqServiceEnv";
+import {noticeUrl} from "../../../../../../config/qqServiceEnv";
 
 // 修改的api
 const updateApi = async (data: any) => {
-  const result = await axiosPut('/api/77hub/notice', data, {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test});
+  const result = await axiosPut('/api/77hub/notice', data, {envName: noticeUrl(location.origin).noticeEnv});
   return result;
 }
 
@@ -215,7 +215,7 @@ const updateAnnounceContentForAdd = async (formData: any, popupData: object = {}
   }
 
   const relData = {...data, ...specialData};
-  return axiosPost('/api/77hub/notice', relData, {envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test});
+  return axiosPost('/api/77hub/notice', relData, {envName: noticeUrl(location.origin).noticeEnv});
   // return {ok: false, message: "ssssss"}
 };
 

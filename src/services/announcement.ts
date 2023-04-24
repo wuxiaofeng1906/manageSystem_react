@@ -1,5 +1,5 @@
 import request from './request';
-import {Notice_Env, Notice_Env_Test} from "../../config/qqServiceEnv";
+import {noticeUrl} from "../../config/qqServiceEnv";
 
 const baseUrl = '/api/verify';
 // 发布过程
@@ -13,7 +13,7 @@ const AnnouncementServices = {
     return request(`${baseUrl}/release/announcement_name`, {
       params: {
         size: 50,
-        envName: location.origin?.includes('rd.q7link.com') ? Notice_Env : Notice_Env_Test
+        envName: noticeUrl(location.origin).noticeEnv
       }
     });
   },

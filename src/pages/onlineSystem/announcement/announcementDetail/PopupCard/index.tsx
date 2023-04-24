@@ -19,10 +19,10 @@ import {customMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-import {defaultImgsUrl, picType, getImageToBackend, getImageForFront} from "../uploadPic/index";
+import {getDefaultImg, picType, getImageToBackend, getImageForFront} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
-import {Notice_ImageView} from "../../../../../../config/qqServiceEnv";
+import {noticeUrl} from "../../../../../../config/qqServiceEnv";
 import {preEnv} from "@/pages/onlineSystem/announcement/constant";
 
 // 当前的tab页面
@@ -561,7 +561,7 @@ const PopupCard: React.FC<any> = (props: any) => {
             <Form.Item label={"上传图片"} name={"uploadPic"} required>
               {picModalState.checkedImg ?
                 <img key={picModalState.checkedImg} data-value={picModalState.checkedImg}
-                     src={`${Notice_ImageView}${picModalState.checkedImg}`}
+                     src={`${noticeUrl(location.origin).imageUpload}${picModalState.checkedImg}`}
                      alt="默认图" style={{height: 100, width: 150}}
                      onClick={() => {
                        setFileList([]);
@@ -702,11 +702,11 @@ const PopupCard: React.FC<any> = (props: any) => {
                   setPicModalState({...picModalState, checkedImg: e.target.dataset.value});
                 }
               }}>
-                {defaultImgsUrl.map(item => (
+                {getDefaultImg().map(item => (
                   <li key={item} data-value={item}
                       className={picModalState.checkedImg === item ? style.activeChose : ''}>
                     <img key={item} data-value={item}
-                         src={`${Notice_ImageView}${item}`}
+                         src={`${noticeUrl(location.origin).imageUpload}${item}`}
                       // src={require('../../../../../../public/77Logo.png')}
                          alt="默认图"/>
 

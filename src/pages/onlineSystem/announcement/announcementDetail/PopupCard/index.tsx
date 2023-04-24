@@ -19,7 +19,7 @@ import {customMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-import {defaultImgsUrl, picType, getImageToBackend, getImageForFront} from "../uploadPic/index";
+import {getDefaultImg, picType, getImageToBackend, getImageForFront} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
 import {noticeUrl} from "../../../../../../config/qqServiceEnv";
@@ -702,7 +702,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                   setPicModalState({...picModalState, checkedImg: e.target.dataset.value});
                 }
               }}>
-                {defaultImgsUrl.map(item => (
+                {getDefaultImg().map(item => (
                   <li key={item} data-value={item}
                       className={picModalState.checkedImg === item ? style.activeChose : ''}>
                     <img key={item} data-value={item}

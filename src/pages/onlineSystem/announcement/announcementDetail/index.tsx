@@ -116,13 +116,17 @@ const Announce: React.FC<any> = (props: any) => {
       content: '确定发布这条公告吗？',
       centered: true,
       onOk: async () => {
-        const releaseResult = await oneKeyToRelease(releaseID);
-        if (releaseResult.ok) {
-          customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
+        // 发布前还需要保存
+        if (await saveMsgInfo(false)) {
+          const releaseResult = await oneKeyToRelease(releaseID);
+          if (releaseResult.ok) {
+            customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
 
-        } else {
-          customMessage({type: "error", msg: "公告发布失败", position: "0vh"})
+          } else {
+            customMessage({type: "error", msg: "公告发布失败", position: "0vh"})
+          }
         }
+
       }
     });
   };
@@ -153,7 +157,7 @@ const Announce: React.FC<any> = (props: any) => {
           // 如果是明细数据，且没有被改变过
           const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
           if (preRt.ok) {
-            const goUrl =preViewEnv.dataEnv === "cn-northwest-0" ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`
+            const goUrl = preViewEnv.dataEnv === "cn-northwest-0" ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`
               : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
 
@@ -166,11 +170,13 @@ const Announce: React.FC<any> = (props: any) => {
           customMessage({type: "success", msg: "保存成功！", position: "0vh"});
           history.push('./announceList');
         }
-        return;
+        return true;
       }
 
       customMessage({type: "error", msg: `数据保存失败:${result.message}`, position: "0vh"});
+      return false;
     }
+    return false;
   };
 
   // 预览

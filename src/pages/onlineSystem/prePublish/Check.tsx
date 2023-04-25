@@ -168,6 +168,7 @@ const Check = (props: any, ref: any) => {
           // ),
         ),
       ).finally(async () => {
+        debugger
         // 存在值班人员为空
         const refresh = isEmpty(orignDuty) && count < 2;
         const checkItem = await OnlineSystemServices.getCheckInfo({release_num});
@@ -195,7 +196,10 @@ const Check = (props: any, ref: any) => {
               }
             }
           }
-
+          if (!currentKey || currentKey.length === 0) {
+            return {}
+          }
+          debugger
           return {
             ...it,
             disabled: false,
@@ -203,14 +207,15 @@ const Check = (props: any, ref: any) => {
             start: flag ? (status == '' ? status : '-') : currentKey?.[it.start] || '',
             end: flag ? (status == '' ? status : '-') : currentKey?.[it.end] || '',
             open: flag ? status !== 'skip' : currentKey?.[it.status] !== 'skip',
-            open_pm: currentKey?.[it.open_pm] || '',
-            open_time: currentKey?.[it.open_time] || '',
-            log: currentKey?.[it.log] || '',
+            open_pm: flag ? currentKey[0][it.open_pm] : currentKey?.[it.open_pm] || '',
+            open_time: flag ? currentKey[0][it.open_time] : currentKey?.[it.open_time] || '',
+            log: flag ? currentKey[0][it.log] : currentKey?.[it.log] || '',
             source: currentKey?.data_from || it.source,
             // contact: orignDuty?.[it.contact] || '',
-            check_person: currentKey?.[it.check_person] || '',
+            check_person: flag ? currentKey[0][it.check_person] : currentKey?.[it.check_person] || '',
             desc: flag ? currentKey[0][it.desc] : currentKey?.[it.desc] || '',
           };
+
         });
         if (refresh) {
           // 获取当前检查周日期 默认为当周

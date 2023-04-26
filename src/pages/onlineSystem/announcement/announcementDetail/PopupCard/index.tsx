@@ -639,7 +639,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                             removeSeond(secondField.name);
                                           }}/>
 
-                                        <ArrowDownOutlined style={styleDelete}
+                                        <ArrowDownOutlined style={{...styleDelete, color: "gray"}}
                                                            onClick={() => {
                                                              moveSecond(second_index, second_index + 1)
                                                            }}/>

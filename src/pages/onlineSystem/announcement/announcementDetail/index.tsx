@@ -267,7 +267,7 @@ const Announce: React.FC<any> = (props: any) => {
   // 设置默认表单
   const setEmptyForm = () => {
     announcementForm.setFieldsValue({
-      announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级。更新功能：`,
+      announce_content: `亲爱的用户：您好，企企经营管理平台已于${releaseTime}更新升级`,
       modules: "1",
       announce_carousel: 1, // 默认为是
       carouselNum: 5
@@ -381,7 +381,7 @@ const Announce: React.FC<any> = (props: any) => {
   };
   // 监听删除键是否用于删除公告详情中的数据
   document.onkeydown = function (event: KeyboardEvent) {
-    if (event?.code === "Backspace" && event.target?.value.endsWith("更新升级。更新功能：")) {
+    if (event?.code === "Backspace" && event.target?.value.endsWith("更新升级")) {
       return false;
     }
     return true;
@@ -439,24 +439,16 @@ const Announce: React.FC<any> = (props: any) => {
                           onChange={(e, time) => {
                             // 先获取原始数据，再改变数据
                             let source = announcementForm.getFieldValue("announce_content");
-                            const updateFunc = source.split("更新功能：");
+                            const updateFunc = source.split("更新升级");
                             // 用原来的时间替换选中的时间
                             announcementForm.setFieldsValue({
-                              announce_content: `亲爱的用户：您好，企企经营管理平台已于${time}更新升级。更新功能：${updateFunc[1]}`
+                              announce_content: `亲爱的用户：您好，企企经营管理平台已于${time}更新升级${updateFunc[1]}`
                             });
                             setReleaseTime(time);
                           }}/>
             </Form.Item>
 
             <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-              {/*<div id={"announceContent"} contentEditable={"true"}*/}
-              {/*     style={{minWidth: 300, width: "50%", border: "solid 1px #F0F0F0", minHeight: 60, textIndent: "2em"}}>*/}
-              {/*  <label*/}
-              {/*    contentEditable={"false"}*/}
-              {/*    style={{color: "gray"}}>亲爱的用户：您好，企企经营管理平台已于 {releaseTime} 更新升级。更新功能：*/}
-              {/*  </label>*/}
-              {/*</div>*/}
-
               <TextArea rows={3} style={{minWidth: 300, width: "50%"}}/>
             </Form.Item>
 

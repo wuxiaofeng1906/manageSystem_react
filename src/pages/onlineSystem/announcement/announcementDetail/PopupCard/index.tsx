@@ -174,12 +174,16 @@ const PopupCard: React.FC<any> = (props: any) => {
       content: '确定发布这条公告吗？',
       centered: true,
       onOk: async () => {
-        const releaseResult = await oneKeyToRelease(releaseID);
-        if (releaseResult.ok) {
-          customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
-        } else {
-          customMessage({type: "error", msg: releaseResult.message, position: "0vh"});
+        const formData = dtForm.getFieldsValue();
+        if (await onFinish(formData)) {
+          const releaseResult = await oneKeyToRelease(releaseID);
+          if (releaseResult.ok) {
+            customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
+          } else {
+            customMessage({type: "error", msg: releaseResult.message, position: "0vh"});
+          }
         }
+
       }
     });
   };
@@ -251,10 +255,10 @@ const PopupCard: React.FC<any> = (props: any) => {
         history.push('./announceList');
       }
       setTabOrder([]);
-      return;
+      return true;
     }
     customMessage({type: "error", msg: `数据保存失败:${result.message}`, position: "0vh"});
-
+    return false;
   };
 
   // 保存数据
@@ -281,7 +285,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           content: `第${notFinishedPage.join(",")}页轮播页没有填写，确认要保存吗？`,
           centered: true,
           onOk() {
-            saveTabPages(finalData, preView, preViewEnv);
+            return saveTabPages(finalData, preView, preViewEnv);
           },
           onCancel() {
             return;
@@ -289,10 +293,11 @@ const PopupCard: React.FC<any> = (props: any) => {
         });
       } else {
         // 填写完了则直接保存。
-        saveTabPages(finalData, preView, preViewEnv);
+        return saveTabPages(finalData, preView, preViewEnv);
       }
 
     }
+    return false;
   };
 
   // 预览

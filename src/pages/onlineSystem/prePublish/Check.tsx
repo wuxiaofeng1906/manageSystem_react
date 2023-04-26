@@ -168,7 +168,6 @@ const Check = (props: any, ref: any) => {
           // ),
         ),
       ).finally(async () => {
-        debugger
         // 存在值班人员为空
         const refresh = isEmpty(orignDuty) && count < 2;
         const checkItem = await OnlineSystemServices.getCheckInfo({release_num});
@@ -199,7 +198,7 @@ const Check = (props: any, ref: any) => {
           if (!currentKey || currentKey.length === 0) {
             return {}
           }
-          debugger
+
           return {
             ...it,
             disabled: false,

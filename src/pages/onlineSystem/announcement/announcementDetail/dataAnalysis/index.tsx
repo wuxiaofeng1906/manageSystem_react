@@ -39,7 +39,7 @@ export const vertifyFieldForCommon = (formInfo: any) => {
     return false;
   }
 
-  if (formInfo.announce_content && isEmpty(((formInfo.announce_content).split("更新功能：")[1]).trim())) {
+  if (formInfo.announce_content && isEmpty(((formInfo.announce_content).split("更新升级")[1]).trim())) {
     customMessage({type: "error", msg: "请完善公告详情！", position: "0vh"});
     // errorMessage("请完善公告详情！");
     return false;

@@ -575,6 +575,11 @@ const PopupCard: React.FC<any> = (props: any) => {
                           >
                             <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}></Input>
                           </Form.Item>
+                          {/* 添加一级特性 */}
+                          <Button style={{marginLeft: 5, border: 'none', color: '#1890FF'}}
+                                  icon={<PlusCircleOutlined/>}
+                                  onClick={() => addFirst()}  // 直接写add函数会导致获取的参数多余
+                          />
 
                           {/* 删除 */}
                           <Button
@@ -627,14 +632,14 @@ const PopupCard: React.FC<any> = (props: any) => {
                         </Form.List>
                       </div>
                     ))}
-                    {/* 点击一级特性 */}
-                    <Form.Item>
-                      <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
-                              icon={<PlusCircleOutlined/>}
-                              onClick={() => addFirst()}  // 直接写add函数会导致获取的参数多余
-                      > 添加一级特性 </Button>
+                    {/*/!* 点击一级特性 *!/*/}
+                    {/*<Form.Item>*/}
+                    {/*  <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}*/}
+                    {/*          icon={<PlusCircleOutlined/>}*/}
+                    {/*          onClick={() => addFirst()}  // 直接写add函数会导致获取的参数多余*/}
+                    {/*  > 添加一级特性 </Button>*/}
 
-                    </Form.Item>
+                    {/*</Form.Item>*/}
                   </div>
                 );
               }}

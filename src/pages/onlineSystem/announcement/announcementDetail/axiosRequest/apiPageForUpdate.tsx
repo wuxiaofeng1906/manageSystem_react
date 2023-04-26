@@ -664,23 +664,26 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
     let modifyPopData = [];
     // 轮播的时候轮播页数才>0
     if (newCommonData.announce_carousel === 1) {
-      let finalCarouselNum = newCommonData.carouselNum;
+      modifyPopData = [...newPopData]; // 正常情况，页数没有减少,或者页数减少后有效的部分数据。
+
       // 判断减少了页数还是增加了页数(最终页数取最多的)
-      if (oldCommonData.carouselNum > newCommonData.carouselNum) {
-        //   减少了页数
-        finalCarouselNum = oldCommonData.carouselNum
-      }
-      for (let i = 0; i < finalCarouselNum; i++) {
-        const pageDt = newPopData[i]?.tabsContent;
-        if (i > newCommonData.carouselNum - 1 && pageDt?.id) {
-          // 需要删除的page
-          page.push({
-            id: pageDt.id,
-            editFlag: "delete",
-          });
-        } else if (newPopData[i]) {
-          modifyPopData.push(newPopData[i]);
-        }
+      if (newCommonData.carouselNum < oldCommonData.carouselNum) {
+
+        // 这里只寻找删除的数据添加进去就好
+        // 拿取需要删除的数据:删除新数据中有效的页数
+        const forDeteleData = [...oldPopData];
+        forDeteleData.splice(0, newCommonData.carouselNum); // splice方法改变数组本身
+
+        forDeteleData.forEach((v: any) => {
+          const pageDt = v.tabsContent;
+          if (pageDt?.id) { // 当前页数>新的轮播页数，则是要删除的
+            // 需要删除的page
+            page.push({
+              id: pageDt.id,
+              editFlag: "delete",
+            });
+          }
+        });
       }
     } else {
       const tabsData = {...newPopData[0].tabsContent};
@@ -697,6 +700,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
       page = page.concat(specialItem);
     }
   }
+
   return {
     id: oldCommonData.id,
     pageSize: newCommonData.carouselNum,
@@ -735,6 +739,7 @@ export const updateAnnouncement = async (releaseID: string, newCommonData: any, 
       const secondLevelState = secondSpecialIsUpdate(newCommonData, newPopData, oldPopData); // 二级特性是否增加或者删除
       //  轮播页数，一级特性和二级特性被修改过
       if (carouseNumState || firstLevelState || secondLevelState || specialNameState) {
+
         relData = otherInfoUpdate(newCommonData, newPopData, oldCommonData, oldPopData);
       } else {
         // 如果都没有被增加或者删除，则调用常规修改接口

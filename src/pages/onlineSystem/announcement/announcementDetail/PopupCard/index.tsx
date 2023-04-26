@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select
+  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select, Popover
 } from 'antd';
 import {history} from "@@/core/history";
 import style from '../style.less';
@@ -498,7 +498,10 @@ const PopupCard: React.FC<any> = (props: any) => {
     // localStorage.removeItem("second_noticeHeader");
 
   };
-
+  // 新增二级特性
+  let secondMethodAdd: Function;
+  const styleAdd = {marginTop: 8, marginLeft: 8, color: '#1890FF', fontSize: 16, height: 16};
+  const styleDelete = {marginTop: 8, color: "red", marginLeft: 15, fontSize: 16, height: 16};
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -576,21 +579,31 @@ const PopupCard: React.FC<any> = (props: any) => {
                             <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}></Input>
                           </Form.Item>
                           {/* 添加一级特性 */}
-                          <Button style={{marginLeft: 5, border: 'none', color: '#1890FF'}}
-                                  icon={<PlusCircleOutlined/>}
-                                  onClick={() => addFirst("", first_index + 1)}  // 直接写add函数会导致获取的参数多余
-                          />
+                          <Popover title="选择添加特性"
+                                   content={
+                                     <div>
+                                       <div>
+                                         <Button type="link" onClick={() => addFirst("", first_index + 1)}>添加一级特性
+                                         </Button>
+                                       </div>
+                                       <div>
+                                         <Button type="link" onClick={() => secondMethodAdd("", first_index + 1)}>添加二级特性
+                                         </Button>
+                                       </div>
+                                     </div>
+                                   }>
+                            <PlusCircleOutlined style={styleAdd}/>
+                          </Popover>
 
                           {/* 删除 */}
-                          <Button
-                            style={{border: 'none', color: "red", marginLeft: 5}}
-                            icon={<MinusCircleOutlined/>}
-                            onClick={() => removeFirst(field.name)}
-                          />
+                          <MinusCircleOutlined style={styleDelete} onClick={() => removeFirst(field.name)}/>
+
+
                         </Row>
                         {/* 二级特性 */}
                         <Form.List name={[field.name, 'seconds']} initialValue={[Object.create(null)]}>
                           {(secondFields, {add: addSecond, remove: removeSeond}) => {
+                            secondMethodAdd = addSecond;
                             return (
                               <>
                                 {secondFields.map((secondField, second_index) => (
@@ -605,15 +618,13 @@ const PopupCard: React.FC<any> = (props: any) => {
                                         <Input style={{minWidth: 400}}></Input>
                                       </Form.Item>
 
-                                      {/* 删除 */}
-                                      <Button
-                                        style={{border: 'none', color: "#1890FF", marginLeft: 5}}
-                                        icon={<PlusCircleOutlined/>}
-                                        onClick={() => addSecond("", second_index + 1)}
-                                      />
-                                      <Button
-                                        style={{border: 'none', color: "red", marginLeft: 5}}
-                                        icon={<MinusCircleOutlined/>}
+                                      {/* 添加二级特性 */}
+                                      <PlusCircleOutlined
+                                        style={styleAdd} onClick={() => addSecond("", second_index + 1)}/>
+
+                                      {/* 删除二级特性 */}
+                                      <MinusCircleOutlined
+                                        style={styleDelete}
                                         onClick={() => {
                                           // 仅有一个二级属性时不能删
                                           if (!secondFields || secondFields.length <= 1) {
@@ -621,8 +632,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                             return;
                                           }
                                           removeSeond(secondField.name);
-                                        }}
-                                      />
+                                        }}/>
                                     </Row>
                                   </div>
                                 ))}

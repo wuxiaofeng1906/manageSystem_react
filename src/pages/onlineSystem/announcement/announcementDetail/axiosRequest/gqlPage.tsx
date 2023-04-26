@@ -28,6 +28,7 @@ export const queryAnnounceDetail = async (id: string) => {
         parentId
         id
         speciality
+        specialityOrdinal
       }
     }
     }

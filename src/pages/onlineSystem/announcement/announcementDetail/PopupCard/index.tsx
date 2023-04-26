@@ -6,7 +6,7 @@ import {
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {
-  PlusCircleOutlined, UploadOutlined, MinusCircleOutlined,
+  PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, ArrowDownOutlined,
   PlusOutlined, ExclamationCircleFilled
 } from '@ant-design/icons';
 import {getYuQueContent, oneKeyToRelease, preViewNotice, saveAnnounceContent} from '../axiosRequest/apiPage';
@@ -585,7 +585,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                 </Button>
                               </div>
                               <div>
-                                <Button type="link" onClick={() => secondMethodAdd("", first_index + 1)}>添加二级特性
+                                <Button type="link" onClick={() => secondMethodAdd("", first_index)}>添加二级特性
                                 </Button>
                               </div>
                             </div>
@@ -605,40 +605,50 @@ const PopupCard: React.FC<any> = (props: any) => {
                         </Row>
                         {/* 二级特性 */}
                         <Form.List name={[field.name, 'seconds']} initialValue={[Object.create(null)]}>
-                          {(secondFields, {add: addSecond, remove: removeSeond}) => {
-                            secondMethodAdd = addSecond;
+                          {(secondFields, {add: addSecond, remove: removeSeond, move: moveSecond}) => {
+
                             return (
                               <>
-                                {secondFields.map((secondField, second_index) => (
-                                  <div key={secondField.key}>
-                                    {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
-                                    <Row>
-                                      <Form.Item
-                                        {...secondField}
-                                        label={`二级特性${second_index + 1}`}
-                                        name={[secondField.name, 'first']}
-                                      >
-                                        <Input style={{minWidth: 400}}></Input>
-                                      </Form.Item>
+                                {secondFields.map((secondField, second_index) => {
+                                  secondMethodAdd = addSecond;
+                                  return (
+                                    <div key={secondField.key}>
+                                      {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
+                                      <Row>
+                                        <Form.Item
+                                          {...secondField}
+                                          label={`二级特性${second_index + 1}`}
+                                          name={[secondField.name, 'first']}
+                                        >
+                                          <Input style={{minWidth: 400}}></Input>
+                                        </Form.Item>
 
-                                      {/* 添加二级特性 */}
-                                      <PlusCircleOutlined
-                                        style={styleAdd} onClick={() => addSecond("", second_index + 1)}/>
+                                        {/* 添加二级特性 */}
+                                        <PlusCircleOutlined
+                                          style={styleAdd} onClick={() => addSecond("", second_index + 1)}/>
 
-                                      {/* 删除二级特性 */}
-                                      <MinusCircleOutlined
-                                        style={styleDelete}
-                                        onClick={() => {
-                                          // 仅有一个二级属性时不能删
-                                          if (!secondFields || secondFields.length <= 1) {
-                                            customMessage({type: "error", msg: "只有一个二级特性时不能删除！", position: "0vh"});
-                                            return;
-                                          }
-                                          removeSeond(secondField.name);
-                                        }}/>
-                                    </Row>
-                                  </div>
-                                ))}
+                                        {/* 删除二级特性 */}
+                                        <MinusCircleOutlined
+                                          style={styleDelete}
+                                          onClick={() => {
+                                            // 仅有一个二级属性时不能删
+                                            if (!secondFields || secondFields.length <= 1) {
+                                              customMessage({type: "error", msg: "只有一个二级特性时不能删除！", position: "0vh"});
+                                              return;
+                                            }
+                                            removeSeond(secondField.name);
+                                          }}/>
+
+                                        <ArrowDownOutlined style={styleDelete}
+                                                           onClick={() => {
+                                                             moveSecond(second_index, second_index + 1)
+                                                           }}/>
+
+
+                                      </Row>
+                                    </div>
+                                  )
+                                })}
                               </>
                             );
                           }}

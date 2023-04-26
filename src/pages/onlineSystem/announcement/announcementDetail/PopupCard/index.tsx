@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select, Popover
+  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select, Popover, Popconfirm
 } from 'antd';
 import {history} from "@@/core/history";
 import style from '../style.less';
@@ -574,29 +574,32 @@ const PopupCard: React.FC<any> = (props: any) => {
                             {...field}
                             label={"一级特性"}
                             name={[field.name, 'first']}
-                            rules={[{required: true, message: '请输入一级特性'}]}
-                          >
+                            rules={[{required: true, message: '请输入一级特性'}]}>
                             <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}></Input>
                           </Form.Item>
                           {/* 添加一级特性 */}
-                          <Popover title="选择添加特性"
-                                   content={
-                                     <div>
-                                       <div>
-                                         <Button type="link" onClick={() => addFirst("", first_index + 1)}>添加一级特性
-                                         </Button>
-                                       </div>
-                                       <div>
-                                         <Button type="link" onClick={() => secondMethodAdd("", first_index + 1)}>添加二级特性
-                                         </Button>
-                                       </div>
-                                     </div>
-                                   }>
+                          <Popover content={
+                            <div>
+                              <div>
+                                <Button type="link" onClick={() => addFirst("", first_index + 1)}>添加一级特性
+                                </Button>
+                              </div>
+                              <div>
+                                <Button type="link" onClick={() => secondMethodAdd("", first_index + 1)}>添加二级特性
+                                </Button>
+                              </div>
+                            </div>
+                          }>
                             <PlusCircleOutlined style={styleAdd}/>
                           </Popover>
 
                           {/* 删除 */}
-                          <MinusCircleOutlined style={styleDelete} onClick={() => removeFirst(field.name)}/>
+                          <Popconfirm
+                            title="确定删除该特性？"
+                            onConfirm={() => removeFirst(field.name)}
+                          >
+                            <MinusCircleOutlined style={styleDelete}/>
+                          </Popconfirm>
 
 
                         </Row>

@@ -564,7 +564,7 @@ const PopupCard: React.FC<any> = (props: any) => {
               {(fields, {add: addFirst, remove: removeFirst}) => {
                 return (
                   <div>
-                    {fields.map((field, index) => (
+                    {fields.map((field, first_index) => (
                       <div key={field.key}>
                         <Row>
                           <Form.Item
@@ -578,7 +578,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                           {/* 添加一级特性 */}
                           <Button style={{marginLeft: 5, border: 'none', color: '#1890FF'}}
                                   icon={<PlusCircleOutlined/>}
-                                  onClick={() => addFirst()}  // 直接写add函数会导致获取的参数多余
+                                  onClick={() => addFirst("", first_index + 1)}  // 直接写add函数会导致获取的参数多余
                           />
 
                           {/* 删除 */}
@@ -593,13 +593,13 @@ const PopupCard: React.FC<any> = (props: any) => {
                           {(secondFields, {add: addSecond, remove: removeSeond}) => {
                             return (
                               <>
-                                {secondFields.map((secondField, index) => (
+                                {secondFields.map((secondField, second_index) => (
                                   <div key={secondField.key}>
                                     {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
                                     <Row>
                                       <Form.Item
                                         {...secondField}
-                                        label={`二级特性${index + 1}`}
+                                        label={`二级特性${second_index + 1}`}
                                         name={[secondField.name, 'first']}
                                       >
                                         <Input style={{minWidth: 400}}></Input>
@@ -609,7 +609,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                       <Button
                                         style={{border: 'none', color: "#1890FF", marginLeft: 5}}
                                         icon={<PlusCircleOutlined/>}
-                                        onClick={() => addSecond()}
+                                        onClick={() => addSecond("", second_index + 1)}
                                       />
                                       <Button
                                         style={{border: 'none', color: "red", marginLeft: 5}}

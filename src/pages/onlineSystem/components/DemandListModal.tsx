@@ -160,9 +160,11 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           ? dayjs().startOf('d').hour(22)
           : dayjs().startOf('d')
     ).format('YYYY-MM-DD HH:mm:ss');
+    let name = `${release_num}${getReleaseName(values.cluster)}`;
     // 如果是修改的情况，则发布时间为获取的数据中的时间，创建的时候才为初始时间
     if (!isEmpty(props.data)) {
       time = props.data?.plan_release_time;
+      name = props.data?.release_name;
     }
 
     const data = {
@@ -179,7 +181,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         apps: o.apps,
       })),
       release_num: release_num ?? '',
-      release_name: `${release_num}${getReleaseName(values.cluster)}`,
+      release_name: name,
       plan_release_time: time,
     };
 

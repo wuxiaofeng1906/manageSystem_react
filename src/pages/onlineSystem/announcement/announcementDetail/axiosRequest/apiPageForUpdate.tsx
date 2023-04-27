@@ -92,8 +92,9 @@ const carouselDataForUpdate = (popupData: any) => {
   if (!popupData || popupData.length === 0) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
-  let start_order = 1;
+
   popupData.map((v: any) => {
+    let start_order = 1;
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
@@ -195,8 +196,9 @@ const carouselDataForAdd = (popupData: any) => {
   if (!popupData || popupData.length === 0) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
-  let start_order = 1;
+
   popupData.map((v: any) => {
+    let start_order = 1;
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
@@ -488,8 +490,9 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
 // 一级特性修改
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
   const pages: any = [];
-  let currentOrder = 1;
+
   modifyPopData.forEach((v1: any) => {
+    let currentOrder = 1;
     const v1_ptyGroup = v1?.tabsContent?.ptyGroup;
     // 用于记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id，不存在的id应该删除
     const newIds: any = [];
@@ -632,14 +635,13 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
 
 // 新增轮播页
 const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any) => {
-  // 旧数据全部被清空了，新数据的序号重新来过。
-  //
-  let currentOrder = 1;
+
   // 新增轮播页
   let page: any = [];
   //  拿最后新增的
   for (let i = 0; i < newPopData.length; i++) {
-
+    // 旧数据全部被清空了，新数据的序号重新来过。
+    let currentOrder = 1;
     const pageDt = newPopData[i].tabsContent; // page页的数据
     const pageContent: any = [];
     if (pageDt.ptyGroup) {

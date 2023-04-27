@@ -498,8 +498,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     // localStorage.removeItem("second_noticeHeader");
 
   };
-  // 新增二级特性
-  let secondMethodAdd: Function;
+
   const styleAdd = {marginTop: 8, marginLeft: 8, color: '#1890FF', fontSize: 16, height: 16};
   const styleDelete = {marginTop: 8, color: "red", marginLeft: 15, fontSize: 16, height: 16};
   return (
@@ -577,42 +576,49 @@ const PopupCard: React.FC<any> = (props: any) => {
                             rules={[{required: true, message: '请输入一级特性'}]}>
                             <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}></Input>
                           </Form.Item>
-                          {/* 添加一级特性 */}
-                          <Popover content={
-                            <div>
-                              <div>
-                                <Button type="link" onClick={() => addFirst("", first_index + 1)}>添加一级特性
-                                </Button>
-                              </div>
-                              <div>
-                                <Button type="link" onClick={() => secondMethodAdd("", first_index)}>添加二级特性
-                                </Button>
-                              </div>
-                            </div>
-                          }>
-                            <PlusCircleOutlined style={styleAdd}/>
-                          </Popover>
-
                           {/* 删除 */}
                           <Popconfirm
                             title="确定删除该特性？"
                             onConfirm={() => removeFirst(field.name)}
                           >
-                            <MinusCircleOutlined style={styleDelete}/>
+                            <MinusCircleOutlined style={{...styleDelete, marginLeft: 38}}/>
                           </Popconfirm>
 
 
                         </Row>
                         {/* 二级特性 */}
                         <Form.List name={[field.name, 'seconds']} initialValue={[Object.create(null)]}>
-                          {(secondFields, {add: addSecond, remove: removeSeond, move: moveSecond}) => {
+                          {(secondFields, {add: addSecond, remove: removeSeond}) => {
 
                             return (
                               <>
                                 {secondFields.map((secondField, second_index) => {
-                                  secondMethodAdd = addSecond;
+
                                   return (
                                     <div key={secondField.key}>
+                                      <Row style={{backgroundColor: "red"}}>
+                                        {/* 添加一级特性 */}
+                                        <Popover content={
+                                          <div>
+                                            <div>
+                                              <Button type="link" onClick={() => addFirst("", first_index + 1)}>添加一级特性
+                                              </Button>
+                                            </div>
+                                            <div>
+                                              <Button type="link" onClick={() => addSecond("", 0)}>添加二级特性
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        }>
+                                          <PlusCircleOutlined
+                                            style={{
+                                              ...styleAdd,
+                                              marginTop: -48,
+                                              display: second_index === 0 ? "inline" : "none",
+                                              marginLeft: 558
+                                            }}/>
+                                        </Popover>
+                                      </Row>
                                       {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
                                       <Row>
                                         <Form.Item
@@ -638,13 +644,6 @@ const PopupCard: React.FC<any> = (props: any) => {
                                             }
                                             removeSeond(secondField.name);
                                           }}/>
-
-                                        <ArrowDownOutlined style={{...styleDelete, color: "gray"}}
-                                                           onClick={() => {
-                                                             moveSecond(second_index, second_index + 1)
-                                                           }}/>
-
-
                                       </Row>
                                     </div>
                                   )
@@ -655,7 +654,8 @@ const PopupCard: React.FC<any> = (props: any) => {
                         </Form.List>
                       </div>
                     ))}
-                    {/* 点击一级特性 */}
+                    {/* 点击一级特性 */
+                    }
                     <Form.Item>
                       <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
                               icon={<PlusCircleOutlined/>}
@@ -664,7 +664,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
                     </Form.Item>
                   </div>
-                );
+                )
+                  ;
               }}
             </Form.List>
             <Divider/>

@@ -142,7 +142,7 @@ const carouselData = (popupData: any) => {
       });
       debugger
       //  这里也有一个循环，所以这里要+1
-      start_order = specilaListArray.finalOrder + 1 // 继续赋值接口传回来的数据
+      start_order = specilaListArray.finalOrder + 1; // 继续赋值接口传回来的数据
     }
   });
   debugger

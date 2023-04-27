@@ -462,9 +462,11 @@ const PopupCard: React.FC<any> = (props: any) => {
     } catch (e: any) {
       customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
     }
+
   }, []);
 
   useEffect(() => {
+    debugger
     try {
       // 按照轮播页数减少anPopData中的数据
       const head = {...commonData};
@@ -487,7 +489,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
 
 
-  }, [commonData, anPopData]);
+  }, []);
   // endregion
 
   window.onbeforeunload = function () {

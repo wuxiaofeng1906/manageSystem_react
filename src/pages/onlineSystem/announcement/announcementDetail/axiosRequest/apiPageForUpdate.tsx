@@ -41,19 +41,29 @@ const getOldNoticeDetails = async (releaseID: string) => {
 };
 
 // region 常规的修改
-const getSpecialListForUpdate = (ptyGroup: any) => {
+const getSpecialListForUpdate = (ptyGroup: any, startOrder: number) => {
+  let finalOrder = startOrder;
   const specialList: any = [];
   ptyGroup.map((v: any) => {
-    const childList: any = [];
-    (v.seconds).map((v2: any) => {
-      if (!isEmpty(v2.first)) childList.push({id: v2.id, speciality: v2.first});
-    })
-    specialList.push({
+    const special: any = {
       id: v.id,
       parentId: v.parentId,
       speciality: v.first,
-      children: childList
-    });
+      specialityOrdinal: finalOrder,
+      children: []
+    };
+
+    (v.seconds).map((v2: any) => {
+      if (v2 && !isEmpty(v2.first)) {
+        special.children.push({
+          id: v2.id,
+          speciality: v2.first,
+          specialityOrdinal: finalOrder,
+        });
+        finalOrder = finalOrder + 1;
+      }
+    })
+    specialList.push(special);
   });
   return specialList;
 };
@@ -70,7 +80,7 @@ const notCarouselDataForUpdate = (popupData: any, oldPopData: any = []) => {
         pageNum: 0, // 所属轮播页码
         layoutTypeId: picLayout,
         yuQue: yuQueUrl,
-        contents: getSpecialListForUpdate(ptyGroup)
+        contents: getSpecialListForUpdate(ptyGroup, 1)
       }
     ]
   }
@@ -82,18 +92,21 @@ const carouselDataForUpdate = (popupData: any) => {
   if (!popupData || popupData.length === 0) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
+  let start_order = 1;
   popupData.map((v: any) => {
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
+      const specilaListArray: any = getSpecialListForUpdate(tabsContent.ptyGroup, start_order);
       data.push({
         id: tabsContent.id,
         featureName: tabsContent.specialName,
         image: tabsContent.uploadPic,
         pageNum: v.tabPage,
         layoutTypeId: tabsContent.picLayout,
-        contents: getSpecialListForUpdate(tabsContent.ptyGroup)
+        contents: specilaListArray.specialList
       });
+      start_order = specilaListArray.finalOrder + 1;
     }
   });
   return {pages: data};
@@ -130,19 +143,31 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
 //  endregion
 
 //  region 修改时候调用的新增（比如修改模板类型，是否轮播）
-const getSpecialListForAdd = (ptyGroup: any) => {
-
+const getSpecialListForAdd = (ptyGroup: any, startOrder: number) => {
+  let finalOrder = startOrder;
   const specialList: any = [];
   ptyGroup.map((v: any) => {
-    const childList: any = [];
-    (v.seconds).map((v2: any) => {
-      if (!isEmpty(v2.first)) childList.push({id: v2.id, speciality: v2.first});
-    })
-    specialList.push({
+    const special: any = {
       id: v.id,
+      specialityOrdinal: finalOrder,
       speciality: v.first,
-      children: childList
-    });
+      children: []
+    };
+
+    (v.seconds).map((v2: any) => {
+
+      if (v2 && !isEmpty(v2.first)) {
+        special.children.push(
+          {
+            id: v2.id,
+            speciality: v2.first,
+            specialityOrdinal: finalOrder,
+          }
+        );
+      }
+      finalOrder = finalOrder + 1;
+    })
+    specialList.push(special);
   });
   return specialList;
 };
@@ -158,7 +183,7 @@ const notCarouselDataForAdd = (details: any) => {
         pageNum: 0, // 所属轮播页码
         layoutTypeId: popupData.picLayout,
         yuQue: popupData.yuQueUrl,
-        contents: getSpecialListForAdd(popupData?.ptyGroup)
+        contents: getSpecialListForAdd(popupData?.ptyGroup, 1)
       }
     ]
   }
@@ -170,17 +195,20 @@ const carouselDataForAdd = (popupData: any) => {
   if (!popupData || popupData.length === 0) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
+  let start_order = 1;
   popupData.map((v: any) => {
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
+      const specilaListArray: any = getSpecialListForAdd(tabsContent.ptyGroup, start_order);
       data.push({
         featureName: tabsContent.specialName,
         image: tabsContent.uploadPic,
         pageNum: v.tabPage,
         layoutTypeId: tabsContent.picLayout,
-        contents: getSpecialListForAdd(tabsContent.ptyGroup)
+        contents: specilaListArray.specialList
       });
+      start_order = specilaListArray.finalOrder + 1;
     }
   });
   return {pages: data};
@@ -596,35 +624,50 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
   return pages;
 };
 
+const getLastPrderNumber = (oldPopData: any) => {
+  debugger
+  let maxNumber = 1;
+  if (oldPopData && oldPopData.length > 0) {
+
+  }
+
+  return maxNumber;
+};
 // 新增轮播页
 const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any) => {
-
+  // 旧数据全部被清空了，新数据的序号重新来过。
+  //
+  let currentOrder = 1;
   // 新增轮播页
   let page: any = [];
   //  拿最后新增的
   for (let i = 0; i < newPopData.length; i++) {
 
-    const pageDt = newPopData[i].tabsContent;
-    const content: any = [];
+    const pageDt = newPopData[i].tabsContent; // page页的数据
+    const pageContent: any = [];
     if (pageDt.ptyGroup) {
       (pageDt.ptyGroup).map((v: any) => {
-
+        const firstSpecial: any = {
+          speciality: v.first,
+          editFlag: "add",
+          children: [],
+          specialityOrdinal: currentOrder
+        };
+        currentOrder = currentOrder + 1;
         // 二级特性
-        const secondLevel: any = [];
         const second = v.seconds;
         second.map((v2: any) => {
           if (v2.first) {
-            secondLevel.push({
+            firstSpecial.children.push({
+              specialityOrdinal: currentOrder,
               speciality: v2.first,
               editFlag: "add"
-            })
+            });
+            currentOrder = currentOrder + 1;
           }
         });
-        content.push({
-          speciality: v.first,
-          editFlag: "add",
-          children: secondLevel
-        });
+
+        pageContent.push(firstSpecial);
       });
       page.push({
         image: pageDt.uploadPic,
@@ -634,7 +677,7 @@ const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any)
         contents: [{
           speciality: pageDt.specialName,
           editFlag: "add",
-          children: content
+          children: pageContent
         }]
       })
     }
@@ -700,7 +743,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
       page = page.concat(specialItem);
     }
   }
-
+  debugger
   return {
     id: oldCommonData.id,
     pageSize: newCommonData.carouselNum,

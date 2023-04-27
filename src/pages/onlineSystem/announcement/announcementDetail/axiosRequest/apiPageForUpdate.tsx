@@ -145,6 +145,7 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
 
 //  region 修改时候调用的新增（比如修改模板类型，是否轮播）
 const getSpecialListForAdd = (ptyGroup: any, startOrder: number) => {
+  debugger
   let finalOrder = startOrder;
   const specialList: any = [];
   ptyGroup.map((v: any) => {
@@ -154,7 +155,7 @@ const getSpecialListForAdd = (ptyGroup: any, startOrder: number) => {
       speciality: v.first,
       children: []
     };
-
+    finalOrder = finalOrder + 1;
     (v.seconds).map((v2: any) => {
 
       if (v2 && !isEmpty(v2.first)) {
@@ -170,7 +171,7 @@ const getSpecialListForAdd = (ptyGroup: any, startOrder: number) => {
     })
     specialList.push(special);
   });
-  return specialList;
+  return {specialList, finalOrder};
 };
 
 // 不轮播时的数据
@@ -184,7 +185,7 @@ const notCarouselDataForAdd = (details: any) => {
         pageNum: 0, // 所属轮播页码
         layoutTypeId: popupData.picLayout,
         yuQue: popupData.yuQueUrl,
-        contents: getSpecialListForAdd(popupData?.ptyGroup, 1)
+        contents: getSpecialListForAdd(popupData?.ptyGroup, 1).specialList
       }
     ]
   }
@@ -203,6 +204,7 @@ const carouselDataForAdd = (popupData: any) => {
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
       const specilaListArray: any = getSpecialListForAdd(tabsContent.ptyGroup, start_order);
+      debugger
       data.push({
         featureName: tabsContent.specialName,
         image: tabsContent.uploadPic,

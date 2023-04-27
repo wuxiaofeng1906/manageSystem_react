@@ -433,6 +433,32 @@ const PopupCard: React.FC<any> = (props: any) => {
     });
   };
 
+  // useEffect(() => {
+  //   debugger
+  //   try {
+  //     // 按照轮播页数减少anPopData中的数据
+  //     const head = {...commonData};
+  //     if (head.announce_carousel === 1) {
+  //       if (head.clearTabContent) {
+  //         setEmptyForm();
+  //       } else if (anPopData && head.carouselNum < anPopData.length) {
+  //
+  //         const filtered: any = [];
+  //         anPopData.map((v: any, i: number) => {
+  //           if (i < head.carouselNum) {
+  //             filtered.push(v);
+  //           }
+  //         });
+  //         setAnnPopData(filtered);
+  //       }
+  //     }
+  //   } catch (e: any) {
+  //     customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
+  //   }
+  //
+  //   console.log(1111111111111)
+  // }, []);
+
   // 展示界面数据
   useEffect(() => {
     try {
@@ -448,27 +474,6 @@ const PopupCard: React.FC<any> = (props: any) => {
       setCommonData(newHead);
       // }
 
-      // 如果没有 type=add 的话，则新增
-      if (type === "add") {
-        showForAdd();
-
-      } else if (type === "detail") {
-
-        showForDetail(newHead);
-
-      } else {
-        setEmptyForm();
-      }
-    } catch (e: any) {
-      customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
-    }
-
-  }, []);
-
-  useEffect(() => {
-    debugger
-    try {
-      // 按照轮播页数减少anPopData中的数据
       const head = {...commonData};
       if (head.announce_carousel === 1) {
         if (head.clearTabContent) {
@@ -483,13 +488,29 @@ const PopupCard: React.FC<any> = (props: any) => {
           });
           setAnnPopData(filtered);
         }
+
+        return;
+      }
+
+
+      // 如果没有 type=add 的话，则新增
+      if (type === "add") {
+        showForAdd();
+
+      } else if (type === "detail") {
+
+        showForDetail(newHead);
+
+      } else {
+        setEmptyForm();
       }
     } catch (e: any) {
       customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
     }
-
-
+    console.log(2222222222222)
   }, []);
+
+
   // endregion
 
   window.onbeforeunload = function () {

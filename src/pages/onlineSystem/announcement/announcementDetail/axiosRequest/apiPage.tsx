@@ -125,8 +125,9 @@ const carouselData = (popupData: any) => {
   if (!popupData || popupData.length === 0) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
-  let start_order = 1;
+
   popupData.map((v: any) => {
+    let start_order = 1;
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {

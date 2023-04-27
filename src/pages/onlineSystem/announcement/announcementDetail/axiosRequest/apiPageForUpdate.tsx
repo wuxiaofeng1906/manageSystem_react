@@ -418,6 +418,7 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
 
 // 二级特性修改
 const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any, currentOrder: number) => {
+  debugger
   let lastOrder = currentOrder;
   const children: any = [];
   const newIds: any = []; // 记录旧数据的id，拿来对比新数据用作删除，如果在新数据里找不到，则删除
@@ -430,14 +431,14 @@ const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any, curre
           children.push({
             id: v1.id,
             speciality: v1.first,
-            specialityOrdinal: currentOrder
+            specialityOrdinal: lastOrder
           });
         } else if (v1.first && !isEmpty((v1.first).trim())) {
           // 没有ID的话就是新增的特性，同时也要判断是值是否为空
           children.push({
             speciality: v1.first,
             editFlag: "add",
-            specialityOrdinal: currentOrder
+            specialityOrdinal: lastOrder
           })
         }
         lastOrder = lastOrder + 1;
@@ -459,14 +460,6 @@ const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any, curre
     });
   }
 
-  // const deletedId: any = [];
-  // 将需要删除的id页保存进去
-  // deletedId.map((id: number) => {
-  //   children.push({
-  //     id: id,
-  //     editFlag: "delete"
-  //   });
-  // })
   return {children, lastOrder};
 };
 
@@ -532,6 +525,7 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
     // 用于记录特性数据
     const content: any = [];
     if (v1.tabsContent && v1_ptyGroup && v1_ptyGroup.length) {
+      debugger
       v1_ptyGroup.map((m: any) => {
 
         // 有id则为修改，没有id则为新增

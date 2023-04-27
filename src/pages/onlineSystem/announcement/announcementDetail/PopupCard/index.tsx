@@ -474,32 +474,32 @@ const PopupCard: React.FC<any> = (props: any) => {
       setCommonData(newHead);
       // }
 
-      const head = {...commonData};
-      if (head.announce_carousel === 1) {
-        if (head.clearTabContent) {
-          setEmptyForm();
-        } else if (anPopData && head.carouselNum < anPopData.length) {
-
-          const filtered: any = [];
-          anPopData.map((v: any, i: number) => {
-            if (i < head.carouselNum) {
-              filtered.push(v);
-            }
-          });
-          setAnnPopData(filtered);
-        }
-
-        return;
-      }
-
 
       // 如果没有 type=add 的话，则新增
       if (type === "add") {
         showForAdd();
 
       } else if (type === "detail") {
+        if (newHead.announce_carousel === 1) {
+          if (newHead.clearTabContent) {
+            setEmptyForm();
+          } else if (anPopData && newHead.carouselNum < anPopData.length) {
 
-        showForDetail(newHead);
+            const filtered: any = [];
+            anPopData.map((v: any, i: number) => {
+              if (i < newHead.carouselNum) {
+                filtered.push(v);
+              }
+            });
+            setAnnPopData(filtered);
+          } else {
+            showForDetail(newHead);
+          }
+
+          return;
+        } else {
+          showForDetail(newHead);
+        }
 
       } else {
         setEmptyForm();

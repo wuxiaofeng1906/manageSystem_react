@@ -417,7 +417,8 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
 };
 
 // 二级特性修改
-const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
+const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any, currentOrder: number) => {
+  let lastOrder = currentOrder;
   const children: any = [];
   const newIds: any = []; // 记录旧数据的id，拿来对比新数据用作删除，如果在新数据里找不到，则删除
   // 先添加新特性。记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id
@@ -429,14 +430,17 @@ const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
           children.push({
             id: v1.id,
             speciality: v1.first,
+            specialityOrdinal: currentOrder
           });
         } else if (v1.first && !isEmpty((v1.first).trim())) {
           // 没有ID的话就是新增的特性，同时也要判断是值是否为空
           children.push({
             speciality: v1.first,
             editFlag: "add",
+            specialityOrdinal: currentOrder
           })
         }
+        lastOrder = lastOrder + 1;
       }
     });
   }
@@ -463,7 +467,7 @@ const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any,) => {
   //     editFlag: "delete"
   //   });
   // })
-  return children;
+  return {children, lastOrder};
 };
 
 // 当删除一级特性后，所对应的二级特性也要删除
@@ -491,6 +495,7 @@ const deleteSeconds = (firstLevelId: string, oldPopData: any) => {
 // 一级特性修改
 const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommonData: any, oldPopData: any) => {
   const pages: any = [];
+  let currentOrder = 1;
   modifyPopData.forEach((v1: any) => {
     const v1_ptyGroup = v1?.tabsContent?.ptyGroup;
     // 用于记录新特性中的id，再对比旧特性，看看有没有新特性中不存在的id，不存在的id应该删除
@@ -526,7 +531,6 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
 
     // 用于记录特性数据
     const content: any = [];
-
     if (v1.tabsContent && v1_ptyGroup && v1_ptyGroup.length) {
       v1_ptyGroup.map((m: any) => {
 
@@ -550,34 +554,41 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
           });
 
           if (m.first) {
+            const secondSpecial = secondSpecialDataUpdate(m.seconds, oldSecondLevel, currentOrder + 1) // 获取二级数据
             content.push({
               id: m.id,
               speciality: m.first,
-              children: secondSpecialDataUpdate(m.seconds, oldSecondLevel) // 获取二级数据
+              specialityOrdinal: currentOrder,
+              children: secondSpecial.children
             });
+            currentOrder = secondSpecial.lastOrder;
           }
+
         } else { // 新增的一级特性（包含里面的二级特性）
 
+          // 一级特性
+          const firstSpecial: any = {
+            speciality: m.first,
+            editFlag: "add",
+            children: [],
+            specialityOrdinal: currentOrder,
+          }
+          currentOrder = currentOrder + 1;
           // 二级特性数据
-          let childs: any = [];
+
           (m.seconds).map((p: any) => {
             if (p.first) {
-              childs.push({
+              firstSpecial.children.push({
                 speciality: p.first,
                 editFlag: "add",
+                specialityOrdinal: currentOrder,
               });
             }
+            currentOrder = currentOrder + 1;
           });
-
           if (m.first) {
-            // 一级特性
-            content.push({
-              speciality: m.first,
-              editFlag: "add",
-              children: childs
-            });
+            content.push(firstSpecial);
           }
-
         }
       });
     }
@@ -624,15 +635,7 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
   return pages;
 };
 
-const getLastPrderNumber = (oldPopData: any) => {
-  debugger
-  let maxNumber = 1;
-  if (oldPopData && oldPopData.length > 0) {
 
-  }
-
-  return maxNumber;
-};
 // 新增轮播页
 const addCarousePage = (oldCommonData: any, newCommonData: any, newPopData: any) => {
   // 旧数据全部被清空了，新数据的序号重新来过。

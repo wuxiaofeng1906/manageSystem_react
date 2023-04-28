@@ -67,6 +67,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 下一页
   const goToNext = (formInfo: any, isClearAllTab: any = undefined) => {
+    debugger
     // 做两个缓存，以防多次上一步操作。
 
     // 第二个缓存始终保存第一个缓存的上一个值
@@ -513,6 +514,7 @@ const Announce: React.FC<any> = (props: any) => {
              centered maskClosable={false} destroyOnClose={true}
              onOk={() => {
                const v = carousePageForm.getFieldValue("clearChoice");
+               debugger
                //继续跳转到下一页
                goToNext(announcementForm.getFieldsValue(), v ? true : false);
              }}

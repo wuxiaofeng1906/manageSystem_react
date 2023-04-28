@@ -94,8 +94,8 @@ import SprintDetailServices from '@/services/sprintDetail';
 import {LocalstorageKeys} from '@/namespaces';
 
 let ora_filter_data: any = [];
-
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
+const dataForOperate: any = [];
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
@@ -1171,28 +1171,22 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
+
   // 修改操作流程
   const modFlowStage = async (content: any, values: any) => {
-    // const selRows: any = gridApi.current?.getSelectedRows();
 
-    // 获取过滤后的数据
-    const selectedRows: any = [];
-    gridApi.current?.forEachNodeAfterFilter((row: any) => {
-      selectedRows.push(row.data);
-    });
-
-    // console.log("selectedRows", selectedRows)
-    const result = await requestModFlowStage(selectedRows, content, values, prjNames);
-    if (result?.code === 200) {
-      setIsFlowModalVisible(false);
-      setIsRevokeModalVisible(false);
-      updateGrid();
-      sucMessage('修改成功！');
-      //   测试确认需要清空
-      setTestConfirm(undefined);
-    } else {
-      setTestConfirm(undefined);
-    }
+    debugger
+    const result = await requestModFlowStage(dataForOperate, content, values, prjNames);
+    // if (result?.code === 200) {
+    //   setIsFlowModalVisible(false);
+    //   setIsRevokeModalVisible(false);
+    //   updateGrid();
+    //   sucMessage('修改成功！');
+    //   //   测试确认需要清空
+    //   setTestConfirm(undefined);
+    // } else {
+    //   setTestConfirm(undefined);
+    // }
   };
 
   const commitFlow = () => {
@@ -1883,6 +1877,17 @@ const SprintList: React.FC<any> = () => {
                 );
               },
             }}
+            onRowSelected={(e: any) => {
+              // debugger
+              //   判断e.rowIndex,有数据的才是被选中的，是undefined 就是过滤前的数据
+              if (e.type === "rowSelected" && (e.rowIndex || e.rowIndex === 0)) {
+                const rows = e.data;
+                if (dataForOperate.indexOf(rows) === -1) {
+                  dataForOperate.push(e.data);
+                }
+              }
+            }}
+
           />
         </div>
       </Spin>

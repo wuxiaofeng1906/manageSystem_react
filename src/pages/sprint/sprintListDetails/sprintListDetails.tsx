@@ -1171,22 +1171,40 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
+  // 获取表格数据
+  const getFinalGridData = () => {
+    // 选中的值
+    const selectedData: any = gridApi.current?.getSelectedRows();
+
+    // 过滤后的值
+    const selectedRows: any = [];
+    gridApi.current?.forEachNodeAfterFilter((row: any) => {
+      selectedRows.push(row.data);
+    });
+
+    // 取交集即是最终数据
+    const data = selectedData.filter((item: any) => {
+      return selectedRows.includes(item)
+    })
+
+    return data;
+  }
 
   // 修改操作流程
   const modFlowStage = async (content: any, values: any) => {
 
-    debugger
-    const result = await requestModFlowStage(dataForOperate, content, values, prjNames);
-    // if (result?.code === 200) {
-    //   setIsFlowModalVisible(false);
-    //   setIsRevokeModalVisible(false);
-    //   updateGrid();
-    //   sucMessage('修改成功！');
-    //   //   测试确认需要清空
-    //   setTestConfirm(undefined);
-    // } else {
-    //   setTestConfirm(undefined);
-    // }
+    const selectedRows: any = getFinalGridData();
+    const result = await requestModFlowStage(selectedRows, content, values, prjNames);
+    if (result?.code === 200) {
+      setIsFlowModalVisible(false);
+      setIsRevokeModalVisible(false);
+      updateGrid();
+      sucMessage('修改成功！');
+      //   测试确认需要清空
+      setTestConfirm(undefined);
+    } else {
+      setTestConfirm(undefined);
+    }
   };
 
   const commitFlow = () => {
@@ -1878,16 +1896,28 @@ const SprintList: React.FC<any> = () => {
               },
             }}
             onRowSelected={(e: any) => {
+
+              // console.log(e)
               // debugger
               //   判断e.rowIndex,有数据的才是被选中的，是undefined 就是过滤前的数据
-              if (e.type === "rowSelected" && (e.rowIndex || e.rowIndex === 0)) {
-                const rows = e.data;
-                if (dataForOperate.indexOf(rows) === -1) {
-                  // 不存在才添加
-                  dataForOperate.push(e.data);
-                }
-              }
+              // if (e.rowIndex || e.rowIndex === 0) {
+              //
+              //   const rows = e.data;
+              //   if (dataForOperate.indexOf(rows) === -1) {
+              //     // 不存在才添加
+              //     dataForOperate.push(e.data);
+              //   }
+              // }
+
+              // console.log(dataForOperate)
             }}
+
+            onSelectionChanged={(e) => {
+              // console.log(2222222)
+              // console.log(e)
+
+            }}
+
 
           />
         </div>

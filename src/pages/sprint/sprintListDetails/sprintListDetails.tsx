@@ -1883,6 +1883,7 @@ const SprintList: React.FC<any> = () => {
               if (e.type === "rowSelected" && (e.rowIndex || e.rowIndex === 0)) {
                 const rows = e.data;
                 if (dataForOperate.indexOf(rows) === -1) {
+                  // 不存在才添加
                   dataForOperate.push(e.data);
                 }
               }

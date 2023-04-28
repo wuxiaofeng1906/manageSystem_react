@@ -476,7 +476,7 @@ const SheetInfo = (props: any, ref: any) => {
           size={'small'}
           // value={isEmpty(p.value) ? undefined : p.value}
           value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
-            isEmpty(p.value)
+            (isEmpty(p.value) || p.value === "-")
               ? field === 'database_version'
               ? databaseVersion[0] : field === 'batch'
                 ? agBatch[0] : undefined : p.value}

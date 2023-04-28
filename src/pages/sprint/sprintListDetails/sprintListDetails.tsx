@@ -95,7 +95,6 @@ import {LocalstorageKeys} from '@/namespaces';
 
 let ora_filter_data: any = [];
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
-const dataForOperate: any = [];
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
@@ -174,6 +173,25 @@ const SprintList: React.FC<any> = () => {
   window.onresize = function () {
     setGridHeight(getHeight());
     gridApi.current?.sizeColumnsToFit();
+  };
+
+  // 获取表格中选中的数据（需要注意过滤后的数据）
+  const getFinalGridData = () => {
+    // 选中的值
+    const selectedData: any = gridApi.current?.getSelectedRows();
+
+    // 过滤后的值
+    const selectedRows: any = [];
+    gridApi.current?.forEachNodeAfterFilter((row: any) => {
+      selectedRows.push(row.data);
+    });
+
+    // 取交集即是最终数据
+    const data = selectedData.filter((item: any) => {
+      return selectedRows.includes(item)
+    })
+
+    return data;
   };
   /* endregion */
 
@@ -954,6 +972,7 @@ const SprintList: React.FC<any> = () => {
   const deleteSprintDetails = () => {
     // 判断是否选中数据
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    debugger
     if (selRows.length === 0) {
       errorMessage('请选中需要删除的数据!');
       return;
@@ -1171,24 +1190,6 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
-  // 获取表格数据
-  const getFinalGridData = () => {
-    // 选中的值
-    const selectedData: any = gridApi.current?.getSelectedRows();
-
-    // 过滤后的值
-    const selectedRows: any = [];
-    gridApi.current?.forEachNodeAfterFilter((row: any) => {
-      selectedRows.push(row.data);
-    });
-
-    // 取交集即是最终数据
-    const data = selectedData.filter((item: any) => {
-      return selectedRows.includes(item)
-    })
-
-    return data;
-  }
 
   // 修改操作流程
   const modFlowStage = async (content: any, values: any) => {
@@ -1895,30 +1896,6 @@ const SprintList: React.FC<any> = () => {
                 );
               },
             }}
-            onRowSelected={(e: any) => {
-
-              // console.log(e)
-              // debugger
-              //   判断e.rowIndex,有数据的才是被选中的，是undefined 就是过滤前的数据
-              // if (e.rowIndex || e.rowIndex === 0) {
-              //
-              //   const rows = e.data;
-              //   if (dataForOperate.indexOf(rows) === -1) {
-              //     // 不存在才添加
-              //     dataForOperate.push(e.data);
-              //   }
-              // }
-
-              // console.log(dataForOperate)
-            }}
-
-            onSelectionChanged={(e) => {
-              // console.log(2222222)
-              // console.log(e)
-
-            }}
-
-
           />
         </div>
       </Spin>

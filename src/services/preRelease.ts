@@ -1,5 +1,6 @@
 import request from './request';
 import {noticeUrl} from "../../config/qqServiceEnv";
+import {axiosPost} from "@/publicMethods/axios";
 
 const baseUrl = '/api/verify';
 // 发布过程
@@ -81,6 +82,10 @@ const PreReleaseServices = {
   // 发布列表排序
   async releaseOrder(data: any) {
     return request(`${baseUrl}/latest-release/order-by`, {method: 'post', data});
+  },
+  // 有错误返回值的请求 --  发布列表排序
+  async releaseOrder_own(data: any) {
+    return axiosPost(`${baseUrl}/latest-release/order-by`, data);
   },
   // 发布历史
   async historyList(params: any) {

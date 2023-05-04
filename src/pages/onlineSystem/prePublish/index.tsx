@@ -6,7 +6,7 @@ import styles from '../config/common.less';
 import ZentaoDetail from './ZentaoDetail';
 import {SyncOutlined} from '@ant-design/icons';
 import ProcessLayout from './layout';
-import {ProcessTabs} from "../components/ProcessTabs";
+import {ProcessTab} from "../components/ProcessTab";
 import {useModel} from "@@/plugin-model/useModel";
 
 const PrePublish = () => {
@@ -27,7 +27,7 @@ const PrePublish = () => {
 
   return (
     // <PageContainer title={query.tab == 'profile' ? '禅道概况' : '发布过程单'}>
-    <PageContainer title={<ProcessTabs finished={globalState.finished}/>}>
+    <PageContainer title={<ProcessTab finished={globalState.finished}/>}>
 
       <div className={styles.profileAndProcess}>
 

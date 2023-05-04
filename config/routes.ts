@@ -250,7 +250,7 @@ export default [
         wrappers: ['../wrappers/auth'],
       },
       {
-        name: '升级公告（新）',
+        name: '更新公告',
         path: 'announceList',
         component: './onlineSystem/announcement/announceList',
         // wrappers: ['../wrappers/auth'],

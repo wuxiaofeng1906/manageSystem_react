@@ -441,7 +441,7 @@ const SheetInfo = (props: any, ref: any) => {
 
   const renderSelect = (p: CellClickedEvent) => {
     const field = p.column.colId as string;
-    if (field == 'sql_order')
+    if (field == 'sql_order') {
       return (
         <Cascader
           multiple={true}
@@ -472,19 +472,25 @@ const SheetInfo = (props: any, ref: any) => {
           }}
         />
       );
+    }
     return (
       <div className={styles.antSelectStyle}>
         <Select
           size={'small'}
-          value={isEmpty(p.value) ? undefined : p.value}
+          // value={isEmpty(p.value) ? undefined : p.value}
+          value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
+            isEmpty(p.value)
+              ? field === 'database_version'
+              ? databaseVersion[0] : field === 'batch'
+                ? agBatch[0] : undefined : p.value}
           style={{width: '100%'}}
           disabled={agFinished}
           allowClear={['batch', 'database_version'].includes(field)}
           dropdownMatchSelectWidth={false}
           options={
-            field == 'database_version'
+            field === 'database_version'
               ? databaseVersion
-              : field == 'batch'
+              : field === 'batch'
               ? agBatch
               : Object.keys(WhetherOrNot)?.map((k) => ({
                 value: k,

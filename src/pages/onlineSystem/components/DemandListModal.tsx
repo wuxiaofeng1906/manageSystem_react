@@ -118,6 +118,21 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
   };
 
+  // 获取发布名称
+  const getReleaseName = (clusterArray: any) => {
+    // 如果选择的集群只为：灰度集群0；灰度集群1；灰度集群0、1三种情况默认加“灰度发布”；否则默认加“正式发布”
+    let allCluster: any = [];
+    clusterArray.map((v: any) => {
+      const vs = v.split(",");
+      allCluster = [...allCluster, ...vs];
+    });
+
+    const name = difference(allCluster, ['cn-northwest-0', 'cn-northwest-1'])?.length > 0
+      ? '正式发布'
+      : '灰度发布';
+
+    return name;
+  };
   const onConfirm = async () => {
     const baseData = await baseForm.validateFields();
     const isPreRelease = baseData.type == '1';
@@ -138,17 +153,20 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       props.onOk?.({...baseData, release_num});
       return;
     }
-    // 非积压发布
-    const time = (isEqual(values.cluster, ['cn-northwest-0'])
+
+    let time = (isEqual(values.cluster, ['cn-northwest-0'])
         ? dayjs().startOf('d').hour(10)
         : isEqual(values.cluster, ['cn-northwest-1'])
           ? dayjs().startOf('d').hour(22)
           : dayjs().startOf('d')
     ).format('YYYY-MM-DD HH:mm:ss');
-    const name =
-      difference(values.cluster, ['cn-northwest-0', 'cn-northwest-1'])?.length > 0
-        ? '正式发布'
-        : '灰度发布';
+    let name = `${release_num}${getReleaseName(values.cluster)}`;
+    // 如果是修改的情况，则发布时间为获取的数据中的时间，创建的时候才为初始时间
+    if (!isEmpty(props.data)) {
+      time = props.data?.plan_release_time;
+      name = props.data?.release_name;
+    }
+
     const data = {
       user_id: user?.userid ?? '',
       cluster: uniq(values.cluster || [])?.join() ?? '',
@@ -163,9 +181,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         apps: o.apps,
       })),
       release_num: release_num ?? '',
-      release_name: `${release_num}${name}`,
+      release_name: name,
       plan_release_time: time,
     };
+
     try {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);

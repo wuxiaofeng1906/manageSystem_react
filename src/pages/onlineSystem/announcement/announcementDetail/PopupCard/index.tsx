@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select
+  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select, Popover, Popconfirm
 } from 'antd';
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {
-  PlusCircleOutlined, UploadOutlined, MinusCircleOutlined,
+  PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, ArrowDownOutlined,
   PlusOutlined, ExclamationCircleFilled
 } from '@ant-design/icons';
 import {getYuQueContent, oneKeyToRelease, preViewNotice, saveAnnounceContent} from '../axiosRequest/apiPage';
@@ -19,10 +19,10 @@ import {customMessage} from "@/publicMethods/showMessages";
 import {isEmpty} from "lodash";
 import {matchYuQueUrl} from "@/publicMethods/regularExpression";
 import {useModel} from "@@/plugin-model/useModel";
-import {defaultImgsUrl, picType, getImageToBackend, getImageForFront} from "../uploadPic/index";
+import {getDefaultImg, picType, getImageToBackend, getImageForFront} from "../uploadPic/index";
 import {getS3Key, uploadPicToS3, getBase64} from "../uploadPic/NoticeImageUploader";
 import {DragTabs} from './TabsApi';
-import {Notice_ImageView} from "../../../../../../config/qqServiceEnv";
+import {noticeUrl} from "../../../../../../config/qqServiceEnv";
 import {preEnv} from "@/pages/onlineSystem/announcement/constant";
 
 // 当前的tab页面
@@ -162,7 +162,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
     setPicUpLoading(false);
     setUploadPics([]);
-    setFileList([])
+    setFileList([]);
+    setShowPreView(true);
   };
 
   // 一键发布
@@ -173,12 +174,16 @@ const PopupCard: React.FC<any> = (props: any) => {
       content: '确定发布这条公告吗？',
       centered: true,
       onOk: async () => {
-        const releaseResult = await oneKeyToRelease(releaseID);
-        if (releaseResult.ok) {
-          customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
-        } else {
-          customMessage({type: "error", msg: releaseResult.message, position: "0vh"});
+        const formData = dtForm.getFieldsValue();
+        if (await onFinish(formData)) {
+          const releaseResult = await oneKeyToRelease(releaseID);
+          if (releaseResult.ok) {
+            customMessage({type: "success", msg: "公告发布成功！", position: "0vh"});
+          } else {
+            customMessage({type: "error", msg: releaseResult.message, position: "0vh"});
+          }
         }
+
       }
     });
   };
@@ -232,7 +237,9 @@ const PopupCard: React.FC<any> = (props: any) => {
         // 如果是明细数据，且没有被改变过
         const preRt = await preViewNotice(noticeId, preViewEnv.dataEnv);
         if (preRt.ok) {
-          const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
+          // const goUrls = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
+          const goUrl = preViewEnv.dataEnv === "cn-northwest-0" ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`
+            : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${preRt?.data.targEnvNoticeAdd}`;
           console.log("预览跳转地址", goUrl);
           window.open(goUrl);
         } else {
@@ -248,10 +255,10 @@ const PopupCard: React.FC<any> = (props: any) => {
         history.push('./announceList');
       }
       setTabOrder([]);
-      return;
+      return true;
     }
     customMessage({type: "error", msg: `数据保存失败:${result.message}`, position: "0vh"});
-
+    return false;
   };
 
   // 保存数据
@@ -278,7 +285,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           content: `第${notFinishedPage.join(",")}页轮播页没有填写，确认要保存吗？`,
           centered: true,
           onOk() {
-            saveTabPages(finalData, preView, preViewEnv);
+            return saveTabPages(finalData, preView, preViewEnv);
           },
           onCancel() {
             return;
@@ -286,10 +293,11 @@ const PopupCard: React.FC<any> = (props: any) => {
         });
       } else {
         // 填写完了则直接保存。
-        saveTabPages(finalData, preView, preViewEnv);
+        return saveTabPages(finalData, preView, preViewEnv);
       }
 
     }
+    return false;
   };
 
   // 预览
@@ -326,11 +334,14 @@ const PopupCard: React.FC<any> = (props: any) => {
           customMessage({type: "error", msg: "预览环境不能为空！", position: "0vh"});
           return;
         }
-        if (showPreView && type === "detail") {
+
+        if (!showPreView && type === "detail") {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
-            const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
+            const goUrl = preViewEnv.dataEnv === "cn-northwest-0" ? `https://app.77hub.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`
+              : `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
+            // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/${preViewEnv.dataEnv}/app#/penetrate/viewSystemUpdate/NoticeEdition/${result?.data.targEnvNoticeAdd}`;
             console.log("预览跳转地址", goUrl);
             window.open(goUrl);
           } else {
@@ -344,32 +355,6 @@ const PopupCard: React.FC<any> = (props: any) => {
       }
     });
 
-
-    // if (showPreView) {
-    //   // window.open("https://nx-temp1-k8s.e7link.com/cn-global/login");
-    //   window.open(Notice_Preview);
-    //   return;
-    // }
-
-    // const formData = dtForm.getFieldsValue();
-    // onFinish(formData, true);
-
-    //   需要需要校验不能为空
-    // let finalData = [];
-    // // 如果是轮播则先放到state中再保存
-    // if (commonData?.announce_carousel === 1) {
-    //   finalData = getPopupSource(currentTab);
-    // } else {
-    //   // 不是轮播，需要把图片路径放进去
-    //   const popData = dtForm.getFieldsValue();
-    //   popData.uploadPic = picModalState.checkedImg;
-    //   finalData.push(popData);
-    // }
-    // if (vertifyFieldForPopup(finalData)) {
-    //   //    commonData, finalData  进行预览的数据
-    // }
-
-    //
   };
   // endregion
 
@@ -448,6 +433,32 @@ const PopupCard: React.FC<any> = (props: any) => {
     });
   };
 
+  // useEffect(() => {
+  //   debugger
+  //   try {
+  //     // 按照轮播页数减少anPopData中的数据
+  //     const head = {...commonData};
+  //     if (head.announce_carousel === 1) {
+  //       if (head.clearTabContent) {
+  //         setEmptyForm();
+  //       } else if (anPopData && head.carouselNum < anPopData.length) {
+  //
+  //         const filtered: any = [];
+  //         anPopData.map((v: any, i: number) => {
+  //           if (i < head.carouselNum) {
+  //             filtered.push(v);
+  //           }
+  //         });
+  //         setAnnPopData(filtered);
+  //       }
+  //     }
+  //   } catch (e: any) {
+  //     customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
+  //   }
+  //
+  //   console.log(1111111111111)
+  // }, []);
+
   // 展示界面数据
   useEffect(() => {
     try {
@@ -463,13 +474,32 @@ const PopupCard: React.FC<any> = (props: any) => {
       setCommonData(newHead);
       // }
 
+
       // 如果没有 type=add 的话，则新增
       if (type === "add") {
         showForAdd();
 
       } else if (type === "detail") {
+        if (newHead.announce_carousel === 1) {
+          if (newHead.clearTabContent) {
+            setEmptyForm();
+          } else if (anPopData && newHead.carouselNum < anPopData.length) {
 
-        showForDetail(newHead);
+            const filtered: any = [];
+            anPopData.map((v: any, i: number) => {
+              if (i < newHead.carouselNum) {
+                filtered.push(v);
+              }
+            });
+            setAnnPopData(filtered);
+          } else {
+            showForDetail(newHead);
+          }
+
+          return;
+        } else {
+          showForDetail(newHead);
+        }
 
       } else {
         setEmptyForm();
@@ -477,32 +507,10 @@ const PopupCard: React.FC<any> = (props: any) => {
     } catch (e: any) {
       customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
     }
+    console.log(2222222222222)
   }, []);
 
-  useEffect(() => {
-    try {
-      // 按照轮播页数减少anPopData中的数据
-      const head = {...commonData};
-      if (head.announce_carousel === 1) {
-        if (head.clearTabContent) {
-          setEmptyForm();
-        } else if (anPopData && head.carouselNum < anPopData.length) {
 
-          const filtered: any = [];
-          anPopData.map((v: any, i: number) => {
-            if (i < head.carouselNum) {
-              filtered.push(v);
-            }
-          });
-          setAnnPopData(filtered);
-        }
-      }
-    } catch (e: any) {
-      customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
-    }
-
-
-  }, [commonData, anPopData]);
   // endregion
 
   window.onbeforeunload = function () {
@@ -514,6 +522,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   };
 
+  const styleAdd = {marginTop: 8, marginLeft: 8, color: '#1890FF', fontSize: 16, height: 16};
+  const styleDelete = {marginTop: 8, color: "red", marginLeft: 15, fontSize: 16, height: 16};
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -532,7 +542,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           <DragTabs onChange={onTabsChange}/>
 
           <Form form={dtForm} autoComplete={"off"} onFinish={onFinish} name={"dynamic_form_nest_item"}
-                onFieldsChange={() => setShowPreView(false)}>
+                onFieldsChange={() => setShowPreView(true)}>
             {/* 特性名称只针对轮播功能 */}
             <Row style={{display: commonData?.announce_carousel === 1 ? "inline-block" : "none"}}>
               <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>
@@ -557,7 +567,7 @@ const PopupCard: React.FC<any> = (props: any) => {
             <Form.Item label={"上传图片"} name={"uploadPic"} required>
               {picModalState.checkedImg ?
                 <img key={picModalState.checkedImg} data-value={picModalState.checkedImg}
-                     src={`${Notice_ImageView}${picModalState.checkedImg}`}
+                     src={`${noticeUrl(location.origin).imageUpload}${picModalState.checkedImg}`}
                      alt="默认图" style={{height: 100, width: 150}}
                      onClick={() => {
                        setFileList([]);
@@ -579,70 +589,96 @@ const PopupCard: React.FC<any> = (props: any) => {
               {(fields, {add: addFirst, remove: removeFirst}) => {
                 return (
                   <div>
-                    {fields.map((field, index) => (
+                    {fields.map((field, first_index) => (
                       <div key={field.key}>
                         <Row>
                           <Form.Item
                             {...field}
                             label={"一级特性"}
                             name={[field.name, 'first']}
-                            rules={[{required: true, message: '请输入一级特性'}]}
-                          >
+                            rules={[{required: true, message: '请输入一级特性'}]}>
                             <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}></Input>
                           </Form.Item>
-
                           {/* 删除 */}
-                          <Button
-                            style={{border: 'none', color: "red", marginLeft: 5}}
-                            icon={<MinusCircleOutlined/>}
-                            onClick={() => removeFirst(field.name)}
-                          />
+                          <Popconfirm
+                            title="确定删除该特性？"
+                            onConfirm={() => removeFirst(field.name)}
+                          >
+                            <MinusCircleOutlined style={{...styleDelete, marginLeft: 38}}/>
+                          </Popconfirm>
+
+
                         </Row>
                         {/* 二级特性 */}
                         <Form.List name={[field.name, 'seconds']} initialValue={[Object.create(null)]}>
                           {(secondFields, {add: addSecond, remove: removeSeond}) => {
+
                             return (
                               <>
-                                {secondFields.map((secondField, index) => (
-                                  <div key={secondField.key}>
-                                    {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
-                                    <Row>
-                                      <Form.Item
-                                        {...secondField}
-                                        label={`二级特性${index + 1}`}
-                                        name={[secondField.name, 'first']}
-                                      >
-                                        <Input style={{minWidth: 400}}></Input>
-                                      </Form.Item>
+                                {secondFields.map((secondField, second_index) => {
 
-                                      {/* 删除 */}
-                                      <Button
-                                        style={{border: 'none', color: "#1890FF", marginLeft: 5}}
-                                        icon={<PlusCircleOutlined/>}
-                                        onClick={() => addSecond()}
-                                      />
-                                      <Button
-                                        style={{border: 'none', color: "red", marginLeft: 5}}
-                                        icon={<MinusCircleOutlined/>}
-                                        onClick={() => {
-                                          // 仅有一个二级属性时不能删
-                                          if (!secondFields || secondFields.length <= 1) {
-                                            customMessage({type: "error", msg: "只有一个二级特性时不能删除！", position: "0vh"});
-                                            return;
-                                          }
-                                          removeSeond(secondField.name);
-                                        }}
-                                      />
-                                    </Row>
-                                  </div>
-                                ))}
+                                  return (
+                                    <div key={secondField.key}>
+                                      <Row style={{backgroundColor: "red"}}>
+                                        {/* 添加一级特性 */}
+                                        <Popover content={
+                                          <div>
+                                            <div>
+                                              <Button type="link" onClick={() => addFirst("", first_index + 1)}>添加一级特性
+                                              </Button>
+                                            </div>
+                                            <div>
+                                              <Button type="link" onClick={() => addSecond("", 0)}>添加二级特性
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        }>
+                                          <PlusCircleOutlined
+                                            style={{
+                                              ...styleAdd,
+                                              marginTop: -48,
+                                              display: second_index === 0 ? "inline" : "none",
+                                              marginLeft: 558
+                                            }}/>
+                                        </Popover>
+                                      </Row>
+                                      {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
+                                      <Row>
+                                        <Form.Item
+                                          {...secondField}
+                                          label={`二级特性${second_index + 1}`}
+                                          name={[secondField.name, 'first']}
+                                        >
+                                          <Input style={{minWidth: 400}}></Input>
+                                        </Form.Item>
+
+                                        {/* 添加二级特性 */}
+                                        <PlusCircleOutlined
+                                          style={styleAdd} onClick={() => addSecond("", second_index + 1)}/>
+
+                                        {/* 删除二级特性 */}
+                                        <MinusCircleOutlined
+                                          style={styleDelete}
+                                          onClick={() => {
+                                            // 仅有一个二级属性时不能删
+                                            if (!secondFields || secondFields.length <= 1) {
+                                              customMessage({type: "error", msg: "只有一个二级特性时不能删除！", position: "0vh"});
+                                              return;
+                                            }
+                                            removeSeond(secondField.name);
+                                          }}/>
+                                      </Row>
+                                    </div>
+                                  )
+                                })}
                               </>
                             );
                           }}
                         </Form.List>
                       </div>
                     ))}
-                    {/* 点击一级特性 */}
+                    {/* 点击一级特性 */
+                    }
                     <Form.Item>
                       <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
                               icon={<PlusCircleOutlined/>}
@@ -651,7 +687,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
                     </Form.Item>
                   </div>
-                );
+                )
+                  ;
               }}
             </Form.List>
             <Divider/>
@@ -698,11 +735,11 @@ const PopupCard: React.FC<any> = (props: any) => {
                   setPicModalState({...picModalState, checkedImg: e.target.dataset.value});
                 }
               }}>
-                {defaultImgsUrl.map(item => (
+                {getDefaultImg().map(item => (
                   <li key={item} data-value={item}
                       className={picModalState.checkedImg === item ? style.activeChose : ''}>
                     <img key={item} data-value={item}
-                         src={`${Notice_ImageView}${item}`}
+                         src={`${noticeUrl(location.origin).imageUpload}${item}`}
                       // src={require('../../../../../../public/77Logo.png')}
                          alt="默认图"/>
 

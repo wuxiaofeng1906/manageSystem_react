@@ -65,7 +65,7 @@ export const preViewNotice = (noticeEditionId: string, targetEnv: string) => {
 
 // 获取特性列表list  startOrder:开始的顺序
 const getSpecialList = (ptyGroup: any, startOrder: number) => {
-  debugger
+
 
   let finalOrder = startOrder;
   if (!ptyGroup) return [];
@@ -141,12 +141,12 @@ const carouselData = (popupData: any) => {
         layoutTypeId: tabsContent.picLayout,
         contents: specilaListArray.specialList
       });
-      debugger
+
       //  这里也有一个循环，所以这里要+1
       start_order = specilaListArray.finalOrder + 1; // 继续赋值接口传回来的数据
     }
   });
-  debugger
+
   return {pages: data};
 };
 
@@ -172,7 +172,7 @@ export const saveAnnounceContent = async (formData: any, popupData: object = {})
         specialData = notCarouselData(popupData[0].tabsContent, formData.announce_name); // 不轮播
       }
     }
-    debugger
+
     const relData = {...data, ...specialData};
     return axiosPost('/api/77hub/notice', relData, {envName: noticeUrl(location.origin).noticeEnv});
   } catch (e: any) {

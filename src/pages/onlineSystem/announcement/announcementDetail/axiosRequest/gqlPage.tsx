@@ -16,14 +16,14 @@ export const queryAnnounceDetail = async (id: string) => {
     description
     isCarousel
     pageSize
-    pages(sorts:[{name:"createdTime"},{name:"modifiedTime"},{name:"id"}]){
+    pages{
       modifiedTime
       id
       yuQue
       image
       pageNum
       layoutTypeId
-      contents(sorts:[{name:"createdTime"},{name:"modifiedTime"},{name:"id"}]){
+      contents(sorts:[{name:"specialityOrdinal"}]){
         modifiedTime
         parentId
         id

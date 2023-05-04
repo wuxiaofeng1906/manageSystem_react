@@ -145,7 +145,7 @@ const normalUpdate = (formData: any, popupData: any = [], oldPopData: any = []) 
 
 //  region 修改时候调用的新增（比如修改模板类型，是否轮播）
 const getSpecialListForAdd = (ptyGroup: any, startOrder: number) => {
-  debugger
+
   let finalOrder = startOrder;
   const specialList: any = [];
   ptyGroup.map((v: any) => {
@@ -204,7 +204,7 @@ const carouselDataForAdd = (popupData: any) => {
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
       const specilaListArray: any = getSpecialListForAdd(tabsContent.ptyGroup, start_order);
-      debugger
+
       data.push({
         featureName: tabsContent.specialName,
         image: tabsContent.uploadPic,
@@ -422,7 +422,7 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
 
 // 二级特性修改
 const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any, currentOrder: number) => {
-  debugger
+
   let lastOrder = currentOrder;
   const children: any = [];
   const newIds: any = []; // 记录旧数据的id，拿来对比新数据用作删除，如果在新数据里找不到，则删除
@@ -530,7 +530,7 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
     // 用于记录特性数据
     const content: any = [];
     if (v1.tabsContent && v1_ptyGroup && v1_ptyGroup.length) {
-      debugger
+
       v1_ptyGroup.map((m: any) => {
 
         // 有id则为修改，没有id则为新增
@@ -744,7 +744,7 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
       page = page.concat(specialItem);
     }
   }
-  debugger
+
   return {
     id: oldCommonData.id,
     pageSize: newCommonData.carouselNum,

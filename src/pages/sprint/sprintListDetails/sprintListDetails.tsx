@@ -33,7 +33,7 @@ import {
   CheckSquareTwoTone,
   SettingOutlined,
   ReloadOutlined,
-  ClearOutlined,
+  ClearOutlined, ExclamationCircleFilled,
   // ExclamationCircleOutlined,
   // InfoCircleOutlined,
 } from '@ant-design/icons';
@@ -1480,6 +1480,7 @@ const SprintList: React.FC<any> = () => {
   }, []);
 
   const onRemoveTab = (key: string) => {
+    debugger
     formForQuery.resetFields();
     const data = tabs?.filter((it: any) => it.projectid !== +key);
     localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify(data));
@@ -1553,6 +1554,33 @@ const SprintList: React.FC<any> = () => {
           hideAdd={true}
           onChange={(v) => onTabChange(v)}
           style={{background: 'white', paddingBottom: 5, marginTop: 15}}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            const historyTab = JSON.parse(localStorage.getItem(LocalstorageKeys.sprintTab) as string);
+            let currentTab: any;
+            historyTab.map((tab: any) => {
+              if (tab.project === e.target?.innerText) {
+                currentTab = tab;
+              }
+            });
+            //  只有一个Tab的时候不用删除,点击空白时候的事件也不用弹出确认框
+            if (historyTab.length > 1 && currentTab) {
+              Modal.confirm({
+                title: "是否关闭其他标签页？",
+                icon: <ExclamationCircleFilled/>,
+                centered: true,
+                onOk() {
+                  // 重新设置缓存
+                  localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify([currentTab]));
+                  setTabs([currentTab]);
+                  onTabChange(currentTab.projectid);
+                },
+                onCancel() {
+                  return;
+                },
+              });
+            }
+          }}
         >
           {tabs.map((it) => (
             <Tabs.TabPane tab={it.project} key={it.projectid} closable={tabs?.length > 1}/>
@@ -1885,8 +1913,8 @@ const SprintList: React.FC<any> = () => {
                           : 'initial',
                       }}
                     >
-                      {params.value}
-                    </span>
+          {params.value}
+            </span>
                   </div>
                 );
               },

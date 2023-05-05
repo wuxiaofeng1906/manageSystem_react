@@ -484,16 +484,28 @@ const SheetInfo = (props: any, ref: any) => {
         />
       );
     }
+    // 获取展示的value
+    let cellValue = p.value;
+    if (isEmpty(p.value) || p.value === "-") {
+      if (field === 'database_version' && databaseVersion && databaseVersion.length) {
+        cellValue = databaseVersion[0];
+      } else if (field === 'batch' && agBatch && agBatch.length) {
+        cellValue = agBatch[0];
+      } else {
+        cellValue = "-";
+      }
+    }
+
     return (
       <div className={styles.antSelectStyle}>
         <Select
           size={'small'}
-          // value={isEmpty(p.value) ? undefined : p.value}
-          value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
-            (isEmpty(p.value) || p.value === "-")
-              ? field === 'database_version'
-              ? databaseVersion[0] : field === 'batch'
-                ? agBatch[0] : undefined : p.value}
+          value={cellValue}
+          // value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
+          //   (isEmpty(p.value) || p.value === "-")
+          //     ? field === 'database_version'
+          //     ? databaseVersion[0] : field === 'batch'
+          //       ? agBatch[0] : undefined : p.value}
           style={{width: '100%'}}
           disabled={agFinished}
           allowClear={['batch', 'database_version'].includes(field)}

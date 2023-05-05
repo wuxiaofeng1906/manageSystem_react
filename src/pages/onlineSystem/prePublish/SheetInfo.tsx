@@ -292,9 +292,15 @@ const SheetInfo = (props: any, ref: any) => {
       }
       // 服务信息
       else if (!isEmpty(serverInfo)) {
-        const enties = Object.entries(  // 暂时不需要 sql_order，database_version 判定
-          pick(serverInfo?.[0], ['cluster', 'clear_redis', 'clear_cache', 'batch']),
-        );
+        const checkItem = ['cluster', 'clear_redis', 'clear_cache'];  // 暂时不需要 sql_order，database_version 判定
+        // 如果一键部署ID中有batch服务，那么列表中的batch服务就不能为空。这里就需要来判断
+        const deployment = baseForm.getFieldValue("deployment");
+        [...deployments].map((it: any) => {
+          if (deployment.includes((it.deployment_id).toString()) && (it.app).includes("batch")) {
+            checkItem.push("batch");
+          }
+        });
+        const enties = Object.entries(pick(serverInfo?.[0], checkItem));
         const err: any = enties.find(([k, v]) => {
           // batch 没数据的时候是-
           return isEmpty(v) || v === "-";

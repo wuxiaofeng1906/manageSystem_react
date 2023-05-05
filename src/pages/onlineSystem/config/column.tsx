@@ -399,6 +399,7 @@ export const PublishSeverColumn = (data: any): (ColDef | ColGroupDef)[] => {
       cellRenderer: 'select',
       autoHeight: true,
       wrapText: true,
+      headerClass: 'ag-required',
     },
     {
       headerName: '数据库版本',

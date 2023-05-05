@@ -272,9 +272,12 @@ const SheetInfo = (props: any, ref: any) => {
       auto_env: '请填写是否升级后自动化环境',
       cluster: '请填写发布环境',
       clear_redis: '请填写是否清理redis缓存',
+      batch: '请填写batch版本',
+      // database_version: '请填写数据库版本',
       is_recovery: '请填写是否涉及数据Recovery',
       is_update: '请填写是否数据update',
       clear_cache: '请填写是否清理应用缓存',
+
     };
 
     // 发布成功、unknown-> 数据完整性校验
@@ -289,9 +292,14 @@ const SheetInfo = (props: any, ref: any) => {
       }
       // 服务信息
       else if (!isEmpty(serverInfo)) {
-        const err = Object.entries(
-          pick(serverInfo?.[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
-        ).find(([k, v]) => isEmpty(v));
+        const enties = Object.entries(  // 暂时不需要 sql_order，database_version 判定
+          pick(serverInfo?.[0], ['cluster', 'clear_redis', 'clear_cache', 'batch']),
+        );
+        const err: any = enties.find(([k, v]) => {
+          // batch 没数据的时候是-
+          return isEmpty(v) || v === "-";
+        });
+        debugger
         if (!isEmpty(err)) {
           showErrTip = errTip[err?.[0]];
         }

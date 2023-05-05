@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select
+  Button, Form, Input, Row, Col, Modal, Upload, Radio, Divider, Layout, Spin, Select, Popover, Popconfirm
 } from 'antd';
 import {history} from "@@/core/history";
 import style from '../style.less';
 import {
-  PlusCircleOutlined, UploadOutlined, MinusCircleOutlined,
+  PlusCircleOutlined, UploadOutlined, MinusCircleOutlined, ArrowDownOutlined,
   PlusOutlined, ExclamationCircleFilled
 } from '@ant-design/icons';
 import {getYuQueContent, oneKeyToRelease, preViewNotice, saveAnnounceContent} from '../axiosRequest/apiPage';
@@ -433,6 +433,32 @@ const PopupCard: React.FC<any> = (props: any) => {
     });
   };
 
+  // useEffect(() => {
+  //   debugger
+  //   try {
+  //     // 按照轮播页数减少anPopData中的数据
+  //     const head = {...commonData};
+  //     if (head.announce_carousel === 1) {
+  //       if (head.clearTabContent) {
+  //         setEmptyForm();
+  //       } else if (anPopData && head.carouselNum < anPopData.length) {
+  //
+  //         const filtered: any = [];
+  //         anPopData.map((v: any, i: number) => {
+  //           if (i < head.carouselNum) {
+  //             filtered.push(v);
+  //           }
+  //         });
+  //         setAnnPopData(filtered);
+  //       }
+  //     }
+  //   } catch (e: any) {
+  //     customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
+  //   }
+  //
+  //   console.log(1111111111111)
+  // }, []);
+
   // 展示界面数据
   useEffect(() => {
     try {
@@ -448,13 +474,32 @@ const PopupCard: React.FC<any> = (props: any) => {
       setCommonData(newHead);
       // }
 
+
       // 如果没有 type=add 的话，则新增
       if (type === "add") {
         showForAdd();
 
       } else if (type === "detail") {
+        if (newHead.announce_carousel === 1) {
+          if (newHead.clearTabContent) {
+            setEmptyForm();
+          } else if (anPopData && newHead.carouselNum < anPopData.length) {
 
-        showForDetail(newHead);
+            const filtered: any = [];
+            anPopData.map((v: any, i: number) => {
+              if (i < newHead.carouselNum) {
+                filtered.push(v);
+              }
+            });
+            setAnnPopData(filtered);
+          } else {
+            showForDetail(newHead);
+          }
+
+          return;
+        } else {
+          showForDetail(newHead);
+        }
 
       } else {
         setEmptyForm();
@@ -462,32 +507,10 @@ const PopupCard: React.FC<any> = (props: any) => {
     } catch (e: any) {
       customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
     }
+    console.log(2222222222222)
   }, []);
 
-  useEffect(() => {
-    try {
-      // 按照轮播页数减少anPopData中的数据
-      const head = {...commonData};
-      if (head.announce_carousel === 1) {
-        if (head.clearTabContent) {
-          setEmptyForm();
-        } else if (anPopData && head.carouselNum < anPopData.length) {
 
-          const filtered: any = [];
-          anPopData.map((v: any, i: number) => {
-            if (i < head.carouselNum) {
-              filtered.push(v);
-            }
-          });
-          setAnnPopData(filtered);
-        }
-      }
-    } catch (e: any) {
-      customMessage({type: "error", msg: `错误：${e.toString()}`, position: "0vh"});
-    }
-
-
-  }, [commonData, anPopData]);
   // endregion
 
   window.onbeforeunload = function () {
@@ -499,6 +522,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
   };
 
+  const styleAdd = {marginTop: 8, marginLeft: 8, color: '#1890FF', fontSize: 16, height: 16};
+  const styleDelete = {marginTop: 8, color: "red", marginLeft: 15, fontSize: 16, height: 16};
   return (
     <PageContainer>
       {/* 要轮播界面 */}
@@ -564,70 +589,96 @@ const PopupCard: React.FC<any> = (props: any) => {
               {(fields, {add: addFirst, remove: removeFirst}) => {
                 return (
                   <div>
-                    {fields.map((field, index) => (
+                    {fields.map((field, first_index) => (
                       <div key={field.key}>
                         <Row>
                           <Form.Item
                             {...field}
                             label={"一级特性"}
                             name={[field.name, 'first']}
-                            rules={[{required: true, message: '请输入一级特性'}]}
-                          >
+                            rules={[{required: true, message: '请输入一级特性'}]}>
                             <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}></Input>
                           </Form.Item>
-
                           {/* 删除 */}
-                          <Button
-                            style={{border: 'none', color: "red", marginLeft: 5}}
-                            icon={<MinusCircleOutlined/>}
-                            onClick={() => removeFirst(field.name)}
-                          />
+                          <Popconfirm
+                            title="确定删除该特性？"
+                            onConfirm={() => removeFirst(field.name)}
+                          >
+                            <MinusCircleOutlined style={{...styleDelete, marginLeft: 38}}/>
+                          </Popconfirm>
+
+
                         </Row>
                         {/* 二级特性 */}
                         <Form.List name={[field.name, 'seconds']} initialValue={[Object.create(null)]}>
                           {(secondFields, {add: addSecond, remove: removeSeond}) => {
+
                             return (
                               <>
-                                {secondFields.map((secondField, index) => (
-                                  <div key={secondField.key}>
-                                    {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
-                                    <Row>
-                                      <Form.Item
-                                        {...secondField}
-                                        label={`二级特性${index + 1}`}
-                                        name={[secondField.name, 'first']}
-                                      >
-                                        <Input style={{minWidth: 400}}></Input>
-                                      </Form.Item>
+                                {secondFields.map((secondField, second_index) => {
 
-                                      {/* 删除 */}
-                                      <Button
-                                        style={{border: 'none', color: "#1890FF", marginLeft: 5}}
-                                        icon={<PlusCircleOutlined/>}
-                                        onClick={() => addSecond()}
-                                      />
-                                      <Button
-                                        style={{border: 'none', color: "red", marginLeft: 5}}
-                                        icon={<MinusCircleOutlined/>}
-                                        onClick={() => {
-                                          // 仅有一个二级属性时不能删
-                                          if (!secondFields || secondFields.length <= 1) {
-                                            customMessage({type: "error", msg: "只有一个二级特性时不能删除！", position: "0vh"});
-                                            return;
-                                          }
-                                          removeSeond(secondField.name);
-                                        }}
-                                      />
-                                    </Row>
-                                  </div>
-                                ))}
+                                  return (
+                                    <div key={secondField.key}>
+                                      <Row style={{backgroundColor: "red"}}>
+                                        {/* 添加一级特性 */}
+                                        <Popover content={
+                                          <div>
+                                            <div>
+                                              <Button type="link" onClick={() => addFirst("", first_index + 1)}>添加一级特性
+                                              </Button>
+                                            </div>
+                                            <div>
+                                              <Button type="link" onClick={() => addSecond("", 0)}>添加二级特性
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        }>
+                                          <PlusCircleOutlined
+                                            style={{
+                                              ...styleAdd,
+                                              marginTop: -48,
+                                              display: second_index === 0 ? "inline" : "none",
+                                              marginLeft: 558
+                                            }}/>
+                                        </Popover>
+                                      </Row>
+                                      {/*// 将原来的second 改为first是为了匹配后端数据回显时递归请求出来的数据*/}
+                                      <Row>
+                                        <Form.Item
+                                          {...secondField}
+                                          label={`二级特性${second_index + 1}`}
+                                          name={[secondField.name, 'first']}
+                                        >
+                                          <Input style={{minWidth: 400}}></Input>
+                                        </Form.Item>
+
+                                        {/* 添加二级特性 */}
+                                        <PlusCircleOutlined
+                                          style={styleAdd} onClick={() => addSecond("", second_index + 1)}/>
+
+                                        {/* 删除二级特性 */}
+                                        <MinusCircleOutlined
+                                          style={styleDelete}
+                                          onClick={() => {
+                                            // 仅有一个二级属性时不能删
+                                            if (!secondFields || secondFields.length <= 1) {
+                                              customMessage({type: "error", msg: "只有一个二级特性时不能删除！", position: "0vh"});
+                                              return;
+                                            }
+                                            removeSeond(secondField.name);
+                                          }}/>
+                                      </Row>
+                                    </div>
+                                  )
+                                })}
                               </>
                             );
                           }}
                         </Form.List>
                       </div>
                     ))}
-                    {/* 点击一级特性 */}
+                    {/* 点击一级特性 */
+                    }
                     <Form.Item>
                       <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
                               icon={<PlusCircleOutlined/>}
@@ -636,7 +687,8 @@ const PopupCard: React.FC<any> = (props: any) => {
 
                     </Form.Item>
                   </div>
-                );
+                )
+                  ;
               }}
             </Form.List>
             <Divider/>

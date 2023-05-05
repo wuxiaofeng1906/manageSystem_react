@@ -63,27 +63,39 @@ export const preViewNotice = (noticeEditionId: string, targetEnv: string) => {
 
 // region 保存功能
 
-// 获取特性列表list
-const getSpecialList = (ptyGroup: any) => {
+// 获取特性列表list  startOrder:开始的顺序
+const getSpecialList = (ptyGroup: any, startOrder: number) => {
 
+
+  let finalOrder = startOrder;
   if (!ptyGroup) return [];
   const specialList: any = [];
-  ptyGroup.map((v: any) => {
-    const childList: any = [];
-    if (v.seconds) {
-      (v.seconds).map((v2: any) => {
-        if (v2) {
-          if (!isEmpty(v2.first)) childList.push({speciality: v2.first});
+  ptyGroup.map((v: any, index: number) => {
+    const special: any = {
+      specialityOrdinal: finalOrder,
+      speciality: v.first,
+      children: []
+    };
+    //
+    finalOrder = finalOrder + 1;
+    const secondsArray = v.seconds;
+    if (secondsArray && secondsArray.length > 0) {
+      secondsArray.map((v2: any, index2: number) => {
+
+        if (v2 && !isEmpty(v2.first)) {
+          special.children.push(
+            {
+              specialityOrdinal: finalOrder,
+              speciality: v2.first
+            }
+          );
         }
+        finalOrder = finalOrder + 1;
       })
     }
-
-    specialList.push({
-      speciality: v.first,
-      children: childList
-    });
+    specialList.push(special);
   });
-  return specialList;
+  return {specialList, finalOrder: finalOrder - 1};
 }
 
 // 不轮播时的数据
@@ -91,7 +103,8 @@ const notCarouselData = (popupData: any, announceName: string) => {
   const popData = popupData[0];
   // 相当于只有一个轮播页面
   const {ptyGroup, uploadPic, picLayout, yuQueUrl} = popData;
-  const data = {
+  const specilaListArray: any = getSpecialList(ptyGroup, 1);
+  const data: any = {
     pages: [
       {
         image: uploadPic,
@@ -99,8 +112,7 @@ const notCarouselData = (popupData: any, announceName: string) => {
         layoutTypeId: picLayout,
         yuQue: yuQueUrl,
         featureName: announceName, // 非轮播的特性名称要保存为公告名称
-        contents: getSpecialList(ptyGroup)
-
+        contents: specilaListArray.specialList// 非轮播只有一页，传1就行
       }
     ]
   }
@@ -109,22 +121,32 @@ const notCarouselData = (popupData: any, announceName: string) => {
 
 // 轮播时的数据
 const carouselData = (popupData: any) => {
+
   if (!popupData || popupData.length === 0) return {};
   // 轮播页数没填完的时候，只保存有数据的页面
   const data: any = [];
+
   popupData.map((v: any) => {
+    let start_order = 1;
     const {tabsContent} = v;
     // 通过判断图片和一级特性是否为空来确定此轮播页面有没有填写完  (测试时：  )
     if (tabsContent.uploadPic && tabsContent.ptyGroup && (tabsContent.ptyGroup)[0].first) {
+
+      const specilaListArray: any = getSpecialList(tabsContent.ptyGroup, start_order);
+
       data.push({
         featureName: tabsContent.specialName,
         image: tabsContent.uploadPic,
         pageNum: v.tabPage,
         layoutTypeId: tabsContent.picLayout,
-        contents: getSpecialList(tabsContent.ptyGroup)
+        contents: specilaListArray.specialList
       });
+
+      //  这里也有一个循环，所以这里要+1
+      start_order = specilaListArray.finalOrder + 1; // 继续赋值接口传回来的数据
     }
   });
+
   return {pages: data};
 };
 

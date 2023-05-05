@@ -80,15 +80,19 @@ const SheetInfo = (props: any, ref: any) => {
 
   const onSave = async (flag = false) => {
     if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
-    const upgrade_api =
-      upgradeRef.current
-        ?.getRenderedNodes()
-        ?.map((it) => it.data)
-        ?.map((it) => ({
-          ...it,
-          concurrent: it.concurrent ?? 20,
-          api_header: it.api_header ?? '',
-        })) || [];
+    // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
+    //       ...it,
+    //       concurrent: it.concurrent ?? 20,
+    //       api_header: it.api_header ?? '',
+    //     })) || [];
+    const upgrade_api: any = [];
+    upgradeRef.current?.forEachNode((it: any) => {
+      upgrade_api.push({
+        ...it.data,
+        concurrent: it.data.concurrent ?? 20,
+        api_header: it.data.api_header ?? '',
+      })
+    });
     const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
     const baseValues = baseForm.getFieldsValue();
     const orderValues = orderForm.getFieldsValue();

@@ -305,7 +305,7 @@ const SheetInfo = (props: any, ref: any) => {
           // batch 没数据的时候是-
           return isEmpty(v) || v === "-";
         });
-        debugger
+
         if (!isEmpty(err)) {
           showErrTip = errTip[err?.[0]];
         }
@@ -508,7 +508,7 @@ const SheetInfo = (props: any, ref: any) => {
           //       ? agBatch[0] : undefined : p.value}
           style={{width: '100%'}}
           disabled={agFinished}
-          allowClear={['batch', 'database_version'].includes(field)}
+          // allowClear={['batch', 'database_version'].includes(field)}
           dropdownMatchSelectWidth={false}
           options={
             field === 'database_version'

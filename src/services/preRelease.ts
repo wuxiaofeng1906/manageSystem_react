@@ -158,8 +158,8 @@ const PreReleaseServices = {
   },
 
   // 非积压发布放开租户
-  async releasetenants() {
-    return {};
+  async releasetenants(data: any) {
+    return request(`${baseUrl}/latest-release/tenant-cluster`, {data, method: 'post'});
   },
 
   // 所有集群组合情况

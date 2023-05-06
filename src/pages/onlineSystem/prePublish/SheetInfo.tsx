@@ -24,7 +24,7 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
-import {isEmpty, omit, isString, pick, chunk, isEqual} from 'lodash';
+import {isEmpty, omit, isString, pick, chunk, isEqual, intersection} from 'lodash';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
@@ -389,7 +389,8 @@ const SheetInfo = (props: any, ref: any) => {
       await PreReleaseServices.automation(params);
       // 获取集群
       const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
-      const clusters = (release_app?.[0]?.cluster).split(",")
+      const clusters = (release_app?.[0]?.cluster).split(",");
+
       // 关联公告并勾选挂起公告
       if (!isEmpty(announce) && announce !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
@@ -399,6 +400,12 @@ const SheetInfo = (props: any, ref: any) => {
           cluster_ids: clusters,
         });
       }
+
+      // 发布类型为停机发布 并且 包含租户集群才调用开放租户接口  （cn-northwest-global）
+      if (orderForm.getFieldValue("release_way") === "stop_server" && !isEqual(clusters, ["cn-northwest-global"])) {
+        await PreReleaseServices.releasetenants({env_name_list: clusters});
+      }
+
       setSuccessModal(false);
       history.replace('/onlineSystem/releaseProcess');
     }

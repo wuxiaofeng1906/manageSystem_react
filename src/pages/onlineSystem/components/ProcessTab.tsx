@@ -170,6 +170,7 @@ export const ProcessTab: React.FC = (props: any) => {
 
     const items = tabList.map((it: any) => {
       return {
+        ...it,
         label: it.release_name,
         key: it.release_num
       };

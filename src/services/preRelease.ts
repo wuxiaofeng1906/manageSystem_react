@@ -156,6 +156,12 @@ const PreReleaseServices = {
       }, method: 'post'
     });
   },
+
+  // 非积压发布放开租户
+  async releasetenants() {
+    return {};
+  },
+
   // 所有集群组合情况
   async clusterGroup() {
     return request(`${baseUrl}/latest-release/cluster`);

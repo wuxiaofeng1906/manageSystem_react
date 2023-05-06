@@ -272,9 +272,12 @@ const SheetInfo = (props: any, ref: any) => {
       auto_env: '请填写是否升级后自动化环境',
       cluster: '请填写发布环境',
       clear_redis: '请填写是否清理redis缓存',
+      batch: '请填写batch版本',
+      // database_version: '请填写数据库版本',
       is_recovery: '请填写是否涉及数据Recovery',
       is_update: '请填写是否数据update',
       clear_cache: '请填写是否清理应用缓存',
+
     };
 
     // 发布成功、unknown-> 数据完整性校验
@@ -289,9 +292,20 @@ const SheetInfo = (props: any, ref: any) => {
       }
       // 服务信息
       else if (!isEmpty(serverInfo)) {
-        const err = Object.entries(
-          pick(serverInfo?.[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
-        ).find(([k, v]) => isEmpty(v));
+        const checkItem = ['cluster', 'clear_redis', 'clear_cache'];  // 暂时不需要 sql_order，database_version 判定
+        // 如果一键部署ID中有batch服务，那么列表中的batch服务就不能为空。这里就需要来判断
+        const deployment = baseForm.getFieldValue("deployment");
+        [...deployments].map((it: any) => {
+          if (deployment.includes((it.deployment_id).toString()) && (it.app).includes("batch")) {
+            checkItem.push("batch");
+          }
+        });
+        const enties = Object.entries(pick(serverInfo?.[0], checkItem));
+        const err: any = enties.find(([k, v]) => {
+          // batch 没数据的时候是-
+          return isEmpty(v) || v === "-";
+        });
+
         if (!isEmpty(err)) {
           showErrTip = errTip[err?.[0]];
         }
@@ -470,19 +484,31 @@ const SheetInfo = (props: any, ref: any) => {
         />
       );
     }
+    // 获取展示的value
+    let cellValue = p.value;
+    if (isEmpty(p.value) || p.value === "-") {
+      if (field === 'database_version' && databaseVersion && databaseVersion.length) {
+        cellValue = databaseVersion[0];
+      } else if (field === 'batch' && agBatch && agBatch.length) {
+        cellValue = agBatch[0];
+      } else {
+        cellValue = "-";
+      }
+    }
+
     return (
       <div className={styles.antSelectStyle}>
         <Select
           size={'small'}
-          // value={isEmpty(p.value) ? undefined : p.value}
-          value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
-            (isEmpty(p.value) || p.value === "-")
-              ? field === 'database_version'
-              ? databaseVersion[0] : field === 'batch'
-                ? agBatch[0] : undefined : p.value}
+          value={cellValue}
+          // value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
+          //   (isEmpty(p.value) || p.value === "-")
+          //     ? field === 'database_version'
+          //     ? databaseVersion[0] : field === 'batch'
+          //       ? agBatch[0] : undefined : p.value}
           style={{width: '100%'}}
           disabled={agFinished}
-          allowClear={['batch', 'database_version'].includes(field)}
+          // allowClear={['batch', 'database_version'].includes(field)}
           dropdownMatchSelectWidth={false}
           options={
             field === 'database_version'

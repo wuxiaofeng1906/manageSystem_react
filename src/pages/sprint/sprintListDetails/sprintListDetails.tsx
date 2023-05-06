@@ -1480,7 +1480,7 @@ const SprintList: React.FC<any> = () => {
   }, []);
 
   const onRemoveTab = (key: string) => {
-    debugger
+
     formForQuery.resetFields();
     const data = tabs?.filter((it: any) => it.projectid !== +key);
     localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify(data));

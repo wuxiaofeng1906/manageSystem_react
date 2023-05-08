@@ -24,7 +24,7 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
-import {isEmpty, omit, isString, pick, chunk, isEqual, intersection} from 'lodash';
+import {isEmpty, omit, isString, pick, difference, isEqual, intersection} from 'lodash';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
@@ -41,8 +41,9 @@ const SheetInfo = (props: any, ref: any) => {
   const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [envs] = useModel('env', (env) => [env.globalEnv]);
-  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft,] = useModel('onlineSystem', (online) => [
-    online.globalState, online.sqlList, online.draft, online.setGlobalState, online.getLogInfo, online.setDraft,]);
+  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft, getReleaseInfo, basic, api] =
+    useModel('onlineSystem', (online) => [online.globalState, online.sqlList,
+      online.draft, online.setGlobalState, online.getLogInfo, online.setDraft, online.getReleaseInfo, online.basic, online.api]);
   const {devOpsOrderInfo, getDevOpsOrderInfo} = useModel('onlineSystem');
 
 
@@ -552,6 +553,59 @@ const SheetInfo = (props: any, ref: any) => {
       setFinished(true);
     }
   }, [globalState?.finished]);
+
+  // 对比 集群 、 应用 、 升级接口 是否相同
+  const checkData = async () => {
+
+
+    if (!basic || api.length === 0) {
+      // 获取项目服务与详情的数据
+      await getReleaseInfo({release_num}, null);
+      return;
+    }
+    debugger
+    const currentPage = {...upgradeData};
+    // basic 中可以对比集群和应用
+    let module = "";
+    if (basic) {
+      //   对比集群
+      if (basic.cluster !== currentPage.release_app?.cluster) {
+        module = "上线集群";
+      }
+      //   对比应用服务
+      if (basic.apps !== currentPage.release_app?.apps) {
+        module = module ? `${module}、应用服务` : "应用服务";
+      }
+
+    }
+
+    // api 中对比升级接口
+    const currentApi: any = currentPage?.upgrade_api;
+    if (api && currentApi && api.length !== currentApi.length) {
+      module = module ? `${module}、升级接口` : "升级接口";
+
+
+    }
+
+    if (module) {
+      Modal.error({
+        title: '工单信息一致性校验',
+        centered: true,
+        content: <div style={{textIndent: "2em"}}>项目与服务详情中的
+          <label style={{color: "red"}}>【{module}】</label>与当前工单中
+          <label style={{color: "red"}}>【{module}】</label>的内容不一致,请联系SQA对应值班负责人！
+        </div>,
+      });
+    }
+  };
+
+  // 工单生成之后校验数据
+  useEffect(() => {
+    if (upgradeData) {
+      checkData();
+    }
+
+  }, [upgradeData, basic]);
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">

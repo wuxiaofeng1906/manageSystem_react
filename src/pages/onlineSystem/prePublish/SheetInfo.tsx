@@ -580,10 +580,52 @@ const SheetInfo = (props: any, ref: any) => {
     }
 
     // api 中对比升级接口
+    const differenceApi: any = [];
     const currentApi: any = currentPage?.upgrade_api;
     if (api && currentApi && api.length !== currentApi.length) {
       module = module ? `${module}、升级接口` : "升级接口";
 
+      if (api.length > currentApi.length) {
+        debugger
+        api.forEach((e: any) => {
+          let exitFlag = false;
+          delete e._id;
+          delete e.ready_release_num;
+          delete e.author;
+          for (let i = 0; i < currentApi.length; i++) {
+            debugger
+            const _currentApi = currentApi[i];
+            delete _currentApi.concurrent
+            if (isEqual(e, _currentApi)) {
+              exitFlag = true;
+              break;
+            }
+          }
+          if (!exitFlag) {
+            differenceApi.push(e);
+          }
+        });
+      } else {
+        currentApi.forEach((e: any) => {
+          let exitFlag = false;
+          delete e.concurrent;
+          for (let i = 0; i < api.length; i++) {
+            const _data = api[i];
+            delete _data._id;
+            delete _data.ready_release_num;
+            delete _data.author
+            debugger
+            if (isEqual(e, _data)) {
+              exitFlag = true;
+              break;
+            }
+          }
+          if (!exitFlag) {
+            differenceApi.push(e);
+          }
+        });
+      }
+      console.log(differenceApi)
 
     }
 

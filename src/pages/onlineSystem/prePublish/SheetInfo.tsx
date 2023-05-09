@@ -561,22 +561,18 @@ const SheetInfo = (props: any, ref: any) => {
     if (globalState?.finished) {
       return;
     }
-    if (!basic || api.length === 0 || basic.release_num !== release_num) {
-      // 获取项目服务与详情的数据
-      await getReleaseInfo({release_num}, null);
-      return;
-    }
 
     const currentPage = {...upgradeData};
-    // -------------------------------------------------------basic 中可以对比集群和应用
     let module = "";
-    if (basic) {
+    // -------------------------------------------------------basicData 中可以对比集群和应用
+    const basicData = await OnlineSystemServices.getBasicInfo({release_num});
+    if (basicData) {
       //   对比集群
-      if (basic.cluster !== currentPage.release_app?.cluster) {
+      if (basicData.cluster !== currentPage.release_app?.cluster) {
         module = "上线集群";
       }
       //   对比应用服务
-      if (basic.apps !== currentPage.release_app?.apps) {
+      if (basicData.apps !== currentPage.release_app?.apps) {
         module = module ? `${module}、应用服务` : "应用服务";
       }
 
@@ -584,12 +580,13 @@ const SheetInfo = (props: any, ref: any) => {
 
     // -----------------------------------------------------api 中对比升级接口
 
+    const apiData = await OnlineSystemServices.getUpgradeInfo({release_num});
     const _newApi: any[] = []; // 过程详情中的api
     const _newCurrentApi: any[] = []; // 工单信息中的api
 
     // 将两个接口字段缩减为一样的。
-    if (api && api.length) {
-      api.forEach((e: any) => {
+    if (apiData && apiData.length) {
+      apiData.forEach((e: any) => {
         delete e._id;
         delete e.ready_release_num;
         delete e.author;
@@ -640,10 +637,10 @@ const SheetInfo = (props: any, ref: any) => {
   // 工单生成之后校验数据
   useEffect(() => {
     if (upgradeData) {
-      checkData();
+       checkData();
     }
 
-  }, [upgradeData, basic]);
+  }, [upgradeData]);
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">

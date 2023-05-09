@@ -556,11 +556,12 @@ const SheetInfo = (props: any, ref: any) => {
 
   // 对比 集群 、 应用 、 升级接口 是否相同
   const checkData = async () => {
+    debugger
     // 历史记录不再检查
-    if(globalState?.finished){
+    if (globalState?.finished) {
       return;
     }
-    if (!basic || api.length === 0) {
+    if (!basic || api.length === 0 || basic.release_num !== release_num) {
       // 获取项目服务与详情的数据
       await getReleaseInfo({release_num}, null);
       return;
@@ -626,7 +627,7 @@ const SheetInfo = (props: any, ref: any) => {
       Modal.error({
         title: '工单信息一致性校验',
         centered: true,
-        width:550,
+        width: 550,
         content: <div style={{textIndent: "2em"}}>项目与服务详情中的
           <label style={{color: "red"}}>【{module}】</label>与当前工单中
           <label style={{color: "red"}}>【{module}】</label>的内容不一致,请联系对应的SQA值班负责人！

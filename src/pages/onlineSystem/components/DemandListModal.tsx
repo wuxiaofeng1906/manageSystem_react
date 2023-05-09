@@ -271,8 +271,23 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         data.story ?? ''
       }』的是否可热更 状态调整为 ${WhetherOrNot[status]}`,
       onOk: () => {
-        list[index].is_update = status;
+        // list[index].is_update = status;
+        // setList([...list]);
+        const _list = list[index];
+        _list.is_update = status;
         setList([...list]);
+
+        // 还要更新selected中的数据
+        const _selected: any = [];
+        // 根据story ID 判断是否存在同一个
+        [...selected].forEach((e: any) => {
+          if (e.story === _list.story) {
+            _selected.push(_list);
+          } else {
+            _selected.push(e);
+          }
+        });
+        setSelected(_selected);
       },
     });
   };

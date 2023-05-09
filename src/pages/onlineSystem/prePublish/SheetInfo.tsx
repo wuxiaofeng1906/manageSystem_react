@@ -561,7 +561,7 @@ const SheetInfo = (props: any, ref: any) => {
       return;
     }
 
-    const currentPage = JSON.parse(JSON.stringify(upgradeData));
+    const currentPage = JSON.parse(JSON.stringify({...upgradeData}));
     let module = "";
     // -------------------------------------------------------basicData 中可以对比集群和应用
     const basicData = await OnlineSystemServices.getBasicInfo({release_num});

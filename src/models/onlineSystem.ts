@@ -29,7 +29,6 @@ export default () => {
   const [sqlList, setSqlList] = useState<any[]>([]);
 
   const getReleaseInfo = async (data: any, refreshData: any = null) => {
-    debugger
     if (refreshData) {
       await OnlineSystemServices.refreshProjectInfo(refreshData);
     }
@@ -57,12 +56,10 @@ export default () => {
     setServer(res);
   };
   const getBasicInfo = async (data: any) => {
-    debugger
     const res = await OnlineSystemServices.getBasicInfo(data);
     setBasic(res);
   };
   const getUpgradeInfo = async (data: any) => {
-    debugger
     const res = await OnlineSystemServices.getUpgradeInfo(data);
     setApi(res);
   };

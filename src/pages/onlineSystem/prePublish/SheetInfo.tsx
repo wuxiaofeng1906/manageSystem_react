@@ -556,13 +556,12 @@ const SheetInfo = (props: any, ref: any) => {
 
   // 对比 集群 、 应用 、 升级接口 是否相同
   const checkData = async () => {
-    debugger
     // 历史记录不再检查
     if (globalState?.finished) {
       return;
     }
 
-    const currentPage = {...upgradeData};
+    const currentPage = JSON.parse(JSON.stringify(upgradeData));
     let module = "";
     // -------------------------------------------------------basicData 中可以对比集群和应用
     const basicData = await OnlineSystemServices.getBasicInfo({release_num});
@@ -637,7 +636,7 @@ const SheetInfo = (props: any, ref: any) => {
   // 工单生成之后校验数据
   useEffect(() => {
     if (upgradeData) {
-       checkData();
+      checkData();
     }
 
   }, [upgradeData]);

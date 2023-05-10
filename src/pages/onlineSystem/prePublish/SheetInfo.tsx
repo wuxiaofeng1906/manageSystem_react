@@ -24,7 +24,7 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
-import {isEmpty, omit, isString, pick, chunk, isEqual, intersection} from 'lodash';
+import {isEmpty, omit, isString, pick, difference, isEqual, intersection} from 'lodash';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
@@ -41,8 +41,9 @@ const SheetInfo = (props: any, ref: any) => {
   const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [envs] = useModel('env', (env) => [env.globalEnv]);
-  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft,] = useModel('onlineSystem', (online) => [
-    online.globalState, online.sqlList, online.draft, online.setGlobalState, online.getLogInfo, online.setDraft,]);
+  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft, getReleaseInfo, basic, api] =
+    useModel('onlineSystem', (online) => [online.globalState, online.sqlList,
+      online.draft, online.setGlobalState, online.getLogInfo, online.setDraft, online.getReleaseInfo, online.basic, online.api]);
   const {devOpsOrderInfo, getDevOpsOrderInfo} = useModel('onlineSystem');
 
 
@@ -552,6 +553,93 @@ const SheetInfo = (props: any, ref: any) => {
       setFinished(true);
     }
   }, [globalState?.finished]);
+
+  // 对比 集群 、 应用 、 升级接口 是否相同
+  const checkData = async () => {
+    // 历史记录不再检查
+    if (globalState?.finished) {
+      return;
+    }
+
+    const currentPage = JSON.parse(JSON.stringify({...upgradeData}));
+    let module = "";
+    // -------------------------------------------------------basicData 中可以对比集群和应用
+    const basicData = await OnlineSystemServices.getBasicInfo({release_num});
+    if (basicData) {
+      //   对比集群
+      if (basicData.cluster !== currentPage.release_app?.cluster) {
+        module = "上线集群";
+      }
+      //   对比应用服务
+      if (basicData.apps !== currentPage.release_app?.apps) {
+        module = module ? `${module}、应用服务` : "应用服务";
+      }
+
+    }
+
+    // -----------------------------------------------------api 中对比升级接口
+
+    const apiData = await OnlineSystemServices.getUpgradeInfo({release_num});
+    const _newApi: any[] = []; // 过程详情中的api
+    const _newCurrentApi: any[] = []; // 工单信息中的api
+
+    // 将两个接口字段缩减为一样的。
+    if (apiData && apiData.length) {
+      apiData.forEach((e: any) => {
+        delete e._id;
+        delete e.ready_release_num;
+        delete e.author;
+        _newApi.push(e);
+      });
+    }
+
+    if ((currentPage?.upgrade_api) && (currentPage?.upgrade_api).length) {
+      (currentPage?.upgrade_api).forEach((e: any) => {
+        delete e.concurrent;
+        _newCurrentApi.push(e);
+      });
+
+    }
+
+    // 有差异的API数据
+    let differenceApi: any[] = [];
+    if (_newApi.length !== _newCurrentApi.length) {
+      module = module ? `${module}、升级接口` : "升级接口";
+
+      if (_newCurrentApi.length > _newApi.length) {
+        differenceApi = _newCurrentApi.filter(v => {
+          return _newApi.every(e => e.api_url != v.api_url);
+        });
+      } else {
+        differenceApi = _newApi.filter(v => {
+          return _newCurrentApi.every(e => e.api_url != v.api_url);
+        });
+      }
+      console.log("不同的API", differenceApi);
+    }
+
+
+    if (module) {
+      Modal.error({
+        title: '工单信息一致性校验',
+        centered: true,
+        width: 550,
+        content: <div style={{textIndent: "2em"}}>项目与服务详情中的
+          <label style={{color: "red"}}>【{module}】</label>与当前工单中
+          <label style={{color: "red"}}>【{module}】</label>的内容不一致,请联系对应的SQA值班负责人！
+          {/*{JSON.stringify(differenceApi)}*/}
+        </div>,
+      });
+    }
+  };
+
+  // 工单生成之后校验数据
+  useEffect(() => {
+    if (upgradeData) {
+      checkData();
+    }
+
+  }, [upgradeData]);
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">

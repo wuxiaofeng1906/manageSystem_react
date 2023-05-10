@@ -3,7 +3,7 @@ import {AgGridReact} from 'ag-grid-react';
 import {Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin, Modal} from 'antd';
 import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
 import {PageContainer} from '@ant-design/pro-layout';
-import {ExclamationCircleOutlined, FolderAddTwoTone} from '@ant-design/icons';
+import {ExclamationCircleOutlined, FolderAddTwoTone, CopyTwoTone} from '@ant-design/icons';
 import {announcementListColumn} from './column';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
@@ -15,6 +15,7 @@ import usePermission from '@/hooks/permission';
 import {customMessage} from '@/publicMethods/showMessages';
 import {deleteList, getAnnounceList} from "./axiosRequest/apiPage";
 import dayjs from "dayjs";
+
 
 const disabledStyle = {filter: 'grayscale(1)', cursor: 'not-allowed'};
 const announceList = () => {
@@ -112,6 +113,11 @@ const announceList = () => {
     });
   };
 
+  // 复制数据
+
+  const onCopy = async (params: CellClickedEvent) => {
+
+  };
   // 获取人
   const getPerson = async () => {
     const res = await AnnouncementServices.applicant();
@@ -196,9 +202,17 @@ const announceList = () => {
                     <Space size={8}>
                       <img
                         width={16}
+                        height={17}
                         style={announcePermission?.().check ? {cursor: 'pointer'} : disabledStyle}
                         src={require('../../../../../public/params.png')}
                         onClick={() => onAdd(params)}
+                      />
+                      <img
+                        width={16}
+                        height={17}
+                        style={{cursor: 'pointer'}}
+                        src={require('../../../../../public/copy.png')}
+                        onClick={() => onCopy(params)}
                       />
                       <img
                         width={16}
@@ -209,6 +223,7 @@ const announceList = () => {
                         src={require('../../../../../public/delete_red.png')}
                         onClick={() => onDelete(params)}
                       />
+
                     </Space>
                   );
                 },

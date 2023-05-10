@@ -116,7 +116,19 @@ const announceList = () => {
   // 复制数据
 
   const onCopy = async (params: CellClickedEvent) => {
+    if (!isEmpty(params) && !announcePermission?.().check)
+      return customMessage({type: "info", msg: "您无查看公告权限！", position: "0vh"});
 
+    let releaseID = '';
+    let releaseName = '';
+
+    if (!isEmpty(params)) {
+      // 修改的话就是原有的id
+      releaseName = params?.data.iteration;
+      releaseID = params?.data.id;
+    }
+    if (isEmpty(releaseName)) return customMessage({type: "error", msg: "数据异常！", position: "0vh"});
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=copy`);
   };
   // 获取人
   const getPerson = async () => {

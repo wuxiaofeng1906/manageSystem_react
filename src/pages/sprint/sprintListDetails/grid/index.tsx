@@ -96,7 +96,7 @@ const getColums = (prjNames: any, show = true) => {
       field: 'ztNo',
       pinned: 'left',
       minWidth: 80,
-      suppressMenu: true,
+      // suppressMenu: true,
       cellRenderer: linkToZentaoPage,
     },
     {
@@ -123,7 +123,7 @@ const getColums = (prjNames: any, show = true) => {
       minWidth: 150,
       cellRenderer: textDecorateRender,
       tooltipField: 'appservice',
-      filter: false,
+      // filter: false,
     },
     {
       headerName: '所属计划',

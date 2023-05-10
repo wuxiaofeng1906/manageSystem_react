@@ -142,7 +142,7 @@ const Announce: React.FC<any> = (props: any) => {
       // 新增和修改调用不一样的接口
       if (type === "detail") {
         result = await updateAnnouncement(releaseID, formInfo, oldCommonData);
-      } else if (type === "add") {
+      } else if (type === "add" || type === "copy") {
         result = await saveAnnounceContent({...formInfo});
       }
       if (result.ok) {
@@ -151,7 +151,7 @@ const Announce: React.FC<any> = (props: any) => {
           let noticeId = releaseID;
           //   保存成功之后预览
           // 预览ID result.data
-          if (type === "add") { // 如果是新增的话，预览之后需要先返回列表
+          if (type === "add" || type === "copy") { // 如果是新增的话，预览之后需要先返回列表
             history.push('./announceList');
             noticeId = result?.data.toString();
           }
@@ -253,7 +253,7 @@ const Announce: React.FC<any> = (props: any) => {
   // 判断是否有上线，有上线才会进行一键发布
   const pulishButtonVisible = async () => {
 
-    if (isEmpty(releaseID)) {
+    if (isEmpty(releaseID) || type === "copy") {
       setShowPulishButton(false);
       return;
     }
@@ -347,7 +347,7 @@ const Announce: React.FC<any> = (props: any) => {
     }
 
     // 如果修改，并且不是上一页返回
-    if (type === "detail" && !back) { // 不为下一页返回的数据才调用原始接口
+    if ((type === "detail" || type === "copy") && !back) { // 不为下一页返回的数据才调用原始接口
       // 如果是从列表页面过来，并且commonData 没有数据，则需要根据id和名字查询页面数据，只要type是details，表示一定是从列表过来的，下一步返回的数据没有这个字段
       await getDataByReleaseId();
       setLoading(false);

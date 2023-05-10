@@ -226,7 +226,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (result.ok) {
       if (preView) {
         let noticeId = releaseID;
-        if (type === "add") {
+        if (type === "add" || type === "copy") {
           noticeId = result.data.toString();
           // 清空state中原始数据
           setAnnPopData([]);
@@ -479,7 +479,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       if (type === "add") {
         showForAdd();
 
-      } else if (type === "detail") {
+      } else if (type === "detail" || type === "copy") {
         if (newHead.announce_carousel === 1) {
           if (newHead.clearTabContent) {
             setEmptyForm();

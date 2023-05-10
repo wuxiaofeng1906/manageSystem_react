@@ -428,6 +428,9 @@ const Announce: React.FC<any> = (props: any) => {
                        },]}>
               <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"}/>
             </Form.Item>
+            <div style={{color: "gray", marginTop: -20, marginLeft: 10}}>
+              <p>命名规则：建议上线分支+发布集群，如：sprint20230511班车+集群1</p>
+            </div>
 
             <Form.Item label={'升级时间'} name={'announce_time'}
                        rules={[{

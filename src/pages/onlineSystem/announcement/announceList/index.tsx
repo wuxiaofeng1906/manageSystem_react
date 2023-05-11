@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
-import {Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin, Modal} from 'antd';
+import {Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin, Modal, Tooltip} from 'antd';
 import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
 import {PageContainer} from '@ant-design/pro-layout';
 import {ExclamationCircleOutlined, FolderAddTwoTone, CopyTwoTone} from '@ant-design/icons';
@@ -212,30 +212,35 @@ const announceList = () => {
                 operation: (params: CellClickedEvent) => {
                   return (
                     <Space size={8}>
-                      <img
-                        width={16}
-                        height={17}
-                        style={announcePermission?.().check ? {cursor: 'pointer'} : disabledStyle}
-                        src={require('../../../../../public/params.png')}
-                        onClick={() => onAdd(params)}
-                      />
-                      <img
-                        width={16}
-                        height={17}
-                        style={{cursor: 'pointer'}}
-                        src={require('../../../../../public/copy.png')}
-                        onClick={() => onCopy(params)}
-                      />
-                      <img
-                        width={16}
-                        height={17}
-                        style={
-                          announcePermission?.().delete ? {cursor: 'pointer'} : disabledStyle
-                        }
-                        src={require('../../../../../public/delete_red.png')}
-                        onClick={() => onDelete(params)}
-                      />
-
+                      <Tooltip title="修改">
+                        <img
+                          width={16}
+                          height={17}
+                          style={announcePermission?.().check ? {cursor: 'pointer'} : disabledStyle}
+                          src={require('../../../../../public/params.png')}
+                          onClick={() => onAdd(params)}
+                        />
+                      </Tooltip>
+                      <Tooltip title="复制">
+                        <img
+                          width={16}
+                          height={17}
+                          style={{cursor: 'pointer'}}
+                          src={require('../../../../../public/copy.png')}
+                          onClick={() => onCopy(params)}
+                        />
+                      </Tooltip>
+                      <Tooltip title="删除">
+                        <img
+                          width={16}
+                          height={17}
+                          style={
+                            announcePermission?.().delete ? {cursor: 'pointer'} : disabledStyle
+                          }
+                          src={require('../../../../../public/delete_red.png')}
+                          onClick={() => onDelete(params)}
+                        />
+                      </Tooltip>
                     </Space>
                   );
                 },

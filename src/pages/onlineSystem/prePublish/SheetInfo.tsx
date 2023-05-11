@@ -225,8 +225,8 @@ const SheetInfo = (props: any, ref: any) => {
         service.batch = batch[0];
       }
       // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
-      if (databaseVersion && databaseVersion.length > 0 && (isEmpty(service.database_version) || service.database_version === "-")) {
-        service.database_version = databaseVersion[0];
+      if (database && database.length > 0 && (isEmpty(service.database_version) || service.database_version === "-")) {
+        service.database_version = database[0];
       }
       setUpgradeData({...res, release_app: service});
       setSpinning(false);

@@ -52,7 +52,7 @@ export default () => {
     setRepair(res);
   };
   const getServerApp = async (data: any) => {
-    const res = await OnlineSystemServices.getServerApp(data);
+    const res = await OnlineSystemServices.getServerApp({...data, onlyappr: true});
     setServer(res);
   };
   const getBasicInfo = async (data: any) => {

@@ -84,7 +84,7 @@ const axiosGet_77Service = async (url: string, queryData: any = {}) => {
   await axios.get(url,
     {
       params: queryData, data: {},
-      headers: {"contentType": "application/json", "Authorization": ""}  // 备注：77服务的请求一定不能带token,否则会报权限问题
+      headers: {"contentType": "application/json", "Authorization": "", "Tenant-Id": "public"}  // 备注：77服务的请求一定不能带token,否则会报权限问题,图片需要上传到public文件夹中
     })
     .then((res: any) => {
       result = res.data;

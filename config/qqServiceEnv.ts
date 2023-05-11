@@ -9,7 +9,7 @@ export const noticeUrl = (origin: any) => {
   if (origin.includes('rd.q7link.com')) {
     noticeEnv = "cn-northwest-global"; // 传给后端的环境（正式环境）
     noticeEnvQuery = `http://identity.${noticeEnv}.77hub.com/`;   // 上传图片之前的鉴权获取，以及公告GQL查询（测试环境）
-    imageUpload = "http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-prod/"; // 图片上传以及通过这个链接拼接上传后的图片ID就可以访问到图片。
+    imageUpload = "http://s3.cn-northwest-1.amazonaws.com.cn/cn-northwest-1-q7link-tenant-public/"; // 图片上传以及通过这个链接拼接上传后的图片ID就可以访问到图片。
 
   }
 

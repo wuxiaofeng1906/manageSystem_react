@@ -90,7 +90,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const getTableList = async () => {
     setSpin(true);
     try {
-      const res = await OnlineSystemServices.getStoryList({branch: computed?.branch});
+      const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {

@@ -13,12 +13,12 @@ export const announcementListColumn: any = [
   {
     headerName: 'ID',
     field: 'id',
-    minWidth: 150,
+    minWidth: 110,
   },
   {
     headerName: '公告名称',
     field: 'iteration',
-    minWidth: 150,
+    minWidth: 240,
   },
   {
     headerName: '升级模板',

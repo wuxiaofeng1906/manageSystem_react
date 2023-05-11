@@ -218,7 +218,7 @@ const SheetInfo = (props: any, ref: any) => {
       });
       setLeaveShow(false);
       setFinished(agFinished);
-      // res中，batch版本和数据库版本需要用来默认为获取的数据中的第一个
+      //--------------- res中，batch版本和数据库版本需要用来默认为获取的数据中的第一个
       const service = res.release_app;
       // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
       if (batch && batch.length > 0 && (isEmpty(service.batch) || service.batch === "-")) {
@@ -509,22 +509,22 @@ const SheetInfo = (props: any, ref: any) => {
       );
     }
     // 获取展示的value
-    let cellValue = p.value;
-    if (isEmpty(p.value) || p.value === "-") {
-      if (field === 'database_version' && databaseVersion && databaseVersion.length) {
-        cellValue = databaseVersion[0];
-      } else if (field === 'batch' && agBatch && agBatch.length) {
-        cellValue = agBatch[0];
-      } else {
-        cellValue = "-";
-      }
-    }
+    // let cellValue = p.value;
+    // if (isEmpty(p.value) || p.value === "-") {
+    //   if (field === 'database_version' && databaseVersion && databaseVersion.length) {
+    //     cellValue = databaseVersion[0];
+    //   } else if (field === 'batch' && agBatch && agBatch.length) {
+    //     cellValue = agBatch[0];
+    //   } else {
+    //     cellValue = "-";
+    //   }
+    // }
 
     return (
       <div className={styles.antSelectStyle}>
         <Select
           size={'small'}
-          value={cellValue}
+          value={isEmpty(p.value) ? undefined : p.value}
           // value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
           //   (isEmpty(p.value) || p.value === "-")
           //     ? field === 'database_version'

@@ -2,11 +2,13 @@ import {axiosPost_77Service, axiosGet_77Service} from '@/publicMethods/axios';
 import {noticeUrl} from "../../../../../../config/qqServiceEnv";
 
 export const getS3Key = async (fileName: string) => {
-  const result = await axiosGet_77Service(`/identity/Attachment/signature/post`, {
-    fileName: fileName,
-    isPublicRead: "true",
-    isHttp: "true"
-  });
+  // 正式环境上要传图片到public文件夹中。
+  let requestHeader = {"contentType": "application/json", "Authorization": ""}
+  if (location.origin.includes('rd.q7link.com')) {
+    requestHeader["Tenant-Id"] = "public";
+  }
+  const result = await axiosGet_77Service(`/identity/Attachment/signature/post`,
+    {fileName: fileName, isPublicRead: "true", isHttp: "true"}, requestHeader);
   return result;
 };
 

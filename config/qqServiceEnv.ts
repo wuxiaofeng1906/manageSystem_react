@@ -1,5 +1,6 @@
 // 从运维那里查询预览地址
 export const Notice_PreviewEnv = "http://ops.q7link.com:8080/api/qqsystem/busenv/?page=1&limit=1000";
+export const Check_Cluster_Status = "http://ops.q7link.com:8000/qqapi/prodReleaseStatus/"; // 检查集群状态
 // 获取公告相关的各个url
 export const noticeUrl = (origin: any) => {
   //  默认是测试的地址

@@ -332,6 +332,16 @@ const SheetInfo = (props: any, ref: any) => {
       orderForm.setFieldsValue({release_result: null});
       return infoMessage(showErrTip);
     }
+
+    // 还要验证运维那边的状态,任务编号：115841
+    // 当为“停机”发布时，调用运维环境判定API，如果对应环境有非成功的状态，就提示请联系运维确认xxxx环境是否可用，在进行发布结果标记
+    debugger
+    if (order.release_way === "stop_server" && serverInfo && serverInfo.length) {
+      const cluster = serverInfo[0].cluster;
+
+    }
+
+    return;
     // 发布结果为空，直接保存
     if (isEmpty(result?.trim()) || result == 'unknown') {
       onSave();

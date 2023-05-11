@@ -172,5 +172,9 @@ const PreReleaseServices = {
     return request(`${baseUrl}/online/sql_api_repair_order`, {params: data});
   },
 
+//   检查对应集群在运维平台的状态
+  async getClusterStatus(cluster: any) {
+    return request(`${baseUrl}/online/sql_api_repair_order`, {params: {env: cluster}});
+  }
 };
 export default PreReleaseServices;

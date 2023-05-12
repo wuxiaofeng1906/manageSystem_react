@@ -27,6 +27,7 @@ import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 import {pushType} from "@/pages/onlineSystem/config/constant";
 import {isTestService} from "@/publicMethods/webMethod";
+import {vertifyClusterStatus} from "../commonFunction";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 let releateOrderInfo: any = {
@@ -254,7 +255,7 @@ const ReleaseOrder = () => {
     });
   };
 
-  const onSaveBeforeCheck = (isAuto = false) => {
+  const onSaveBeforeCheck =async (isAuto = false) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
@@ -283,10 +284,19 @@ const ReleaseOrder = () => {
       orderForm.setFieldsValue({release_result: null});
       return infoMessage(errMsg);
     }
+
     // 发布结果为空，直接保存
     if (isEmpty(result) || result == 'unknown') {
       onSave();
     } else {
+      // 如果是停服的话需要验证集群状态才标记发布结果
+      if (order.release_way === "stop_server") {
+        const continueFlag = await vertifyClusterStatus((base.cluster).join(","));
+        if (!continueFlag) {
+          return;
+        }
+      }
+
       // 二次确认标记发布结果
       const tips = {
         cancel: {title: '取消发布提醒', content: '取消发布将删除工单，请确认是否取消发布?'},

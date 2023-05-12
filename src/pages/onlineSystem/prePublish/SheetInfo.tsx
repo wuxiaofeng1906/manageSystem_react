@@ -29,6 +29,7 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
+import {vertifyClusterStatus} from "@/pages/onlineSystem/commonFunction";
 
 let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
@@ -333,37 +334,20 @@ const SheetInfo = (props: any, ref: any) => {
       return infoMessage(showErrTip);
     }
 
-    // 还要验证运维那边的状态,任务编号：115841
-    // 当为“停机”发布时，调用运维环境判定API，如果对应环境有非成功的状态，就提示请联系运维确认xxxx环境是否可用，在进行发布结果标记
-    debugger
-    if (order.release_way === "stop_server" && serverInfo && serverInfo.length) {
-      const failedEnv: any = []; // 是否进行发布结果标记
-      // const cluterInfo = await PreReleaseServices.getClusterStatus(serverInfo[0].cluster);
-      const cluterInfo = await PreReleaseServices.getClusterStatus("cn-northwest-0,cn-northwest-1,cn-northwest-2,drill-7");
-      const clusterStatusArray = cluterInfo?.data;
-      if (clusterStatusArray && clusterStatusArray.length > 0) {
-        clusterStatusArray.forEach((e: any) => {
-          // 如果运维那边的状态不为成功，则不能继续标记发布结果
-          if (!(e.taskStatus === "success")) {
-            failedEnv.push(e.taskEnv);
-          }
-        });
-
-        if (failedEnv.length) {
-          errorMessage(`请联系运维确认【${failedEnv.join(",")}】环境是否可用，再进行发布结果标记！`)
-          return;
-        }
-      } else {
-        errorMessage(`涉及环境状态获取失败，请联系运维确认环境是否可用，再进行发布结果标记！`)
-        return;
-      }
-    }
-
-
     // 发布结果为空，直接保存
     if (isEmpty(result?.trim()) || result == 'unknown') {
       onSave();
     } else {
+      // 还要验证运维那边的状态,任务编号：115841
+      // 当为“停机”发布时，调用运维环境判定API，如果对应环境有非成功的状态，就提示请联系运维确认xxxx环境是否可用，在进行发布结果标记
+      if (order.release_way === "stop_server" && serverInfo && serverInfo.length) {
+        // 如果是停服的话需要验证集群状态才标记发布结果
+        const continueFlag = await vertifyClusterStatus(serverInfo[0].cluster);
+        if (!continueFlag) {
+          return;
+        }
+      }
+
       // 二次确认标记发布结果
       const tips = {
         draft: {

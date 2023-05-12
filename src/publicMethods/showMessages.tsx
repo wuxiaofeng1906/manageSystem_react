@@ -1,4 +1,4 @@
-import {message} from "antd";
+import {message, Modal} from "antd";
 
 
 interface Iparam {
@@ -87,4 +87,14 @@ const warnMessage = (warningMsg: string, dutationTime: number = 1.5) => {
   });
 };
 
-export {errorMessage, infoMessage, sucMessage, warnMessage}
+// 错误的弹窗信息
+const errorModal = (title: string, content: any) => {
+  Modal.error({
+    title: title,
+    centered: true,
+    width: 550,
+    content: content
+  });
+}
+
+export {errorMessage, infoMessage, sucMessage, warnMessage, errorModal}

@@ -1,6 +1,7 @@
 // 调用运维接口验证集群是否ok
 import PreReleaseServices from "@/services/preRelease";
-import {errorMessage} from "@/publicMethods/showMessages";
+import {errorModal} from "@/publicMethods/showMessages";
+
 
 export const vertifyClusterStatus = async (clusters: any) => {
   const failedEnv: any = []; // 是否进行发布结果标记
@@ -9,10 +10,9 @@ export const vertifyClusterStatus = async (clusters: any) => {
   const clusterStatusArray = cluterInfo?.data;
 
   if (!clusterStatusArray || clusterStatusArray.length === 0) {
-    errorMessage(`涉及环境状态获取失败，请联系运维确认环境是否可用，再进行发布结果标记！`);
+    errorModal('集群状态校验', `涉及环境状态获取失败，请联系运维确认环境是否可用，再进行发布结果标记！`);
     return false;
   }
-
 
   clusterStatusArray.forEach((e: any) => {
     // 如果运维那边的状态不为成功，则不能继续标记发布结果
@@ -22,7 +22,7 @@ export const vertifyClusterStatus = async (clusters: any) => {
   });
 
   if (failedEnv.length) {
-    errorMessage(`请联系运维确认【${failedEnv.join(",")}】环境是否可用，再进行发布结果标记！`);
+    errorModal('集群状态校验', `请联系运维确认【${failedEnv.join(",")}】环境是否可用，再进行发布结果标记！`);
     return false;
   }
 

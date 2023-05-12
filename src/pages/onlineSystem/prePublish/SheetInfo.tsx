@@ -10,7 +10,7 @@ import {
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
-import {infoMessage} from '@/publicMethods/showMessages';
+import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
 import {useModel} from '@@/plugin-model/useModel';
 import {getDevOpsOrderColumn, PublishSeverColumn, PublishUpgradeColumn} from '@/pages/onlineSystem/config/column';
 import {
@@ -337,13 +337,29 @@ const SheetInfo = (props: any, ref: any) => {
     // 当为“停机”发布时，调用运维环境判定API，如果对应环境有非成功的状态，就提示请联系运维确认xxxx环境是否可用，在进行发布结果标记
     debugger
     if (order.release_way === "stop_server" && serverInfo && serverInfo.length) {
-      const cluster = serverInfo[0].cluster;
-      const cluterStatus = await PreReleaseServices.getClusterStatus(cluster);
+      const failedEnv: any = []; // 是否进行发布结果标记
+      // const cluterInfo = await PreReleaseServices.getClusterStatus(serverInfo[0].cluster);
+      const cluterInfo = await PreReleaseServices.getClusterStatus("cn-northwest-0,cn-northwest-1,cn-northwest-2,drill-7");
+      const clusterStatusArray = cluterInfo?.data;
+      if (clusterStatusArray && clusterStatusArray.length > 0) {
+        clusterStatusArray.forEach((e: any) => {
+          // 如果运维那边的状态不为成功，则不能继续标记发布结果
+          if (!(e.taskStatus === "success")) {
+            failedEnv.push(e.taskEnv);
+          }
+        });
 
-debugger
+        if (failedEnv.length) {
+          errorMessage(`请联系运维确认【${failedEnv.join(",")}】环境是否可用，再进行发布结果标记！`)
+          return;
+        }
+      } else {
+        errorMessage(`涉及环境状态获取失败，请联系运维确认环境是否可用，再进行发布结果标记！`)
+        return;
+      }
     }
 
-    return;
+
     // 发布结果为空，直接保存
     if (isEmpty(result?.trim()) || result == 'unknown') {
       onSave();

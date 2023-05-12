@@ -264,7 +264,7 @@ const SheetInfo = (props: any, ref: any) => {
     );
   };
 
-  const onSaveBeforeCheck = (isAuto = false) => {
+  const onSaveBeforeCheck = async (isAuto = false) => {
 
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
@@ -338,7 +338,9 @@ const SheetInfo = (props: any, ref: any) => {
     debugger
     if (order.release_way === "stop_server" && serverInfo && serverInfo.length) {
       const cluster = serverInfo[0].cluster;
+      const cluterStatus = await PreReleaseServices.getClusterStatus(cluster);
 
+debugger
     }
 
     return;

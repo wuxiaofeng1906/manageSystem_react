@@ -1,5 +1,5 @@
 import request from './request';
-import {noticeUrl} from "../../config/qqServiceEnv";
+import {noticeUrl, Check_Cluster_Status} from "../../config/qqServiceEnv";
 
 const baseUrl = '/api/verify';
 // 发布过程
@@ -174,7 +174,7 @@ const PreReleaseServices = {
 
 //   检查对应集群在运维平台的状态
   async getClusterStatus(cluster: any) {
-    return request(`${baseUrl}/online/sql_api_repair_order`, {params: {env: cluster}});
+    return request(Check_Cluster_Status, {params: {env: cluster}});
   }
 };
 export default PreReleaseServices;

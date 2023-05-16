@@ -1,5 +1,6 @@
 import request from './request';
-import {noticeUrl} from "../../config/qqServiceEnv";
+import {noticeUrl, Check_Cluster_Status} from "../../config/qqServiceEnv";
+import {axiosGet_TJ} from "@/publicMethods/axios";
 
 const baseUrl = '/api/verify';
 // 发布过程
@@ -172,5 +173,9 @@ const PreReleaseServices = {
     return request(`${baseUrl}/online/sql_api_repair_order`, {params: data});
   },
 
+//   检查对应集群在运维平台的状态
+  async getClusterStatus(cluster: any) {
+    return axiosGet_TJ(Check_Cluster_Status, {env: cluster});
+  }
 };
 export default PreReleaseServices;

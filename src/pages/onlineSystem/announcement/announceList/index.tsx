@@ -69,6 +69,7 @@ const announceList = () => {
     if (!announcePermission?.().edit) return;
     let releaseID = '';
     let releaseName = '';
+    let isPublished = false;
     let type = 'detail';
 
     if (isEmpty(params)) {
@@ -80,10 +81,11 @@ const announceList = () => {
       // 修改的话就是原有的id
       releaseName = params?.data.iteration;
       releaseID = params?.data.id;
+      isPublished = params?.data.isPublished;
     }
     // if (isEmpty(releaseName)) return errorMessage('数据异常');
 
-    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}`);
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&isPublished=${isPublished}`);
   };
 
   // 删除数据
@@ -116,19 +118,21 @@ const announceList = () => {
   // 复制数据
 
   const onCopy = async (params: CellClickedEvent) => {
+
     if (!isEmpty(params) && !announcePermission?.().check)
       return customMessage({type: "info", msg: "您无查看公告权限！", position: "0vh"});
 
     let releaseID = '';
     let releaseName = '';
-
+    let isPublished = false;
     if (!isEmpty(params)) {
       // 修改的话就是原有的id
       releaseName = params?.data.iteration;
       releaseID = params?.data.id;
+      isPublished = params?.data.isPublished;
     }
     if (isEmpty(releaseName)) return customMessage({type: "error", msg: "数据异常！", position: "0vh"});
-    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=copy`);
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=copy&isPublished=${isPublished}`);
   };
   // 获取人
   const getPerson = async () => {

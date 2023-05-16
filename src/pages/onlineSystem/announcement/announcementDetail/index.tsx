@@ -28,7 +28,7 @@ const Announce: React.FC<any> = (props: any) => {
     getAnnounceContent
   } = useModel('announcement');
   // 公告列表过来的数据（releaseName:公告名称, releaseID：公告id, type：新增还是删除）
-  const {releaseName, releaseID, type, back} = props.location?.query;
+  const {releaseName, releaseID, type, back, isPublished} = props.location?.query;
   const [announcementForm] = Form.useForm();
   const [carousePageForm] = Form.useForm();
   // 点击预览按钮过后进度展示
@@ -79,7 +79,7 @@ const Announce: React.FC<any> = (props: any) => {
     }));
 
     setCommonData({...formInfo, clearTabContent: isClearAllTab, releaseID: releaseID});
-    history.push(`/onlineSystem/PopupCard?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&back=${back}`);
+    history.push(`/onlineSystem/PopupCard?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&back=${back}&isPublished=${isPublished}`);
   };
 
   // 跳转到下一页
@@ -426,7 +426,7 @@ const Announce: React.FC<any> = (props: any) => {
                            else callback();
                          },
                        },]}>
-              <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"}/>
+              <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"} disabled={isPublished === "true"}/>
             </Form.Item>
             <div style={{color: "gray", marginTop: -20, marginLeft: 10}}>
               <p>命名规则：建议上线分支+发布集群，如：sprint20230511班车+集群1</p>
@@ -440,6 +440,7 @@ const Announce: React.FC<any> = (props: any) => {
                          }
                        }]}>
               <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
+                          disabled={isPublished === "true"}
                           onChange={(e, time) => {
                             // 先获取原始数据，再改变数据
                             let source = announcementForm.getFieldValue("announce_content");
@@ -453,7 +454,7 @@ const Announce: React.FC<any> = (props: any) => {
             </Form.Item>
 
             <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-              <TextArea rows={3} style={{minWidth: 300, width: "50%"}}/>
+              <TextArea rows={3} style={{minWidth: 300, width: "50%"}} disabled={isPublished === "true"}/>
             </Form.Item>
 
             <div id={"popup"} style={{display: stepShow.popCard}}>
@@ -467,7 +468,7 @@ const Announce: React.FC<any> = (props: any) => {
                       } else {
                         setCarouselNumShow("none");
                       }
-                    }}>
+                    }} disabled={isPublished === "true"}>
                       <Radio value={1}>是</Radio>
                       <Radio value={0}>否</Radio>
                     </Radio.Group>
@@ -475,7 +476,7 @@ const Announce: React.FC<any> = (props: any) => {
                 </Col>
                 <Col>
                   <Form.Item name="carouselNum" rules={[{required: true}]} style={{display: carouselNumShow}}>
-                    <InputNumber></InputNumber>
+                    <InputNumber disabled={isPublished === "true"}></InputNumber>
                   </Form.Item>
                 </Col>
               </Row>

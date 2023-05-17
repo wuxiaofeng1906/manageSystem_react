@@ -55,6 +55,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 升级模板点击改变
   const onModuleChanged = (e: RadioChangeEvent) => {
+    if(!eidtFlag) return;
     if (e.target.value === "1") { // 1 是消息弹窗
       setStepShow({
         msgCard: "inline",
@@ -503,6 +504,7 @@ const Announce: React.FC<any> = (props: any) => {
               <Spin spinning={preview} tip={"预览环境加载中，请稍后..."}>
                 <Button
                   type="primary" className={style.saveButtonStyle}
+                  disabled={!eidtFlag}
                   style={{marginLeft: 10}} onClick={() => saveMsgInfo(false)}>保存
                 </Button>
                 <Button

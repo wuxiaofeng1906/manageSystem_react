@@ -74,23 +74,27 @@ const usePermission = () => {
 
     authority.map((it: any) => {
       switch (it.name) {
-        case "announcementAdd":  // 新增公告
+        case "announcementAdd":  // 新增公告                             -----------对应权限名字：公告新增
           flag.add = true;
           break;
-        case "modifyQiQiHubNotice": // 修改公告内容（未发布）
+        case "pendingAnnouncement": // 一键发布公告                       ----------对应权限名字：一键挂起公告
+          flag.push = true;
+          break;
+        //  以上两个权限是旧公告时候配置的权限。
+        case "modifyQiQiHubNotice": // 修改公告内容（未发布）              -----------对应权限名字：修改公告内容
           flag.edit = true;
           break;
-        case "modifyQiQiHubPublishedNotice": //修改已发布公告
+        case "modifyQiQiHubPublishedNotice": //修改已发布公告            -----------对应权限名字：修改已发布的公告
           flag.editPublished = true;
           break;
-        case "announcementDelete":  // 删除公告,
+        case "deleteQiQiHubNotice":  // 删除公告,                       ----------对应权限名字：（逻辑）删除公告
           flag.delete = true;
           break;
-        case "deleteQiQiHubPublishedNotice":// 删除已发布公告
+        case "deleteQiQiHubPublishedNotice":// 删除已发布公告            ----------对应权限名字：（逻辑）删除已发布的公告
           flag.deletePublished = true;
           break;
-        case "pendingAnnouncement": // 一键发布公告
-          flag.push = true;
+
+        default:
           break;
       }
     });

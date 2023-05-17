@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {
-  Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Modal, Space, Spin, Select
+  Row, Col, Input, Radio, InputNumber, Form, DatePicker, Button, Layout, Divider, Modal, Space, Spin, Select,
+  PageHeader, Breadcrumb
 } from 'antd';
 import style from './style.less';
 import type {RadioChangeEvent} from 'antd';
@@ -18,6 +19,7 @@ import {ExclamationCircleFilled} from "@ant-design/icons";
 import {OnlineSystemServices} from "@/services/onlineSystem";
 import moment from 'moment';
 import usePermission from "@/hooks/permission";
+import {Link} from "react-router-dom";
 
 const {TextArea} = Input;
 // 重新合并公告数据
@@ -55,7 +57,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 升级模板点击改变
   const onModuleChanged = (e: RadioChangeEvent) => {
-    if(!eidtFlag) return;
+    if (!eidtFlag) return;
     if (e.target.value === "1") { // 1 是消息弹窗
       setStepShow({
         msgCard: "inline",
@@ -395,159 +397,180 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   return (
-    <PageContainer>
-      <Spin size={"large"} spinning={loading} tip={"数据加载中..."}>
-        <div style={{marginTop: -15, background: 'white', padding: 10}}>
-          <Form form={announcementForm} autoComplete={"off"}
-                onFieldsChange={() => {
-                  setShowPreView(false);
-                }}>
-            <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
-              {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
-              <Radio.Group className={style.antRadioGroup} onChange={onModuleChanged}>
-                <Radio.Button value={"1"} style={{width: 122, height: 116, border: "none"}}>
-                  <img
-                    {...SIZE}
-                    src={require('../../../../../public/msgCard.png')}
-                    style={{marginLeft: -8, marginTop: 14}}
-                  />
-                  <span style={{marginLeft: 25}}>消息卡片</span>
-                </Radio.Button>
-                <Radio.Button value={"2"} style={{width: 122, height: 116, marginLeft: 25, border: "none"}}>
-                  <img
-                    {...SIZE}
-                    style={{marginLeft: -8, marginTop: 14}}
-                    src={require('../../../../../public/popCard.png')}
-                  />
-                  <span style={{marginLeft: 30}}>弹窗</span>
-                </Radio.Button>
+    <div>
+      <PageHeader
+        ghost={false}
+        title={' '}
+        style={{marginTop: -20, height: 45}}
+        breadcrumbRender={() => {
+          return <Breadcrumb>{[
+            <Breadcrumb.Item key="上线系统">上线系统</Breadcrumb.Item>,
+            <Breadcrumb.Item key="更新公告">
+              <Link to="/onlineSystem/announceList">更新公告</Link>
+            </Breadcrumb.Item>,
+            <Breadcrumb.Item key="公告详情">公告详情</Breadcrumb.Item>,
+          ]}</Breadcrumb>;
+        }}
+      > </PageHeader>
+
+      <div style={{marginTop: 20}}>
+        <Spin size={"large"} spinning={loading} tip={"数据加载中..."}>
+          <div style={{marginTop: -15, background: 'white', padding: 10}}>
+            <Form form={announcementForm} autoComplete={"off"}
+                  onFieldsChange={() => {
+                    setShowPreView(false);
+                  }}>
+              <Form.Item label="升级模板：" name="modules" rules={[{required: true}]}>
+                {/* 升级模板选择按钮 （消息卡片或者弹窗）*/}
+                <Radio.Group className={style.antRadioGroup} onChange={onModuleChanged}>
+                  <Radio.Button value={"1"} style={{width: 122, height: 116, border: "none"}}>
+                    <img
+                      {...SIZE}
+                      src={require('../../../../../public/msgCard.png')}
+                      style={{marginLeft: -8, marginTop: 14}}
+                    />
+                    <span style={{marginLeft: 25}}>消息卡片</span>
+                  </Radio.Button>
+                  <Radio.Button value={"2"} style={{width: 122, height: 116, marginLeft: 25, border: "none"}}>
+                    <img
+                      {...SIZE}
+                      style={{marginLeft: -8, marginTop: 14}}
+                      src={require('../../../../../public/popCard.png')}
+                    />
+                    <span style={{marginLeft: 30}}>弹窗</span>
+                  </Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+
+              <Form.Item label={'公告名称'} name={'announce_name'}
+                         rules={[{
+                           required: true,
+                           validator: (r, v, callback) => {
+                             if (isEmpty(v?.trim())) callback('请填写公告名称！');
+                             else callback();
+                           },
+                         },]}>
+                <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"} disabled={!eidtFlag}/>
+              </Form.Item>
+              <div style={{color: "gray", marginTop: -20, marginLeft: 10}}>
+                <p>命名规则：建议上线分支+发布集群，如：sprint20230511班车+集群1</p>
+              </div>
+
+              <Form.Item label={'升级时间'} name={'announce_time'}
+                         rules={[{
+                           required: true, validator: (r, v, callback) => {
+                             if (v === undefined) callback('请填写升级时间！');
+                             else callback();
+                           }
+                         }]}>
+                <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
+                            disabled={!eidtFlag}
+                            onChange={(e, time) => {
+                              // 先获取原始数据，再改变数据
+                              let source = announcementForm.getFieldValue("announce_content");
+                              const updateFunc = source.split("更新升级");
+                              // 用原来的时间替换选中的时间
+                              announcementForm.setFieldsValue({
+                                announce_content: `亲爱的用户：您好，企企经营管理平台已于${time}更新升级${updateFunc[1]}`
+                              });
+                              setReleaseTime(time);
+                            }}/>
+              </Form.Item>
+
+              <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
+                <TextArea autoSize={{minRows: 10, maxRows: 100}} style={{minWidth: 300, width: "50%"}}
+                          disabled={!eidtFlag}/>
+              </Form.Item>
+
+              <div id={"popup"} style={{display: stepShow.popCard}}>
+                <Row>
+                  <Col>
+                    <Form.Item label={'是否轮播'} name="announce_carousel" rules={[{required: true}]}>
+                      <Radio.Group onChange={(e: RadioChangeEvent) => {
+                        if (e.target?.value === 1) {
+                          setCarouselNumShow("inline");
+                          announcementForm.setFieldsValue({carouselNum: 5});
+                        } else {
+                          setCarouselNumShow("none");
+                        }
+                      }} disabled={!eidtFlag}>
+                        <Radio value={1}>是</Radio>
+                        <Radio value={0}>否</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </Col>
+                  <Col>
+                    <Form.Item name="carouselNum" rules={[{required: true}]} style={{display: carouselNumShow}}>
+                      <InputNumber disabled={!eidtFlag}></InputNumber>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+            </Form>
+            {/* 我是一条分割线 */}
+            <Divider style={{marginTop: -10}}/>
+            {/* 一键发布、保存、下一步 */}
+            <Footer style={{height: 30, backgroundColor: "white", marginTop: -20}}>
+              <div style={{marginTop: -15}}>
+                {/* 弹窗操作 */}
+                <div id={"popup"} style={{display: stepShow.popCard}}>
+                  <Button
+                    type="primary" className={style.saveButtonStyle}
+                    style={{marginLeft: 10}} onClick={onNextPageClick}>下一步
+                  </Button>
+                </div>
+                {/* 消息卡片操作 */}
+                <div id={"message"} style={{display: stepShow.msgCard}}>
+                  <Spin spinning={preview} tip={"预览环境加载中，请稍后..."}>
+                    <Button
+                      type="primary" className={style.saveButtonStyle}
+                      disabled={!eidtFlag}
+                      style={{marginLeft: 10}} onClick={() => saveMsgInfo(false)}>保存
+                    </Button>
+                    <Button
+                      className={style.commonBtn}
+                      style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
+                      onClick={releaseNoticeInfo}>一键发布
+                    </Button>
+
+                    <Button className={style.commonBtn} style={{marginLeft: 10}}
+                            onClick={onPreView}>预览</Button>
+                  </Spin>
+                </div>
+              </div>
+            </Footer>
+          </div>
+        </Spin>
+
+
+        <Modal title="轮播页操作" visible={pageChoice}
+               centered maskClosable={false} destroyOnClose={true}
+               onOk={() => {
+                 const v = carousePageForm.getFieldValue("clearChoice");
+
+                 //继续跳转到下一页
+                 goToNext(announcementForm.getFieldsValue(), v ? true : false);
+               }}
+               onCancel={() => {
+                 setPageChoice(false);
+               }}>
+          <Form form={carousePageForm} preserve={false}>
+
+            <p>轮播图张数已改小，请选择删除轮播页面:</p>
+            <Form.Item name={'clearChoice'} style={{textIndent: "10px"}}>
+              <Radio.Group defaultValue={false}>
+                <Space direction="vertical">
+                  <Radio value={false}>删除后面多余张数的内容</Radio>
+                  <Radio value={true}>删除全部内容，重新创建</Radio>
+                </Space>
               </Radio.Group>
             </Form.Item>
-
-            <Form.Item label={'公告名称'} name={'announce_name'}
-                       rules={[{
-                         required: true,
-                         validator: (r, v, callback) => {
-                           if (isEmpty(v?.trim())) callback('请填写公告名称！');
-                           else callback();
-                         },
-                       },]}>
-              <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"} disabled={!eidtFlag}/>
-            </Form.Item>
-            <div style={{color: "gray", marginTop: -20, marginLeft: 10}}>
-              <p>命名规则：建议上线分支+发布集群，如：sprint20230511班车+集群1</p>
-            </div>
-
-            <Form.Item label={'升级时间'} name={'announce_time'}
-                       rules={[{
-                         required: true, validator: (r, v, callback) => {
-                           if (v === undefined) callback('请填写升级时间！');
-                           else callback();
-                         }
-                       }]}>
-              <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
-                          disabled={!eidtFlag}
-                          onChange={(e, time) => {
-                            // 先获取原始数据，再改变数据
-                            let source = announcementForm.getFieldValue("announce_content");
-                            const updateFunc = source.split("更新升级");
-                            // 用原来的时间替换选中的时间
-                            announcementForm.setFieldsValue({
-                              announce_content: `亲爱的用户：您好，企企经营管理平台已于${time}更新升级${updateFunc[1]}`
-                            });
-                            setReleaseTime(time);
-                          }}/>
-            </Form.Item>
-
-            <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-              <TextArea rows={14} style={{minWidth: 300, width: "50%"}} disabled={!eidtFlag}/>
-            </Form.Item>
-
-            <div id={"popup"} style={{display: stepShow.popCard}}>
-              <Row>
-                <Col>
-                  <Form.Item label={'是否轮播'} name="announce_carousel" rules={[{required: true}]}>
-                    <Radio.Group onChange={(e: RadioChangeEvent) => {
-                      if (e.target?.value === 1) {
-                        setCarouselNumShow("inline");
-                        announcementForm.setFieldsValue({carouselNum: 5});
-                      } else {
-                        setCarouselNumShow("none");
-                      }
-                    }} disabled={!eidtFlag}>
-                      <Radio value={1}>是</Radio>
-                      <Radio value={0}>否</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-                <Col>
-                  <Form.Item name="carouselNum" rules={[{required: true}]} style={{display: carouselNumShow}}>
-                    <InputNumber disabled={!eidtFlag}></InputNumber>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
           </Form>
-          {/* 我是一条分割线 */}
-          <Divider/>
-          {/* 一键发布、保存、下一步 */}
-          <Footer style={{height: 70, backgroundColor: "white", marginTop: -20}}>
-            {/* 弹窗操作 */}
-            <div id={"popup"} style={{display: stepShow.popCard}}>
-              <Button
-                type="primary" className={style.saveButtonStyle}
-                style={{marginLeft: 10}} onClick={onNextPageClick}>下一步
-              </Button>
-            </div>
-            {/* 消息卡片操作 */}
-            <div id={"message"} style={{display: stepShow.msgCard}}>
-              <Spin spinning={preview} tip={"预览环境加载中，请稍后..."}>
-                <Button
-                  type="primary" className={style.saveButtonStyle}
-                  disabled={!eidtFlag}
-                  style={{marginLeft: 10}} onClick={() => saveMsgInfo(false)}>保存
-                </Button>
-                <Button
-                  className={style.commonBtn} style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}
-                  onClick={releaseNoticeInfo}>一键发布
-                </Button>
 
-                <Button className={style.commonBtn} style={{marginLeft: 10}}
-                        onClick={onPreView}>预览</Button>
-              </Spin>
-            </div>
-          </Footer>
-        </div>
-      </Spin>
+        </Modal>
+      </div>
+    </div>
 
-
-      <Modal title="轮播页操作" visible={pageChoice}
-             centered maskClosable={false} destroyOnClose={true}
-             onOk={() => {
-               const v = carousePageForm.getFieldValue("clearChoice");
-
-               //继续跳转到下一页
-               goToNext(announcementForm.getFieldsValue(), v ? true : false);
-             }}
-             onCancel={() => {
-               setPageChoice(false);
-             }}>
-        <Form form={carousePageForm} preserve={false}>
-
-          <p>轮播图张数已改小，请选择删除轮播页面:</p>
-          <Form.Item name={'clearChoice'} style={{textIndent: "10px"}}>
-            <Radio.Group defaultValue={false}>
-              <Space direction="vertical">
-                <Radio value={false}>删除后面多余张数的内容</Radio>
-                <Radio value={true}>删除全部内容，重新创建</Radio>
-              </Space>
-            </Radio.Group>
-          </Form.Item>
-        </Form>
-
-      </Modal>
-
-    </PageContainer>
   );
 };
 

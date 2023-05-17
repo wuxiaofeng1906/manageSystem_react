@@ -30,7 +30,7 @@ export const getAnnounceList = async (page: number, size: number, createdUser: a
 
     });
   }
-debugger
+
   return {
     results: data.sort(objectArraySortByDesc('create_time')),  // 按照时间排序
     page: page || 1,

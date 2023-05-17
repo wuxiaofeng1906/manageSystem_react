@@ -62,23 +62,34 @@ const announceList = () => {
   const onAdd = async (params?: CellClickedEvent) => {
     let releaseID = '';
     let releaseName = '';
-    let isPublished = false;
+    let allowToUpdate;
     let type = 'detail';
-
     if (isEmpty(params)) {
       // 先要获取公告name（后端服务生成）
       // const res = await DutyListServices.getDutyNum();
       // releaseName = res.ready_release_num;
       type = 'add';
+
+      allowToUpdate = myAuthority.add;
     } else {
       // 修改的话就是原有的id
       releaseName = params?.data.iteration;
       releaseID = params?.data.id;
-      isPublished = params?.data.isPublished;
-    }
-    // if (isEmpty(releaseName)) return errorMessage('数据异常');
+      // 这里还需要配置权限
+      // 判断是否发布，
+      if (params?.data.isPublished) { // 已发布 默认创建人/测试值班人员/管理员可以编辑
+        if (user?.userid === params?.data?.createdUser?.uid) {
+          allowToUpdate = true;
+        } else {
+          allowToUpdate = myAuthority?.editPublished;
+        }
+      } else { // 未发布
+        allowToUpdate = myAuthority?.edit;
+      }
 
-    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&isPublished=${isPublished}`);
+    }
+
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&flag=${allowToUpdate}`);
   };
 
   // 删除数据
@@ -121,7 +132,7 @@ const announceList = () => {
       isPublished = params?.data.isPublished;
     }
     if (isEmpty(releaseName)) return customMessage({type: "error", msg: "数据异常！", position: "0vh"});
-    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=copy&isPublished=${isPublished}`);
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=copy&flag=true`);
   };
   // 获取人
   const getPerson = async () => {
@@ -131,7 +142,6 @@ const announceList = () => {
 
   const getAuthority = async () => {
     myAuthority = await announcePermission();
-    debugger
   }
   useEffect(() => {
     getPerson();

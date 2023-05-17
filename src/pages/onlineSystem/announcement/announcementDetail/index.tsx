@@ -454,7 +454,7 @@ const Announce: React.FC<any> = (props: any) => {
             </Form.Item>
 
             <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-              <TextArea rows={3} style={{minWidth: 300, width: "50%"}} disabled={isPublished === "true"}/>
+              <TextArea rows={14} style={{minWidth: 300, width: "50%"}} disabled={isPublished === "true"}/>
             </Form.Item>
 
             <div id={"popup"} style={{display: stepShow.popCard}}>

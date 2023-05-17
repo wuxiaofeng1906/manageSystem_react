@@ -478,7 +478,8 @@ const Announce: React.FC<any> = (props: any) => {
               </Form.Item>
 
               <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
-                <TextArea autoSize={{minRows: 10, maxRows: 100}} style={{minWidth: 300, width: "50%"}}
+                <TextArea spellCheck={"false"} autoSize={{minRows: 10, maxRows: 100}}
+                          style={{minWidth: 300, width: "50%"}}
                           disabled={!eidtFlag}/>
               </Form.Item>
 

@@ -124,12 +124,10 @@ const announceList = () => {
   const onCopy = async (params: CellClickedEvent) => {
     let releaseID = '';
     let releaseName = '';
-    let isPublished = false;
     if (!isEmpty(params)) {
       // 修改的话就是原有的id
       releaseName = params?.data.iteration;
       releaseID = params?.data.id;
-      isPublished = params?.data.isPublished;
     }
     if (isEmpty(releaseName)) return customMessage({type: "error", msg: "数据异常！", position: "0vh"});
     history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=copy&flag=true`);

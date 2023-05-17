@@ -3,10 +3,9 @@ import {AgGridReact} from 'ag-grid-react';
 import {Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin, Modal, Tooltip} from 'antd';
 import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
 import {PageContainer} from '@ant-design/pro-layout';
-import {ExclamationCircleOutlined, FolderAddTwoTone, CopyTwoTone} from '@ant-design/icons';
+import {ExclamationCircleOutlined, FolderAddTwoTone} from '@ant-design/icons';
 import {announcementListColumn} from './column';
 import styles from './index.less';
-import DutyListServices from '@/services/dutyList';
 import AnnouncementServices from '@/services/announcement';
 import {isEmpty} from 'lodash';
 import IPagination from '@/components/IPagination';
@@ -16,7 +15,7 @@ import {customMessage} from '@/publicMethods/showMessages';
 import {deleteList, getAnnounceList} from "./axiosRequest/apiPage";
 import dayjs from "dayjs";
 
-
+let myAuthority: any = {};
 const disabledStyle = {filter: 'grayscale(1)', cursor: 'not-allowed'};
 const announceList = () => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -61,12 +60,6 @@ const announceList = () => {
 
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
-    if (!isEmpty(params) && !announcePermission?.().check)
-      return customMessage({type: "info", msg: "您无查看公告权限！", position: "0vh"});
-
-    // 新增
-    if (isEmpty(params) && !announcePermission?.().add) return;
-    if (!announcePermission?.().edit) return;
     let releaseID = '';
     let releaseName = '';
     let isPublished = false;
@@ -90,7 +83,8 @@ const announceList = () => {
 
   // 删除数据
   const onDelete = async (params: CellClickedEvent) => {
-    if (!announcePermission?.().delete) return;
+    if (!myAuthority?.delete) return;
+
     // 判断是否关联了发布过程公告
     if (isEmpty(params.data.id)) return customMessage({type: "info", msg: '数据异常', position: "0vh"});
     // const res = await AnnouncementServices.checkDeleteAnnouncement(params.data.announcement_num);
@@ -116,12 +110,7 @@ const announceList = () => {
   };
 
   // 复制数据
-
   const onCopy = async (params: CellClickedEvent) => {
-
-    if (!isEmpty(params) && !announcePermission?.().check)
-      return customMessage({type: "info", msg: "您无查看公告权限！", position: "0vh"});
-
     let releaseID = '';
     let releaseName = '';
     let isPublished = false;
@@ -139,6 +128,11 @@ const announceList = () => {
     const res = await AnnouncementServices.applicant();
     setPersons(res?.map((it: any) => ({label: it.user_name, value: it.user_id})));
   };
+
+  const getAuthority = async () => {
+    myAuthority = await announcePermission();
+    debugger
+  }
   useEffect(() => {
     getPerson();
     getList();
@@ -151,6 +145,11 @@ const announceList = () => {
     };
   }, []);
 
+  useEffect(() => {
+    getAuthority();
+  }, [announcePermission])
+
+
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <PageContainer>
@@ -161,9 +160,9 @@ const announceList = () => {
                 <Button
                   type={'text'}
                   onClick={() => onAdd()}
-                  disabled={!announcePermission?.().add}
+                  disabled={!myAuthority?.add}
                   icon={
-                    <FolderAddTwoTone style={announcePermission?.().add ? {} : disabledStyle}/>
+                    <FolderAddTwoTone style={myAuthority?.add ? {} : disabledStyle}/>
                   }
                 >
                   新增
@@ -220,7 +219,7 @@ const announceList = () => {
                         <img
                           width={16}
                           height={17}
-                          style={announcePermission?.().check ? {cursor: 'pointer'} : disabledStyle}
+                          style={{cursor: 'pointer'}}
                           src={require('../../../../../public/params.png')}
                           onClick={() => onAdd(params)}
                         />
@@ -239,7 +238,7 @@ const announceList = () => {
                           width={16}
                           height={17}
                           style={
-                            announcePermission?.().delete ? {cursor: 'pointer'} : disabledStyle
+                            myAuthority?.delete ? {cursor: 'pointer'} : disabledStyle
                           }
                           src={require('../../../../../public/delete_red.png')}
                           onClick={() => onDelete(params)}

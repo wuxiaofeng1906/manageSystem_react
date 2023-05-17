@@ -68,7 +68,8 @@ const usePermission = () => {
         add: true,
         edit: true,
         editPublished: true,
-        push: true
+        push: true,
+        delete: true
       };
     }
 

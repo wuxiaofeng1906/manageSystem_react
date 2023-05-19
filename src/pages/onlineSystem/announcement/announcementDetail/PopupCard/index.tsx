@@ -336,7 +336,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           return;
         }
 
-        if (!showPreView && type === "detail") {
+        if (!eidtFlag || (!showPreView && type === "detail")) {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
@@ -547,14 +547,14 @@ const PopupCard: React.FC<any> = (props: any) => {
             {/* 特性名称只针对轮播功能 */}
             <Row style={{display: commonData?.announce_carousel === 1 ? "inline-block" : "none"}}>
               <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>
-                <Input style={{minWidth: 400}} disabled={!eidtFlag}></Input>
+                <Input style={{minWidth: 400, color: "black"}} disabled={!eidtFlag}></Input>
               </Form.Item>
             </Row>
             {/* 特性名称只针对不轮播功能 */}
             <Row style={{display: commonData?.announce_carousel === 1 ? "none" : "inline-flex"}}>
               <Col>
                 <Form.Item label={"语雀迭代版本地址："} name={"yuQueUrl"}>
-                  <Input style={{minWidth: 400}} placeholder={"从语雀复制更新版本地址"} spellCheck={"false"}
+                  <Input style={{minWidth: 400, color: "black"}} placeholder={"从语雀复制更新版本地址"} spellCheck={"false"}
                          disabled={!eidtFlag}></Input>
                 </Form.Item>
               </Col>
@@ -573,7 +573,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                      src={`${noticeUrl(location.origin).imageUpload}${picModalState.checkedImg}`}
                      alt="默认图" style={{height: 100, width: 150}}
                      onClick={() => {
-                       if (!eidtFlag) {
+                       if (eidtFlag) {
                          setFileList([]);
                          setPicModalState({...picModalState, visible: true});
                        }
@@ -586,7 +586,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                 </Button>}
             </Form.Item>
             <Form.Item label={"图文布局"} name={"picLayout"} required>
-              <Radio.Group disabled={!eidtFlag}>
+              <Radio.Group className={style.antRadioDisable} disabled={!eidtFlag} style={{color: "black"}}>
                 <Radio value={"1"}>上下布局</Radio>
                 <Radio value={"2"}>左右布局</Radio>
               </Radio.Group>
@@ -603,7 +603,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                             label={"一级特性"}
                             name={[field.name, 'first']}
                             rules={[{required: true, message: '请输入一级特性'}]}>
-                            <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}
+                            <Input placeholder={"建议不超过15个字"} style={{minWidth: 400, color: "black"}}
                                    disabled={!eidtFlag}></Input>
                           </Form.Item>
                           {/* 删除 */}
@@ -659,7 +659,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                           label={`二级特性${second_index + 1}`}
                                           name={[secondField.name, 'first']}
                                         >
-                                          <Input style={{minWidth: 400}} disabled={!eidtFlag}></Input>
+                                          <Input style={{minWidth: 400, color: "black"}} disabled={!eidtFlag}></Input>
                                         </Form.Item>
 
                                         {/* 添加二级特性 */}

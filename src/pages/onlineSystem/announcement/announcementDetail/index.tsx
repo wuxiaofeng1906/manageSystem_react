@@ -189,6 +189,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 预览
   const onPreView = async () => {  // PRE_ENV
+
     setPreview(true);
     // `https://${it}.e7link.com/cn-global/login`
     let preViewEnv = {
@@ -221,8 +222,9 @@ const Announce: React.FC<any> = (props: any) => {
           customMessage({type: "error", msg: "预览环境不能为空！", position: "0vh"})
           return;
         }
-        if (showPreView && type === "detail") {
-          // 如果是明细数据，且没有被改变过
+        if (!eidtFlag || (showPreView && type === "detail")) {
+          debugger
+          // 如果是 没有权限修改或者  明细数据，且没有被改变过 或者没有权限修改的时候
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
             // const goUrl = `https://${preViewEnv.viewEnv}.e7link.com/cn-global/login`;
@@ -450,20 +452,23 @@ const Announce: React.FC<any> = (props: any) => {
                              else callback();
                            },
                          },]}>
-                <Input style={{minWidth: 300, width: "50%"}} placeholder={"请填写公告名称"} disabled={!eidtFlag}/>
+                <Input style={{minWidth: 300, width: "50%", color: "black"}} placeholder={"请填写公告名称"}
+                       disabled={!eidtFlag}/>
               </Form.Item>
               <div style={{color: "gray", marginTop: -20, marginLeft: 10}}>
                 <p>命名规则：建议上线分支+发布集群，如：sprint20230511班车+集群1</p>
               </div>
 
               <Form.Item label={'升级时间'} name={'announce_time'}
+                         style={{color: "black"}}
                          rules={[{
                            required: true, validator: (r, v, callback) => {
                              if (v === undefined) callback('请填写升级时间！');
                              else callback();
                            }
                          }]}>
-                <DatePicker style={{minWidth: 300, width: "50%"}} showTime allowClear={false} format="YYYY-MM-DD HH:mm"
+                <DatePicker className={style.antTimePicker} style={{minWidth: 300, width: "50%", color: "black"}}
+                            showTime allowClear={false} format="YYYY-MM-DD HH:mm"
                             disabled={!eidtFlag}
                             onChange={(e, time) => {
                               // 先获取原始数据，再改变数据
@@ -479,7 +484,7 @@ const Announce: React.FC<any> = (props: any) => {
 
               <Form.Item label={'公告详情'} name="announce_content" rules={[{required: true}]}>
                 <TextArea spellCheck={"false"} autoSize={{minRows: 10, maxRows: 100}}
-                          style={{minWidth: 300, width: "50%"}}
+                          style={{minWidth: 300, width: "50%", color: "black"}}
                           disabled={!eidtFlag}/>
               </Form.Item>
 
@@ -487,7 +492,7 @@ const Announce: React.FC<any> = (props: any) => {
                 <Row>
                   <Col>
                     <Form.Item label={'是否轮播'} name="announce_carousel" rules={[{required: true}]}>
-                      <Radio.Group onChange={(e: RadioChangeEvent) => {
+                      <Radio.Group className={style.antRadioDisable} onChange={(e: RadioChangeEvent) => {
                         if (e.target?.value === 1) {
                           setCarouselNumShow("inline");
                           announcementForm.setFieldsValue({carouselNum: 5});
@@ -501,8 +506,9 @@ const Announce: React.FC<any> = (props: any) => {
                     </Form.Item>
                   </Col>
                   <Col>
-                    <Form.Item name="carouselNum" rules={[{required: true}]} style={{display: carouselNumShow}}>
-                      <InputNumber disabled={!eidtFlag}></InputNumber>
+                    <Form.Item name="carouselNum" rules={[{required: true}]}
+                               style={{display: carouselNumShow}}>
+                      <InputNumber style={{color: "black"}} disabled={!eidtFlag}></InputNumber>
                     </Form.Item>
                   </Col>
                 </Row>

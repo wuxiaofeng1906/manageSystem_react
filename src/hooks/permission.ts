@@ -113,8 +113,12 @@ const usePermission = () => {
       add: roles?.includes(156),
       save: roles?.includes(157),
       saveResult: roles?.includes(158),
+      dbUpdate: roles?.includes(185),
+      dbRecovery: roles?.includes(186),
+      hotUpdate: roles?.includes(187),
     };
   }, [authority]);
+
   const onlineSystemPermission = useCallback(() => {
     const roles = authority?.flatMap((it: any) => (it?.parentId == 114 ? [+it.id] : [])) ?? [];
     return {

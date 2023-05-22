@@ -14,6 +14,7 @@ import {
 import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
+import usePermission from '@/hooks/permission';
 
 const {TextArea} = Input;
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
@@ -34,6 +35,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
   const [branchs, setBranchs] = useState<any[]>();
   const [releaseCluster, setReleaseCluster] = useState(globalEnv);
+  const {prePermission} = usePermission();
+  const hasPermission = prePermission();
+
   useEffect(() => {
     if (!props.visible) {
       form.resetFields();
@@ -557,7 +561,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
             render: (v: string, row: any, i: number) =>
               v == '-' ? (v) : (
                 <Select
-                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update)}
+                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update) || !hasPermission.dbUpdate}
                   value={v}
                   style={{width: '100%'}}
                   options={[...Object.keys(WhetherOrNot)?.map((k) => ({
@@ -582,7 +586,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                 v
               ) : (
                 <Select
-                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update)}
+                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update) || !hasPermission.hotUpdate}
                   value={v}
                   style={{width: '100%'}}
                   options={Object.keys(WhetherOrNot)?.map((k) => ({

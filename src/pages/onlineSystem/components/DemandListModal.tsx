@@ -183,8 +183,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         pro_id: o.pro_id,
         story_num: o.story,
         is_hot_update: o.is_update,
+        hot_update_note: "",
         is_data_update: o.db_update,
-
+        data_update_note: "",
         apps: o.apps,
       })),
       release_num: release_num ?? '',

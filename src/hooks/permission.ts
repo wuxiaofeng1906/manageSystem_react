@@ -1,24 +1,106 @@
-import { useCallback } from 'react';
-import { useModel } from 'umi';
+import {useCallback} from 'react';
+import {useModel} from 'umi';
+import axios from "axios";
+import dayjs from "dayjs";
+import {errorMessage} from "@/publicMethods/showMessages";
 
 const usePermission = () => {
-  const [authority] = useModel('@@initialState', (init) => [
+
+  // 勾选的权限
+  const [authority, group, userid] = useModel('@@initialState', (init) => [
     init.initialState?.currentUser?.authority,
+    init.initialState?.currentUser?.group,
+    init.initialState?.currentUser?.userid
   ]);
+
+  // 获取值班人
+  // 界面值班计划查询
+  const queryDutyCardInfo = async () => {
+    let result: any = [];
+    const currentWeek = {
+      start: dayjs().startOf('week').add(1, 'day').format('YYYY/MM/DD'),
+      end: dayjs().endOf('week').add(1, 'day').format('YYYY/MM/DD'),
+    };
+    await axios.get('/api/verify/duty/plan_data', {params: {start_time: currentWeek.start, end_time: currentWeek.end}})
+      .then(function (res) {
+        if (res.data.code === 200) {
+
+          result = res.data.data.data;
+        } else {
+          errorMessage(`错误：${res.data.msg}`)
+        }
+      }).catch(function (error) {
+        errorMessage(`异常信息:${error.toString()}`)
+      });
+    return result[0];
+  };
+
   /*
    公告升级权限
    145,147,148，150，151 => 公告保存，公告查看，公告挂起，删除，新增
    */
-  const announcePermission = useCallback(() => {
-    const roles: number[] =
-      authority?.flatMap((it: any) => (it?.parentId == 146 ? [+it.id] : [])) ?? [];
-    return {
-      edit: roles?.includes(145), // 保存权限
-      push: roles?.includes(148), // 公告挂起
-      check: roles?.includes(147), // 公告查看
-      add: roles?.includes(151), // 新增公告
-      delete: roles?.includes(150), // 删除
-    };
+  const announcePermission = useCallback(async () => {
+    // 新增不做控制；对所有删除功能做控制；修改功能要区分已发布或者未发布：已发布的默认创建人/测试值班人员/管理员可以编辑，可以支持权限配置
+
+    // if (group === "superGroup") {
+    //   return {
+    //     add: true,// 新增公告
+    //     edit: true, // 修改公告内容（未发布）
+    //     editPublished: true,//修改已发布公告
+    //     delete: true, // 删除公告,
+    //     deletePublished: true, // 删除已发布公告
+    //   };
+    // }
+    let flag = {
+      view: true,// 公告查看
+      add: false,// 新增公告
+      edit: false, // 修改公告内容（未发布）
+      editPublished: false,//修改已发布公告
+      delete: false, // 删除公告,
+      deletePublished: false, // 删除已发布公告
+      push: false, // 一键发布公告
+    }
+    const dutyPerson = await queryDutyCardInfo(); // user_tech
+    const dutyTest = dutyPerson.filter((it: any) => it.user_tech === "测试" && it.user_id === userid);
+    if (dutyTest.length) { // 如果当前登陆人是值班测试
+      return {
+        ...flag,
+        add: true,
+        edit: true,
+        editPublished: true,
+        push: true,
+        delete: true
+      };
+    }
+
+    authority.map((it: any) => {
+      switch (it.name) {
+        case "announcementAdd":  // 新增公告                             -----------对应权限名字：公告新增
+          flag.add = true;
+          break;
+        case "pendingAnnouncement": // 一键发布公告                       ----------对应权限名字：一键挂起公告
+          flag.push = true;
+          break;
+        //  以上两个权限是旧公告时候配置的权限。
+        case "modifyQiQiHubNotice": // 修改公告内容（未发布）              -----------对应权限名字：修改公告内容
+          flag.edit = true;
+          break;
+        case "modifyQiQiHubPublishedNotice": //修改已发布公告            -----------对应权限名字：修改已发布的公告
+          flag.editPublished = true;
+          break;
+        case "deleteQiQiHubNotice":  // 删除公告,                       ----------对应权限名字：（逻辑）删除公告
+          flag.delete = true;
+          break;
+        case "deleteQiQiHubPublishedNotice":// 删除已发布公告            ----------对应权限名字：（逻辑）删除已发布的公告
+          flag.deletePublished = true;
+          break;
+
+        default:
+          break;
+      }
+    });
+
+    return flag;
   }, [authority]);
 
   const prePermission = useCallback(() => {
@@ -56,6 +138,6 @@ const usePermission = () => {
     };
   }, [authority]);
 
-  return { announcePermission, prePermission, onlineSystemPermission };
+  return {announcePermission, prePermission, onlineSystemPermission};
 };
 export default usePermission;

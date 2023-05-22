@@ -13,12 +13,12 @@ export const announcementListColumn: any = [
   {
     headerName: 'ID',
     field: 'id',
-    minWidth: 150,
+    minWidth: 110,
   },
   {
     headerName: '公告名称',
     field: 'iteration',
-    minWidth: 150,
+    minWidth: 240,
   },
   {
     headerName: '升级模板',
@@ -33,13 +33,21 @@ export const announcementListColumn: any = [
     field: 'updatedTime',
     minWidth: 160,
     cellRenderer: (v: any) => {
-      return dayjs(v.value).format("YYYY-MM-DD HH:mm")
+      return dayjs(v.value).format("YYYY-MM-DD HH:mm");
     }
   },
   {
     headerName: '升级描述',
     field: 'description',
     minWidth: 160,
+  },
+  {
+    headerName: '发布状态',
+    field: 'isPublished',
+    minWidth: 120,
+    cellRenderer: (v: any) => {
+      return v.value ? "已发布" : "未发布";
+    }
   },
   {
     headerName: '创建人',

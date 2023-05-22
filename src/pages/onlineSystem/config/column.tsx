@@ -219,12 +219,12 @@ export const preServerColumn = (data: any[]): ColumnsType<any> => {
         width: 150,
         render: (v: string) => cpWhetherOrNot[v] ?? v,
       },
-      {
-        title: '是否涉及数据Recovery',
-        dataIndex: 'is_recovery',
-        width: 160,
-        render: (v: string) => cpWhetherOrNot[v] ?? v,
-      },
+      // {
+      //   title: '是否涉及数据Recovery',
+      //   dataIndex: 'is_recovery',
+      //   width: 160,
+      //   render: (v: string) => cpWhetherOrNot[v] ?? v,
+      // },
       {
         title: '是否可热更',
         dataIndex: 'is_hot_update',

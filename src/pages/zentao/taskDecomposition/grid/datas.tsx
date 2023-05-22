@@ -19,14 +19,16 @@ const getEmptyRow = async (count: any) => {
   let index = 0;
   while (index < count) {
     index += 1;
-    // eslint-disable-next-line @typescript-eslint/no-loop-func
-    tempDatas.forEach((ele: any, num: number) => {
-      girdData.push({
-        ...ele,
-        No: num + 1, // 固定的12345
-        ids: `${index}${num}`// 用于区分初始化中相同行
+    if (tempDatas && tempDatas.length) {
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      tempDatas.forEach((ele: any, num: number) => {
+        girdData.push({
+          ...ele,
+          No: num + 1, // 固定的12345
+          ids: `${index}${num}`// 用于区分初始化中相同行
+        });
       });
-    });
+    }
   }
 
   return girdData;

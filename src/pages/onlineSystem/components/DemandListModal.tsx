@@ -275,9 +275,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
   const updateStatus = (column: string, data: any, status: string, index: number) => {
 
-    let newDesc = ""; // 修改说明
     const columnTitle = column === "db_update" ? "是否涉及数据update" : "是否可热更";
-    const inputValue = column === "db_update" ? data.data_update_note : data.hot_update_note;
+    let inputValue = column === "db_update" ? data.data_update_note : data.hot_update_note;
     Modal.confirm({
       centered: true,
       title: `修改${columnTitle}提醒`,
@@ -287,14 +286,16 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         }』的{columnTitle} 状态调整为 {WhetherOrNot[status] ?? "-"}</div>
         <div>
           {/*<label>修改说明</label>*/}
-          <Input addonBefore="修改说明" defaultValue={inputValue} onChange={(e: any) => {
-            newDesc = e.target.value;
-          }}/>
+          <Input addonBefore={<div><span>修改说明</span><span style={{color: "red", marginLeft: 5}}>*</span></div>}
+                 defaultValue={inputValue}
+                 onChange={(e: any) => {
+                   inputValue = e.target.value;
+                 }}/>
         </div>
       </div>,
 
       onOk: () => {
-        if (isEmpty(newDesc)) {
+        if (isEmpty(inputValue)) {
           errorMessage("修改说明不能为空!", 2);
           return;
         }
@@ -305,7 +306,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         _list[column] = status;
         // 更新说明值
         const descColumn = column === "db_update" ? "data_update_note" : "hot_update_note";
-        _list[descColumn] = newDesc;
+        _list[descColumn] = inputValue;
 
         // 重新设置数据源
         setList([...list]);

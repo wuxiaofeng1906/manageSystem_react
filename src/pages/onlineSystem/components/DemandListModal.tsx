@@ -277,7 +277,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
     const columnTitle = column === "db_update" ? "是否涉及数据update" : "是否可热更";
     let inputValue = column === "db_update" ? data.data_update_note : data.hot_update_note;
-    Modal.confirm({
+    let confirm = Modal.confirm({
       centered: true,
       title: `修改${columnTitle}提醒`,
       width: 500,
@@ -294,7 +294,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         </div>
       </div>,
 
-      onOk: () => {
+      onOk: (e) => {   // 如果需要点击ok后，不满足条件不关闭的话，就必须写这个参数
+
         if (isEmpty(inputValue)) {
           errorMessage("修改说明不能为空!", 2);
           return;
@@ -322,6 +323,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           }
         });
         setSelected(_selected);
+        confirm.destroy();
+
 
       },
     });

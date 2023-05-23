@@ -223,7 +223,7 @@ const Announce: React.FC<any> = (props: any) => {
           return;
         }
         if (!eidtFlag || (showPreView && type === "detail")) {
-          debugger
+
           // 如果是 没有权限修改或者  明细数据，且没有被改变过 或者没有权限修改的时候
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {

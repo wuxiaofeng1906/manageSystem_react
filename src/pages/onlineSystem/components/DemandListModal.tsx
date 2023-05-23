@@ -96,6 +96,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setSpin(true);
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
+
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
@@ -171,7 +172,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       time = props.data?.plan_release_time;
       name = props.data?.release_name;
     }
-    debugger
+
     const data = {
       user_id: user?.userid ?? '',
       cluster: uniq(values.cluster || [])?.join() ?? '',
@@ -183,16 +184,16 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         pro_id: o.pro_id,
         story_num: o.story,
         is_hot_update: o.is_update,
-        hot_update_note: "",
+        hot_update_note: o.hot_update_note,
         is_data_update: o.db_update,
-        data_update_note: "",
+        data_update_note: o.data_update_note,
         apps: o.apps,
       })),
       release_num: release_num ?? '',
       release_name: name,
       plan_release_time: time,
     };
-    debugger
+
     try {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
@@ -271,10 +272,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     );
   };
 
+
   const updateStatus = (column: string, data: any, status: string, index: number) => {
-    debugger
+
     let newDesc = ""; // 修改说明
     const columnTitle = column === "db_update" ? "是否涉及数据update" : "是否可热更";
+    const inputValue = column === "db_update" ? data.data_update_note : data.hot_update_note;
     Modal.confirm({
       centered: true,
       title: `修改${columnTitle}提醒`,
@@ -284,21 +287,24 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         }』的{columnTitle} 状态调整为 {WhetherOrNot[status] ?? "-"}</div>
         <div>
           {/*<label>修改说明</label>*/}
-          <Input addonBefore="修改说明" defaultValue={data.opened_by} onChange={(e: any) => {
+          <Input addonBefore="修改说明" defaultValue={inputValue} onChange={(e: any) => {
             newDesc = e.target.value;
           }}/>
         </div>
       </div>,
-      onOk: () => {
-        debugger
 
+      onOk: () => {
+        if (isEmpty(newDesc)) {
+          errorMessage("修改说明不能为空!", 2);
+          return;
+        }
         // list[index].is_update = status;
         // setList([...list]);
         const _list = list[index];
         // 更新是否值（是否数据update，是否热更）
         _list[column] = status;
         // 更新说明值
-        const descColumn = column === "db_update" ? "是否涉及数据update" : "是否可热更";
+        const descColumn = column === "db_update" ? "data_update_note" : "hot_update_note";
         _list[descColumn] = newDesc;
 
         // 重新设置数据源
@@ -315,6 +321,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           }
         });
         setSelected(_selected);
+
       },
     });
   };
@@ -559,19 +566,19 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
             dataIndex: 'db_update',
             // width: 150,
             // render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-            render: (v: string, row: any, i: number) =>
-              v == '-' ? (v) : (
-                <Select
-                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update) || !hasPermission.dbUpdate}
-                  value={v}
-                  style={{width: '100%'}}
-                  options={[...Object.keys(WhetherOrNot)?.map((k) => ({
-                    value: k,
-                    label: WhetherOrNot[k],
-                  })), {value: "-", label: "-"}]}
-                  onChange={(e) => updateStatus("db_update", row, e, i)}
-                />
-              ),
+            render: (v: string, row: any, i: number) => v == '-' ? (v) : (
+              <Select
+                disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update) || !hasPermission.dbUpdate}
+                value={v}
+                style={{width: '100%'}}
+                options={Object.keys(WhetherOrNot)?.map((k) => ({
+                  value: k,
+                  label: WhetherOrNot[k],
+                }))}
+                onChange={(e) => updateStatus("db_update", row, e, i)}
+              />
+            ),
+
           },
           // {
           //   title: '是否涉及数据Recovery',
@@ -602,7 +609,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           {title: '需求指派人', dataIndex: 'ass_to', width: 100},
           {
             title: '数据update修改说明',
-            dataIndex: 'title',
+            dataIndex: 'data_update_note',
             width: 150,
             ellipsis: {showTitle: false},
             render: (v: string) => (
@@ -611,7 +618,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           },
           {
             title: '是否可热更修改说明',
-            dataIndex: 'title',
+            dataIndex: 'hot_update_note',
             width: 150,
             ellipsis: {showTitle: false},
             render: (v: string) => (

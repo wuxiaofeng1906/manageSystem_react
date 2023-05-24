@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button} from 'antd';
+import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input} from 'antd';
 import dayjs from 'dayjs';
 import {useModel} from 'umi';
 import {isEmpty, difference, isEqual, intersection, uniq} from 'lodash';
@@ -14,7 +14,9 @@ import {
 import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
+import usePermission from '@/hooks/permission';
 
+const {TextArea} = Input;
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [form] = Form.useForm();
   const [baseForm] = Form.useForm();
@@ -33,6 +35,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
   const [branchs, setBranchs] = useState<any[]>();
   const [releaseCluster, setReleaseCluster] = useState(globalEnv);
+  const {prePermission} = usePermission();
+  const hasPermission = prePermission();
+
   useEffect(() => {
     if (!props.visible) {
       form.resetFields();
@@ -91,6 +96,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setSpin(true);
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
+
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
@@ -178,6 +184,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         pro_id: o.pro_id,
         story_num: o.story,
         is_hot_update: o.is_update,
+        hot_update_note: o.hot_update_note,
+        is_data_update: o.db_update,
+        data_update_note: o.data_update_note,
         apps: o.apps,
       })),
       release_num: release_num ?? '',
@@ -263,18 +272,44 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     );
   };
 
-  const updateStatus = (data: any, status: string, index: number) => {
-    Modal.confirm({
+
+  const updateStatus = (column: string, data: any, status: string, index: number) => {
+
+    const columnTitle = column === "db_update" ? "是否涉及数据update" : "是否可热更";
+    let inputValue = column === "db_update" ? data.data_update_note : data.hot_update_note;
+    let confirm = Modal.confirm({
       centered: true,
-      title: '修改是否可热更提醒',
-      content: `请确认是否将『执行名称：${data.pro_name ?? ''} 需求编号：${
-        data.story ?? ''
-      }』的是否可热更 状态调整为 ${WhetherOrNot[status]}`,
-      onOk: () => {
+      title: `修改${columnTitle}提醒`,
+      width: 500,
+      content: <div>
+        <div>请确认是否将『执行名称：{data.pro_name ?? ''} 需求编号：{data.story ?? ''
+        }』的{columnTitle} 状态调整为 {WhetherOrNot[status] ?? "-"}</div>
+        <div>
+          {/*<label>修改说明</label>*/}
+          <Input addonBefore={<div><span>修改说明</span><span style={{color: "red", marginLeft: 5}}>*</span></div>}
+                 defaultValue={inputValue}
+                 onChange={(e: any) => {
+                   inputValue = e.target.value;
+                 }}/>
+        </div>
+      </div>,
+
+      onOk: (e) => {   // 如果需要点击ok后，不满足条件不关闭的话，就必须写这个参数
+
+        if (isEmpty(inputValue)) {
+          errorMessage("修改说明不能为空!", 2);
+          return;
+        }
         // list[index].is_update = status;
         // setList([...list]);
         const _list = list[index];
-        _list.is_update = status;
+        // 更新是否值（是否数据update，是否热更）
+        _list[column] = status;
+        // 更新说明值
+        const descColumn = column === "db_update" ? "data_update_note" : "hot_update_note";
+        _list[descColumn] = inputValue;
+
+        // 重新设置数据源
         setList([...list]);
 
         // 还要更新selected中的数据
@@ -288,6 +323,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           }
         });
         setSelected(_selected);
+        confirm.destroy();
+
+
       },
     });
   };
@@ -531,13 +569,26 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
             title: '是否涉及数据update',
             dataIndex: 'db_update',
             // width: 150,
-            render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+            // render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+            render: (v: string, row: any, i: number) => v == '-' ? (v) : (
+              <Select
+                disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update) || !hasPermission.dbUpdate}
+                value={v}
+                style={{width: '100%'}}
+                options={Object.keys(WhetherOrNot)?.map((k) => ({
+                  value: k,
+                  label: WhetherOrNot[k],
+                }))}
+                onChange={(e) => updateStatus("db_update", row, e, i)}
+              />
+            ),
+
           },
-          {
-            title: '是否涉及数据Recovery',
-            dataIndex: 'is_recovery',
-            render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-          },
+          // {
+          //   title: '是否涉及数据Recovery',
+          //   dataIndex: 'is_recovery',
+          //   render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+          // },
           {
             title: '是否可热更',
             dataIndex: 'is_update',
@@ -547,19 +598,37 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                 v
               ) : (
                 <Select
-                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update)}
+                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update) || !hasPermission.hotUpdate}
                   value={v}
                   style={{width: '100%'}}
                   options={Object.keys(WhetherOrNot)?.map((k) => ({
                     value: k,
                     label: WhetherOrNot[k],
                   }))}
-                  onChange={(e) => updateStatus(row, e, i)}
+                  onChange={(e) => updateStatus("is_update", row, e, i)}
                 />
               ),
           },
           {title: '需求创建人', dataIndex: 'opened_by', width: 100},
           {title: '需求指派人', dataIndex: 'ass_to', width: 100},
+          {
+            title: '数据update修改说明',
+            dataIndex: 'data_update_note',
+            width: 150,
+            ellipsis: {showTitle: false},
+            render: (v: string) => (
+              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            ),
+          },
+          {
+            title: '是否可热更修改说明',
+            dataIndex: 'hot_update_note',
+            width: 150,
+            ellipsis: {showTitle: false},
+            render: (v: string) => (
+              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            ),
+          },
         ],
     };
   }

@@ -102,7 +102,10 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
       if ((msg && isString(res?.msg)) || (msg && res?.msg !== 'success')) {
         message.info(msg === true ? res?.msg : msg);
       }
-      return res?.data;
+      if (res?.data) {
+        return res?.data;
+      }
+      return res;
     })
     .catch(async (e: any) => {
 

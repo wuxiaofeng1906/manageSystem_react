@@ -294,38 +294,52 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         </div>
       </div>,
 
-      onOk: (e) => {   // 如果需要点击ok后，不满足条件不关闭的话，就必须写这个参数
+      onOk: async (e) => {   // 如果需要点击ok后，不满足条件不关闭的话，就必须写这个参数
 
         if (isEmpty(inputValue)) {
           errorMessage("修改说明不能为空!", 2);
           return;
         }
-        // list[index].is_update = status;
-        // setList([...list]);
+
         const _list = list[index];
-        // 更新是否值（是否数据update，是否热更）
-        _list[column] = status;
-        // 更新说明值
-        const descColumn = column === "db_update" ? "data_update_note" : "hot_update_note";
-        _list[descColumn] = inputValue;
-
-        // 重新设置数据源
-        setList([...list]);
-
-        // 还要更新selected中的数据
-        const _selected: any = [];
-        // 根据story ID 判断是否存在同一个
-        [...selected].forEach((e: any) => {
-          if (e.story === _list.story) {
-            _selected.push(_list);
-          } else {
-            _selected.push(e);
-          }
+        // 先更新后端，后端更新成功再更新这个界面上的值
+        const updateResult = await OnlineSystemServices.updateListColumn({
+          // "release_num": "202305250008", 可以不传
+          "execu_no": _list.pro_id,
+          "story_no": _list.story,
+          "user_id": user?.userid ?? '',
+          "datas": [
+            {
+              "label_en": column === "db_update" ? "is_data_update" : "is_hot_update",
+              "old_value": column === "db_update" ? _list.db_update : _list.is_update,
+              "new_value": status,
+              "note": inputValue
+            }
+          ]
         });
-        setSelected(_selected);
-        confirm.destroy();
+        if (updateResult.code === 200) {
+          // 更新是否值（是否数据update，是否热更）
+          _list[column] = status;
+          // 更新说明值
+          const descColumn = column === "db_update" ? "data_update_note" : "hot_update_note";
+          _list[descColumn] = inputValue;
 
+          // 重新设置数据源
+          setList([...list]);
 
+          // 还要更新selected中的数据
+          const _selected: any = [];
+          // 根据story ID 判断是否存在同一个
+          [...selected].forEach((e: any) => {
+            if (e.story === _list.story) {
+              _selected.push(_list);
+            } else {
+              _selected.push(e);
+            }
+          });
+          setSelected(_selected);
+          confirm.destroy();
+        }
       },
     });
   };

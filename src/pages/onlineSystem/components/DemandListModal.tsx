@@ -11,7 +11,7 @@ import {
   WhetherOrNot,
   onLog,
 } from '@/pages/onlineSystem/config/constant';
-import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
+import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessages';
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
@@ -318,6 +318,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           ]
         });
         if (updateResult.code === 200) {
+          sucMessage(`${column === "db_update" ? "是否涉及数据update" : "是否可热更"}状态修改成功！`);
           // 更新是否值（是否数据update，是否热更）
           _list[column] = status;
           // 更新说明值

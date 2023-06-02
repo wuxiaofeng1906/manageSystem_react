@@ -112,7 +112,11 @@ const ReleaseOrder = () => {
   const getOrderDetail = async (clusterMap = clusters) => {
     try {
       setSpinning(true);
-      const res = await PreReleaseServices.orderDetail({release_num: id, include_deleted: true});
+      let params: any = {release_num: id};
+      if (is_delete === "true") {
+        params = {...params, include_deleted: true};
+      }
+      const res = await PreReleaseServices.orderDetail(params);
       if (isEmpty(res)) {
         initForm();
       } else

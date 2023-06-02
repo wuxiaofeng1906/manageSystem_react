@@ -1,5 +1,4 @@
 import request from './request';
-import {noticeUrl} from "../../config/qqServiceEnv";
 import {axiosPost} from "@/publicMethods/axios";
 import {noticeUrl, Check_Cluster_Status} from "../../config/qqServiceEnv";
 import {axiosGet_TJ} from "@/publicMethods/axios";

@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Spin } from 'antd';
-import { AgGridReact } from 'ag-grid-react';
-import { GridApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
+import React, {useEffect, useRef, useState} from 'react';
+import {Button, Spin} from 'antd';
+import {AgGridReact} from 'ag-grid-react';
+import {GridApi, GridReadyEvent, CellClickedEvent} from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
-import { releaseListColumn } from '@/pages/onlineSystem/releaseProcess/column';
+import {releaseListColumn} from '@/pages/onlineSystem/releaseProcess/column';
 import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, orderBy } from 'lodash';
-import { history, useLocation } from 'umi';
+import {isEmpty, orderBy} from 'lodash';
+import {history, useLocation} from 'umi';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
-import { WarningOutlined } from '@ant-design/icons';
+import {WarningOutlined} from '@ant-design/icons';
 
-const PreReleaseList = ({ disabled, height }: { disabled?: boolean; height: number }) => {
+const PreReleaseList = ({disabled, height}: { disabled?: boolean; height: number }) => {
   const gridRef = useRef<GridApi>();
   const query = useLocation()?.query;
   const [rowData, setRowData] = useState<any[]>([]);
@@ -38,9 +38,9 @@ const PreReleaseList = ({ disabled, height }: { disabled?: boolean; height: numb
 
   const onFinish = async (data: any) => {
     if (!isEmpty(data)) {
-      let href = `/onlineSystem/releaseOrder/${data?.release_num}`;
+      let href = `/onlineSystem/releaseOrder/${data?.release_num}/false/${data?.release_name}`;
       if (data.type == '1') {
-        href = `/onlineSystem/prePublish/${data?.release_num}/${data?.branch}`;
+        href = `/onlineSystem/prePublish/${data?.release_num}/${data?.branch}/false/${data?.release_name}`;
       }
       history.push(href);
     }
@@ -65,7 +65,7 @@ const PreReleaseList = ({ disabled, height }: { disabled?: boolean; height: numb
       setSpinning(false);
       setWarnTip(
         sortData?.map((it: any) => it.release_num)?.toString() !==
-          formatData?.map((it) => it.release_num)?.toString(),
+        formatData?.map((it) => it.release_num)?.toString(),
       );
     } catch (e) {
       setSpinning(false);
@@ -93,13 +93,13 @@ const PreReleaseList = ({ disabled, height }: { disabled?: boolean; height: numb
           </Button>
           {warnTip && (
             <div className={styles.warnWrap}>
-              <WarningOutlined style={{ fontSize: 18, marginRight: 8 }} />
-              提示：当前预发布列表，红色标记<span style={{ margin: '0 5px' }}>“计划发布时间”</span>
+              <WarningOutlined style={{fontSize: 18, marginRight: 8}}/>
+              提示：当前预发布列表，红色标记<span style={{margin: '0 5px'}}>“计划发布时间”</span>
               顺序有误，请确认后及时调整
             </div>
           )}
         </div>
-        <div className="ag-theme-alpine" style={{ height: height - 80, width: '100%' }}>
+        <div className="ag-theme-alpine" style={{height: height - 80, width: '100%'}}>
           <AgGridReact
             columnDefs={releaseListColumn('pre')}
             rowData={rowData}
@@ -108,7 +108,7 @@ const PreReleaseList = ({ disabled, height }: { disabled?: boolean; height: numb
               filter: true,
               flex: 1,
               suppressMenu: true,
-              cellStyle: { 'line-height': '28px' },
+              cellStyle: {'line-height': '28px'},
             }}
             rowHeight={28}
             headerHeight={30}
@@ -130,9 +130,9 @@ const PreReleaseList = ({ disabled, height }: { disabled?: boolean; height: numb
                     }}
                     className={styles.links}
                     onClick={() => {
-                      let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}`;
+                      let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/${p.data.is_delete}/${p.data.release_name}`;
                       if (p.data.release_type == 'backlog_release') {
-                        href = `/onlineSystem/releaseOrder/${p.data.release_num}`;
+                        href = `/onlineSystem/releaseOrder/${p.data.release_num}/${p.data.is_delete}/${p.data.release_name}`;
                       }
                       history.push(href);
                     }}
@@ -144,7 +144,7 @@ const PreReleaseList = ({ disabled, height }: { disabled?: boolean; height: numb
             }}
           />
         </div>
-        <DemandListModal visible={visible} onOk={onFinish} />
+        <DemandListModal visible={visible} onOk={onFinish}/>
       </div>
     </Spin>
   );

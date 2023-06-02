@@ -623,9 +623,17 @@ const CheckSettingModal = (props: ModalFuncProps & { init: { visible: boolean; d
   const getDetail = async () => {
     setLoading(true);
     try {
-      const res = await OnlineSystemServices.getCheckSettingDetail({
+      let queryParam = {
         release_num: props.init.data,
-      });
+        include_deleted: true
+      };
+      // 不能编辑（删除或者去取消发布）的时候也要展示原始记录
+      // if (props.editMode) {
+      //   queryParam["include_deleted"] = true;
+      // }
+
+      const res = await OnlineSystemServices.getCheckSettingDetail(queryParam);
+
       const data = res?.branch_check_data;
       form.setFieldsValue({
         main_branch: data?.main_branch ? data?.main_branch?.split(',') : [],

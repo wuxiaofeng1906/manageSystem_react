@@ -54,14 +54,12 @@ interface IAxios extends AxiosRequestConfig {
 }
 
 function request(url: string, ioptions: IOption = {}) {
-
   const {dealRes = true, warn = true, forceLogin = true, msg, localCache, ...options} = ioptions;
   let mRequest;
   if (localCache) mRequest = localCacheWrap(url, options);
   // 统一结构接口
   if (!mRequest) mRequest = _request(url, options);
   if (dealRes) mRequest = dealResWrap(mRequest, warn, forceLogin, msg);
-
   return mRequest;
 }
 
@@ -107,11 +105,16 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
       }
       return res;
     })
-    .catch(async (e: any) => {
+    .catch((e) => {
 
-      //
-      // const a = await e.json()
-      // errorMessage(a.error);
+      if (e.status) {
+        errorMessage(`请求异常信息:${e.status.toString()} ${e.statusText.toString()}`);
+      } else if (e.code) {
+        errorMessage(`请求异常信息:${e.code.toString()} ${e.msg.toString()}`);
+      } else {
+        errorMessage(`请求异常!`);
+      }
+
       return Promise.reject(e);
     });
 }
@@ -133,16 +136,19 @@ export const irregularRequest = async (url: string, options: IAxios) => {
     const errTip = JSON.parse(error.response.request.response);
     if (errTip.code == 403) {
       message.info('对不起，您无权操作');
-    } else if (options.msg || options.warn)
+    } else if (options.msg || options.warn) {
       errorMessage(
         options.msg == true || options.warn == true
           ? errTip.message
           : options.msg || options.warn || '操作失败',
       );
-    else if (errTip?.ok == false && errTip.code !== 200)
+    } else if (errTip?.ok == false && errTip.code !== 200) {
       errorMessage(
         errTip.message || errTip.msg || errTip?.datas?.[0]?.message || '操作失败，请刷新重试',
       );
+    } else {
+      errorMessage(errTip.toString());
+    }
     throw errTip;
   }
 };

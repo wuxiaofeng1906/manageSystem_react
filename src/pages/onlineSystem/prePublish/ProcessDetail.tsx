@@ -92,7 +92,11 @@ const ProcessDetail = (props: any, ref: any) => {
         {release_num},
         refresh ? {release_num, user_id: user?.userid ?? ''} : null,
       );
-      await OnlineSystemServices.abnormalApi({release_num});
+      let params: any = {release_num};
+      if (globalState.finished) {
+        params = {...params, include_deleted: true}
+      }
+      await OnlineSystemServices.abnormalApi(params);
       const res = await OnlineSystemServices.initDataBranch({branch});
       setHasBranch(res?.have_branch == 'yes');
       setLoading(false);

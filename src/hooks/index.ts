@@ -6,36 +6,42 @@
  * @LastEditors: jieTan
  * @LastModify:
  */
-import { ApolloClient, gql, ApolloQueryResult } from '@apollo/client/core';
+import {ApolloClient, gql, ApolloQueryResult} from '@apollo/client/core';
 // @ts-ignore
-import { useModel } from '@@/plugin-model/useModel';
-import { useRequest } from 'ahooks';
-import { useEffect, useRef } from 'react';
+import {useModel} from '@@/plugin-model/useModel';
+import {useRequest} from 'ahooks';
+import {useEffect, useRef} from 'react';
+import {errorMessage} from "@/publicMethods/showMessages";
 
 export class GqlClient<T> {
   // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-  constructor(private readonly apolloClient: ApolloClient<T>) {}
+  constructor(private readonly apolloClient: ApolloClient<T>) {
+  }
 
   query = (query: string) => {
     console.log('query中GQL的token', localStorage.getItem('accessId'));
     // gql 浏览器页面下面的 HTTP HEADERS 下面需要写：{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MzA2Nzd9.G3EjtMWppClX_E2NN0dFPXgX6OsGSrIXy4ReT_Rs5zI"}
-    return this.apolloClient
-      .query({
-        query: gql(query),
-        context: {
-          headers: { Authorization: `Bearer ${localStorage.getItem('accessId')}` }, // 添加headers请求头，用于权限控制
-          // headers: {"Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuiwreadsCIsInN1YiI6IlRhbkppZSIsImlhdCI6MTYyMzgyOTk4NX0.GqXs9NTJ3ynUzT0w9hkxppaKqvBUa6PDG2TmrfGyN5k`},  // 谭杰的token
-        },
-      })
-      .catch((err) => {
-        throw err;
-      });
+
+    const queryData = this.apolloClient.query({
+      query: gql(query),
+      context: {
+        headers: {Authorization: `Bearer ${localStorage.getItem('accessId')}`}, // 添加headers请求头，用于权限控制
+        // headers: {"Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuiwreadsCIsInN1YiI6IlRhbkppZSIsImlhdCI6MTYyMzgyOTk4NX0.GqXs9NTJ3ynUzT0w9hkxppaKqvBUa6PDG2TmrfGyN5k`},  // 谭杰的token
+      },
+    }).catch((err) => {
+      console.log("gql连接错误：" + err.toString());
+      errorMessage("gql连接错误：" + err.toString());
+      return {data: []}
+      // throw err;
+    });
+
+    return queryData;
   };
 }
 
 export function useGqlClient(): GqlClient<object> {
   const {
-    initialState: { gqlClient },
+    initialState: {gqlClient},
   } = useModel('@@initialState') as any;
   return gqlClient;
 }
@@ -44,7 +50,7 @@ export function useQuery(query: string): { data: any; loading: boolean; error: a
   const client = useGqlClient();
 
   return useRequest(async () => {
-    const { data } = await client.query(query);
+    const {data} = await client.query(query);
 
     return data;
   });

@@ -33,9 +33,14 @@ export default () => {
       await OnlineSystemServices.refreshProjectInfo(refreshData);
     }
     if (data) {
+      let unFinishedData = data;
+      // 如果是历史信息，getBasicInfo,getServerApp 需要加查询参数
+      if (globalState.finished) {
+        unFinishedData = {...unFinishedData, include_deleted: true};
+      }
       await Promise.all([
-        getBasicInfo(data),
-        getServerApp(data),
+        getBasicInfo(unFinishedData),
+        getServerApp(unFinishedData),
         getUpgradeInfo(data),
         getRepairInfo(data),
         getServerConfirm(data),

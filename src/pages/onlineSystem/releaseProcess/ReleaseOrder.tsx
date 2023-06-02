@@ -28,6 +28,7 @@ import ICluster from '@/components/ICluster';
 import {pushType} from "@/pages/onlineSystem/config/constant";
 import {isTestService} from "@/publicMethods/webMethod";
 import {vertifyClusterStatus} from "../commonFunction";
+import {ProcessTab} from "@/pages/onlineSystem/components/ProcessTab";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 let releateOrderInfo: any = {
@@ -35,7 +36,7 @@ let releateOrderInfo: any = {
   INTER: []
 }; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
 const ReleaseOrder = () => {
-  const {id} = useParams() as { id: string };
+  const {id, is_delete} = useParams() as { id: string, is_delete: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const [envList] = useModel('env', (env) => [env.releaseOrderEnv]);
@@ -81,14 +82,13 @@ const ReleaseOrder = () => {
     return () => {
       window.onresize = null;
     };
-  }, []);
+  }, [id]);
 
 
   const getBaseList = async () => {
     /* 注意：ag-grid中，列的渲染是没法用usestate中的数据来进行动态渲染的，解决方案：需要定义一个全局变量来动态记录需要改变的数据，渲染中使用这个全局变量 */
     releateOrderInfo.SQL = await PreReleaseServices.getRelatedInfo({order_type: "SQL"});
     releateOrderInfo.INTER = await PreReleaseServices.getRelatedInfo({order_type: "DeployApi"});
-
     const announce = await AnnouncementServices.preAnnouncement();
     const order = await PreReleaseServices.dutyOrder();
     const devopsInfo = await OnlineSystemServices.getDevOpsOrderInfo({release_num: id});
@@ -113,7 +113,11 @@ const ReleaseOrder = () => {
   const getOrderDetail = async (clusterMap = clusters) => {
     try {
       setSpinning(true);
-      const res = await PreReleaseServices.orderDetail({release_num: id});
+      let params: any = {release_num: id};
+      if (is_delete === "true") {
+        params = {...params, include_deleted: true};
+      }
+      const res = await PreReleaseServices.orderDetail(params);
       if (isEmpty(res)) {
         initForm();
       } else
@@ -129,7 +133,7 @@ const ReleaseOrder = () => {
         ...res,
         cluster: res.cluster ?? [],
       });
-      agFinished = res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
+      agFinished = is_delete === "true" ? true : res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
       setFinished(agFinished);
       setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
@@ -577,7 +581,7 @@ const ReleaseOrder = () => {
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <PageContainer title={<div/>}>
+      <PageContainer title={<ProcessTab finished={finished}/>}>
         <div className={styles.releaseOrder}>
           <div className={styles.header}>
             <div className={styles.title}>工单基本信息</div>
@@ -797,7 +801,7 @@ const ReleaseOrder = () => {
                       onClick={() => {
                         if (!p.data.release_num) return;
                         history.push(
-                          `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}`,
+                          `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/${p.data.release_name}`,
                         );
                       }}
                     >

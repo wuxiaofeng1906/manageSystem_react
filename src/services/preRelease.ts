@@ -1,4 +1,5 @@
 import request from './request';
+import {axiosPost} from "@/publicMethods/axios";
 import {noticeUrl, Check_Cluster_Status} from "../../config/qqServiceEnv";
 import {axiosGet_TJ} from "@/publicMethods/axios";
 
@@ -82,6 +83,10 @@ const PreReleaseServices = {
   // 发布列表排序
   async releaseOrder(data: any) {
     return request(`${baseUrl}/latest-release/order-by`, {method: 'post', data});
+  },
+  // 有错误返回值的请求 --  发布列表排序
+  async releaseOrder_own(data: any) {
+    return axiosPost(`${baseUrl}/latest-release/order-by`, data);
   },
   // 发布历史
   async historyList(params: any) {

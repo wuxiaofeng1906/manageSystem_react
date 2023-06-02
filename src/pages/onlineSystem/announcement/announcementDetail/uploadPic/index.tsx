@@ -5,10 +5,10 @@ export const getDefaultImg = () => {
 
   if (location.origin.includes('rd.q7link.com')) {
     return [
-      "0/2023/04/87af181d-ff0f-49e7-819a-9c3c6d25474c.jpg",
-      "0/2023/04/ce0da6d9-cad0-455d-bc3a-07d4468ef11b.jpg",
-      "0/2023/04/f395f89a-4d4c-44d9-9145-09e6061605aa.jpg",
-      "0/2023/04/998186d6-7de1-47f5-b7de-57033325bf2e.jpg"
+      "public/2023/05/a2957334-035d-4f40-abfc-166787baf2d6.jpg",
+      "public/2023/05/c13e1c55-0e10-46f0-90f1-4f0b625324e6.jpg",
+      "public/2023/05/fe680877-4146-49c7-b82a-6d08035f12e9.jpg",
+      "public/2023/05/9aff7379-c31e-42e6-9e0b-abd440fff29c.jpg"
     ];
   }
   return [
@@ -26,17 +26,17 @@ export const getImageToBackend = (imgId: string, laout: string) => {
 
   if (location.origin.includes('rd.q7link.com')) {
     switch (imgId) {
-      case  "0/2023/04/87af181d-ff0f-49e7-819a-9c3c6d25474c.jpg":
-        resultIgm = laout === "1" ? "0/2023/04/a7cb3d02-12ae-42d3-8056-c9d343eec2b6.png" : "0/2023/04/2ddace67-139a-4c2c-9cdf-9417f01d0877.png";
+      case  "public/2023/05/a2957334-035d-4f40-abfc-166787baf2d6.jpg":
+        resultIgm = laout === "1" ? "public/2023/05/63d766f3-1de6-46bc-a020-c70078ac78be.png" : "public/2023/05/85e19d04-2274-4532-a85f-867bd2927e9a.png";
         break;
-      case "0/2023/04/ce0da6d9-cad0-455d-bc3a-07d4468ef11b.jpg":
-        resultIgm = laout === "1" ? "0/2023/04/32c9b977-9007-4304-bc53-ac261042cb5e.png" : "0/2023/04/965ddeab-041e-4869-85e0-47768adde359.png";
+      case "public/2023/05/c13e1c55-0e10-46f0-90f1-4f0b625324e6.jpg":
+        resultIgm = laout === "1" ? "public/2023/05/7547d365-0fe3-4658-90bc-56ab045cf003.png" : "public/2023/05/3e1301c4-e090-49e3-a3ca-cb9d7cb94f34.png";
         break;
-      case "0/2023/04/f395f89a-4d4c-44d9-9145-09e6061605aa.jpg":
-        resultIgm = laout === "1" ? "0/2023/04/f199346a-c4c8-4bfd-b475-c4191966724b.png" : "0/2023/04/9bf97e7d-ccfd-4770-9925-555301388958.png";
+      case "public/2023/05/fe680877-4146-49c7-b82a-6d08035f12e9.jpg":
+        resultIgm = laout === "1" ? "public/2023/05/4ad34134-e77d-498d-822f-92024c652a3b.png" : "public/2023/05/e205d8ef-dc73-4034-b5d4-13952645b5c2.png";
         break;
-      case"0/2023/04/998186d6-7de1-47f5-b7de-57033325bf2e.jpg":
-        resultIgm = laout === "1" ? "0/2023/04/9e54ead7-aaea-462a-a27e-6c05e6a0cdaa.png" : "0/2023/04/65137585-5e71-40dc-990c-2a96f1fb630d.png";
+      case"public/2023/05/9aff7379-c31e-42e6-9e0b-abd440fff29c.jpg":
+        resultIgm = laout === "1" ? "public/2023/05/3314dede-a0db-4897-956c-e81ed5ac3882.png" : "public/2023/05/fb34def3-7830-40f9-bf0c-62325f6fb954.png";
         break;
       default:
         resultIgm = imgId; // 手动上传的图片没有对应的后端图片
@@ -73,24 +73,24 @@ export const getImageForFront = (imgId: string) => {
   if (location.origin.includes('rd.q7link.com')) {
     switch (imgId) {
 
-      case "0/2023/04/a7cb3d02-12ae-42d3-8056-c9d343eec2b6.png":
-      case "0/2023/04/2ddace67-139a-4c2c-9cdf-9417f01d0877.png":
-        resultIgm = "0/2023/04/87af181d-ff0f-49e7-819a-9c3c6d25474c.jpg";
+      case "public/2023/05/63d766f3-1de6-46bc-a020-c70078ac78be.png":
+      case "public/2023/05/85e19d04-2274-4532-a85f-867bd2927e9a.png":
+        resultIgm = "public/2023/05/a2957334-035d-4f40-abfc-166787baf2d6.jpg";
         break;
 
-      case  "0/2023/04/32c9b977-9007-4304-bc53-ac261042cb5e.png":
-      case "0/2023/04/965ddeab-041e-4869-85e0-47768adde359.png":
-        resultIgm = "0/2023/04/ce0da6d9-cad0-455d-bc3a-07d4468ef11b.jpg";
+      case  "public/2023/05/7547d365-0fe3-4658-90bc-56ab045cf003.png":
+      case "public/2023/05/3e1301c4-e090-49e3-a3ca-cb9d7cb94f34.png":
+        resultIgm = "public/2023/05/c13e1c55-0e10-46f0-90f1-4f0b625324e6.jpg";
         break;
 
-      case "0/2023/04/f199346a-c4c8-4bfd-b475-c4191966724b.png":
-      case "0/2023/04/9bf97e7d-ccfd-4770-9925-555301388958.png":
-        resultIgm = "0/2023/04/f395f89a-4d4c-44d9-9145-09e6061605aa.jpg";
+      case "public/2023/05/4ad34134-e77d-498d-822f-92024c652a3b.png":
+      case "public/2023/05/e205d8ef-dc73-4034-b5d4-13952645b5c2.png":
+        resultIgm = "public/2023/05/fe680877-4146-49c7-b82a-6d08035f12e9.jpg";
         break;
 
-      case"0/2023/04/9e54ead7-aaea-462a-a27e-6c05e6a0cdaa.png":
-      case "0/2023/04/65137585-5e71-40dc-990c-2a96f1fb630d.png":
-        resultIgm = "0/2023/04/998186d6-7de1-47f5-b7de-57033325bf2e.jpg";
+      case"public/2023/05/3314dede-a0db-4897-956c-e81ed5ac3882.png":
+      case "public/2023/05/fb34def3-7830-40f9-bf0c-62325f6fb954.png":
+        resultIgm = "public/2023/05/9aff7379-c31e-42e6-9e0b-abd440fff29c.jpg";
         break;
 
       default:

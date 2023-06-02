@@ -1152,6 +1152,7 @@ export default [
         component: './zentao/peopleExcuteSetting',
         access: 'sysAdmin', // 管理员可见
         wrappers: ['../wrappers/auth'],
+        hideInMenu: true,
       },
       {
         name: '禅道模板',
@@ -1197,7 +1198,7 @@ export default [
     name: '石墨管理',
     icon: 'BookOutlined',
     path: '/shimo',
-    hideInMenu: false,
+    hideInMenu: true,
     access: 'devCenter', // 仅研发中心人员可见，客服不可见，
     routes: [
       {

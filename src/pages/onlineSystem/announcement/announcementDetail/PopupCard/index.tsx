@@ -35,7 +35,8 @@ const PopupCard: React.FC<any> = (props: any) => {
     commonData, anPopData, setAnnPopData, getAnnounceContent, showPulishButton,
     setCommonData, setOldCommonData, tabOrder, setTabOrder
   } = useModel('announcement');
-  const {releaseName, releaseID, type, back} = props.location?.query;
+  const {releaseName, releaseID, type, back, flag} = props.location?.query;
+  const eidtFlag = flag === "true";
   const [dtForm] = Form.useForm();
   // 点击预览按钮过后进度展示
   const [preview, setPreview] = useState(false);
@@ -207,7 +208,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     }
 
     setAnnPopData(finalData);
-    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&back=true`);
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&back=true&flag=${eidtFlag}`);
   }
 
   // region =======>>>>>>>>>>>>>>>>>保存数据和预览
@@ -226,7 +227,7 @@ const PopupCard: React.FC<any> = (props: any) => {
     if (result.ok) {
       if (preView) {
         let noticeId = releaseID;
-        if (type === "add") {
+        if (type === "add" || type === "copy") {
           noticeId = result.data.toString();
           // 清空state中原始数据
           setAnnPopData([]);
@@ -335,7 +336,7 @@ const PopupCard: React.FC<any> = (props: any) => {
           return;
         }
 
-        if (!showPreView && type === "detail") {
+        if (!eidtFlag || (!showPreView && type === "detail")) {
           // 如果是明细数据，且没有被改变过
           const result = await preViewNotice(releaseID, preViewEnv.dataEnv);
           if (result.ok) {
@@ -479,7 +480,7 @@ const PopupCard: React.FC<any> = (props: any) => {
       if (type === "add") {
         showForAdd();
 
-      } else if (type === "detail") {
+      } else if (type === "detail" || type === "copy") {
         if (newHead.announce_carousel === 1) {
           if (newHead.clearTabContent) {
             setEmptyForm();
@@ -546,19 +547,21 @@ const PopupCard: React.FC<any> = (props: any) => {
             {/* 特性名称只针对轮播功能 */}
             <Row style={{display: commonData?.announce_carousel === 1 ? "inline-block" : "none"}}>
               <Form.Item label={"特性名称"} name={"specialName"} rules={[{required: false, message: '特性名称不能为空！'}]}>
-                <Input style={{minWidth: 400}}></Input>
+                <Input style={{minWidth: 400, color: "black"}} disabled={!eidtFlag}></Input>
               </Form.Item>
             </Row>
             {/* 特性名称只针对不轮播功能 */}
             <Row style={{display: commonData?.announce_carousel === 1 ? "none" : "inline-flex"}}>
               <Col>
                 <Form.Item label={"语雀迭代版本地址："} name={"yuQueUrl"}>
-                  <Input style={{minWidth: 400}} placeholder={"从语雀复制更新版本地址"} spellCheck={"false"}></Input>
+                  <Input style={{minWidth: 400, color: "black"}} placeholder={"从语雀复制更新版本地址"} spellCheck={"false"}
+                         disabled={!eidtFlag}></Input>
                 </Form.Item>
               </Col>
               <Col>
                 <Button
                   className={style.commonBtn} style={{marginLeft: 10}}
+                  disabled={!eidtFlag}
                   onClick={syncYuqueInfo}>
                   同步信息
                 </Button>
@@ -570,17 +573,20 @@ const PopupCard: React.FC<any> = (props: any) => {
                      src={`${noticeUrl(location.origin).imageUpload}${picModalState.checkedImg}`}
                      alt="默认图" style={{height: 100, width: 150}}
                      onClick={() => {
-                       setFileList([]);
-                       setPicModalState({...picModalState, visible: true});
+                       if (eidtFlag) {
+                         setFileList([]);
+                         setPicModalState({...picModalState, visible: true});
+                       }
                      }
                      }/> :
                 <Button type="default" icon={<UploadOutlined/>}
                         style={{color: "#1890FF", border: "none"}}
+                        disabled={!eidtFlag}
                         onClick={() => setPicModalState({...picModalState, visible: true})}>选择/上传
                 </Button>}
             </Form.Item>
             <Form.Item label={"图文布局"} name={"picLayout"} required>
-              <Radio.Group>
+              <Radio.Group className={style.antRadioDisable} disabled={!eidtFlag} style={{color: "black"}}>
                 <Radio value={"1"}>上下布局</Radio>
                 <Radio value={"2"}>左右布局</Radio>
               </Radio.Group>
@@ -597,12 +603,14 @@ const PopupCard: React.FC<any> = (props: any) => {
                             label={"一级特性"}
                             name={[field.name, 'first']}
                             rules={[{required: true, message: '请输入一级特性'}]}>
-                            <Input placeholder={"建议不超过15个字"} style={{minWidth: 400}}></Input>
+                            <Input placeholder={"建议不超过15个字"} style={{minWidth: 400, color: "black"}}
+                                   disabled={!eidtFlag}></Input>
                           </Form.Item>
                           {/* 删除 */}
                           <Popconfirm
                             title="确定删除该特性？"
                             onConfirm={() => removeFirst(field.name)}
+                            disabled={!eidtFlag}
                           >
                             <MinusCircleOutlined style={{...styleDelete, marginLeft: 38}}/>
                           </Popconfirm>
@@ -624,11 +632,13 @@ const PopupCard: React.FC<any> = (props: any) => {
                                         <Popover content={
                                           <div>
                                             <div>
-                                              <Button type="link" onClick={() => addFirst("", first_index + 1)}>添加一级特性
+                                              <Button disabled={!eidtFlag} type="link"
+                                                      onClick={() => addFirst("", first_index + 1)}>添加一级特性
                                               </Button>
                                             </div>
                                             <div>
-                                              <Button type="link" onClick={() => addSecond("", 0)}>添加二级特性
+                                              <Button disabled={!eidtFlag} type="link"
+                                                      onClick={() => addSecond("", 0)}>添加二级特性
                                               </Button>
                                             </div>
                                           </div>
@@ -649,17 +659,25 @@ const PopupCard: React.FC<any> = (props: any) => {
                                           label={`二级特性${second_index + 1}`}
                                           name={[secondField.name, 'first']}
                                         >
-                                          <Input style={{minWidth: 400}}></Input>
+                                          <Input style={{minWidth: 400, color: "black"}} disabled={!eidtFlag}></Input>
                                         </Form.Item>
 
                                         {/* 添加二级特性 */}
                                         <PlusCircleOutlined
-                                          style={styleAdd} onClick={() => addSecond("", second_index + 1)}/>
+                                          style={styleAdd} onClick={() => {
+                                          if (!eidtFlag) {
+                                            return;
+                                          }
+                                          addSecond("", second_index + 1);
+                                        }}/>
 
                                         {/* 删除二级特性 */}
                                         <MinusCircleOutlined
                                           style={styleDelete}
                                           onClick={() => {
+                                            if (!eidtFlag) {
+                                              return;
+                                            }
                                             // 仅有一个二级属性时不能删
                                             if (!secondFields || secondFields.length <= 1) {
                                               customMessage({type: "error", msg: "只有一个二级特性时不能删除！", position: "0vh"});
@@ -681,6 +699,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                     }
                     <Form.Item>
                       <Button style={{marginLeft: 130, border: 'none', color: '#1890FF'}}
+                              disabled={!eidtFlag}
                               icon={<PlusCircleOutlined/>}
                               onClick={() => addFirst()}  // 直接写add函数会导致获取的参数多余
                       > 添加一级特性 </Button>
@@ -697,6 +716,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                 <div id={"message"}>
                   <Spin spinning={preview} tip={"预览环境加载中，请稍后..."}>
                     <Button className={style.saveButtonStyle} type="primary" style={{marginLeft: 10}}
+                            disabled={!eidtFlag}
                             htmlType="submit">保存</Button>
                     <Button className={style.commonBtn}
                             style={{marginLeft: 10, display: showPulishButton ? "inline" : "none"}}

@@ -1,12 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
-import {Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin, Modal} from 'antd';
+import {Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin, Modal, Tooltip} from 'antd';
 import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
 import {PageContainer} from '@ant-design/pro-layout';
 import {ExclamationCircleOutlined, FolderAddTwoTone} from '@ant-design/icons';
 import {announcementListColumn} from './column';
 import styles from './index.less';
-import DutyListServices from '@/services/dutyList';
 import AnnouncementServices from '@/services/announcement';
 import {isEmpty} from 'lodash';
 import IPagination from '@/components/IPagination';
@@ -16,6 +15,7 @@ import {customMessage} from '@/publicMethods/showMessages';
 import {deleteList, getAnnounceList} from "./axiosRequest/apiPage";
 import dayjs from "dayjs";
 
+let myAuthority: any = {};
 const disabledStyle = {filter: 'grayscale(1)', cursor: 'not-allowed'};
 const announceList = () => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -60,34 +60,42 @@ const announceList = () => {
 
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
-    if (!isEmpty(params) && !announcePermission?.().check)
-      return customMessage({type: "info", msg: "您无查看公告权限！", position: "0vh"});
-
-    // 新增
-    if (isEmpty(params) && !announcePermission?.().add) return;
-    if (!announcePermission?.().edit) return;
     let releaseID = '';
     let releaseName = '';
+    let allowToUpdate;
     let type = 'detail';
-
     if (isEmpty(params)) {
       // 先要获取公告name（后端服务生成）
       // const res = await DutyListServices.getDutyNum();
       // releaseName = res.ready_release_num;
       type = 'add';
+
+      allowToUpdate = myAuthority.add;
     } else {
       // 修改的话就是原有的id
       releaseName = params?.data.iteration;
       releaseID = params?.data.id;
-    }
-    // if (isEmpty(releaseName)) return errorMessage('数据异常');
+      // 这里还需要配置权限
+      // 判断是否发布，
+      if (params?.data.isPublished) { // 已发布 默认创建人/测试值班人员/管理员可以编辑
+        if (user?.userid === params?.data?.createdUser?.uid) {
+          allowToUpdate = true;
+        } else {
+          allowToUpdate = myAuthority?.editPublished;
+        }
+      } else { // 未发布
+        allowToUpdate = myAuthority?.edit;
+      }
 
-    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}`);
+    }
+
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=${type}&flag=${allowToUpdate}`);
   };
 
   // 删除数据
   const onDelete = async (params: CellClickedEvent) => {
-    if (!announcePermission?.().delete) return;
+    if (!myAuthority?.delete) return;
+
     // 判断是否关联了发布过程公告
     if (isEmpty(params.data.id)) return customMessage({type: "info", msg: '数据异常', position: "0vh"});
     // const res = await AnnouncementServices.checkDeleteAnnouncement(params.data.announcement_num);
@@ -112,11 +120,27 @@ const announceList = () => {
     });
   };
 
+  // 复制数据
+  const onCopy = async (params: CellClickedEvent) => {
+    let releaseID = '';
+    let releaseName = '';
+    if (!isEmpty(params)) {
+      // 修改的话就是原有的id
+      releaseName = params?.data.iteration;
+      releaseID = params?.data.id;
+    }
+    if (isEmpty(releaseName)) return customMessage({type: "error", msg: "数据异常！", position: "0vh"});
+    history.push(`/onlineSystem/announcementDetail?releaseName=${releaseName}&releaseID=${releaseID}&type=copy&flag=true`);
+  };
   // 获取人
   const getPerson = async () => {
     const res = await AnnouncementServices.applicant();
     setPersons(res?.map((it: any) => ({label: it.user_name, value: it.user_id})));
   };
+
+  const getAuthority = async () => {
+    myAuthority = await announcePermission();
+  }
   useEffect(() => {
     getPerson();
     getList();
@@ -129,6 +153,11 @@ const announceList = () => {
     };
   }, []);
 
+  useEffect(() => {
+    getAuthority();
+  }, [announcePermission])
+
+
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <PageContainer>
@@ -139,9 +168,9 @@ const announceList = () => {
                 <Button
                   type={'text'}
                   onClick={() => onAdd()}
-                  disabled={!announcePermission?.().add}
+                  disabled={!myAuthority?.add}
                   icon={
-                    <FolderAddTwoTone style={announcePermission?.().add ? {} : disabledStyle}/>
+                    <FolderAddTwoTone style={myAuthority?.add ? {} : disabledStyle}/>
                   }
                 >
                   新增
@@ -194,21 +223,35 @@ const announceList = () => {
                 operation: (params: CellClickedEvent) => {
                   return (
                     <Space size={8}>
-                      <img
-                        width={16}
-                        style={announcePermission?.().check ? {cursor: 'pointer'} : disabledStyle}
-                        src={require('../../../../../public/params.png')}
-                        onClick={() => onAdd(params)}
-                      />
-                      <img
-                        width={16}
-                        height={17}
-                        style={
-                          announcePermission?.().delete ? {cursor: 'pointer'} : disabledStyle
-                        }
-                        src={require('../../../../../public/delete_red.png')}
-                        onClick={() => onDelete(params)}
-                      />
+                      <Tooltip title="修改">
+                        <img
+                          width={16}
+                          height={17}
+                          style={{cursor: 'pointer'}}
+                          src={require('../../../../../public/params.png')}
+                          onClick={() => onAdd(params)}
+                        />
+                      </Tooltip>
+                      <Tooltip title="复制">
+                        <img
+                          width={16}
+                          height={17}
+                          style={{cursor: 'pointer'}}
+                          src={require('../../../../../public/copy.png')}
+                          onClick={() => onCopy(params)}
+                        />
+                      </Tooltip>
+                      <Tooltip title="删除">
+                        <img
+                          width={16}
+                          height={17}
+                          style={
+                            myAuthority?.delete ? {cursor: 'pointer'} : disabledStyle
+                          }
+                          src={require('../../../../../public/delete_red.png')}
+                          onClick={() => onDelete(params)}
+                        />
+                      </Tooltip>
                     </Space>
                   );
                 },

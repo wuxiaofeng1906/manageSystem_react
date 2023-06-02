@@ -37,8 +37,9 @@ const getColums = (prjNames: any, show = true) => {
       pinned: 'left',
       filter: false,
       checkboxSelection: true,
-      // headerCheckboxSelection: true, // 表头显示全选
+      headerCheckboxSelection: true, // 表头显示全选
       maxWidth: 35,
+
     },
     {
       headerName: '序号',
@@ -95,7 +96,7 @@ const getColums = (prjNames: any, show = true) => {
       field: 'ztNo',
       pinned: 'left',
       minWidth: 80,
-      suppressMenu: true,
+      // suppressMenu: true,
       cellRenderer: linkToZentaoPage,
     },
     {
@@ -122,7 +123,7 @@ const getColums = (prjNames: any, show = true) => {
       minWidth: 150,
       cellRenderer: textDecorateRender,
       tooltipField: 'appservice',
-      filter: false,
+      // filter: false,
     },
     {
       headerName: '所属计划',

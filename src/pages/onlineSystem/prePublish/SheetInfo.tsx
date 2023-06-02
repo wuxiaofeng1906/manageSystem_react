@@ -10,7 +10,7 @@ import {
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
-import {infoMessage} from '@/publicMethods/showMessages';
+import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
 import {useModel} from '@@/plugin-model/useModel';
 import {getDevOpsOrderColumn, PublishSeverColumn, PublishUpgradeColumn} from '@/pages/onlineSystem/config/column';
 import {
@@ -24,11 +24,12 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
-import {isEmpty, omit, isString, pick, chunk, isEqual} from 'lodash';
+import {isEmpty, omit, isString, pick, difference, isEqual, intersection} from 'lodash';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
+import {vertifyClusterStatus} from "@/pages/onlineSystem/commonFunction";
 
 let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
@@ -41,8 +42,9 @@ const SheetInfo = (props: any, ref: any) => {
   const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [envs] = useModel('env', (env) => [env.globalEnv]);
-  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft,] = useModel('onlineSystem', (online) => [
-    online.globalState, online.sqlList, online.draft, online.setGlobalState, online.getLogInfo, online.setDraft,]);
+  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft, getReleaseInfo, basic, api] =
+    useModel('onlineSystem', (online) => [online.globalState, online.sqlList,
+      online.draft, online.setGlobalState, online.getLogInfo, online.setDraft, online.getReleaseInfo, online.basic, online.api]);
   const {devOpsOrderInfo, getDevOpsOrderInfo} = useModel('onlineSystem');
 
 
@@ -80,15 +82,19 @@ const SheetInfo = (props: any, ref: any) => {
 
   const onSave = async (flag = false) => {
     if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
-    const upgrade_api =
-      upgradeRef.current
-        ?.getRenderedNodes()
-        ?.map((it) => it.data)
-        ?.map((it) => ({
-          ...it,
-          concurrent: it.concurrent ?? 20,
-          api_header: it.api_header ?? '',
-        })) || [];
+    // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
+    //       ...it,
+    //       concurrent: it.concurrent ?? 20,
+    //       api_header: it.api_header ?? '',
+    //     })) || [];
+    const upgrade_api: any = [];
+    upgradeRef.current?.forEachNode((it: any) => {
+      upgrade_api.push({
+        ...it.data,
+        concurrent: it.data.concurrent ?? 20,
+        api_header: it.data.api_header ?? '',
+      })
+    });
     const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
     const baseValues = baseForm.getFieldsValue();
     const orderValues = orderForm.getFieldsValue();
@@ -166,6 +172,13 @@ const SheetInfo = (props: any, ref: any) => {
   const getDetail = async () => {
     setSpinning(true);
     try {
+      // 因为结果前提需要依靠这里面的数据，所以需要写在这里（获取所有的数据库版本和batch版本）
+      const database = await OnlineSystemServices.databaseVersion();
+      databaseVersion = database?.map((it: string) => ({label: it, value: it}));
+      const batch = await OnlineSystemServices.getBatchVersion({release_num});
+      agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
+
+      // 工单信息的初始化数据
       let param: any = {release_num};
       if (globalState.finished) {
         param = {release_num, include_deleted: true}
@@ -210,7 +223,17 @@ const SheetInfo = (props: any, ref: any) => {
       });
       setLeaveShow(false);
       setFinished(agFinished);
-      setUpgradeData(res);
+      //--------------- res中，batch版本和数据库版本需要用来默认为获取的数据中的第一个
+      const service = res.release_app;
+      // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
+      if (batch && batch.length > 0 && (isEmpty(service.batch) || service.batch === "-")) {
+        service.batch = batch[0];
+      }
+      // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
+      if (database && database.length > 0 && (isEmpty(service.database_version) || service.database_version === "-")) {
+        service.database_version = database[0];
+      }
+      setUpgradeData({...res, release_app: service});
       setSpinning(false);
     } catch (e) {
       setSpinning(false);
@@ -218,10 +241,6 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const getBaseList = async () => {
-    const database = await OnlineSystemServices.databaseVersion();
-    databaseVersion = database?.map((it: string) => ({label: it, value: it}));
-    const batch = await OnlineSystemServices.getBatchVersion({release_num});
-    agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
     const order = await PreReleaseServices.dutyOrder();
     setDutyList(
       order?.map((it: any) => ({
@@ -250,7 +269,7 @@ const SheetInfo = (props: any, ref: any) => {
     );
   };
 
-  const onSaveBeforeCheck = (isAuto = false) => {
+  const onSaveBeforeCheck = async (isAuto = false) => {
 
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
@@ -275,9 +294,12 @@ const SheetInfo = (props: any, ref: any) => {
       auto_env: '请填写是否升级后自动化环境',
       cluster: '请填写发布环境',
       clear_redis: '请填写是否清理redis缓存',
+      batch: '请填写batch版本',
+      // database_version: '请填写数据库版本',
       is_recovery: '请填写是否涉及数据Recovery',
       is_update: '请填写是否数据update',
       clear_cache: '请填写是否清理应用缓存',
+
     };
 
     // 发布成功、unknown-> 数据完整性校验
@@ -292,9 +314,20 @@ const SheetInfo = (props: any, ref: any) => {
       }
       // 服务信息
       else if (!isEmpty(serverInfo)) {
-        const err = Object.entries(
-          pick(serverInfo?.[0], ['cluster', 'clear_redis', 'clear_cache', 'sql_order']),
-        ).find(([k, v]) => isEmpty(v));
+        const checkItem = ['cluster', 'clear_redis', 'clear_cache'];  // 暂时不需要 sql_order，database_version 判定
+        // 如果一键部署ID中有batch服务，那么列表中的batch服务就不能为空。这里就需要来判断
+        const deployment = baseForm.getFieldValue("deployment");
+        [...deployments].map((it: any) => {
+          if (deployment.includes((it.deployment_id).toString()) && (it.app).includes("batch")) {
+            checkItem.push("batch");
+          }
+        });
+        const enties = Object.entries(pick(serverInfo?.[0], checkItem));
+        const err: any = enties.find(([k, v]) => {
+          // batch 没数据的时候是-
+          return isEmpty(v) || v === "-";
+        });
+
         if (!isEmpty(err)) {
           showErrTip = errTip[err?.[0]];
         }
@@ -304,10 +337,21 @@ const SheetInfo = (props: any, ref: any) => {
       orderForm.setFieldsValue({release_result: null});
       return infoMessage(showErrTip);
     }
+
     // 发布结果为空，直接保存
     if (isEmpty(result?.trim()) || result == 'unknown') {
       onSave();
     } else {
+      // 还要验证运维那边的状态,任务编号：115841
+      // 当为“停机”发布时，调用运维环境判定API，如果对应环境有非成功的状态，就提示请联系运维确认xxxx环境是否可用，在进行发布结果标记
+      if (order.release_way === "stop_server" && serverInfo && serverInfo.length) {
+        // 如果是停服的话需要验证集群状态才标记发布结果
+        const continueFlag = await vertifyClusterStatus(serverInfo[0].cluster);
+        if (!continueFlag) {
+          return;
+        }
+      }
+
       // 二次确认标记发布结果
       const tips = {
         draft: {
@@ -374,7 +418,8 @@ const SheetInfo = (props: any, ref: any) => {
       await PreReleaseServices.automation(params);
       // 获取集群
       const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
-      const clusters = (release_app?.[0]?.cluster).split(",")
+      const clusters = (release_app?.[0]?.cluster).split(",");
+
       // 关联公告并勾选挂起公告
       if (!isEmpty(announce) && announce !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
@@ -384,6 +429,12 @@ const SheetInfo = (props: any, ref: any) => {
           cluster_ids: clusters,
         });
       }
+
+      // 发布类型为停机发布 并且 包含租户集群才调用开放租户接口  （cn-northwest-global）
+      if (orderForm.getFieldValue("release_way") === "stop_server" && !isEqual(clusters, ["cn-northwest-global"])) {
+        await PreReleaseServices.releasetenants({env_name_list: clusters});
+      }
+
       setSuccessModal(false);
       history.replace('/onlineSystem/releaseProcess');
     }
@@ -473,19 +524,31 @@ const SheetInfo = (props: any, ref: any) => {
         />
       );
     }
+    // 获取展示的value
+    // let cellValue = p.value;
+    // if (isEmpty(p.value) || p.value === "-") {
+    //   if (field === 'database_version' && databaseVersion && databaseVersion.length) {
+    //     cellValue = databaseVersion[0];
+    //   } else if (field === 'batch' && agBatch && agBatch.length) {
+    //     cellValue = agBatch[0];
+    //   } else {
+    //     cellValue = "-";
+    //   }
+    // }
+
     return (
       <div className={styles.antSelectStyle}>
         <Select
           size={'small'}
-          // value={isEmpty(p.value) ? undefined : p.value}
-          value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
-            isEmpty(p.value)
-              ? field === 'database_version'
-              ? databaseVersion[0] : field === 'batch'
-                ? agBatch[0] : undefined : p.value}
+          value={isEmpty(p.value) ? undefined : p.value}
+          // value={ // 如果原始值为空的话，则展示最新的第一条数据，不为空的话展示后端传输的数据
+          //   (isEmpty(p.value) || p.value === "-")
+          //     ? field === 'database_version'
+          //     ? databaseVersion[0] : field === 'batch'
+          //       ? agBatch[0] : undefined : p.value}
           style={{width: '100%'}}
           disabled={agFinished}
-          allowClear={['batch', 'database_version'].includes(field)}
+          // allowClear={['batch', 'database_version'].includes(field)}
           dropdownMatchSelectWidth={false}
           options={
             field === 'database_version'
@@ -518,6 +581,93 @@ const SheetInfo = (props: any, ref: any) => {
       setFinished(true);
     }
   }, [globalState?.finished]);
+
+  // 对比 集群 、 应用 、 升级接口 是否相同
+  const checkData = async () => {
+    // 历史记录不再检查
+    if (globalState?.finished) {
+      return;
+    }
+
+    const currentPage = JSON.parse(JSON.stringify({...upgradeData}));
+    let module = "";
+    // -------------------------------------------------------basicData 中可以对比集群和应用
+    const basicData = await OnlineSystemServices.getBasicInfo({release_num});
+    if (basicData) {
+      //   对比集群
+      if (basicData.cluster !== currentPage.release_app?.cluster) {
+        module = "上线集群";
+      }
+      //   对比应用服务
+      if (basicData.apps !== currentPage.release_app?.apps) {
+        module = module ? `${module}、应用服务` : "应用服务";
+      }
+
+    }
+
+    // -----------------------------------------------------api 中对比升级接口
+
+    const apiData = await OnlineSystemServices.getUpgradeInfo({release_num});
+    const _newApi: any[] = []; // 过程详情中的api
+    const _newCurrentApi: any[] = []; // 工单信息中的api
+
+    // 将两个接口字段缩减为一样的。
+    if (apiData && apiData.length) {
+      apiData.forEach((e: any) => {
+        delete e._id;
+        delete e.ready_release_num;
+        delete e.author;
+        _newApi.push(e);
+      });
+    }
+
+    if ((currentPage?.upgrade_api) && (currentPage?.upgrade_api).length) {
+      (currentPage?.upgrade_api).forEach((e: any) => {
+        delete e.concurrent;
+        _newCurrentApi.push(e);
+      });
+
+    }
+
+    // 有差异的API数据
+    let differenceApi: any[] = [];
+    if (_newApi.length !== _newCurrentApi.length) {
+      module = module ? `${module}、升级接口` : "升级接口";
+
+      if (_newCurrentApi.length > _newApi.length) {
+        differenceApi = _newCurrentApi.filter(v => {
+          return _newApi.every(e => e.api_url != v.api_url);
+        });
+      } else {
+        differenceApi = _newApi.filter(v => {
+          return _newCurrentApi.every(e => e.api_url != v.api_url);
+        });
+      }
+      console.log("不同的API", differenceApi);
+    }
+
+
+    if (module) {
+      Modal.error({
+        title: '工单信息一致性校验',
+        centered: true,
+        width: 550,
+        content: <div style={{textIndent: "2em"}}>项目与服务详情中的
+          <label style={{color: "red"}}>【{module}】</label>与当前工单中
+          <label style={{color: "red"}}>【{module}】</label>的内容不一致,请联系对应的SQA值班负责人！
+          {/*{JSON.stringify(differenceApi)}*/}
+        </div>,
+      });
+    }
+  };
+
+  // 工单生成之后校验数据
+  useEffect(() => {
+    if (upgradeData) {
+      checkData();
+    }
+
+  }, [upgradeData]);
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">

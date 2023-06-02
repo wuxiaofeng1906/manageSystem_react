@@ -1,6 +1,8 @@
 import request from './request';
 import {noticeUrl} from "../../config/qqServiceEnv";
 import {axiosPost} from "@/publicMethods/axios";
+import {noticeUrl, Check_Cluster_Status} from "../../config/qqServiceEnv";
+import {axiosGet_TJ} from "@/publicMethods/axios";
 
 const baseUrl = '/api/verify';
 // 发布过程
@@ -161,6 +163,12 @@ const PreReleaseServices = {
       }, method: 'post'
     });
   },
+
+  // 非积压发布放开租户
+  async releasetenants(data: any) {
+    return request(`${baseUrl}/latest-release/tenant-cluster`, {data, method: 'post'});
+  },
+
   // 所有集群组合情况
   async clusterGroup() {
     return request(`${baseUrl}/latest-release/cluster`);
@@ -171,5 +179,9 @@ const PreReleaseServices = {
     return request(`${baseUrl}/online/sql_api_repair_order`, {params: data});
   },
 
+//   检查对应集群在运维平台的状态
+  async getClusterStatus(cluster: any) {
+    return axiosGet_TJ(Check_Cluster_Status, {env: cluster});
+  }
 };
 export default PreReleaseServices;

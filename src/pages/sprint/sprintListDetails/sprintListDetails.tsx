@@ -33,7 +33,7 @@ import {
   CheckSquareTwoTone,
   SettingOutlined,
   ReloadOutlined,
-  ClearOutlined,
+  ClearOutlined, ExclamationCircleFilled,
   // ExclamationCircleOutlined,
   // InfoCircleOutlined,
 } from '@ant-design/icons';
@@ -94,7 +94,6 @@ import SprintDetailServices from '@/services/sprintDetail';
 import {LocalstorageKeys} from '@/namespaces';
 
 let ora_filter_data: any = [];
-
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
@@ -174,6 +173,25 @@ const SprintList: React.FC<any> = () => {
   window.onresize = function () {
     setGridHeight(getHeight());
     gridApi.current?.sizeColumnsToFit();
+  };
+
+  // 获取表格中选中的数据（需要注意过滤后的数据）
+  const getFinalGridData = () => {
+    // 选中的值
+    const selectedData: any = gridApi.current?.getSelectedRows();
+
+    // 过滤后的值
+    const selectedRows: any = [];
+    gridApi.current?.forEachNodeAfterFilter((row: any) => {
+      selectedRows.push(row.data);
+    });
+
+    // 取交集即是最终数据
+    const data = selectedData.filter((item: any) => {
+      return selectedRows.includes(item)
+    })
+
+    return data;
   };
   /* endregion */
 
@@ -527,7 +545,7 @@ const SprintList: React.FC<any> = () => {
 
   //   发送请求 修改数据
   const modCommitDetails = async (datas: any) => {
-    const origin = gridApi.current?.getSelectedRows()?.[0];
+    const origin = getFinalGridData()?.[0];
     let partData = {}; // 只传递有修改的参数
     for (const key in datas) {
       if (origin[key] != datas[key] && (datas[key] || origin[key])) {
@@ -661,7 +679,7 @@ const SprintList: React.FC<any> = () => {
 
       addCommitDetails(datas);
     } else {
-      const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+      const curRow: any = getFinalGridData(); // 获取选中的行
       datas['id'] = curRow[0].id;
       // 判断是否被修改过 禅道id 对应测试、对应UED、创建人,是否需要测试验证
       if (curRow[0].ztNo !== oradata.adminChandaoId) {
@@ -748,7 +766,7 @@ const SprintList: React.FC<any> = () => {
       errorMessage(`禅道类型和禅道编号不能为空！`);
       return;
     }
-    const datas = alayManagerData(oradata, gridApi.current?.getSelectedRows(), prjId);
+    const datas = alayManagerData(oradata, getFinalGridData(), prjId);
     modCommitDetails(datas);
   };
 
@@ -801,7 +819,7 @@ const SprintList: React.FC<any> = () => {
       errorMessage(`禅道类型和禅道编号不能为空！`);
       return;
     }
-    const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const curRow: any = getFinalGridData(); // 获取选中的行
     const datas = {
       id: curRow[0].id,
       project: prjId,
@@ -854,7 +872,7 @@ const SprintList: React.FC<any> = () => {
       errorMessage(`禅道类型和禅道编号不能为空！`);
       return;
     }
-    const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const curRow: any = getFinalGridData(); // 获取选中的行
     const rowDatas = curRow[0];
     const datas = {
       id: rowDatas.id,
@@ -926,7 +944,7 @@ const SprintList: React.FC<any> = () => {
 
   // 修改按钮点击事件
   const btnModifyProject = () => {
-    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const selRows: any = getFinalGridData(); // 获取选中的行
     // 没有选中则提醒
     if (selRows.length === 0) {
       errorMessage('请选中需要修改的数据!');
@@ -953,7 +971,7 @@ const SprintList: React.FC<any> = () => {
   // 删除按钮点击
   const deleteSprintDetails = () => {
     // 判断是否选中数据
-    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const selRows: any = getFinalGridData(); // 获取选中的行
     if (selRows.length === 0) {
       errorMessage('请选中需要删除的数据!');
       return;
@@ -963,7 +981,7 @@ const SprintList: React.FC<any> = () => {
 
   // 删除选中的数据
   const delSprintList = async () => {
-    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const selRows: any = getFinalGridData(); // 获取选中的行
     const result = await delSprintDetails(selRows);
     if (result.ok === true) {
       setIsDelModalVisible(false);
@@ -988,7 +1006,7 @@ const SprintList: React.FC<any> = () => {
 
   // 窗口弹出，并赋值
   const moveProject = () => {
-    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const selRows: any = getFinalGridData(); // 获取选中的行
     if (selRows.length <= 0) {
       errorMessage('请选择需要移动的数据！');
       return;
@@ -1008,7 +1026,7 @@ const SprintList: React.FC<any> = () => {
   // 发送请求
   const moveSprintList = async () => {
     // 获取被选择明细项
-    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const selRows: any = getFinalGridData(); // 获取选中的行
     const oradata = formForMove.getFieldsValue();
 
     const result = await moveSprintDetails(selRows, prjId, oradata);
@@ -1107,7 +1125,7 @@ const SprintList: React.FC<any> = () => {
 
   // 判断是否有勾选一条数据
   const judgingSelectdRow = () => {
-    const selRows: any = gridApi.current?.getSelectedRows();
+    const selRows: any = getFinalGridData();
     if (selRows.length > 0) {
       return true;
     }
@@ -1134,7 +1152,7 @@ const SprintList: React.FC<any> = () => {
   // 流程-测试已验revert
   const flowForTestRevert = async () => {
     if (judgingSelectdRow()) {
-      const selected: any[] = gridApi.current?.getSelectedRows() ?? [];
+      const selected: any[] = getFinalGridData() ?? [];
       const findDissatisfy = selected.filter(
         (it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1,
       );
@@ -1171,17 +1189,11 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
+
   // 修改操作流程
   const modFlowStage = async (content: any, values: any) => {
-    // const selRows: any = gridApi.current?.getSelectedRows();
 
-    // 获取过滤后的数据
-    const selectedRows: any = [];
-    gridApi.current?.forEachNodeAfterFilter((row: any) => {
-      selectedRows.push(row.data);
-    });
-
-    // console.log("selectedRows", selectedRows)
+    const selectedRows: any = getFinalGridData();
     const result = await requestModFlowStage(selectedRows, content, values, prjNames);
     if (result?.code === 200) {
       setIsFlowModalVisible(false);
@@ -1252,10 +1264,6 @@ const SprintList: React.FC<any> = () => {
   const testConfirmSelect = async (params: any) => {
     const flag = await checkTestValid();
     if (judgingSelectdRow()) {
-      // const selRows: any = gridApi.current?.getSelectedRows();
-      // selRows.forEach((row: any) => {
-      //
-      // });
       setTestConfirm(params);
       if (flag) {
         setTestConfirm(undefined);
@@ -1380,7 +1388,7 @@ const SprintList: React.FC<any> = () => {
 
   const onRemove = async () => {
     if (!hasPermission) return;
-    if (isEmpty(gridApi.current?.getSelectedRows()))
+    if (isEmpty(getFinalGridData()))
       return message.warning('请先选择需要移除的项目！');
     setShowRemoveModal(true);
   };
@@ -1472,6 +1480,7 @@ const SprintList: React.FC<any> = () => {
   }, []);
 
   const onRemoveTab = (key: string) => {
+
     formForQuery.resetFields();
     const data = tabs?.filter((it: any) => it.projectid !== +key);
     localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify(data));
@@ -1545,6 +1554,33 @@ const SprintList: React.FC<any> = () => {
           hideAdd={true}
           onChange={(v) => onTabChange(v)}
           style={{background: 'white', paddingBottom: 5, marginTop: 15}}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            const historyTab = JSON.parse(localStorage.getItem(LocalstorageKeys.sprintTab) as string);
+            let currentTab: any;
+            historyTab.map((tab: any) => {
+              if (tab.project === e.target?.innerText) {
+                currentTab = tab;
+              }
+            });
+            //  只有一个Tab的时候不用删除,点击空白时候的事件也不用弹出确认框
+            if (historyTab.length > 1 && currentTab) {
+              Modal.confirm({
+                title: "是否关闭其他标签页？",
+                icon: <ExclamationCircleFilled/>,
+                centered: true,
+                onOk() {
+                  // 重新设置缓存
+                  localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify([currentTab]));
+                  setTabs([currentTab]);
+                  onTabChange(currentTab.projectid);
+                },
+                onCancel() {
+                  return;
+                },
+              });
+            }
+          }}
         >
           {tabs.map((it) => (
             <Tabs.TabPane tab={it.project} key={it.projectid} closable={tabs?.length > 1}/>
@@ -1877,8 +1913,8 @@ const SprintList: React.FC<any> = () => {
                           : 'initial',
                       }}
                     >
-                      {params.value}
-                    </span>
+          {params.value}
+            </span>
                   </div>
                 );
               },

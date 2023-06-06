@@ -12,11 +12,13 @@ import React from "react";
 
 const {Option} = Select;
 
-const loadUserSelect = async (teach: string) => {
+const loadUserSelect = async (teach: string, allowEmpty: boolean = true) => {
 
-  const teachData: any = [<Option key={""} value={`""&免`}>免</Option>];
+  const teachData: any = [];
+  if (allowEmpty) {
+    teachData.push(<Option key={""} value={`""&免`}>免</Option>);
+  }
   const userInfo = await getAllUsers(teach);
-
   if (userInfo.message !== "") {
     message.error({
       content: userInfo.message,
@@ -32,6 +34,7 @@ const loadUserSelect = async (teach: string) => {
         <Option key={user.user_id} value={`${user.user_id}&${user.user_name}`}>{user.user_name}</Option>);
     });
   }
+
   return teachData;
 };
 

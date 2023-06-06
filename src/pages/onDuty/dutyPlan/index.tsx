@@ -408,11 +408,12 @@ const DutyPlan: React.FC<any> = () => {
     setIsPlanVisble(true);
 
     /* region 下拉框中选项加载  */
-    // 生成值班人下拉框
-    const frontUserInfo = await loadUserSelect('1');
-    const backendUserInfo = await loadUserSelect('2');
-    const testerUserInfo = await loadUserSelect('3');
+    // 生成值班人下拉框   // 前端/后端/测试：第二值班人不能为空(不能为免)
+    const frontUserInfo = await loadUserSelect('1', false);
+    const backendUserInfo = await loadUserSelect('2', false);
+    const testerUserInfo = await loadUserSelect('3', false);
     const sqaUserInfo = await loadUserSelect('7');
+    const flowUserInfo = await loadUserSelect('2');
     const wx_allUsers = await loadAllUserSelect();
     // const openApiUserInfo = await loadUserSelect("10");
     // const abosStoreUserInfo = await loadUserSelect("11");
@@ -421,7 +422,7 @@ const DutyPlan: React.FC<any> = () => {
       front: frontUserInfo,
       backend: backendUserInfo,
       tester: testerUserInfo,
-      flow: backendUserInfo,
+      flow: flowUserInfo,
       SQA: sqaUserInfo,
       my_global: wx_allUsers,
       openApi: wx_allUsers,

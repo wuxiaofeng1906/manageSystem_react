@@ -97,15 +97,19 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
 
   // 减少tab
   const onEdit = (e: string, type: string) => {
+
     if (type === "remove") {
       const pageArray = [...tabList];
       const exitedArray = pageArray.filter(item => item.key !== e);
       setTabList(exitedArray);
+      const storages = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
+      const new_storages = storages.filter((item:any) => item.release_num !== e);
+      localStorage.setItem("onlineSystem_tab", JSON.stringify(new_storages));
     }
   };
   // 重新获得Tabs顺序
   const getRealSort = () => {
-    debugger
+
     const pageArray = [...tabList];
     let oraData: any = [];
     pageArray.forEach((page: any) => {
@@ -167,7 +171,9 @@ export const ProcessTab: React.FC = (props: any) => {
   //获取发布列表
   const getTabsList = async () => {
     // effect 中调用异步信息时间延迟可能导致最终获取的数据不正确。
-    let tabList = await PreReleaseServices.releaseList();
+    // let tabList = await PreReleaseServices.releaseList();
+    let tabList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
+
     // 如果是历史记录，则只展示一个Tab
     if (props.finished) {
       const path = history.location.pathname;

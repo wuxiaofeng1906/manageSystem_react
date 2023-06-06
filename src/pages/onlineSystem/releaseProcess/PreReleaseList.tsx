@@ -10,6 +10,7 @@ import {isEmpty, orderBy} from 'lodash';
 import {history, useLocation} from 'umi';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import {WarningOutlined} from '@ant-design/icons';
+import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 
 const PreReleaseList = ({disabled, height}: { disabled?: boolean; height: number }) => {
   const gridRef = useRef<GridApi>();
@@ -134,6 +135,11 @@ const PreReleaseList = ({disabled, height}: { disabled?: boolean; height: number
                       if (p.data.release_type == 'backlog_release') {
                         href = `/onlineSystem/releaseOrder/${p.data.release_num}/${p.data.is_delete}/${p.data.release_name}`;
                       }
+
+                      setTabsLocalStorage({
+                        "release_num": p.data.release_num,
+                        "release_name": p.data.release_name
+                      });
                       history.push(href);
                     }}
                   >

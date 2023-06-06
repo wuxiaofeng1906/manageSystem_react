@@ -95,12 +95,21 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
     }
   };
 
+  // 减少tab
+  const onEdit = (e: string, type: string) => {
+    if (type === "remove") {
+      const pageArray = [...tabList];
+      const exitedArray = pageArray.filter(item => item.key !== e);
+      setTabList(exitedArray);
+    }
+  };
   // 重新获得Tabs顺序
   const getRealSort = () => {
+    debugger
     const pageArray = [...tabList];
     let oraData: any = [];
     pageArray.forEach((page: any) => {
-      oraData.push(<TabPane tab={page.label} key={page.key} closable={false}/>)
+      oraData.push(<TabPane tab={page.label} key={page.key} closable={pageArray.length > 1 ? true : false}/>)
     });
     return oraData;
   }
@@ -138,6 +147,7 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
         renderTabBar={renderTabBar}
         type="editable-card"
         hideAdd={true}
+        onEdit={onEdit}
       >
         {getRealSort()}
       </Tabs>

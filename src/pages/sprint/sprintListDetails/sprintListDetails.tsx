@@ -1262,14 +1262,15 @@ const SprintList: React.FC<any> = () => {
 
   // 批量修改测试
   const testConfirmSelect = async (params: any) => {
-    const flag = await checkTestValid();
+    // 前面已验证，无需再验一遍
+    // const flag = await checkTestValid();
     if (judgingSelectdRow()) {
       setTestConfirm(params);
-      if (flag) {
-        setTestConfirm(undefined);
-        infoMessage('已基线，不能修改');
-        return;
-      }
+      // if (flag) {
+      //   setTestConfirm(undefined);
+      //   infoMessage('已基线，不能修改');
+      //   return;
+      // }
       modFlowStage('testConfirmed', params);
     }
   };
@@ -1373,6 +1374,7 @@ const SprintList: React.FC<any> = () => {
     initialState?.currentUser?.authority?.find((it: any) => +it?.id == 149)?.id == 149;
   // 验证是否可批量 修改测试确认
   const checkTestValid = async () => {
+    debugger
     //  是班车才调用接口获取是否可以测试确认
     if (!prjNames.startsWith("sprint")) {
       setTestSelectorShow(false);

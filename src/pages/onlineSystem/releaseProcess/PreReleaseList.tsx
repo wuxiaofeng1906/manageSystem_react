@@ -138,7 +138,7 @@ const PreReleaseList = ({disabled, height}: { disabled?: boolean; height: number
 
                       setTabsLocalStorage({
                         "release_num": p.data.release_num,
-                        "release_name": p.data.release_name
+                        "release_name": p.data.release_name,
                       });
                       history.push(href);
                     }}

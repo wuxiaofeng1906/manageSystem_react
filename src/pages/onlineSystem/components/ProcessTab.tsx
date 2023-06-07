@@ -88,7 +88,11 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
       })
       const saved = await PreReleaseServices.releaseOrder_own(sortArr);
       if (saved.code === 200) {
+        debugger
         setTabList(tabOrder);
+        //   这里也要修改localstorage的数据
+        localStorage.setItem("onlineSystem_tab", JSON.stringify(tabOrder))
+
       } else {
         errorMessage("顺序保存错误：" + saved.msg);
       }
@@ -103,7 +107,7 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
       const exitedArray = pageArray.filter(item => item.key !== e);
       setTabList(exitedArray);
       const storages = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
-      const new_storages = storages.filter((item:any) => item.release_num !== e);
+      const new_storages = storages.filter((item: any) => item.release_num !== e);
       localStorage.setItem("onlineSystem_tab", JSON.stringify(new_storages));
     }
   };
@@ -174,7 +178,7 @@ export const ProcessTab: React.FC = (props: any) => {
     // let tabList = await PreReleaseServices.releaseList();
     let tabList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
 
-    // 如果是历史记录，则只展示一个Tab
+    // 如果是历史记录，则只展示一个Tab,
     if (props.finished) {
       const path = history.location.pathname;
       if (path.includes("/onlineSystem/releaseOrder/")) { //  releaseOrder 的工单编号不是release_num

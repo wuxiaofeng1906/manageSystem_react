@@ -146,10 +146,12 @@ const HistoryList = ({height}: { height: number }) => {
                     if (p.data.release_type == 'backlog_release') {
                       href = `/onlineSystem/releaseOrder/${p.data.release_num}/${p.data.is_delete}/${p.data.release_name}`;
                     }
-                    setTabsLocalStorage({
-                      "release_num": p.data.release_num,
-                      "release_name": p.data.release_name
-                    });
+                    // 历史信息不需要添加缓存，因为历史信息不需要展示多条
+                    // setTabsLocalStorage({
+                    //   "release_num": p.data.release_num,
+                    //   "release_name": p.data.release_name,
+                    //   "isFinished": true
+                    // });
                     history.push(href);
                   }}
                 >

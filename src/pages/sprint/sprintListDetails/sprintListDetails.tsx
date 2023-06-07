@@ -1373,6 +1373,12 @@ const SprintList: React.FC<any> = () => {
     initialState?.currentUser?.authority?.find((it: any) => +it?.id == 149)?.id == 149;
   // 验证是否可批量 修改测试确认
   const checkTestValid = async () => {
+    //  是班车才调用接口获取是否可以测试确认
+    if (!prjNames.startsWith("sprint")) {
+      setTestSelectorDisabled(false);
+      return false;
+    }
+
     try {
       await SprintDetailServices.checkUpdateTest({
         execName: prjNames,

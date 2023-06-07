@@ -88,7 +88,6 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
       })
       const saved = await PreReleaseServices.releaseOrder_own(sortArr);
       if (saved.code === 200) {
-        debugger
         setTabList(tabOrder);
         //   这里也要修改localstorage的数据
         localStorage.setItem("onlineSystem_tab", JSON.stringify(tabOrder))

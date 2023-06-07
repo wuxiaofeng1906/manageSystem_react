@@ -101,7 +101,7 @@ const SprintList: React.FC<any> = () => {
   const [envs] = useModel('env', (env) => [env.globalEnv]);
   const {prjId, prjNames, prjType, showTestConfirmFlag, ztId} = getProjectInfo();
   const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [testSelectorDisabled, setTestSelectorDisabled] = useState(false);
+  const [testSelectorShow, setTestSelectorShow] = useState(false);
   // 不满足移除的数据
   const [dissatisfy, setDissatisfy] = useState<any[]>([]);
   // 获取所有的班车所属执行
@@ -1375,19 +1375,18 @@ const SprintList: React.FC<any> = () => {
   const checkTestValid = async () => {
     //  是班车才调用接口获取是否可以测试确认
     if (!prjNames.startsWith("sprint")) {
-      setTestSelectorDisabled(false);
+      setTestSelectorShow(false);
       return false;
     }
-
     try {
-      await SprintDetailServices.checkUpdateTest({
+      const result = await SprintDetailServices.checkUpdateTest({
         execName: prjNames,
         currAt: moment().format('YYYY-MM-DD HH:mm:ss'),
       });
-      setTestSelectorDisabled(false);
-      return false;
-    } catch (e) {
-      setTestSelectorDisabled(e.ok == false);
+      setTestSelectorShow(result.ok == true);
+      return result.ok == true;
+    } catch (e: any) {
+      setTestSelectorShow(e.ok == false);
       return e.ok == false;
     }
   };
@@ -1455,6 +1454,7 @@ const SprintList: React.FC<any> = () => {
   const marginTopHeight = {marginTop: -15};
 
   const renderTestSelect = useCallback(() => {
+    debugger
     return (
       <Select
         placeholder="请选择"
@@ -1463,11 +1463,11 @@ const SprintList: React.FC<any> = () => {
           marginLeft: '5px',
           width: '85px',
           marginTop: '4px',
-          display: judgeAuthority(`修改"测试已确认"字段`) === true ? 'inline' : 'none',
+          display: judgeAuthority(`修改"测试已确认"字段`) === true && testSelectorShow === true ? 'inline' : 'none',
         }}
         size={'small'}
         onChange={testConfirmSelect}
-        disabled={testSelectorDisabled}
+        // disabled={testSelectorShow}
       >
         {[
           <Option key={'1'} value={'1'}>
@@ -1479,7 +1479,7 @@ const SprintList: React.FC<any> = () => {
         ]}
       </Select>
     );
-  }, [testSelectorDisabled, testConfirm]);
+  }, [testSelectorShow, testConfirm]);
 
   useEffect(() => {
     Modal.destroyAll();
@@ -1825,12 +1825,12 @@ const SprintList: React.FC<any> = () => {
               <label
                 style={{
                   marginTop: '5px',
-                  display: judgeAuthority(`修改"测试已确认"字段`) === true ? 'inline' : 'none',
+                  display: judgeAuthority(`修改"测试已确认"字段`) === true && testSelectorShow === true ? 'inline' : 'none',
                 }}
               >
                 测试确认:
               </label>
-              {testSelectorDisabled ? (
+              {testSelectorShow ? (
                 <Tooltip title={'已基线，不能修改'}>{renderTestSelect()}</Tooltip>
               ) : (
                 renderTestSelect()

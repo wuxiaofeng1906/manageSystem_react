@@ -1374,7 +1374,6 @@ const SprintList: React.FC<any> = () => {
     initialState?.currentUser?.authority?.find((it: any) => +it?.id == 149)?.id == 149;
   // 验证是否可批量 修改测试确认
   const checkTestValid = async () => {
-    debugger
     //  是班车才调用接口获取是否可以测试确认
     if (!prjNames.startsWith("sprint")) {
       setTestSelectorShow(false);
@@ -1385,11 +1384,11 @@ const SprintList: React.FC<any> = () => {
         execName: prjNames,
         currAt: moment().format('YYYY-MM-DD HH:mm:ss'),
       });
-      setTestSelectorShow(result.ok == true);
-      return result.ok == true;
+      setTestSelectorShow(result.ok);
+      return result.ok;
     } catch (e: any) {
-      setTestSelectorShow(e.ok == false);
-      return e.ok == false;
+      setTestSelectorShow(e.ok);
+      return e.ok;
     }
   };
 
@@ -1456,7 +1455,7 @@ const SprintList: React.FC<any> = () => {
   const marginTopHeight = {marginTop: -15};
 
   const renderTestSelect = useCallback(() => {
-    debugger
+
     return (
       <Select
         placeholder="请选择"

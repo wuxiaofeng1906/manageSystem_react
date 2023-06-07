@@ -1830,7 +1830,7 @@ const SprintList: React.FC<any> = () => {
               >
                 测试确认:
               </label>
-              {testSelectorShow ? (
+              {!testSelectorShow ? (
                 <Tooltip title={'已基线，不能修改'}>{renderTestSelect()}</Tooltip>
               ) : (
                 renderTestSelect()

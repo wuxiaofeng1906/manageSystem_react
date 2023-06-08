@@ -195,7 +195,7 @@ const SheetInfo = (props: any, ref: any) => {
             ? undefined
             : basicInfo?.release_result?.trim() || undefined,
         announcement_num: basicInfo?.announcement_num || undefined,
-        person_duty_num: basicInfo?.person_duty_num || undefined,
+        person_duty_num: basicInfo?.person_duty_num ?? '免',
       });
       baseForm.setFieldsValue({
         ...res?.basic_data,

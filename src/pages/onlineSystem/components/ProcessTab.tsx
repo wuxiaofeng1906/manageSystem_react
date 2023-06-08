@@ -76,26 +76,31 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
     tabOrder.splice(dragIndex, 1);
     // 后新增
     tabOrder.splice(hoverIndex, 0, dragedRow);
-    // 先请求后端保存数据，保存成功再设置
-
+    // 不再请求后端保存排序功能
     if (tabOrder && tabOrder.length > 0) {
-      const sortArr: any = []; // 保存数据传值到后端
-      tabOrder.map((it: any, index: number) => {
-        sortArr.push({
-          release_index: index + 1,
-          release_num: it.key
-        })
-      })
-      const saved = await PreReleaseServices.releaseOrder_own(sortArr);
-      if (saved.code === 200) {
-        setTabList(tabOrder);
-        //   这里也要修改localstorage的数据
-        localStorage.setItem("onlineSystem_tab", JSON.stringify(tabOrder))
-
-      } else {
-        errorMessage("顺序保存错误：" + saved.msg);
-      }
+      setTabList(tabOrder);
+      // 这里也要修改localstorage的数据
+      localStorage.setItem("onlineSystem_tab", JSON.stringify(tabOrder));
     }
+
+    // if (tabOrder && tabOrder.length > 0) {
+    //   const sortArr: any = []; // 保存数据传值到后端
+    //   tabOrder.map((it: any, index: number) => {
+    //     sortArr.push({
+    //       release_index: index + 1,
+    //       release_num: it.key
+    //     })
+    //   })
+    //   const saved = await PreReleaseServices.releaseOrder_own(sortArr);
+    //   if (saved.code === 200) {
+    //     setTabList(tabOrder);
+    //     //   这里也要修改localstorage的数据
+    //     localStorage.setItem("onlineSystem_tab", JSON.stringify(tabOrder));
+    //
+    //   } else {
+    //     errorMessage("顺序保存错误：" + saved.msg);
+    //   }
+    // }
   };
 
   // 减少tab

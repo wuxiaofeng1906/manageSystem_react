@@ -15,6 +15,7 @@ import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessage
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
+import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 
 const {TextArea} = Input;
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
@@ -155,7 +156,13 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
     // 灰度发布
     if (!isPreRelease) {
+      debugger
       setSpin(false);
+      setTabsLocalStorage({
+        "release_num": release_num,
+        "release_name": "",
+        "newAdd": true
+      });
       props.onOk?.({...baseData, release_num});
       return;
     }
@@ -197,6 +204,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     try {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
+      setTabsLocalStorage({
+        "release_num": release_num,
+        "release_name": "",
+        "newAdd": true
+      });
+
       props.onOk?.({...baseData, release_num});
     } catch (e) {
       errorMessage('接口异常');

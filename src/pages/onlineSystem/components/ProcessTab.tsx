@@ -172,9 +172,12 @@ export const ProcessTab: React.FC = (props: any) => {
 
   // tab的数据
   const [tabList, setTabList] = useState<any>([]);
-  const {release_num, release_name} = useParams() as { release_num: string; release_name: string }; // 非积压发布获取参数
+  let {release_num, release_name} = useParams() as { release_num: string; release_name: string }; // 非积压发布获取参数
   const {id} = useParams() as { id: string; }; // 灰度推线上获取参数
 
+  if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) { //  releaseOrder 的工单编号不是release_num
+    release_num = id;
+  }
 
   //获取发布列表
   const getTabsList = async () => {
@@ -184,22 +187,35 @@ export const ProcessTab: React.FC = (props: any) => {
 
     // 如果是历史记录，则只展示一个Tab,
     if (props.finished) {
-      const path = history.location.pathname;
-      if (path.includes("/onlineSystem/releaseOrder/")) { //  releaseOrder 的工单编号不是release_num
-        tabList = [{release_num: id, release_name}];
-      } else {
-        tabList = [{release_num, release_name}];
+      // const path = history.location.pathname;
+      // if (path.includes("/onlineSystem/releaseOrder/")) { //  releaseOrder 的工单编号不是release_num
+      //   tabList = [{release_num: id, release_name}];
+      // } else {
+      tabList = [{release_num, release_name}];
+      // }
+    }
+    debugger
+    // 判断当前page是否为新增页面，是则只展示一个Tab
+    if (tabList && tabList.length) {
+      const currentNum = tabList.filter((e: any) => e.release_num === release_num);
+      if (currentNum && currentNum.length) {
+        const flag = currentNum[0].hasOwnProperty("newAdd")
+        if (flag) {
+          tabList = [{release_num, release_name: release_num + "新增"}];
+        }
       }
     }
+    if (tabList && tabList.length) {
+      const items = tabList.map((it: any) => {
+        return {
+          ...it,
+          label: it.release_name,
+          key: it.release_num
+        };
+      });
+      setTabList(items);
+    }
 
-    const items = tabList.map((it: any) => {
-      return {
-        ...it,
-        label: it.release_name,
-        key: it.release_num
-      };
-    });
-    setTabList(items);
   };
 
   useEffect(() => {

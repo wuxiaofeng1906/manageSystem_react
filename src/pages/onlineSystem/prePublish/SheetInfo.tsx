@@ -177,12 +177,12 @@ const SheetInfo = (props: any, ref: any) => {
       databaseVersion = database?.map((it: string) => ({label: it, value: it}));
       const batch = await OnlineSystemServices.getBatchVersion({release_num});
       agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
-
-      // 工单信息的初始化数据
-      let param: any = {release_num};
-      if (globalState.finished) {
-        param = {release_num, include_deleted: true}
-      }
+      debugger
+      // 工单信息的初始化数据(获取界面数据，被删除也要展示)
+      let param: any = {release_num, include_deleted: true};
+      // if (globalState.finished) {
+      //   param = {release_num, include_deleted: true}
+      // }
       let res = await OnlineSystemServices.getOrderDetail(param);
       const basicInfo = res?.basic_data;
       orderForm.setFieldsValue({

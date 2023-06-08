@@ -107,13 +107,16 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
     })
     .catch((e) => {
 
-      // if (e.status) {
-      //   errorMessage(`请求异常信息:${e.status.toString()} ${e.statusText.toString()}`);
-      // } else if (e.code) {
-      //   errorMessage(`请求异常信息:${e.code.toString()} ${e.msg.toString()}`);
-      // } else {
-      //   errorMessage(`请求异常!`);
-      // }
+      if (e.status) {
+        console.log(`请求异常信息:${e.status.toString()} ${e.statusText.toString()}`);
+        // errorMessage(`请求异常信息:${e.status.toString()} ${e.statusText.toString()}`);
+      } else if (e.code) {
+        console.log(`请求异常信息:${e.code.toString()} ${e.msg.toString()}`);
+        // errorMessage(`请求异常信息:${e.code.toString()} ${e.msg.toString()}`);
+      } else {
+        console.log(`请求异常！`);
+        // errorMessage(`请求异常!`);
+      }
 
       return Promise.reject(e);
     });

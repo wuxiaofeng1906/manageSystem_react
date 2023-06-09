@@ -179,31 +179,33 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
 
   //获取发布列表
   const getTabsList = async () => {
-    // effect 中调用异步信息时间延迟可能导致最终获取的数据不正确。
-    // let tabList = await PreReleaseServices.releaseList();
-    let tabList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
+    let newTabList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
 
     // 如果是历史记录，则只展示一个Tab,
     if (props.finished) {
-      // const path = history.location.pathname;
-      // if (path.includes("/onlineSystem/releaseOrder/")) { //  releaseOrder 的工单编号不是release_num
-      //   tabList = [{release_num: id, release_name}];
-      // } else {
-      tabList = [{release_num, release_name}];
-      // }
+      newTabList = [{release_num, release_name}];
     } else if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) {
       // 判断当前page是否为正式发布的新增页面，是的话需要添加到tabLst中展示出来（灰度推生产在创建的时候没有放到缓存，因为这里不点击保存，数据库就没这条记录，就不必在缓存中。
       // 这里不用判断非积压发布的新增，因为非积压发布在新增的时候默认数据库就会有记录，在建立的时候就必须加入缓存）
       // 如果是新增的话，正式发布的工单名称为空
       if (release_name === "undefined") {
-        tabList.push({
-          release_num,
-          release_name: release_num + "灰度推生产"
-        })
+
+        if (newTabList && newTabList.length) {
+          newTabList.push({
+            release_num,
+            release_name: release_num + "灰度推生产"
+          })
+        } else {
+          newTabList = [{
+            release_num,
+            release_name: release_num + "灰度推生产"
+          }]
+        }
+
       }
     }
-    if (tabList && tabList.length) {
-      const items = tabList.map((it: any) => {
+    if (newTabList && newTabList.length) {
+      const items = newTabList.map((it: any) => {
         return {
           ...it,
           label: it.release_name,

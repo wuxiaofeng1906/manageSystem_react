@@ -156,7 +156,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
     // 灰度发布
     if (!isPreRelease) {
-      debugger
+
       setSpin(false);
       // 这里不能加入灰度推生产的缓存，只有在点击保存后才有本张单据的缓存。
       // setTabsLocalStorage({

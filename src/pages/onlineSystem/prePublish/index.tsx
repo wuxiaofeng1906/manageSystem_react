@@ -6,11 +6,17 @@ import styles from '../config/common.less';
 import ZentaoDetail from './ZentaoDetail';
 import {SyncOutlined} from '@ant-design/icons';
 import ProcessLayout from './layout';
-import {ProcessTab} from "../components/ProcessTab";
+import ProcessTab from "../components/ProcessTab";
 import {useModel} from "@@/plugin-model/useModel";
 
 const PrePublish = () => {
-  const refreshRef = useRef() as React.MutableRefObject<{ onRefresh: Function }>;
+  const refreshRef = useRef() as React.MutableRefObject<{
+    onRefresh: Function;
+  }>;
+  // tab标签页的刷新
+  const tabRefreshRef = useRef() as React.MutableRefObject<{
+    onTabsRefresh: Function;
+  }>;
   const query = useLocation()?.query;
   const {globalState} = useModel('onlineSystem');
 
@@ -27,7 +33,7 @@ const PrePublish = () => {
 
   return (
     // <PageContainer title={query.tab == 'profile' ? '禅道概况' : '发布过程单'}>
-    <PageContainer title={<ProcessTab finished={globalState.finished}/>}>
+    <PageContainer title={<ProcessTab finished={globalState.finished} ref={tabRefreshRef}/>}>
 
       <div className={styles.profileAndProcess}>
 
@@ -49,7 +55,8 @@ const PrePublish = () => {
           }
         >
           <Tabs.TabPane key={'process'} tab={'发布过程单'}>
-            <ProcessLayout/>
+            {/* 将Tab刷新功能的ref传到子组件去 */}
+            <ProcessLayout tabsRefresh={tabRefreshRef}/>
           </Tabs.TabPane>
           <Tabs.TabPane key={'profile'} tab={'禅道概况'}>
             <ZentaoDetail ref={refreshRef}/>

@@ -28,7 +28,7 @@ import ICluster from '@/components/ICluster';
 import {pushType} from "@/pages/onlineSystem/config/constant";
 import {isTestService} from "@/publicMethods/webMethod";
 import {setTabsLocalStorage, vertifyClusterStatus} from "../commonFunction";
-import {ProcessTab} from "@/pages/onlineSystem/components/ProcessTab";
+import ProcessTab from "@/pages/onlineSystem/components/ProcessTab";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 let releateOrderInfo: any = {
@@ -83,7 +83,8 @@ const ReleaseOrder = () => {
       window.onresize = null;
     };
   }, [id]);
-
+  // Tab 标签页的名字刷新
+  const ref = useRef() as React.MutableRefObject<{ onTabsRefresh: Function; }>;
 
   const getBaseList = async () => {
     /* 注意：ag-grid中，列的渲染是没法用usestate中的数据来进行动态渲染的，解决方案：需要定义一个全局变量来动态记录需要改变的数据，渲染中使用这个全局变量 */
@@ -382,6 +383,13 @@ const ReleaseOrder = () => {
       ready_release_num: orderData?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
       plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
     });
+    setTabsLocalStorage({
+      "release_num": id,
+      "release_name": base.release_name?.trim() ?? '',
+      // "newAdd": true
+    });
+    // 修改后要刷新Tab
+    await ref.current?.onTabsRefresh();
     // 更新详情
     if (!jump) {
       getOrderDetail();
@@ -584,10 +592,9 @@ const ReleaseOrder = () => {
     setOrderData(dt);
   };
 
-
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <PageContainer title={<ProcessTab finished={finished}/>}>
+      <PageContainer title={<ProcessTab finished={finished} ref={ref}/>}>
         <div className={styles.releaseOrder}>
           <div className={styles.header}>
             <div className={styles.title}>工单基本信息</div>

@@ -18,7 +18,7 @@ const tabs = [
   // { name: '工单审批', comp: Approval, key: 'approval' },
   // { name: '发布', comp: Publish, key: 'publish' },
 ];
-const Layout = () => {
+const Layout = (props: any) => {
   const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
@@ -218,7 +218,7 @@ const Layout = () => {
               disabled={(globalState.step || 1) < index || touched}
 
             >
-              <it.comp ref={ref}/>
+              <it.comp ref={ref} others={props.tabsRefresh}/>
             </Tabs.TabPane>
           );
         })}

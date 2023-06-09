@@ -1,12 +1,10 @@
 import type {TabsProps} from 'antd';
 import {Tabs} from 'antd';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useImperativeHandle, forwardRef} from 'react';
 import {DndProvider, useDrag, useDrop} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
-import PreReleaseServices from "@/services/preRelease";
 import {history} from "@@/core/history";
 import {useParams} from "umi";
-import {errorMessage} from "@/publicMethods/showMessages";
 
 const type = 'DraggableTabNode';
 const {TabPane} = Tabs;
@@ -167,9 +165,9 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
   );
 };
 
+const ProcessTab: React.FC = (props: any, ref: any) => {
 
-export const ProcessTab: React.FC = (props: any) => {
-
+  useImperativeHandle(ref, () => ({onTabsRefresh: getTabsList}));
   // tab的数据
   const [tabList, setTabList] = useState<any>([]);
   let {release_num, release_name} = useParams() as { release_num: string; release_name: string }; // 非积压发布获取参数
@@ -199,9 +197,10 @@ export const ProcessTab: React.FC = (props: any) => {
     if (tabList && tabList.length) {
       const currentNum = tabList.filter((e: any) => e.release_num === release_num);
       if (currentNum && currentNum.length) {
-        const flag = currentNum[0].hasOwnProperty("newAdd")
+        const current: any = currentNum[0];
+        const flag = current.hasOwnProperty("newAdd")
         if (flag) {
-          tabList = [{release_num, release_name: release_num + "新增"}];
+          tabList = [{release_num, release_name: current.release_name}];
         }
       }
     }
@@ -233,4 +232,5 @@ export const ProcessTab: React.FC = (props: any) => {
   )
 };
 
+export default forwardRef(ProcessTab);
 

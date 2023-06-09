@@ -30,6 +30,7 @@ import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import usePermission from '@/hooks/permission';
 import {display} from "html2canvas/dist/types/css/property-descriptors/display";
+import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 
 const color = {yes: '#2BF541', no: '#faad14'};
 const pickKey = ['release_name', 'release_env', 'plan_release_time'];
@@ -394,6 +395,14 @@ const ProcessDetail = (props: any, ref: any) => {
               },
               {release_num},
             );
+            setTabsLocalStorage({
+              "release_num": release_num,
+              "release_name": values.release_name,
+              // "newAdd": true
+            });
+            // 刷新
+            // 修改后要刷新Tab
+            await props.others.current.onTabsRefresh();
             setLoading(false);
           } catch (e) {
             setLoading(false);

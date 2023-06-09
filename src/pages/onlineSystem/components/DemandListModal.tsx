@@ -160,7 +160,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       setSpin(false);
       setTabsLocalStorage({
         "release_num": release_num,
-        "release_name": "",
+        "release_name": release_num + "灰度推生产",
         "newAdd": true
       });
       props.onOk?.({...baseData, release_num});
@@ -206,7 +206,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       setSpin(false);
       setTabsLocalStorage({
         "release_num": release_num,
-        "release_name": "",
+        "release_name": release_num + "正式发布",
         "newAdd": true
       });
 

@@ -191,17 +191,15 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
       // } else {
       tabList = [{release_num, release_name}];
       // }
-    }
-    debugger
-    // 判断当前page是否为新增页面，是则只展示一个Tab
-    if (tabList && tabList.length) {
-      const currentNum = tabList.filter((e: any) => e.release_num === release_num);
-      if (currentNum && currentNum.length) {
-        const current: any = currentNum[0];
-        const flag = current.hasOwnProperty("newAdd")
-        if (flag) {
-          tabList = [{release_num, release_name: current.release_name}];
-        }
+    } else if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) {
+      // 判断当前page是否为正式发布的新增页面，是的话需要添加到tabLst中展示出来（灰度推生产在创建的时候没有放到缓存，因为这里不点击保存，数据库就没这条记录，就不必在缓存中。
+      // 这里不用判断非积压发布的新增，因为非积压发布在新增的时候默认数据库就会有记录，在建立的时候就必须加入缓存）
+      // 如果是新增的话，正式发布的工单名称为空
+      if (release_name === "undefined") {
+        tabList.push({
+          release_num,
+          release_name: release_num + "灰度推生产"
+        })
       }
     }
     if (tabList && tabList.length) {

@@ -158,11 +158,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     if (!isPreRelease) {
       debugger
       setSpin(false);
-      setTabsLocalStorage({
-        "release_num": release_num,
-        "release_name": release_num + "灰度推生产",
-        "newAdd": true
-      });
+      // 这里不能加入灰度推生产的缓存，只有在点击保存后才有本张单据的缓存。
+      // setTabsLocalStorage({
+      //   "release_num": release_num,
+      //   "release_name": release_num + "灰度推生产",
+      //   "newAdd": true
+      // });
       props.onOk?.({...baseData, release_num});
       return;
     }

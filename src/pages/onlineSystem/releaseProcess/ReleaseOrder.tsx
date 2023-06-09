@@ -27,7 +27,7 @@ import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 import {pushType} from "@/pages/onlineSystem/config/constant";
 import {isTestService} from "@/publicMethods/webMethod";
-import {vertifyClusterStatus} from "../commonFunction";
+import {setTabsLocalStorage, vertifyClusterStatus} from "../commonFunction";
 import {ProcessTab} from "@/pages/onlineSystem/components/ProcessTab";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
@@ -259,7 +259,7 @@ const ReleaseOrder = () => {
     });
   };
 
-  const onSaveBeforeCheck =async (isAuto = false) => {
+  const onSaveBeforeCheck = async (isAuto = false) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
@@ -329,7 +329,11 @@ const ReleaseOrder = () => {
                   },
                   false,
                 );
-              } else await onSave();
+              } else {
+                await onSave();
+              }
+              //   清除Tab缓存
+              setTabsLocalStorage({release_num: id ?? ''}, "delete");
             } catch (e) {
               setConfirmDisabled(false);
             }
@@ -419,6 +423,8 @@ const ReleaseOrder = () => {
         });
       }
       setVisible(false);
+      //   清除Tab缓存
+      setTabsLocalStorage({release_num: id ?? ''}, "delete");
       history.replace('/onlineSystem/releaseProcess');
     }
   };

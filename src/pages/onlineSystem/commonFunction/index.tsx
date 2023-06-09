@@ -31,10 +31,17 @@ export const vertifyClusterStatus = async (clusters: any) => {
 
 
 // 设置 Tab 标签页的缓存
-export const setTabsLocalStorage = (currentPage: any) => {
-  debugger
+export const setTabsLocalStorage = (currentPage: any, type: string = "add") => {
+
   const old_onlineSystem_tab = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
-  // 需要去重(保存最新的一次点击数据)
+
+  // 去除指定的缓存数据
+  if (type === "delete") {
+    const newPage = old_onlineSystem_tab.filter((item: any) => item.release_num !== currentPage.release_num);
+    localStorage.setItem("onlineSystem_tab", JSON.stringify(newPage));
+    return;
+  }
+  // 添加缓存-需要去重(保存最新的一次点击数据)
   if (old_onlineSystem_tab && old_onlineSystem_tab.length) {
     // 用的替换（只能替换，不能判重）
     let exitFlag = false;
@@ -53,9 +60,6 @@ export const setTabsLocalStorage = (currentPage: any) => {
       newPage.push(currentPage);
     }
 
-    // const newPage = (old_onlineSystem_tab.concat([currentPage])).filter((item: any, index: any, self: any) => {
-    //   return self.findIndex((el: any) => el.release_num === item.release_num) === index
-    // })
     localStorage.setItem("onlineSystem_tab", JSON.stringify(newPage));
   } else {
     localStorage.setItem("onlineSystem_tab", JSON.stringify([currentPage]))

@@ -29,7 +29,7 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
-import {vertifyClusterStatus} from "@/pages/onlineSystem/commonFunction";
+import {setTabsLocalStorage, vertifyClusterStatus} from "@/pages/onlineSystem/commonFunction";
 
 let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
@@ -379,8 +379,13 @@ const SheetInfo = (props: any, ref: any) => {
               if (result == 'draft') {
                 await OnlineSystemServices.removeOrder({release_num, user_id: user?.userid});
                 await getDetail();
-              } else await onSave(true); // 发布失败
+              } else {
+                await onSave(true);// 发布失败
+                //   清除Tab缓存（置为草稿不需要清缓存）
+                setTabsLocalStorage({release_num}, "delete");
+              }
               setConfirmDisabled(false);
+
             } catch (e) {
               setConfirmDisabled(false);
             }
@@ -394,7 +399,9 @@ const SheetInfo = (props: any, ref: any) => {
     }
   };
 
+  // 确认发布成功
   const onSuccessConfirm = async (data: any) => {
+
     const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});
@@ -435,7 +442,10 @@ const SheetInfo = (props: any, ref: any) => {
         await PreReleaseServices.releasetenants({env_name_list: clusters});
       }
 
+      // 清除tab缓存
       setSuccessModal(false);
+      //   清除Tab缓存
+      setTabsLocalStorage({release_num}, "delete");
       history.replace('/onlineSystem/releaseProcess');
     }
   };

@@ -389,7 +389,7 @@ const ReleaseOrder = () => {
       // "newAdd": true
     });
     // 修改后要刷新Tab
-    await ref.current?.onTabsRefresh();
+    await ref.current?.onTabsRefresh(true);
     // 更新详情
     if (!jump) {
       getOrderDetail();

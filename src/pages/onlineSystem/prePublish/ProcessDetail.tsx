@@ -344,6 +344,8 @@ const ProcessDetail = (props: any, ref: any) => {
           );
           setConfirmDisabled(false);
           history.replace('/onlineSystem/releaseProcess');
+          //   删除当前缓存
+          setTabsLocalStorage({release_num}, "delete");
         } catch (e) {
           setConfirmDisabled(false);
         }

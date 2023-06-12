@@ -51,7 +51,7 @@ const DraggableTabNode = ({index, children, moveNode}: DraggableTabPaneProps) =>
 // 拖拽的功能
 const DraggableTabs: React.FC<TabsProps> = (props: any) => {
 
-  let {setTabList, tabList, activeKey}: any = props;
+  const {setTabList, tabList, activeKey}: any = props;
 
   // 移动tab时，获取移动后的id顺序
   const moveTabNode = async (dragKey: React.Key, hoverKey: React.Key) => {
@@ -102,22 +102,32 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
   };
 
   // 减少tab
-  const onEdit = (e: string, type: string) => {
+  const onEdit = (e: string, types: string) => {
 
-    if (type === "remove") {
+    if (types === "remove") {
       const pageArray = [...tabList];
       const exitedArray = pageArray.filter(item => item.key !== e);
       setTabList(exitedArray);
       const storages = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
       const new_storages = storages.filter((item: any) => item.release_num !== e);
       localStorage.setItem("onlineSystem_tab", JSON.stringify(new_storages));
+      //  减少缓存之后，需要删除当前页面，
+      // 如果删除的是当前所看的tab页。则下一个展示链接需要跳转到第一个
+      if (activeKey === e) {
+        const currentPage = new_storages[0];
+        let replaceUrl = `/onlineSystem/prePublish/${currentPage.release_num}/${currentPage.branch}/${currentPage.is_delete}/${currentPage.release_name}`;
+        if (currentPage.release_type == 'backlog_release') {  // 灰度推生产
+          replaceUrl = `/onlineSystem/releaseOrder/${currentPage.release_num}/${currentPage.is_delete}/${currentPage.release_name}`;
+        }
+        history.replace(replaceUrl);
+      }
     }
   };
   // 重新获得Tabs顺序
   const getRealSort = () => {
 
     const pageArray = [...tabList];
-    let oraData: any = [];
+    const oraData: any = [];
     pageArray.forEach((page: any) => {
       oraData.push(<TabPane tab={page.label} key={page.key} closable={pageArray.length > 1 ? true : false}/>)
     });
@@ -167,7 +177,6 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
 
 const ProcessTab: React.FC = (props: any, ref: any) => {
 
-  useImperativeHandle(ref, () => ({onTabsRefresh: getTabsList}));
   // tab的数据
   const [tabList, setTabList] = useState<any>([]);
   let {release_num, release_name} = useParams() as { release_num: string; release_name: string }; // 非积压发布获取参数
@@ -179,7 +188,7 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
 
   //获取发布列表
   const getTabsList = async (refresh: boolean = false) => {
-    debugger
+
     let newTabList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
 
     // 如果是历史记录，则只展示一个Tab,
@@ -217,6 +226,8 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
     }
 
   };
+
+  useImperativeHandle(ref, () => ({onTabsRefresh: getTabsList}));
 
   useEffect(() => {
     getTabsList();

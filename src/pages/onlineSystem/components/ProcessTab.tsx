@@ -194,7 +194,7 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
     let oraList = await PreReleaseServices.releaseList();
     let storageList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
 
-    let newTabList = intersectionBy(oraList, storageList, "release_num");
+    let newTabList: any = intersectionBy(oraList, storageList, "release_num");
     // 如果是历史记录，则只展示一个Tab,
     if (props.finished) {
       newTabList = [{release_num, release_name}];

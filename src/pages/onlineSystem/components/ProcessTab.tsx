@@ -191,54 +191,89 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
 
   // 获取需要展示的tab
   const getFinalTabList = async () => {
-    debugger
+
     // 也要获取列表数据，取交集。才得到最终Tab展示的数据。并且删除不存在的缓存
     let oraList = await PreReleaseServices.releaseList();
     let storageList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
     const newTabList: any = intersectionBy(oraList, storageList, "release_num");
     // 需要删除的tab
-    const forDelete = storageList.filter((v: any) => {
-      return newTabList.every((e: any) => e.release_num != v.release_num);
-    });
-    if (forDelete && forDelete.length) {
-      forDelete.map((e: any) => {
-        setTabsLocalStorage({
-          "release_num": e.release_num,
-          "release_name": e.release_name,
-        }, "delete");
-      })
+    if (newTabList && newTabList.length) {
+      const forDelete = storageList.filter((v: any) => {
+        return newTabList.every((e: any) => e.release_num != v.release_num);
+      });
+      if (forDelete && forDelete.length) {
+        forDelete.map((e: any) => {
+          setTabsLocalStorage({
+            "release_num": e.release_num,
+            "release_name": e.release_name,
+          }, "delete");
+        })
+      }
     }
+
+    // 是通过别人的链接进来的，本地缓存可能没有数据，就要手动添加到Tablist中
+    // 判断当前单号是否存在newTabList中，不存在需要添加进去
+    const filterdArray = newTabList.filter((e: any) => {
+      return e.release_num === release_num;
+    });
+
+    // 不存在。则添加
+    if (!filterdArray || filterdArray.length == 0) {
+      const detailsData = oraList.filter((e: any) => {
+        return e.release_num === release_num;
+      });
+      if (detailsData && detailsData.length > 0) {
+        const item = detailsData[0];
+        newTabList.push(item);
+
+        // 并添加到缓存
+        setTabsLocalStorage({
+          "release_num": item.release_num,
+          "release_name": item.release_name,
+          // "branch": item.data.branch,
+          // "is_delete": item.data.is_delete,
+          // "release_type": item.data.release_type,
+        });
+      }
+    }
+
     return newTabList;
   };
   //获取发布列表
   const getTabsList = async (refresh: boolean = false) => {
-
-    let newTabList: any = await getFinalTabList();
-    // 删除没有用到的缓存
+    console.log(props.finished)
+    debugger
+    let newTabList: any;
 
     // 如果是历史记录，则只展示一个Tab,
     if (props.finished) {
       newTabList = [{release_num, release_name}];
-    } else if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) {
-      // 判断当前page是否为正式发布的新增页面，是的话需要添加到tabLst中展示出来（灰度推生产在创建的时候没有放到缓存，因为这里不点击保存，数据库就没这条记录，就不必在缓存中。
-      // 这里不用判断非积压发布的新增，因为非积压发布在新增的时候默认数据库就会有记录，在建立的时候就必须加入缓存）
-      // 如果是新增的话，正式发布的工单名称为空  刷新的时候不再判断是否为新增项
-      if (release_name === "undefined" && !refresh) {
+    } else {
+      newTabList = await getFinalTabList();
+      debugger
+      if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) {
+        // 判断当前page是否为正式发布的新增页面，是的话需要添加到tabLst中展示出来（灰度推生产在创建的时候没有放到缓存，因为这里不点击保存，数据库就没这条记录，就不必在缓存中。
+        // 这里不用判断非积压发布的新增，因为非积压发布在新增的时候默认数据库就会有记录，在建立的时候就必须加入缓存）
+        // 如果是新增的话，正式发布的工单名称为空  刷新的时候不再判断是否为新增项
+        if (release_name === "undefined" && !refresh) {
 
-        if (newTabList && newTabList.length) {
-          newTabList.push({
-            release_num,
-            release_name: release_num + "灰度推生产"
-          })
-        } else {
-          newTabList = [{
-            release_num,
-            release_name: release_num + "灰度推生产"
-          }]
+          if (newTabList && newTabList.length) {
+            newTabList.push({
+              release_num,
+              release_name: release_num + "灰度推生产"
+            })
+          } else {
+            newTabList = [{
+              release_num,
+              release_name: release_num + "灰度推生产"
+            }]
+          }
+
         }
-
       }
     }
+
+    debugger
     if (newTabList && newTabList.length) {
       const items = newTabList.map((it: any) => {
         return {

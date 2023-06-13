@@ -108,6 +108,7 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
   const onEdit = (e: string, types: string) => {
 
     if (types === "remove") {
+      debugger
       const pageArray = [...tabList];
       const exitedArray = pageArray.filter(item => item.key !== e);
       setTabList(exitedArray);
@@ -150,6 +151,7 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
 
   // 切换tab
   const onTabChange = (v: any) => {
+
     // 跳转链接需要找到下一个数据的subtab和tab
     const p = tabList.find((e: any) => {
       return e.release_num === v
@@ -230,9 +232,9 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
         setTabsLocalStorage({
           "release_num": item.release_num,
           "release_name": item.release_name,
-          // "branch": item.data.branch,
-          // "is_delete": item.data.is_delete,
-          // "release_type": item.data.release_type,
+          "branch": item.data.branch,
+          "is_delete": item.data.is_delete,
+          "release_type": item.data.release_type,
         });
       }
     }
@@ -249,7 +251,7 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
     if (props.finished) {
       newTabList = [{release_num, release_name}];
     } else {
-      newTabList = await getFinalTabList();
+      // newTabList = await getFinalTabList();
       debugger
       if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) {
         // 判断当前page是否为正式发布的新增页面，是的话需要添加到tabLst中展示出来（灰度推生产在创建的时候没有放到缓存，因为这里不点击保存，数据库就没这条记录，就不必在缓存中。

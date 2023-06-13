@@ -192,10 +192,10 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
   }
 
   // 获取需要展示的tab
-  const getFinalTabList = async () => {
+  const getFinalTabList = async (oraList: any) => {
 
     // 也要获取列表数据，取交集。才得到最终Tab展示的数据。并且删除不存在的缓存
-    let oraList = await PreReleaseServices.releaseList();
+
     let storageList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
     const newTabList: any = intersectionBy(oraList, storageList, "release_num");
     // 需要删除的tab
@@ -232,27 +232,34 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
         setTabsLocalStorage({
           "release_num": item.release_num,
           "release_name": item.release_name,
-          "branch": item.data.branch,
-          "is_delete": item.data.is_delete,
-          "release_type": item.data.release_type,
+          "branch": item.branch,
+          "is_delete": item.is_delete,
+          "release_type": item.release_type,
         });
       }
     }
 
     return newTabList;
   };
+
+  // 判断当前单号是否为发布成功
+  const releaseFinshed = () => {
+    //   不能用单据原有的finished参数，多次渲染导致展示效果不好
+
+  };
   //获取发布列表
   const getTabsList = async (refresh: boolean = false) => {
-    console.log(props.finished)
+
     debugger
+    let oraList = await PreReleaseServices.releaseList();
     let newTabList: any;
 
     // 如果是历史记录，则只展示一个Tab,
     if (props.finished) {
       newTabList = [{release_num, release_name}];
     } else {
-      // newTabList = await getFinalTabList();
-      debugger
+      newTabList = await getFinalTabList(oraList);
+
       if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) {
         // 判断当前page是否为正式发布的新增页面，是的话需要添加到tabLst中展示出来（灰度推生产在创建的时候没有放到缓存，因为这里不点击保存，数据库就没这条记录，就不必在缓存中。
         // 这里不用判断非积压发布的新增，因为非积压发布在新增的时候默认数据库就会有记录，在建立的时候就必须加入缓存）
@@ -290,6 +297,7 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
   };
 
   useImperativeHandle(ref, () => ({onTabsRefresh: getTabsList}));
+
 
   useEffect(() => {
     getTabsList();

@@ -5,6 +5,8 @@ import {DndProvider, useDrag, useDrop} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 import {history} from "@@/core/history";
 import {useParams} from "umi";
+import PreReleaseServices from "@/services/preRelease";
+import {intersectionBy} from "lodash";
 
 const type = 'DraggableTabNode';
 const {TabPane} = Tabs;
@@ -188,9 +190,11 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
 
   //获取发布列表
   const getTabsList = async (refresh: boolean = false) => {
+    // 也要获取列表数据，取交集。才得到最终Tab展示的数据。
+    let oraList = await PreReleaseServices.releaseList();
+    let storageList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
 
-    let newTabList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
-
+    let newTabList = intersectionBy(oraList, storageList, "release_num");
     // 如果是历史记录，则只展示一个Tab,
     if (props.finished) {
       newTabList = [{release_num, release_name}];

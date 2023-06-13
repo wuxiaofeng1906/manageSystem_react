@@ -213,7 +213,8 @@ const SheetInfo = (props: any, ref: any) => {
             : [],
         need_auto: basicInfo?.need_auto || undefined,
       });
-      agFinished = is_delete === "true" ? true : !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
+      debugger
+      agFinished = basicInfo.is_delete ? true : !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
 
       setDraft(res?.status !== 'save');
       setGlobalState({

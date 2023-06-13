@@ -133,7 +133,7 @@ const ReleaseOrder = () => {
         ...res,
         cluster: res.cluster ?? [],
       });
-      agFinished = is_delete === "true" ? true : res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
+      agFinished = res.is_delete ? true : res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
       setFinished(agFinished);
       setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
@@ -259,7 +259,7 @@ const ReleaseOrder = () => {
     });
   };
 
-  const onSaveBeforeCheck =async (isAuto = false) => {
+  const onSaveBeforeCheck = async (isAuto = false) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;

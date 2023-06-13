@@ -7,6 +7,7 @@ import {history} from "@@/core/history";
 import {useParams} from "umi";
 import PreReleaseServices from "@/services/preRelease";
 import {intersectionBy} from "lodash";
+import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 
 const type = 'DraggableTabNode';
 const {TabPane} = Tabs;
@@ -188,13 +189,33 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
     release_num = id;
   }
 
-  //获取发布列表
-  const getTabsList = async (refresh: boolean = false) => {
-    // 也要获取列表数据，取交集。才得到最终Tab展示的数据。
+  // 获取需要展示的tab
+  const getFinalTabList = async () => {
+    debugger
+    // 也要获取列表数据，取交集。才得到最终Tab展示的数据。并且删除不存在的缓存
     let oraList = await PreReleaseServices.releaseList();
     let storageList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
+    const newTabList: any = intersectionBy(oraList, storageList, "release_num");
+    // 需要删除的tab
+    const forDelete = storageList.filter((v: any) => {
+      return newTabList.every((e: any) => e.release_num != v.release_num);
+    });
+    if (forDelete && forDelete.length) {
+      forDelete.map((e: any) => {
+        setTabsLocalStorage({
+          "release_num": e.release_num,
+          "release_name": e.release_name,
+        }, "delete");
+      })
+    }
+    return newTabList;
+  };
+  //获取发布列表
+  const getTabsList = async (refresh: boolean = false) => {
 
-    let newTabList: any = intersectionBy(oraList, storageList, "release_num");
+    let newTabList: any = await getFinalTabList();
+    // 删除没有用到的缓存
+
     // 如果是历史记录，则只展示一个Tab,
     if (props.finished) {
       newTabList = [{release_num, release_name}];

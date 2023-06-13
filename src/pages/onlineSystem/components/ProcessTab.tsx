@@ -243,19 +243,30 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
   };
 
   // 判断当前单号是否为发布成功
-  const releaseFinshed = () => {
+  const releaseFinshed = (oraList: any) => {
     //   不能用单据原有的finished参数，多次渲染导致展示效果不好
-
+    //   这里只需要判断当前单号是否在未发布的列表中，如果不在，那就是历史记录
+    let finished = true;
+    if (oraList && oraList.length) {
+      oraList.forEach((e: any) => {
+        if (e.release_num === release_num) {
+          finished = false;
+        }
+      });
+    }
+    return finished;
   };
   //获取发布列表
   const getTabsList = async (refresh: boolean = false) => {
 
     debugger
+    // 未发布的列表
     let oraList = await PreReleaseServices.releaseList();
+
     let newTabList: any;
 
     // 如果是历史记录，则只展示一个Tab,
-    if (props.finished) {
+    if (releaseFinshed(oraList)) {
       newTabList = [{release_num, release_name}];
     } else {
       newTabList = await getFinalTabList(oraList);
@@ -302,7 +313,7 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
   useEffect(() => {
     getTabsList();
 
-  }, [release_num, id, props.finished]);
+  }, [release_num, id]);
 
 
   return (

@@ -179,10 +179,10 @@ const SheetInfo = (props: any, ref: any) => {
       agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
 
       // 工单信息的初始化数据
-      let param: any = {release_num};
-      if (globalState.finished) {
-        param = {release_num, include_deleted: true}
-      }
+      let param: any = {release_num, include_deleted: true};
+      // if (globalState.finished) {
+      //   param = {release_num, include_deleted: true}
+      // }
       let res = await OnlineSystemServices.getOrderDetail(param);
       const basicInfo = res?.basic_data;
       orderForm.setFieldsValue({

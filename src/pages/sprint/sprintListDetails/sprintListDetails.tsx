@@ -284,13 +284,15 @@ const SprintList: React.FC<any> = () => {
       setShowReason(false);
     } else setShowReason(filterData?.some((it) => !isEmpty(it.nobaseDesc)));
     gridApi.current?.setRowData(filterData);
+    if (gird_filter_condition && gird_filter_condition.length) {
+      // 过滤表格自带条件
+      const hardcodedFilter = {};
+      gird_filter_condition.forEach((ele: any) => {
+        hardcodedFilter[ele.column] = {type: 'set', values: ele.filterValue};
+      });
+      gridApi.current?.setFilterModel(hardcodedFilter);
+    }
 
-    // 过滤表格自带条件
-    const hardcodedFilter = {};
-    gird_filter_condition.forEach((ele: any) => {
-      hardcodedFilter[ele.column] = {type: 'set', values: ele.filterValue};
-    });
-    gridApi.current?.setFilterModel(hardcodedFilter);
 
     // 还要设置title
     const countRt = calTypeCount(getFilteredGridData());
@@ -337,7 +339,11 @@ const SprintList: React.FC<any> = () => {
       ztId,
     );
     ora_filter_data = datas?.result;
-    setData(datas);
+
+    setData({
+      ...data,
+      resCount: datas.resCount
+    });
     onSelectChanged();
   };
 
@@ -1361,7 +1367,7 @@ const SprintList: React.FC<any> = () => {
     setRefreshItem(true);
     const result = await syncDetailsData(prjId);
     if (result.ok === true) {
-      updateGrid();
+      await updateGrid();
       sucMessage('项目详情同步成功！');
     } else {
       errorMessage(`错误：${result.message}`);

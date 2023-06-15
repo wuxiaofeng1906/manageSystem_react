@@ -387,6 +387,13 @@ const ReleaseOrder = () => {
     }
     if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
 
+    // 过滤掉工单-表单设置（orderData）手动添加的空行
+
+    let filteredOrder: any = [];
+    if (orderData && orderData.length) {
+      filteredOrder = orderData.filter((e: any) => e.ready_release_name !== "" && e.repair_order_type !== "");
+    }
+
     await PreReleaseServices.saveOrder({
       release_num: id, // 发布编号
       user_id: user?.userid ?? '',
@@ -394,12 +401,12 @@ const ReleaseOrder = () => {
       person_duty_num: order.person_duty_num,
       announcement_num: order.announcement_num ?? '',
       release_type: 'backlog_release',
-      rd_repair_data: orderData ?? [],
+      rd_repair_data: filteredOrder,
       release_way: order.release_way ?? '',
       ops_repair_data: compareData?.opsData ?? [],
       release_result: order.release_result ?? 'unknown',
       cluster: base.cluster?.join(',') ?? '',
-      ready_release_num: orderData?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
+      ready_release_num: filteredOrder?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
       plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
     });
     // 更新详情

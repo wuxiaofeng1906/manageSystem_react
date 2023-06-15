@@ -173,7 +173,21 @@ const ReleaseOrder = () => {
     // 手动在表单里面加的数据不进行对比。这里要进行过滤
     let rdOrigin: any = [];
     rdOriginDt.forEach((e: any) => {
-      if (e.repair_order_type !== "DeployApi" && e.repair_order_type !== "SQL") rdOrigin.push(e);
+      if (e.repair_order_type === "DeployApi" || e.repair_order_type === "SQL") {
+        debugger
+        const {label, repair_order_type, ready_release_name} = e;
+        // 解析出 repair_order和project;
+        const alls = label.split("id:")[1];
+        const info = alls.split("(title:");
+        rdOrigin.push({
+          repair_order: info[0],
+          project: info[1].replaceAll(")", "").trim(),
+          repair_order_type,
+          ready_release_name
+        })
+      } else {
+        rdOrigin.push(e)
+      }
     })
 
     let ops = opsOrigin;
@@ -259,7 +273,7 @@ const ReleaseOrder = () => {
     });
   };
 
-  const onSaveBeforeCheck =async (isAuto = false) => {
+  const onSaveBeforeCheck = async (isAuto = false) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;

@@ -35,6 +35,11 @@ let releateOrderInfo: any = {
   SQL: [],
   INTER: []
 }; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
+
+let agCompareData: any = {
+  opsData: [],
+  alpha: []
+} //  被对比的数据-处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
   const {id, is_delete} = useParams() as { id: string, is_delete: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -152,6 +157,7 @@ const ReleaseOrder = () => {
       if (isEmpty(values.cluster)) {
         setOrderData([]);
         setCompareData({opsData: [], alpha: []});
+        agCompareData = {opsData: [], alpha: []};
         setSpinning(false);
         return;
       }
@@ -176,15 +182,17 @@ const ReleaseOrder = () => {
       if (e.repair_order_type === "DeployApi" || e.repair_order_type === "SQL") {
         debugger
         const {label, repair_order_type, ready_release_name} = e;
-        // 解析出 repair_order和project;
-        const alls = label.split("id:")[1];
-        const info = alls.split("(title:");
-        rdOrigin.push({
-          repair_order: info[0],
-          project: info[1].replaceAll(")", "").trim(),
-          repair_order_type,
-          ready_release_name
-        })
+        if (label) {
+          // 解析出 repair_order和project;
+          const alls = label.split("id:")[1];
+          const info = alls.split("(title:");
+          rdOrigin.push({
+            repair_order: info[0],
+            project: info[1].replaceAll(")", "").trim(),
+            repair_order_type,
+            ready_release_name
+          })
+        }
       } else {
         rdOrigin.push(e)
       }
@@ -197,6 +205,7 @@ const ReleaseOrder = () => {
     }
     if (isEmpty(ops) && isEmpty(rdOrigin)) {
       setCompareData({opsData: [], alpha: []});
+      agCompareData = {opsData: [], alpha: []};
       return;
     }
     let mergeArr: any[] = [];
@@ -260,6 +269,7 @@ const ReleaseOrder = () => {
     }
 
     setCompareData({opsData: ops, alpha: mergeArr});
+    agCompareData = {opsData: ops, alpha: mergeArr};
   };
 
   const initForm = () => {
@@ -447,6 +457,8 @@ const ReleaseOrder = () => {
 
     setOrderData(newDt);
     gridRef.current?.setRowData(newDt)
+    //   还要刷新工单核对检查
+    formatCompare(agCompareData?.opsData ?? [], newDt);
   };
 
   // 永久删除积压工单
@@ -508,7 +520,7 @@ const ReleaseOrder = () => {
               ?.getRenderedNodes()
               ?.map((it) => it.data)
               ?.filter((obj) => !isEqual(obj, p.data)) || [];
-          await formatCompare(compareData?.opsData || [], result);
+          await formatCompare(agCompareData?.opsData || [], result);
           setOrderData(result);
           setConfirmDisabled(false);
         },
@@ -590,6 +602,9 @@ const ReleaseOrder = () => {
 
     gridRef.current?.setRowData(dt);
     setOrderData(dt);
+
+    //   还要刷新工单核对检查
+    formatCompare(agCompareData?.opsData ?? [], dt);
   };
 
 

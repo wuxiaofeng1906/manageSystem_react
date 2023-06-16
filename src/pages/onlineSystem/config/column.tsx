@@ -344,7 +344,7 @@ export const repairColumn: (ColDef | ColGroupDef)[] = [
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
   {headerName: '数据修复内容', field: 'title', tooltipField: 'title'},
-  {headerName: '涉及租户', field: 'tenant', minWidth: 100, maxWidth: 100},
+  {headerName: '涉及租户', field: 'tenant', minWidth: 100},
   {headerName: '类型', field: 'recovery_type', minWidth: 100, maxWidth: 100},
   {headerName: '修复提交人', field: 'author', minWidth: 110, maxWidth: 110, hide: true},
   {headerName: '分支', field: 'branch', minWidth: 110, maxWidth: 180},

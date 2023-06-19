@@ -386,6 +386,8 @@ const ReleaseOrder = () => {
     setTabsLocalStorage({
       "release_num": id,
       "release_name": base.release_name?.trim() ?? '',
+      "is_delete": false,
+      "release_type": 'backlog_release',
       // "newAdd": true
     });
     // 修改后要刷新Tab

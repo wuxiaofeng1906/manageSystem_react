@@ -241,6 +241,10 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
 
   // 判断当前单号是否为发布成功
   const releaseFinshed = (oraList: any) => {
+    //  灰度推线上，新增的时候预发布列表还没有存在这条记录
+    if (release_name === "undefined") {
+      return false;
+    }
     //   不能用单据原有的finished参数，多次渲染导致展示效果不好
     //   这里只需要判断当前单号是否在未发布的列表中，如果不在，那就是历史记录
     let finished = true;

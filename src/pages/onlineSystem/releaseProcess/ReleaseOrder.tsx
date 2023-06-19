@@ -35,6 +35,11 @@ let releateOrderInfo: any = {
   SQL: [],
   INTER: []
 }; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
+
+let agCompareData: any = {
+  opsData: [],
+  alpha: []
+} //  被对比的数据-处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
   const {id, is_delete} = useParams() as { id: string, is_delete: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -152,6 +157,7 @@ const ReleaseOrder = () => {
       if (isEmpty(values.cluster)) {
         setOrderData([]);
         setCompareData({opsData: [], alpha: []});
+        agCompareData = {opsData: [], alpha: []};
         setSpinning(false);
         return;
       }
@@ -173,7 +179,23 @@ const ReleaseOrder = () => {
     // 手动在表单里面加的数据不进行对比。这里要进行过滤
     let rdOrigin: any = [];
     rdOriginDt.forEach((e: any) => {
-      if (e.repair_order_type !== "DeployApi" && e.repair_order_type !== "SQL") rdOrigin.push(e);
+      if (e.repair_order_type === "DeployApi" || e.repair_order_type === "SQL") {
+        debugger
+        const {label, repair_order_type, ready_release_name} = e;
+        if (label) {
+          // 解析出 repair_order和project;
+          const alls = label.split("id:")[1];
+          const info = alls.split("(title:");
+          rdOrigin.push({
+            repair_order: info[0],
+            project: info[1].replaceAll(")", "").trim(),
+            repair_order_type,
+            ready_release_name
+          })
+        }
+      } else {
+        rdOrigin.push(e)
+      }
     })
 
     let ops = opsOrigin;
@@ -183,6 +205,7 @@ const ReleaseOrder = () => {
     }
     if (isEmpty(ops) && isEmpty(rdOrigin)) {
       setCompareData({opsData: [], alpha: []});
+      agCompareData = {opsData: [], alpha: []};
       return;
     }
     let mergeArr: any[] = [];
@@ -246,6 +269,7 @@ const ReleaseOrder = () => {
     }
 
     setCompareData({opsData: ops, alpha: mergeArr});
+    agCompareData = {opsData: ops, alpha: mergeArr};
   };
 
   const initForm = () => {
@@ -363,6 +387,13 @@ const ReleaseOrder = () => {
     }
     if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
 
+    // 过滤掉工单-表单设置（orderData）手动添加的空行
+
+    let filteredOrder: any = [];
+    if (orderData && orderData.length) {
+      filteredOrder = orderData.filter((e: any) => e.ready_release_name !== "" && e.repair_order_type !== "");
+    }
+
     await PreReleaseServices.saveOrder({
       release_num: id, // 发布编号
       user_id: user?.userid ?? '',
@@ -370,12 +401,12 @@ const ReleaseOrder = () => {
       person_duty_num: order.person_duty_num,
       announcement_num: order.announcement_num ?? '',
       release_type: 'backlog_release',
-      rd_repair_data: orderData ?? [],
+      rd_repair_data: filteredOrder,
       release_way: order.release_way ?? '',
       ops_repair_data: compareData?.opsData ?? [],
       release_result: order.release_result ?? 'unknown',
       cluster: base.cluster?.join(',') ?? '',
-      ready_release_num: orderData?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
+      ready_release_num: filteredOrder?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
       plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
     });
     // 更新详情
@@ -433,6 +464,8 @@ const ReleaseOrder = () => {
 
     setOrderData(newDt);
     gridRef.current?.setRowData(newDt)
+    //   还要刷新工单核对检查
+    formatCompare(agCompareData?.opsData ?? [], newDt);
   };
 
   // 永久删除积压工单
@@ -494,7 +527,7 @@ const ReleaseOrder = () => {
               ?.getRenderedNodes()
               ?.map((it) => it.data)
               ?.filter((obj) => !isEqual(obj, p.data)) || [];
-          await formatCompare(compareData?.opsData || [], result);
+          await formatCompare(agCompareData?.opsData || [], result);
           setOrderData(result);
           setConfirmDisabled(false);
         },
@@ -576,6 +609,9 @@ const ReleaseOrder = () => {
 
     gridRef.current?.setRowData(dt);
     setOrderData(dt);
+
+    //   还要刷新工单核对检查
+    formatCompare(agCompareData?.opsData ?? [], dt);
   };
 
 

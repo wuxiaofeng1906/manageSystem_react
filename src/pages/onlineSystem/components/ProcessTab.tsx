@@ -108,7 +108,6 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
   const onEdit = (e: string, types: string) => {
 
     if (types === "remove") {
-      debugger
       const pageArray = [...tabList];
       const exitedArray = pageArray.filter(item => item.key !== e);
       setTabList(exitedArray);
@@ -193,11 +192,9 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
 
   // 获取需要展示的tab
   const getFinalTabList = async (oraList: any) => {
-
     // 也要获取列表数据，取交集。才得到最终Tab展示的数据。并且删除不存在的缓存
-
     let storageList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
-    const newTabList: any = intersectionBy(oraList, storageList, "release_num");
+    const newTabList: any = intersectionBy(storageList, oraList, "release_num");
     // 需要删除的tab
     if (newTabList && newTabList.length) {
       const forDelete = storageList.filter((v: any) => {
@@ -258,11 +255,8 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
   };
   //获取发布列表
   const getTabsList = async (refresh: boolean = false) => {
-
-    debugger
     // 未发布的列表
     let oraList = await PreReleaseServices.releaseList();
-
     let newTabList: any;
 
     // 如果是历史记录，则只展示一个Tab,
@@ -293,7 +287,6 @@ const ProcessTab: React.FC = (props: any, ref: any) => {
       }
     }
 
-    debugger
     if (newTabList && newTabList.length) {
       const items = newTabList.map((it: any) => {
         return {

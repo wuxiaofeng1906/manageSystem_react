@@ -259,7 +259,7 @@ const ReleaseOrder = () => {
     });
   };
 
-  const onSaveBeforeCheck =async (isAuto = false) => {
+  const onSaveBeforeCheck = async (isAuto = false) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
@@ -750,6 +750,7 @@ const ReleaseOrder = () => {
                   pushType: (params: CellClickedEvent) => {
                     // 只有是SQL工单、接口工单或者新增行时
                     if (params.value === "DeployApi" || params.value === "SQL" || params.data?.addID) {
+                      debugger
                       return (
                         <Select
                           style={{
@@ -780,6 +781,7 @@ const ReleaseOrder = () => {
                           }}
                           size={'small'}
                           value={p.value}
+                          dropdownMatchSelectWidth={false} // 下拉框选项内容全部展示出来
                           options={releateOrderInfos.map((k: any) => ({
                             value: JSON.stringify(k.id),
                             label: k.label,

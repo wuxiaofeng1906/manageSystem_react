@@ -207,7 +207,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       setSpin(false);
       setTabsLocalStorage({
         "release_num": release_num,
-        "release_name": release_num + "正式发布",
+        "release_name": name,
         "newAdd": true
       });
 

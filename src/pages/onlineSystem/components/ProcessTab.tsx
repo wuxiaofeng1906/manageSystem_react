@@ -1,12 +1,13 @@
 import type {TabsProps} from 'antd';
 import {Tabs} from 'antd';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useImperativeHandle, forwardRef} from 'react';
 import {DndProvider, useDrag, useDrop} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
-import PreReleaseServices from "@/services/preRelease";
 import {history} from "@@/core/history";
 import {useParams} from "umi";
-import {errorMessage} from "@/publicMethods/showMessages";
+import PreReleaseServices from "@/services/preRelease";
+import {intersectionBy} from "lodash";
+import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 
 const type = 'DraggableTabNode';
 const {TabPane} = Tabs;
@@ -53,7 +54,7 @@ const DraggableTabNode = ({index, children, moveNode}: DraggableTabPaneProps) =>
 // 拖拽的功能
 const DraggableTabs: React.FC<TabsProps> = (props: any) => {
 
-  let {setTabList, tabList, activeKey}: any = props;
+  const {setTabList, tabList, activeKey}: any = props;
 
   // 移动tab时，获取移动后的id顺序
   const moveTabNode = async (dragKey: React.Key, hoverKey: React.Key) => {
@@ -76,31 +77,62 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
     tabOrder.splice(dragIndex, 1);
     // 后新增
     tabOrder.splice(hoverIndex, 0, dragedRow);
-    // 先请求后端保存数据，保存成功再设置
-
+    // 不再请求后端保存排序功能
     if (tabOrder && tabOrder.length > 0) {
-      const sortArr: any = []; // 保存数据传值到后端
-      tabOrder.map((it: any, index: number) => {
-        sortArr.push({
-          release_index: index + 1,
-          release_num: it.key
-        })
-      })
-      const saved = await PreReleaseServices.releaseOrder_own(sortArr);
-      if (saved.code === 200) {
-        setTabList(tabOrder);
-      } else {
-        errorMessage("顺序保存错误：" + saved.msg);
+      setTabList(tabOrder);
+      // 这里也要修改localstorage的数据
+      localStorage.setItem("onlineSystem_tab", JSON.stringify(tabOrder));
+    }
+
+    // if (tabOrder && tabOrder.length > 0) {
+    //   const sortArr: any = []; // 保存数据传值到后端
+    //   tabOrder.map((it: any, index: number) => {
+    //     sortArr.push({
+    //       release_index: index + 1,
+    //       release_num: it.key
+    //     })
+    //   })
+    //   const saved = await PreReleaseServices.releaseOrder_own(sortArr);
+    //   if (saved.code === 200) {
+    //     setTabList(tabOrder);
+    //     //   这里也要修改localstorage的数据
+    //     localStorage.setItem("onlineSystem_tab", JSON.stringify(tabOrder));
+    //
+    //   } else {
+    //     errorMessage("顺序保存错误：" + saved.msg);
+    //   }
+    // }
+  };
+
+  // 减少tab
+  const onEdit = (e: string, types: string) => {
+
+    if (types === "remove") {
+      const pageArray = [...tabList];
+      const exitedArray = pageArray.filter(item => item.key !== e);
+      setTabList(exitedArray);
+      const storages = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
+      const new_storages = storages.filter((item: any) => item.release_num !== e);
+      localStorage.setItem("onlineSystem_tab", JSON.stringify(new_storages));
+      //  减少缓存之后，需要删除当前页面，
+      // 如果删除的是当前所看的tab页。则下一个展示链接需要跳转到第一个
+      if (activeKey === e) {
+        const currentPage = new_storages[0];
+        let replaceUrl = `/onlineSystem/prePublish/${currentPage.release_num}/${currentPage.branch}/${currentPage.is_delete}/${currentPage.release_name}`;
+        if (currentPage.release_type == 'backlog_release') {  // 灰度推生产
+          replaceUrl = `/onlineSystem/releaseOrder/${currentPage.release_num}/${currentPage.is_delete}/${currentPage.release_name}`;
+        }
+        history.replace(replaceUrl);
       }
     }
   };
-
   // 重新获得Tabs顺序
   const getRealSort = () => {
+
     const pageArray = [...tabList];
-    let oraData: any = [];
+    const oraData: any = [];
     pageArray.forEach((page: any) => {
-      oraData.push(<TabPane tab={page.label} key={page.key} closable={false}/>)
+      oraData.push(<TabPane tab={page.label} key={page.key} closable={pageArray.length > 1 ? true : false}/>)
     });
     return oraData;
   }
@@ -118,6 +150,7 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
 
   // 切换tab
   const onTabChange = (v: any) => {
+
     // 跳转链接需要找到下一个数据的subtab和tab
     const p = tabList.find((e: any) => {
       return e.release_num === v
@@ -138,6 +171,7 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
         renderTabBar={renderTabBar}
         type="editable-card"
         hideAdd={true}
+        onEdit={onEdit}
       >
         {getRealSort()}
       </Tabs>
@@ -145,43 +179,138 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
   );
 };
 
-
-export const ProcessTab: React.FC = (props: any) => {
+const ProcessTab: React.FC = (props: any, ref: any) => {
 
   // tab的数据
   const [tabList, setTabList] = useState<any>([]);
-  const {release_num, release_name} = useParams() as { release_num: string; release_name: string }; // 非积压发布获取参数
+  let {release_num, release_name} = useParams() as { release_num: string; release_name: string }; // 非积压发布获取参数
   const {id} = useParams() as { id: string; }; // 灰度推线上获取参数
 
+  if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) { //  releaseOrder 的工单编号不是release_num
+    release_num = id;
+  }
 
-  //获取发布列表
-  const getTabsList = async () => {
-    // effect 中调用异步信息时间延迟可能导致最终获取的数据不正确。
-    let tabList = await PreReleaseServices.releaseList();
-    // 如果是历史记录，则只展示一个Tab
-    if (props.finished) {
-      const path = history.location.pathname;
-      if (path.includes("/onlineSystem/releaseOrder/")) { //  releaseOrder 的工单编号不是release_num
-        tabList = [{release_num: id, release_name}];
-      } else {
-        tabList = [{release_num, release_name}];
+  // 获取需要展示的tab
+  const getFinalTabList = async (oraList: any) => {
+    // 也要获取列表数据，取交集。才得到最终Tab展示的数据。并且删除不存在的缓存
+    let storageList = JSON.parse(localStorage.getItem("onlineSystem_tab") as string);
+    const newTabList: any = intersectionBy(storageList, oraList, "release_num");
+    // 需要删除的tab
+    if (newTabList && newTabList.length) {
+      const forDelete = storageList.filter((v: any) => {
+        return newTabList.every((e: any) => e.release_num != v.release_num);
+      });
+      if (forDelete && forDelete.length) {
+        forDelete.map((e: any) => {
+          setTabsLocalStorage({
+            "release_num": e.release_num,
+            "release_name": e.release_name,
+          }, "delete");
+        })
       }
     }
 
-    const items = tabList.map((it: any) => {
-      return {
-        ...it,
-        label: it.release_name,
-        key: it.release_num
-      };
+    // 是通过别人的链接进来的，本地缓存可能没有数据，就要手动添加到Tablist中
+    // 判断当前单号是否存在newTabList中，不存在需要添加进去
+    const filterdArray = newTabList.filter((e: any) => {
+      return e.release_num === release_num;
     });
-    setTabList(items);
+
+    // 不存在。则添加
+    if (!filterdArray || filterdArray.length == 0) {
+      const detailsData = oraList.filter((e: any) => {
+        return e.release_num === release_num;
+      });
+      if (detailsData && detailsData.length > 0) {
+        const item = detailsData[0];
+        newTabList.push(item);
+
+        // 并添加到缓存
+        setTabsLocalStorage({
+          "release_num": item.release_num,
+          "release_name": item.release_name,
+          "branch": item.branch,
+          "is_delete": item.is_delete,
+          "release_type": item.release_type,
+        });
+      }
+    }
+
+    return newTabList;
   };
+
+  // 判断当前单号是否为发布成功
+  const releaseFinshed = (oraList: any) => {
+    //  灰度推线上，新增的时候预发布列表还没有存在这条记录
+    if (release_name === "undefined") {
+      return false;
+    }
+    //   不能用单据原有的finished参数，多次渲染导致展示效果不好
+    //   这里只需要判断当前单号是否在未发布的列表中，如果不在，那就是历史记录
+    let finished = true;
+    if (oraList && oraList.length) {
+      oraList.forEach((e: any) => {
+        if (e.release_num === release_num) {
+          finished = false;
+        }
+      });
+    }
+    return finished;
+  };
+  //获取发布列表
+  const getTabsList = async (refresh: boolean = false) => {
+    // 未发布的列表
+    let oraList = await PreReleaseServices.releaseList();
+    let newTabList: any;
+
+    // 如果是历史记录，则只展示一个Tab,
+    if (releaseFinshed(oraList)) {
+      newTabList = [{release_num, release_name}];
+    } else {
+      newTabList = await getFinalTabList(oraList);
+
+      if (history.location.pathname.includes("/onlineSystem/releaseOrder/")) {
+        // 判断当前page是否为正式发布的新增页面，是的话需要添加到tabLst中展示出来（灰度推生产在创建的时候没有放到缓存，因为这里不点击保存，数据库就没这条记录，就不必在缓存中。
+        // 这里不用判断非积压发布的新增，因为非积压发布在新增的时候默认数据库就会有记录，在建立的时候就必须加入缓存）
+        // 如果是新增的话，正式发布的工单名称为空  刷新的时候不再判断是否为新增项
+        if (release_name === "undefined" && !refresh) {
+
+          if (newTabList && newTabList.length) {
+            newTabList.push({
+              release_num,
+              release_name: release_num + "灰度推生产"
+            })
+          } else {
+            newTabList = [{
+              release_num,
+              release_name: release_num + "灰度推生产"
+            }]
+          }
+
+        }
+      }
+    }
+
+    if (newTabList && newTabList.length) {
+      const items = newTabList.map((it: any) => {
+        return {
+          ...it,
+          label: it.release_name,
+          key: it.release_num
+        };
+      });
+      setTabList(items);
+    }
+
+  };
+
+  useImperativeHandle(ref, () => ({onTabsRefresh: getTabsList}));
+
 
   useEffect(() => {
     getTabsList();
 
-  }, [release_num, id, props.finished]);
+  }, [release_num, id]);
 
 
   return (
@@ -193,4 +322,5 @@ export const ProcessTab: React.FC = (props: any) => {
   )
 };
 
+export default forwardRef(ProcessTab);
 

@@ -435,7 +435,6 @@ const PopupCard: React.FC<any> = (props: any) => {
   };
 
   // useEffect(() => {
-  //   debugger
   //   try {
   //     // 按照轮播页数减少anPopData中的数据
   //     const head = {...commonData};

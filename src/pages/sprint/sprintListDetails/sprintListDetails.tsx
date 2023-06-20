@@ -101,7 +101,7 @@ const SprintList: React.FC<any> = () => {
   const [envs] = useModel('env', (env) => [env.globalEnv]);
   const {prjId, prjNames, prjType, showTestConfirmFlag, ztId} = getProjectInfo();
   const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [testSelectorDisabled, setTestSelectorDisabled] = useState(false);
+  const [testSelectorShow, setTestSelectorShow] = useState(false);
   // 不满足移除的数据
   const [dissatisfy, setDissatisfy] = useState<any[]>([]);
   // 获取所有的班车所属执行
@@ -284,13 +284,15 @@ const SprintList: React.FC<any> = () => {
       setShowReason(false);
     } else setShowReason(filterData?.some((it) => !isEmpty(it.nobaseDesc)));
     gridApi.current?.setRowData(filterData);
+    if (gird_filter_condition && gird_filter_condition.length) {
+      // 过滤表格自带条件
+      const hardcodedFilter = {};
+      gird_filter_condition.forEach((ele: any) => {
+        hardcodedFilter[ele.column] = {type: 'set', values: ele.filterValue};
+      });
+      gridApi.current?.setFilterModel(hardcodedFilter);
+    }
 
-    // 过滤表格自带条件
-    const hardcodedFilter = {};
-    gird_filter_condition.forEach((ele: any) => {
-      hardcodedFilter[ele.column] = {type: 'set', values: ele.filterValue};
-    });
-    gridApi.current?.setFilterModel(hardcodedFilter);
 
     // 还要设置title
     const countRt = calTypeCount(getFilteredGridData());
@@ -337,7 +339,11 @@ const SprintList: React.FC<any> = () => {
       ztId,
     );
     ora_filter_data = datas?.result;
-    setData(datas);
+
+    setData({
+      ...data,
+      resCount: datas.resCount
+    });
     onSelectChanged();
   };
 
@@ -1262,14 +1268,15 @@ const SprintList: React.FC<any> = () => {
 
   // 批量修改测试
   const testConfirmSelect = async (params: any) => {
-    const flag = await checkTestValid();
+    // 前面已验证，无需再验一遍
+    // const flag = await checkTestValid();
     if (judgingSelectdRow()) {
       setTestConfirm(params);
-      if (flag) {
-        setTestConfirm(undefined);
-        infoMessage('已基线，不能修改');
-        return;
-      }
+      // if (flag) {
+      //   setTestConfirm(undefined);
+      //   infoMessage('已基线，不能修改');
+      //   return;
+      // }
       modFlowStage('testConfirmed', params);
     }
   };
@@ -1360,7 +1367,7 @@ const SprintList: React.FC<any> = () => {
     setRefreshItem(true);
     const result = await syncDetailsData(prjId);
     if (result.ok === true) {
-      updateGrid();
+      await updateGrid();
       sucMessage('项目详情同步成功！');
     } else {
       errorMessage(`错误：${result.message}`);
@@ -1373,16 +1380,22 @@ const SprintList: React.FC<any> = () => {
     initialState?.currentUser?.authority?.find((it: any) => +it?.id == 149)?.id == 149;
   // 验证是否可批量 修改测试确认
   const checkTestValid = async () => {
+    debugger
+    //  是班车才调用接口获取是否可以测试确认
+    if (!prjNames.startsWith("sprint")) {
+      setTestSelectorShow(false);
+      return false;
+    }
     try {
-      await SprintDetailServices.checkUpdateTest({
+      const result = await SprintDetailServices.checkUpdateTest({
         execName: prjNames,
         currAt: moment().format('YYYY-MM-DD HH:mm:ss'),
       });
-      setTestSelectorDisabled(false);
-      return false;
-    } catch (e) {
-      setTestSelectorDisabled(e.ok == false);
-      return e.ok == false;
+      setTestSelectorShow(result.ok);
+      return result.ok;
+    } catch (e: any) {
+      setTestSelectorShow(e.ok);
+      return e.ok;
     }
   };
 
@@ -1429,8 +1442,11 @@ const SprintList: React.FC<any> = () => {
   };
   useEffect(() => {
     getNextSprint();
-    checkTestValid();
   }, []);
+
+  useEffect(() => {
+    checkTestValid();
+  }, [prjNames]);
 
   // useEffect(() => {
   //
@@ -1449,6 +1465,7 @@ const SprintList: React.FC<any> = () => {
   const marginTopHeight = {marginTop: -15};
 
   const renderTestSelect = useCallback(() => {
+
     return (
       <Select
         placeholder="请选择"
@@ -1457,11 +1474,11 @@ const SprintList: React.FC<any> = () => {
           marginLeft: '5px',
           width: '85px',
           marginTop: '4px',
-          display: judgeAuthority(`修改"测试已确认"字段`) === true ? 'inline' : 'none',
+          display: judgeAuthority(`修改"测试已确认"字段`) === true && testSelectorShow === true ? 'inline' : 'none',
         }}
         size={'small'}
         onChange={testConfirmSelect}
-        disabled={testSelectorDisabled}
+        // disabled={testSelectorShow}
       >
         {[
           <Option key={'1'} value={'1'}>
@@ -1473,7 +1490,7 @@ const SprintList: React.FC<any> = () => {
         ]}
       </Select>
     );
-  }, [testSelectorDisabled, testConfirm]);
+  }, [testSelectorShow, testConfirm]);
 
   useEffect(() => {
     Modal.destroyAll();
@@ -1491,7 +1508,13 @@ const SprintList: React.FC<any> = () => {
   };
   const onTabChange = (v: number) => {
     formForQuery.resetFields();
-    const current = tabs?.find((it: any) => it.projectid == v);
+    let current = tabs?.find((it: any) => it.projectid == v);
+    if (current.ztId === null) {
+      current = {
+        ...current,
+        ztId: "null"
+      }
+    }
     history.replace({pathname: history.location.pathname, query: current});
   };
 
@@ -1819,12 +1842,12 @@ const SprintList: React.FC<any> = () => {
               <label
                 style={{
                   marginTop: '5px',
-                  display: judgeAuthority(`修改"测试已确认"字段`) === true ? 'inline' : 'none',
+                  display: judgeAuthority(`修改"测试已确认"字段`) === true && testSelectorShow === true ? 'inline' : 'none',
                 }}
               >
                 测试确认:
               </label>
-              {testSelectorDisabled ? (
+              {!testSelectorShow ? (
                 <Tooltip title={'已基线，不能修改'}>{renderTestSelect()}</Tooltip>
               ) : (
                 renderTestSelect()

@@ -27,14 +27,19 @@ import usePermission from '@/hooks/permission';
 import ICluster from '@/components/ICluster';
 import {pushType} from "@/pages/onlineSystem/config/constant";
 import {isTestService} from "@/publicMethods/webMethod";
-import {vertifyClusterStatus} from "../commonFunction";
-import {ProcessTab} from "@/pages/onlineSystem/components/ProcessTab";
+import {setTabsLocalStorage, vertifyClusterStatus} from "../commonFunction";
+import ProcessTab from "@/pages/onlineSystem/components/ProcessTab";
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 let releateOrderInfo: any = {
   SQL: [],
   INTER: []
 }; // 用于保存由推送类型获取的工单信息（ag-grid中的渲染用state无用）
+
+let agCompareData: any = {
+  opsData: [],
+  alpha: []
+} //  被对比的数据-处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
   const {id, is_delete} = useParams() as { id: string, is_delete: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -83,7 +88,8 @@ const ReleaseOrder = () => {
       window.onresize = null;
     };
   }, [id]);
-
+  // Tab 标签页的名字刷新
+  const ref = useRef() as React.MutableRefObject<{ onTabsRefresh: Function; }>;
 
   const getBaseList = async () => {
     /* 注意：ag-grid中，列的渲染是没法用usestate中的数据来进行动态渲染的，解决方案：需要定义一个全局变量来动态记录需要改变的数据，渲染中使用这个全局变量 */
@@ -152,6 +158,7 @@ const ReleaseOrder = () => {
       if (isEmpty(values.cluster)) {
         setOrderData([]);
         setCompareData({opsData: [], alpha: []});
+        agCompareData = {opsData: [], alpha: []};
         setSpinning(false);
         return;
       }
@@ -173,7 +180,23 @@ const ReleaseOrder = () => {
     // 手动在表单里面加的数据不进行对比。这里要进行过滤
     let rdOrigin: any = [];
     rdOriginDt.forEach((e: any) => {
-      if (e.repair_order_type !== "DeployApi" && e.repair_order_type !== "SQL") rdOrigin.push(e);
+      if (e.repair_order_type === "DeployApi" || e.repair_order_type === "SQL") {
+        debugger
+        const {label, repair_order_type, ready_release_name} = e;
+        if (label) {
+          // 解析出 repair_order和project;
+          const alls = label.split("id:")[1];
+          const info = alls.split("(title:");
+          rdOrigin.push({
+            repair_order: info[0],
+            project: info[1].replaceAll(")", "").trim(),
+            repair_order_type,
+            ready_release_name
+          })
+        }
+      } else {
+        rdOrigin.push(e)
+      }
     })
 
     let ops = opsOrigin;
@@ -183,6 +206,7 @@ const ReleaseOrder = () => {
     }
     if (isEmpty(ops) && isEmpty(rdOrigin)) {
       setCompareData({opsData: [], alpha: []});
+      agCompareData = {opsData: [], alpha: []};
       return;
     }
     let mergeArr: any[] = [];
@@ -246,6 +270,7 @@ const ReleaseOrder = () => {
     }
 
     setCompareData({opsData: ops, alpha: mergeArr});
+    agCompareData = {opsData: ops, alpha: mergeArr};
   };
 
   const initForm = () => {
@@ -329,7 +354,11 @@ const ReleaseOrder = () => {
                   },
                   false,
                 );
-              } else await onSave();
+              } else {
+                await onSave();
+              }
+              //   清除Tab缓存
+              setTabsLocalStorage({release_num: id ?? ''}, "delete");
             } catch (e) {
               setConfirmDisabled(false);
             }
@@ -363,6 +392,13 @@ const ReleaseOrder = () => {
     }
     if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
 
+    // 过滤掉工单-表单设置（orderData）手动添加的空行
+
+    let filteredOrder: any = [];
+    if (orderData && orderData.length) {
+      filteredOrder = orderData.filter((e: any) => e.ready_release_name !== "" && e.repair_order_type !== "");
+    }
+
     await PreReleaseServices.saveOrder({
       release_num: id, // 发布编号
       user_id: user?.userid ?? '',
@@ -370,14 +406,23 @@ const ReleaseOrder = () => {
       person_duty_num: order.person_duty_num,
       announcement_num: order.announcement_num ?? '',
       release_type: 'backlog_release',
-      rd_repair_data: orderData ?? [],
+      rd_repair_data: filteredOrder,
       release_way: order.release_way ?? '',
       ops_repair_data: compareData?.opsData ?? [],
       release_result: order.release_result ?? 'unknown',
       cluster: base.cluster?.join(',') ?? '',
-      ready_release_num: orderData?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
+      ready_release_num: filteredOrder?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
       plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
     });
+    setTabsLocalStorage({
+      "release_num": id,
+      "release_name": base.release_name?.trim() ?? '',
+      "is_delete": false,
+      "release_type": 'backlog_release',
+      // "newAdd": true
+    });
+    // 修改后要刷新Tab
+    await ref.current?.onTabsRefresh(true);
     // 更新详情
     if (!jump) {
       getOrderDetail();
@@ -419,6 +464,8 @@ const ReleaseOrder = () => {
         });
       }
       setVisible(false);
+      //   清除Tab缓存
+      setTabsLocalStorage({release_num: id ?? ''}, "delete");
       history.replace('/onlineSystem/releaseProcess');
     }
   };
@@ -433,6 +480,8 @@ const ReleaseOrder = () => {
 
     setOrderData(newDt);
     gridRef.current?.setRowData(newDt)
+    //   还要刷新工单核对检查
+    formatCompare(agCompareData?.opsData ?? [], newDt);
   };
 
   // 永久删除积压工单
@@ -494,7 +543,7 @@ const ReleaseOrder = () => {
               ?.getRenderedNodes()
               ?.map((it) => it.data)
               ?.filter((obj) => !isEqual(obj, p.data)) || [];
-          await formatCompare(compareData?.opsData || [], result);
+          await formatCompare(agCompareData?.opsData || [], result);
           setOrderData(result);
           setConfirmDisabled(false);
         },
@@ -576,12 +625,14 @@ const ReleaseOrder = () => {
 
     gridRef.current?.setRowData(dt);
     setOrderData(dt);
-  };
 
+    //   还要刷新工单核对检查
+    formatCompare(agCompareData?.opsData ?? [], dt);
+  };
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <PageContainer title={<ProcessTab finished={finished}/>}>
+      <PageContainer title={<ProcessTab finished={finished} ref={ref}/>}>
         <div className={styles.releaseOrder}>
           <div className={styles.header}>
             <div className={styles.title}>工单基本信息</div>
@@ -750,6 +801,7 @@ const ReleaseOrder = () => {
                   pushType: (params: CellClickedEvent) => {
                     // 只有是SQL工单、接口工单或者新增行时
                     if (params.value === "DeployApi" || params.value === "SQL" || params.data?.addID) {
+                      debugger
                       return (
                         <Select
                           style={{
@@ -780,6 +832,7 @@ const ReleaseOrder = () => {
                           }}
                           size={'small'}
                           value={p.value}
+                          dropdownMatchSelectWidth={false} // 下拉框选项内容全部展示出来
                           options={releateOrderInfos.map((k: any) => ({
                             value: JSON.stringify(k.id),
                             label: k.label,

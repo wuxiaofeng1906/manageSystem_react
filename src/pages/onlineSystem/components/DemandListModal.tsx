@@ -15,6 +15,7 @@ import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessage
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
+import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 
 const {TextArea} = Input;
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
@@ -155,7 +156,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
     // 灰度发布
     if (!isPreRelease) {
+
       setSpin(false);
+      // 这里不能加入灰度推生产的缓存，只有在点击保存后才有本张单据的缓存。
+      // setTabsLocalStorage({
+      //   "release_num": release_num,
+      //   "release_name": release_num + "灰度推生产",
+      //   "newAdd": true
+      // });
       props.onOk?.({...baseData, release_num});
       return;
     }
@@ -197,6 +205,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     try {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
+      setTabsLocalStorage({
+        "release_num": release_num,
+        "release_name": name,
+        "newAdd": true
+      });
+
       props.onOk?.({...baseData, release_num});
     } catch (e) {
       errorMessage('接口异常');

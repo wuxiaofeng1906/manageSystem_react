@@ -178,7 +178,7 @@ const SheetInfo = (props: any, ref: any) => {
       const batch = await OnlineSystemServices.getBatchVersion({release_num});
       agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
 
-      // 工单信息的初始化数据
+      // 工单信息的初始化数据(获取界面数据，被删除也要展示)
       let param: any = {release_num, include_deleted: true};
       // if (globalState.finished) {
       //   param = {release_num, include_deleted: true}
@@ -213,7 +213,8 @@ const SheetInfo = (props: any, ref: any) => {
             : [],
         need_auto: basicInfo?.need_auto || undefined,
       });
-      agFinished = is_delete === "true" ? true : !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
+
+      agFinished = basicInfo.is_delete ? true : !isEmpty(basicInfo?.release_result?.trim()) && basicInfo?.release_result !== 'unknown';
 
       setDraft(res?.status !== 'save');
       setGlobalState({

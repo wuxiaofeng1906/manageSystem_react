@@ -119,10 +119,10 @@ const ReleaseOrder = () => {
   const getOrderDetail = async (clusterMap = clusters) => {
     try {
       setSpinning(true);
-      let params: any = {release_num: id};
-      if (is_delete === "true") {
-        params = {...params, include_deleted: true};
-      }
+      const params: any = {release_num: id, include_deleted: true};
+      // if (is_delete === "true") {
+      //   params = {...params, include_deleted: true};
+      // }
       const res = await PreReleaseServices.orderDetail(params);
       if (isEmpty(res)) {
         initForm();
@@ -139,7 +139,7 @@ const ReleaseOrder = () => {
         ...res,
         cluster: res.cluster ?? [],
       });
-      agFinished = is_delete === "true" ? true : res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
+      agFinished = res.is_delete ? true : res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
       setFinished(agFinished);
       setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);

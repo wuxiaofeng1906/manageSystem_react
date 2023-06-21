@@ -765,7 +765,10 @@ const ReleaseOrder = () => {
                     )}
                     style={{width: '100%'}}
                     mode={'multiple'}
-                    onChange={onLinkTable}
+                    // onChange={onLinkTable}
+                    // 失去焦点的时候再查询，点一个查一个，太耗时了
+                    onBlur={onLinkTable}
+                    onDeselect={onLinkTable}
                   />
                 </Form.Item>
               </Col>

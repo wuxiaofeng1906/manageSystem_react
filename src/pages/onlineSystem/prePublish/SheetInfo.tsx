@@ -10,7 +10,7 @@ import {
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
-import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
+import {errorMessage} from '@/publicMethods/showMessages';
 import {useModel} from '@@/plugin-model/useModel';
 import {getDevOpsOrderColumn, PublishSeverColumn, PublishUpgradeColumn} from '@/pages/onlineSystem/config/column';
 import {
@@ -24,7 +24,7 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
-import {isEmpty, omit, isString, pick, difference, isEqual, intersection} from 'lodash';
+import {isEmpty, omit, isString, pick, isEqual} from 'lodash';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
@@ -38,11 +38,11 @@ let databaseVersion: any[] = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
-  const {release_num, is_delete} = useParams() as { release_num: string, is_delete: string };
+  const {release_num} = useParams() as { release_num: string };
   const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [envs] = useModel('env', (env) => [env.globalEnv]);
-  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft, getReleaseInfo, basic, api] =
+  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft] =
     useModel('onlineSystem', (online) => [online.globalState, online.sqlList,
       online.draft, online.setGlobalState, online.getLogInfo, online.setDraft, online.getReleaseInfo, online.basic, online.api]);
   const {devOpsOrderInfo, getDevOpsOrderInfo} = useModel('onlineSystem');
@@ -81,7 +81,7 @@ const SheetInfo = (props: any, ref: any) => {
   ]);
 
   const onSave = async (flag = false) => {
-    if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
+    if (isEmpty(upgradeData)) return errorMessage('工单基础信息获取异常，请刷新重试');
     // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
     //       ...it,
     //       concurrent: it.concurrent ?? 20,
@@ -150,7 +150,7 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const onDrag = async () => {
-    if (agFinished) return infoMessage('已标记发布结果不能修改工单顺序!');
+    if (agFinished) return errorMessage('已标记发布结果不能修改工单顺序!');
     if (!leaveShow) setLeaveShow(true);
   };
 
@@ -336,7 +336,7 @@ const SheetInfo = (props: any, ref: any) => {
     }
     if (showErrTip) {
       orderForm.setFieldsValue({release_result: null});
-      return infoMessage(showErrTip);
+      return errorMessage(showErrTip);
     }
 
     // 发布结果为空，直接保存

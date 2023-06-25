@@ -41,7 +41,7 @@ let agCompareData: any = {
   alpha: []
 } //  被对比的数据-处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
-  const {id, is_delete} = useParams() as { id: string, is_delete: string };
+  const {id} = useParams() as { id: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const [envList] = useModel('env', (env) => [env.releaseOrderEnv]);
@@ -65,7 +65,7 @@ const ReleaseOrder = () => {
   const [clusters, setClusters] = useState<any>(); // 所有组合集群
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   // const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
-
+  let releaseEnvOpend = false; // 发布环境下拉框是否为展开的状态
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
     params.api.sizeColumnsToFit();
@@ -768,7 +768,16 @@ const ReleaseOrder = () => {
                     // onChange={onLinkTable}
                     // 失去焦点的时候再查询，点一个查一个，太耗时了
                     onBlur={onLinkTable}
-                    onDeselect={onLinkTable}
+                    onDeselect={() => {
+                      // 在下拉框中取消选中项，不直接调用onLinkTable方法。只有在下拉框为关闭状态才调用onLinkTable方法,
+                      if (!releaseEnvOpend) {
+                        onLinkTable();
+                      }
+                    }}
+                    onDropdownVisibleChange={(e: boolean) => { // 下拉框是否展开
+                      // 用于记录下拉框展示的状态，用于onDeselect是否调用onLinkTable方法
+                      releaseEnvOpend = e;
+                    }}
                   />
                 </Form.Item>
               </Col>

@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Form, Select, DatePicker, Spin, Col, Row} from 'antd';
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi, GridReadyEvent} from 'ag-grid-community';
-import {releaseListColumn} from '@/pages/onlineSystem/releaseProcess/column';
+import {historyReleaseListColumn} from '@/pages/onlineSystem/releaseProcess/column';
 import IPagination from '@/components/IPagination';
 import PreReleaseServices from '@/services/preRelease';
 import {useLocation} from 'umi';
@@ -117,7 +117,7 @@ const HistoryList = ({height}: { height: number }) => {
         style={{height: height - 150, width: '100%', marginTop: 8}}
       >
         <AgGridReact
-          columnDefs={releaseListColumn('history')}
+          columnDefs={historyReleaseListColumn()}
           rowData={rowData}
           defaultColDef={{
             resizable: true,

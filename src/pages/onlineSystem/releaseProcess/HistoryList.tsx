@@ -9,7 +9,7 @@ import {useLocation} from 'umi';
 import {isEmpty} from 'lodash';
 import moment from 'moment';
 import {history} from '@@/core/history';
-import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
+import "./index.less";
 
 const HistoryList = ({height}: { height: number }) => {
   const gridRef = useRef<GridApi>();
@@ -43,6 +43,77 @@ const HistoryList = ({height}: { height: number }) => {
     setOrders(order?.flatMap((num: string) => (num ? [{label: num, value: num, key: num}] : [])));
   };
 
+  // 处理失败和成功的数据
+  const dealRows = (res: any) => {
+    const testData = [{
+      "sortNo": 1,
+      "story": "",
+      "release_num": "202306280003",
+      "release_name": "202306280003灰度发布",
+      "project": [
+        {
+          "pro_name": "emergency20230625",
+          "pro_id": "2709"
+        }
+      ],
+      "branch": "emergency20230625",
+      "repair_order": null,
+      "release_type": "ready_release",
+      "release_way": "keep_server",
+      "release_env": "宁夏灰度集群0",
+      "cluster": [
+        "cn-northwest-0"
+      ],
+      "plan_release_time": "2023-06-28 10:00:00",
+      "release_index": 473,
+      "person_duty_num": null,
+      "announcement_num": null,
+      "apps": "h5,web,authapp",
+      "project_manager": "李小雷",
+      "release_result": "success",
+      "baseline_cluster": "",
+      "is_delete": false,
+      rowSpan: 2
+    },
+      {
+        "story": "",
+        "release_num": "202306280003",
+        "release_name": "202306280003灰度发布",
+        "project": [
+          {
+            "pro_name": "emergency20230625",
+            "pro_id": "2709"
+          }
+        ],
+        "branch": "emergency20230625",
+        "repair_order": null,
+        "release_type": "ready_release",
+        "release_way": "keep_server",
+        "release_env": "宁夏灰度集群1",
+        "cluster": [
+          "cn-northwest-0"
+        ],
+        "plan_release_time": "2023-06-28 10:00:00",
+        "release_index": 473,
+        "person_duty_num": null,
+        "announcement_num": null,
+        "apps": "h5,web,authapp",
+        "project_manager": "李小雷",
+        "release_result": "failure",
+        "baseline_cluster": "",
+        "is_delete": false
+      }
+    ];
+
+
+    setRowData(
+      testData.map((it: any) => ({
+        ...it,
+        project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
+      })) ?? [],
+    );
+  };
+
   const getTableList = async (page = 1, page_size = pages.page_size) => {
     try {
       setSpinning(true);
@@ -59,12 +130,8 @@ const HistoryList = ({height}: { height: number }) => {
           ? ''
           : moment(values.time?.[1]).endOf('d').format('YYYY-MM-DD HH:mm:ss'),
       });
-      setRowData(
-        res.data?.map((it: any) => ({
-          ...it,
-          project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
-        })) ?? [],
-      );
+
+      dealRows(res);
       setPages({page: res.page, total: res.total, page_size: res.page_size});
       setSpinning(false);
     } catch (e) {
@@ -130,6 +197,7 @@ const HistoryList = ({height}: { height: number }) => {
           headerHeight={30}
           onGridReady={onGridReady}
           onGridSizeChanged={onGridReady}
+          suppressRowTransform={true}
           frameworkComponents={{
             link: (p: CellClickedEvent) => {
               return (

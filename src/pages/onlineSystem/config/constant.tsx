@@ -330,7 +330,8 @@ export const checkInfo = [
     desc: "remark"
   },
   {
-    check_type: 'web/h5部署时是否勾选自动化测试参数',
+    // check_type: 'web/h5部署时是否勾选自动化测试参数',
+    check_type: 'authapp/web部署时是否勾选自动化测试参数',
     side: 'public',
     status: 'automation_check',
     start: 'check_start_time',

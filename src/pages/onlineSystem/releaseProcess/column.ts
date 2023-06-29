@@ -103,13 +103,13 @@ const rowSpanMethod = {
   rowSpan: (params: any) => params.data.rowSpan ?? 1,
   cellClassRules: {
     // 不一样的合并值，用不一样的渲染方式
-    // 'history-cell-span-1': (param: any) => {
-    //   // 不合并的时候，只画右边的线条。
-    //   return param.data.rowSpan !== 2;
-    // },
+    'history-cell-span-1': (param: any) => {
+      // 只有在计划发布时间字段的时候，只画右边的线条。
+      return param.colDef.field === "plan_release_time";
+    },
 
     'history-cell-span-2': (param: any) => {
-      // 合并的时候画右边和下面的线条
+      // 合并的时候画底部的线条
       return param.data.rowSpan === 2;
     },
     'history-cell-color-single': (param: any) => {
@@ -124,7 +124,7 @@ const rowSpanMethod = {
 }
 
 const noRowSpanMethod = {
-  rowSpan: (params: any) => 1,
+  rowSpan: () => 1,
   cellClassRules: {
 
     'history-cell-color-single': (param: any) => {

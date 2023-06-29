@@ -102,6 +102,62 @@ const HistoryList = ({height}: { height: number }) => {
         "release_result": "failure",
         "baseline_cluster": "",
         "is_delete": false
+      }, {
+        "sortNo": 2,
+        "story": "",
+        "release_num": "202306280003",
+        "release_name": "202306280003灰度发布",
+        "project": [
+          {
+            "pro_name": "emergency20230625",
+            "pro_id": "2709"
+          }
+        ],
+        "branch": "emergency20230625",
+        "repair_order": null,
+        "release_type": "ready_release",
+        "release_way": "keep_server",
+        "release_env": "宁夏灰度集群1",
+        "cluster": [
+          "cn-northwest-0"
+        ],
+        "plan_release_time": "2023-06-28 10:00:00",
+        "release_index": 473,
+        "person_duty_num": null,
+        "announcement_num": null,
+        "apps": "h5,web,authapp",
+        "project_manager": "李小雷",
+        "release_result": "unknown",
+        "baseline_cluster": "",
+        "is_delete": true
+      }, {
+        "sortNo": 3,
+        "story": "",
+        "release_num": "202306280003",
+        "release_name": "202306280003灰度发布",
+        "project": [
+          {
+            "pro_name": "emergency20230625",
+            "pro_id": "2709"
+          }
+        ],
+        "branch": "emergency20230625",
+        "repair_order": null,
+        "release_type": "ready_release",
+        "release_way": "keep_server",
+        "release_env": "宁夏灰度集群1",
+        "cluster": [
+          "cn-northwest-0"
+        ],
+        "plan_release_time": "2023-06-28 10:00:00",
+        "release_index": 473,
+        "person_duty_num": null,
+        "announcement_num": null,
+        "apps": "h5,web,authapp",
+        "project_manager": "李小雷",
+        "release_result": "unknown",
+        "baseline_cluster": "",
+        "is_delete": true
       }
     ];
 
@@ -189,7 +245,7 @@ const HistoryList = ({height}: { height: number }) => {
           defaultColDef={{
             resizable: true,
             filter: true,
-            flex: 1,
+            // flex: 1,
             suppressMenu: true,
             cellStyle: {'line-height': '28px'},
           }}

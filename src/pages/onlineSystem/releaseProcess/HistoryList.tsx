@@ -45,36 +45,37 @@ const HistoryList = ({height}: { height: number }) => {
 
   // 处理失败和成功的数据
   const dealRows = (res: any) => {
-    const testData = [{
-      "sortNo": 1,
-      "story": "",
-      "release_num": "202306280003",
-      "release_name": "202306280003灰度发布",
-      "project": [
-        {
-          "pro_name": "emergency20230625",
-          "pro_id": "2709"
-        }
-      ],
-      "branch": "emergency20230625",
-      "repair_order": null,
-      "release_type": "ready_release",
-      "release_way": "keep_server",
-      "release_env": "宁夏灰度集群0",
-      "cluster": [
-        "cn-northwest-0"
-      ],
-      "plan_release_time": "2023-06-28 10:00:00",
-      "release_index": 473,
-      "person_duty_num": null,
-      "announcement_num": null,
-      "apps": "h5,web,authapp",
-      "project_manager": "李小雷",
-      "release_result": "success",
-      "baseline_cluster": "",
-      "is_delete": false,
-      rowSpan: 2
-    },
+    const testData = [
+      {
+        "sortNo": 1,
+        "story": "",
+        "release_num": "202306280003",
+        "release_name": "202306280003灰度发布",
+        "project": [
+          {
+            "pro_name": "emergency20230625",
+            "pro_id": "2709"
+          }
+        ],
+        "branch": "emergency20230625",
+        "repair_order": null,
+        "release_type": "ready_release",
+        "release_way": "keep_server",
+        "release_env": "宁夏灰度集群0",
+        "cluster": [
+          "cn-northwest-0"
+        ],
+        "plan_release_time": "2023-06-28 10:00:00",
+        "release_index": 473,
+        "person_duty_num": null,
+        "announcement_num": null,
+        "apps": "h5,web,authapp",
+        "project_manager": "李小雷",
+        "release_result": "success",
+        "baseline_cluster": "",
+        "is_delete": false,
+        rowSpan: 2
+      },
       {
         "story": "",
         "release_num": "202306280003",
@@ -168,6 +169,13 @@ const HistoryList = ({height}: { height: number }) => {
         project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
       })) ?? [],
     );
+
+    // setRowData(
+    //   res.data.map((it: any) => ({
+    //     ...it,
+    //     project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
+    //   })) ?? [],
+    // );
   };
 
   const getTableList = async (page = 1, page_size = pages.page_size) => {
@@ -256,6 +264,12 @@ const HistoryList = ({height}: { height: number }) => {
           suppressRowTransform={true}
           frameworkComponents={{
             link: (p: CellClickedEvent) => {
+              let marginStyle = {
+                marginTop: 0
+              }
+              if (p.data?.rowSpan === 2) {
+                marginStyle.marginTop = 15;
+              }
               return (
                 <div
                   style={{
@@ -264,6 +278,7 @@ const HistoryList = ({height}: { height: number }) => {
                     width: '100%',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
+                    ...marginStyle
                   }}
                   onClick={() => {
                     let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/${p.data.is_delete}/${p.data.release_name}`;

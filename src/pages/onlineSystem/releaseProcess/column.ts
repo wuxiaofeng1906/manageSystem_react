@@ -99,26 +99,63 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   },
 ];
 
-const rowSpanRender = {
+const rowSpanMethod = {
   rowSpan: (params: any) => params.data.rowSpan ?? 1,
   cellClassRules: {
     // 不一样的合并值，用不一样的渲染方式
-    'history-cell-span-1': (param: any) => {
-      // 不合并的时候，只画右边的线条。
-      return param.data.rowSpan !== 2;
-    },
+    // 'history-cell-span-1': (param: any) => {
+    //   // 不合并的时候，只画右边的线条。
+    //   return param.data.rowSpan !== 2;
+    // },
+
     'history-cell-span-2': (param: any) => {
       // 合并的时候画右边和下面的线条
       return param.data.rowSpan === 2;
+    },
+    'history-cell-color-single': (param: any) => {
+      //   单行为白色
+      return param.data.sortNo % 2 !== 0
+    },
+    'history-cell-color-double': (param: any) => {
+      //   双行为灰色
+      return param.data.sortNo % 2 === 0
     }
   },
-  cellRenderer: (param: any) => {
-    if (param.data?.rowSpan === 2) {
-      return `<div style="margin-top: 15px;margin-left: -5px">${param.value}</div>`
+}
+
+const noRowSpanMethod = {
+  rowSpan: (params: any) => 1,
+  cellClassRules: {
+
+    'history-cell-color-single': (param: any) => {
+      //   单行为白色
+      return param.data.sortNo % 2 !== 0
+    },
+    'history-cell-color-double': (param: any) => {
+      //   双行为灰色
+      return param.data.sortNo % 2 === 0
     }
-    return `<div>${param.value}</div>`
+  },
+}
+
+const cellRendererMethod = {
+  cellRenderer: (param: any) => {
+    const valueObject = {
+      'ready_release': '非积压发布',
+      'backlog_release': '灰度推线上',
+      'stop_server': '停服',
+      'keep_server': '不停服',
+      null: ""
+    }
+    const values = valueObject[param.value] ?? param.value;
+
+    if (param.data?.rowSpan === 2) {
+      return `<div style="margin-top: 15px;">${values}</div>`
+    }
+    return `<div>${values}</div>`
   }
 }
+
 export const historyReleaseListColumn = () => [
   {
     headerName: '序号',
@@ -127,7 +164,8 @@ export const historyReleaseListColumn = () => [
     maxWidth: 80,
     filter: false,
     pinned: 'left',
-    ...rowSpanRender,
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '预发布批次名',
@@ -136,55 +174,62 @@ export const historyReleaseListColumn = () => [
     cellRenderer: 'link',
     tooltipField: 'release_name',
     pinned: 'left',
-    // ...rowSpanRender,
+    ...rowSpanMethod
   },
   {
     headerName: '发布项目',
     field: 'project',
     minWidth: 130,
-    ...rowSpanRender,
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '工单编号',
     field: 'repair_order',
     minWidth: 110,
-    ...rowSpanRender,
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '发布服务',
     field: 'apps',
     minWidth: 130,
     tooltipField: 'apps',
-    ...rowSpanRender,
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '项目负责人',
     field: 'project_manager',
     minWidth: 130,
-    ...rowSpanRender,
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '发布分支',
     field: 'branch',
     minWidth: 130,
     tooltipField: 'branch',
-    ...rowSpanRender,
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '发布类型',
     field: 'release_type',
     minWidth: 120,
-    cellRenderer: (p) =>
-      p.value == 'ready_release' ? '非积压发布' : p.value == 'backlog_release' ? '灰度推线上' : '',
-    ...rowSpanRender,
+    // cellRenderer: (p) =>
+    //   p.value == 'ready_release' ? '非积压发布' : p.value == 'backlog_release' ? '灰度推线上' : '',
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '发布方式',
     field: 'release_way',
     minWidth: 100,
-    cellRenderer: (p) =>
-      p.value == 'stop_server' ? '停服' : p.value == 'keep_server' ? '不停服' : '',
-    ...rowSpanRender,
+    // cellRenderer: (p) =>
+    //   p.value == 'stop_server' ? '停服' : p.value == 'keep_server' ? '不停服' : '',
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '计划发布时间',
@@ -192,7 +237,8 @@ export const historyReleaseListColumn = () => [
     minWidth: 170,
     tooltipField: 'plan_release_time',
     cellStyle: (p) => ({color: p.data?.tip ? 'red' : 'initial', lineHeight: '28px'}),
-    ...rowSpanRender,
+    ...rowSpanMethod,
+    ...cellRendererMethod
   },
   {
     headerName: '发布结果',
@@ -207,13 +253,14 @@ export const historyReleaseListColumn = () => [
       }">${
         p.value === 'success' ? '发布成功' : p.value === 'failure' ? '发布失败' : ''
       }</span>`;
-    }
-    ,
+    },
+    ...noRowSpanMethod,
   },
   {
     headerName: '发布环境',
     field: 'release_env',
     minWidth: 120,
+    ...noRowSpanMethod,
   },
 ];
 

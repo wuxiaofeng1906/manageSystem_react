@@ -65,31 +65,27 @@ export const preViewNotice = (noticeEditionId: string, targetEnv: string) => {
 
 // 获取特性列表list  startOrder:开始的顺序
 const getSpecialList = (ptyGroup: any, startOrder: number) => {
-
+  debugger
 
   let finalOrder = startOrder;
   if (!ptyGroup) return [];
   const specialList: any = [];
-  ptyGroup.map((v: any, index: number) => {
+  ptyGroup.map((v: any) => {
     const special: any = {
       specialityOrdinal: finalOrder,
       speciality: v.first,
       children: []
     };
-    //
     finalOrder = finalOrder + 1;
     const secondsArray = v.seconds;
     if (secondsArray && secondsArray.length > 0) {
-      secondsArray.map((v2: any, index2: number) => {
-
-        if (v2 && !isEmpty(v2.first)) {
-          special.children.push(
-            {
-              specialityOrdinal: finalOrder,
-              speciality: v2.first
-            }
-          );
-        }
+      secondsArray.map((v2: any) => {
+        special.children.push(
+          {
+            specialityOrdinal: finalOrder,
+            speciality: v2.first ?? ""
+          }
+        );
         finalOrder = finalOrder + 1;
       })
     }

@@ -713,8 +713,9 @@ const ReleaseOrder = () => {
                           className={styles.selectColor}
                           onChange={() => onSaveBeforeCheck(true)}
                           options={[
-                            {label: '发布成功', value: 'success', key: 'success'},
-                            {label: '发布失败', value: 'failure', key: 'failure'},
+                            // {label: '发布成功', value: 'success', key: 'success'},
+                            // {label: '发布失败', value: 'failure', key: 'failure'},
+                            {label: '发布结果', value: 'result', key: 'result'},
                             {label: '取消发布', value: 'cancel', key: 'cancel'},
                             {label: ' ', value: 'unknown', key: 'unknown'},
                           ]}

@@ -142,9 +142,9 @@ const HistoryList = ({height}: { height: number }) => {
                     textOverflow: 'ellipsis',
                   }}
                   onClick={() => {
-                    let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/${p.data.is_delete}/${p.data.release_name}`;
+                    let href = `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/${p.data.release_name}`;
                     if (p.data.release_type == 'backlog_release') {
-                      href = `/onlineSystem/releaseOrder/${p.data.release_num}/${p.data.is_delete}/${p.data.release_name}`;
+                      href = `/onlineSystem/releaseOrder/${p.data.release_num}/${p.data.release_name}`;
                     }
                     // 历史信息不需要添加缓存，因为历史信息不需要展示多条
                     // setTabsLocalStorage({

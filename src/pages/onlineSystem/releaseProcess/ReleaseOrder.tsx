@@ -120,9 +120,6 @@ const ReleaseOrder = () => {
     try {
       setSpinning(true);
       const params: any = {release_num: id, include_deleted: true};
-      // if (is_delete === "true") {
-      //   params = {...params, include_deleted: true};
-      // }
       const res = await PreReleaseServices.orderDetail(params);
       if (isEmpty(res)) {
         initForm();
@@ -866,7 +863,7 @@ const ReleaseOrder = () => {
                       onClick={() => {
                         if (!p.data.release_num) return;
                         history.push(
-                          `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/false/${p.data.release_name}`,
+                          `/onlineSystem/prePublish/${p.data.release_num}/${p.data.branch}/${p.data.release_name}`,
                         );
                       }}
                     >

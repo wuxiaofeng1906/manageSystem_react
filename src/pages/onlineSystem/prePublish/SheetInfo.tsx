@@ -175,8 +175,6 @@ const SheetInfo = (props: any, ref: any) => {
       // 因为结果前提需要依靠这里面的数据，所以需要写在这里（获取所有的数据库版本和batch版本）
       const database = await OnlineSystemServices.databaseVersion();
       databaseVersion = database?.map((it: string) => ({label: it, value: it}));
-      const batch = await OnlineSystemServices.getBatchVersion({release_num});
-      agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
 
       // 工单信息的初始化数据(获取界面数据，被删除也要展示)
       let param: any = {release_num, include_deleted: true};
@@ -226,11 +224,18 @@ const SheetInfo = (props: any, ref: any) => {
       setFinished(agFinished);
       //--------------- res中，batch版本和数据库版本需要用来默认为获取的数据中的第一个
       const service = res.release_app;
-      // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
-      if (batch && batch.length > 0 && (isEmpty(service.batch) || service.batch === "-")) {
-        service.batch = batch[0];
+
+      // 应用里面必须包bpatch才展示默认值
+      if ((service.apps).includes('batch')) {
+        // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
+        const batch = await OnlineSystemServices.getBatchVersion({release_num});
+        agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
+        if (batch && batch.length > 0 && (isEmpty(service.batch) || service.batch === "-")) {
+          service.batch = batch[0];
+        }
       }
-      // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
+
+      // 如果获取的database数组有数据，并且表格返回的database没有数据，则默认为数组的第一个值。
       if (database && database.length > 0 && (isEmpty(service.database_version) || service.database_version === "-")) {
         service.database_version = database[0];
       }

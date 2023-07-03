@@ -8,6 +8,7 @@ import {useParams} from "umi";
 import PreReleaseServices from "@/services/preRelease";
 import {intersectionBy} from "lodash";
 import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
+import {errorMessage} from "@/publicMethods/showMessages";
 
 const type = 'DraggableTabNode';
 const {TabPane} = Tabs;
@@ -117,12 +118,17 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
       //  减少缓存之后，需要删除当前页面，
       // 如果删除的是当前所看的tab页。则下一个展示链接需要跳转到第一个
       if (activeKey === e) {
-        const currentPage = new_storages[0];
-        let replaceUrl = `/onlineSystem/prePublish/${currentPage.release_num}/${currentPage.branch}/${currentPage.is_delete}/${currentPage.release_name}`;
-        if (currentPage.release_type == 'backlog_release') {  // 灰度推生产
-          replaceUrl = `/onlineSystem/releaseOrder/${currentPage.release_num}/${currentPage.is_delete}/${currentPage.release_name}`;
+        if (new_storages && new_storages.length > 0) {
+          const currentPage = new_storages[0];
+          let replaceUrl = `/onlineSystem/prePublish/${currentPage.release_num}/${currentPage.branch}/${currentPage.is_delete}/${currentPage.release_name}`;
+          if (currentPage.release_type == 'backlog_release') {  // 灰度推生产
+            replaceUrl = `/onlineSystem/releaseOrder/${currentPage.release_num}/${currentPage.is_delete}/${currentPage.release_name}`;
+          }
+          history.replace(replaceUrl);
+        } else {
+          errorMessage("标签页切换错误！");
         }
-        history.replace(replaceUrl);
+
       }
     }
   };

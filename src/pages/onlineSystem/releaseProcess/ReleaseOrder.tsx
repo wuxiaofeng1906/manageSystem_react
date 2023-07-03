@@ -17,7 +17,7 @@ import AnnouncementServices from '@/services/announcement';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import {useModel, useParams, history} from 'umi';
 import {isEmpty, omit, isEqual} from 'lodash';
-import {infoMessage} from '@/publicMethods/showMessages';
+import {errorMessage} from '@/publicMethods/showMessages';
 import moment from 'moment';
 import {PageContainer} from '@ant-design/pro-layout';
 import DragIcon from '@/components/DragIcon';
@@ -41,7 +41,7 @@ let agCompareData: any = {
   alpha: []
 } //  被对比的数据-处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
-  const {id, is_delete} = useParams() as { id: string, is_delete: string };
+  const {id} = useParams() as { id: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const [envList] = useModel('env', (env) => [env.releaseOrderEnv]);
@@ -65,7 +65,7 @@ const ReleaseOrder = () => {
   const [clusters, setClusters] = useState<any>(); // 所有组合集群
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   // const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
-
+  let releaseEnvOpend = false; // 发布环境下拉框是否为展开的状态
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
     params.api.sizeColumnsToFit();
@@ -146,7 +146,7 @@ const ReleaseOrder = () => {
       setSpinning(false);
     } catch (e: any) {
       if (e?.code == 4001) initForm();
-      else infoMessage(e?.msg ?? e?.statusText);
+      else errorMessage(e?.msg ?? e?.statusText);
       setSpinning(false);
     }
   };
@@ -311,7 +311,7 @@ const ReleaseOrder = () => {
     }
     if (!['failure', 'cancel'].includes(result) && errMsg) {
       orderForm.setFieldsValue({release_result: null});
-      return infoMessage(errMsg);
+      return errorMessage(errMsg);
     }
 
     // 发布结果为空，直接保存
@@ -387,10 +387,10 @@ const ReleaseOrder = () => {
     const valid = Object.values(checkObj).some((it) => isEmpty(it));
     if (valid) {
       const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
-      infoMessage(errTip[errArr?.[0]]);
+      errorMessage(errTip[errArr?.[0]]);
       return;
     }
-    if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
+    if (isEmpty(base.release_name?.trim())) return errorMessage(errTip.release_name);
 
     // 过滤掉工单-表单设置（orderData）手动添加的空行
 
@@ -488,7 +488,7 @@ const ReleaseOrder = () => {
   const onRemove = (p: any) => {
     const cluster = baseForm.getFieldValue('cluster');
     if (agFinished || !hasPermission.delete) {
-      return infoMessage(agFinished ? '已标记发布结果不能删除积压工单!' : '您无删除积压工单权限!');
+      return errorMessage(agFinished ? '已标记发布结果不能删除积压工单!' : '您无删除积压工单权限!');
     }
 
     // 如果是接口工单和sql工单,则之间删除，不请求其他接口
@@ -524,7 +524,7 @@ const ReleaseOrder = () => {
   //忽略本次积压工单
   const onIgnore = (p: any) => {
     if (agFinished) {
-      return infoMessage('已标记发布结果不能忽略积压工单!');
+      return errorMessage('已标记发布结果不能忽略积压工单!');
     }
 
     // 如果是接口工单和sql工单,则之间删除，不请求其他接口
@@ -553,7 +553,7 @@ const ReleaseOrder = () => {
   };
 
   const onDrag = async () => {
-    if (finished) return infoMessage('已标记发布结果不能修改工单顺序!');
+    if (finished) return errorMessage('已标记发布结果不能修改工单顺序!');
     const sortArr: any = [];
     gridRef.current?.forEachNode(function (node) {
       sortArr.push({...node.data});
@@ -765,7 +765,19 @@ const ReleaseOrder = () => {
                     )}
                     style={{width: '100%'}}
                     mode={'multiple'}
-                    onChange={onLinkTable}
+                    // onChange={onLinkTable}
+                    // 失去焦点的时候再查询，点一个查一个，太耗时了
+                    onBlur={onLinkTable}
+                    onDeselect={() => {
+                      // 在下拉框中取消选中项，不直接调用onLinkTable方法。只有在下拉框为关闭状态才调用onLinkTable方法,
+                      if (!releaseEnvOpend) {
+                        onLinkTable();
+                      }
+                    }}
+                    onDropdownVisibleChange={(e: boolean) => { // 下拉框是否展开
+                      // 用于记录下拉框展示的状态，用于onDeselect是否调用onLinkTable方法
+                      releaseEnvOpend = e;
+                    }}
                   />
                 </Form.Item>
               </Col>

@@ -282,8 +282,13 @@ const SprintList: React.FC<any> = () => {
     const filterData = filterDatasByCondition(queryCondition, ora_filter_data);
     if (isEmpty(filterData)) {
       setShowReason(false);
-    } else setShowReason(filterData?.some((it) => !isEmpty(it.nobaseDesc)));
+    } else {
+      setShowReason(filterData?.some((it) => !isEmpty(it.nobaseDesc)));
+    }
+
     gridApi.current?.setRowData(filterData);
+
+    // gird 自带过滤
     if (gird_filter_condition && gird_filter_condition.length) {
       // 过滤表格自带条件
       const hardcodedFilter = {};
@@ -340,10 +345,7 @@ const SprintList: React.FC<any> = () => {
     );
     ora_filter_data = datas?.result;
 
-    setData({
-      ...data,
-      resCount: datas.resCount
-    });
+    // 过滤数据
     onSelectChanged();
   };
 

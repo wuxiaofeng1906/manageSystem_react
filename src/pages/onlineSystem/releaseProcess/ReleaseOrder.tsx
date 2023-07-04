@@ -16,7 +16,7 @@ import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import {useModel, useParams, history} from 'umi';
-import {isEmpty, omit, isEqual, difference} from 'lodash';
+import {isEmpty, omit, isEqual, difference, intersectionBy} from 'lodash';
 import {infoMessage} from '@/publicMethods/showMessages';
 import moment from 'moment';
 import {PageContainer} from '@ant-design/pro-layout';
@@ -983,7 +983,8 @@ export const ModalSuccessCheck = ({visible, onOk, cluster,}: {
     setLoading(true);
     try {
       const values = await form.validateFields();
-      await onOk(values);
+      debugger
+      // await onOk(values);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -1010,6 +1011,7 @@ export const ModalSuccessCheck = ({visible, onOk, cluster,}: {
 
         <Form.Item style={{marginTop: -20}} shouldUpdate={(old, next) => old.failedList != next.failedList}>
           {({getFieldValue}) => {
+
             return (
               <Form.Item
                 label="发布成功集群列表"
@@ -1020,7 +1022,7 @@ export const ModalSuccessCheck = ({visible, onOk, cluster,}: {
                   size={"small"}
                   allowClear
                   style={{width: '350px'}}
-                  options={envList}
+                  options={envList.filter(e => cluster.includes(e.key))}
                   onChange={() => {
                     const successCluter = getFieldValue("successList");
                     const failedCluster = difference(cluster, successCluter);
@@ -1047,7 +1049,7 @@ export const ModalSuccessCheck = ({visible, onOk, cluster,}: {
                   size={"small"}
                   allowClear
                   style={{width: '350px'}}
-                  options={envList}
+                  options={envList.filter(e => cluster.includes(e.key))}
                   onChange={() => {
                     const failedCluster = getFieldValue("failedList");
                     const successCluter = difference(cluster, failedCluster);
@@ -1089,9 +1091,10 @@ export const ModalSuccessCheck = ({visible, onOk, cluster,}: {
               <Form.Item
                 label="检查结果"
                 name="checkResult"
+                className={styles.noRules}
                 style={{marginLeft: 30}}
                 // required={true}
-                // rules={[{required: afterCheck !== true, message: '请选择检查结果'}]}
+                rules={[{required: afterCheck !== true, message: '请选择检查结果'}]}
               >
                 <Checkbox.Group style={{width: '100%'}} disabled={afterCheck == true}>
                   <Checkbox value="ui">UI执行通过</Checkbox>

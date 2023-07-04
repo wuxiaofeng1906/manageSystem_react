@@ -168,6 +168,7 @@
     }
   }
 }
+
 .history-cell-span-1 {
   //background-color: #FCFCFC;
   border-right: 1px solid lightgrey !important;
@@ -186,3 +187,19 @@
 .history-cell-color-double {
   background-color: #FCFCFC;
 }
+
+// 隐藏require 所带星号
+.noRules {
+  :global {
+    .ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+      display: inline-block;
+      margin-right: 4px;
+      color: white;
+      font-size: 14px;
+      font-family: SimSun, sans-serif;
+      line-height: 1;
+      content: '*';
+    }
+  }
+}
+

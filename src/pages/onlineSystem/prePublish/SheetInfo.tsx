@@ -35,6 +35,7 @@ let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
 let agBatch: any[] = [];
 let databaseVersion: any[] = [];
+let allClusters: any = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
@@ -354,39 +355,28 @@ const SheetInfo = (props: any, ref: any) => {
       }
 
       // 二次确认标记发布结果
-      const tips = {
-        draft: {
-          title: '置为草稿提醒',
-          content: '置为草稿将还原到初始生成工单信息,请确认是否置为草稿?',
-        },
-        success: {title: '发布成功提醒', content: '请确认是否标记发布成功?'},
-        failure: {title: '发布失败提醒', content: '请确认是否标记发布失败?'},
-      };
-      if (result == 'success') {
+      if (result == 'result') {
+        debugger
+        // 集群，用于传数据到结果确认页面
+        allClusters = (serverInfo?.[0]?.cluster).split(",");
         setSuccessModal(true);
-      } else {
+
+      } else if (result == 'draft') {
         setLeaveShow(false);
         Modal.confirm({
           okText: '确认',
           cancelText: '取消',
           centered: true,
-          title: tips[result].title,
-          content: tips[result].content,
+          title: "置为草稿提醒",
+          content: '置为草稿将还原到初始生成工单信息,请确认是否置为草稿?',
           icon: <InfoCircleOutlined style={{color: result == 'cancel' ? 'red' : '#1585ff'}}/>,
           okButtonProps: {disabled: confirmDisabled},
           onOk: async () => {
             setConfirmDisabled(true);
             try {
-              if (result == 'draft') {
-                await OnlineSystemServices.removeOrder({release_num, user_id: user?.userid});
-                await getDetail();
-              } else {
-                await onSave(true);// 发布失败
-                //   清除Tab缓存（置为草稿不需要清缓存）
-                setTabsLocalStorage({release_num}, "delete");
-              }
+              await OnlineSystemServices.removeOrder({release_num, user_id: user?.userid});
+              await getDetail();
               setConfirmDisabled(false);
-
             } catch (e) {
               setConfirmDisabled(false);
             }
@@ -757,8 +747,9 @@ const SheetInfo = (props: any, ref: any) => {
                         className={styles.selectColor}
                         onChange={() => onSaveBeforeCheck(true)}
                         options={[
-                          {label: '发布成功', value: 'success', key: 'success'},
-                          {label: '发布失败', value: 'failure', key: 'failure'},
+                          // {label: '发布成功', value: 'success', key: 'success'},
+                          // {label: '发布失败', value: 'failure', key: 'failure'},
+                          {label: '发布结果', value: 'result', key: 'result'},
                           {label: '置为草稿', value: 'draft', key: 'draft'},
                           {label: ' ', value: 'unknown', key: 'unknown'},
                         ]}
@@ -979,7 +970,7 @@ const SheetInfo = (props: any, ref: any) => {
         <ModalSuccessCheck
           visible={successModal}
           onOk={(v?: any) => onSuccessConfirm(v)}
-          announce={orderForm.getFieldValue('announcement_num')}
+          cluster={allClusters}
         />
       </div>
     </Spin>

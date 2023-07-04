@@ -313,7 +313,7 @@ const ReleaseOrder = () => {
       orderForm.setFieldsValue({release_result: null});
       return infoMessage(errMsg);
     }
-
+    debugger
     // 发布结果为空，直接保存
     if (isEmpty(result) || result == 'unknown') {
       onSave();
@@ -327,37 +327,30 @@ const ReleaseOrder = () => {
       }
 
       // 二次确认标记发布结果
-      const tips = {
-        cancel: {title: '取消发布提醒', content: '取消发布将删除工单，请确认是否取消发布?'},
-        success: {title: '发布成功提醒', content: '请确认是否标记发布成功?'},
-        failure: {title: '发布失败提醒', content: '请确认是否标记发布失败?'},
-      };
-      if (result == 'success') {
+      if (result == 'result') {
+        // 发布成功或者发布失败都走这里
         setVisible(true);
-      } else {
+      } else if (result == 'cancel') {
         Modal.confirm({
           okText: '确认',
           cancelText: '取消',
           centered: true,
-          title: tips[result].title,
-          content: tips[result].content,
+          title: "取消发布提醒",
+          content: '取消发布将删除工单，请确认是否取消发布?',
           icon: <InfoCircleOutlined style={{color: result == 'cancel' ? 'red' : '#1585ff'}}/>,
           okButtonProps: {disabled: confirmDisabled},
           onOk: async () => {
             setConfirmDisabled(true);
             try {
-              if (result == 'cancel') {
-                await PreReleaseServices.removeRelease(
-                  {
-                    user_id: user?.userid ?? '',
-                    release_num: id ?? '',
-                  },
-                  false,
-                );
-              } else {
-                await onSave();
-              }
-              //   清除Tab缓存
+              await PreReleaseServices.removeRelease(
+                {
+                  user_id: user?.userid ?? '',
+                  release_num: id ?? '',
+                },
+                false,
+              );
+
+              //  清除Tab缓存
               setTabsLocalStorage({release_num: id ?? ''}, "delete");
             } catch (e) {
               setConfirmDisabled(false);
@@ -713,8 +706,8 @@ const ReleaseOrder = () => {
                           className={styles.selectColor}
                           onChange={() => onSaveBeforeCheck(true)}
                           options={[
-                            {label: '发布成功', value: 'success', key: 'success'},
-                            {label: '发布失败', value: 'failure', key: 'failure'},
+                            // {label: '发布成功', value: 'success', key: 'success'},
+                            // {label: '发布失败', value: 'failure', key: 'failure'},
                             {label: '发布结果', value: 'result', key: 'result'},
                             {label: '取消发布', value: 'cancel', key: 'cancel'},
                             {label: ' ', value: 'unknown', key: 'unknown'},
@@ -983,8 +976,7 @@ export const ModalSuccessCheck = ({visible, onOk, cluster,}: {
     setLoading(true);
     try {
       const values = await form.validateFields();
-      debugger
-      // await onOk(values);
+      await onOk(values);
       setLoading(false);
     } catch (e) {
       setLoading(false);

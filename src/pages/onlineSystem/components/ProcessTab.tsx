@@ -120,9 +120,9 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
       if (activeKey === e) {
         if (new_storages && new_storages.length > 0) {
           const currentPage = new_storages[0];
-          let replaceUrl = `/onlineSystem/prePublish/${currentPage.release_num}/${currentPage.branch}/${currentPage.is_delete}/${currentPage.release_name}`;
+          let replaceUrl = `/onlineSystem/prePublish/${currentPage.release_num}/${currentPage.branch}/${currentPage.release_name}`;
           if (currentPage.release_type == 'backlog_release') {  // 灰度推生产
-            replaceUrl = `/onlineSystem/releaseOrder/${currentPage.release_num}/${currentPage.is_delete}/${currentPage.release_name}`;
+            replaceUrl = `/onlineSystem/releaseOrder/${currentPage.release_num}/${currentPage.release_name}`;
           }
           history.replace(replaceUrl);
         } else {
@@ -162,9 +162,9 @@ const DraggableTabs: React.FC<TabsProps> = (props: any) => {
       return e.release_num === v
     });
 
-    let replaceUrl = `/onlineSystem/prePublish/${p.release_num}/${p.branch}/${p.is_delete}/${p.release_name}`;
+    let replaceUrl = `/onlineSystem/prePublish/${p.release_num}/${p.branch}/${p.release_name}`;
     if (p.release_type == 'backlog_release') {  // 灰度推生产
-      replaceUrl = `/onlineSystem/releaseOrder/${p.release_num}/${p.is_delete}/${p.release_name}`;
+      replaceUrl = `/onlineSystem/releaseOrder/${p.release_num}/${p.release_name}`;
     }
     history.replace(replaceUrl);
   };

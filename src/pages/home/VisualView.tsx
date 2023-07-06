@@ -266,43 +266,6 @@ const VisualView = () => {
     );
   };
 
-  // const preData = (clusterMap = cluster) => {
-  //   Promise.all([PreReleaseServices.releaseView(), PreReleaseServices.releasePlan({})]).then(
-  //     (res) => {
-  //       const [currentDay, plan] = res;
-  //       setCurrentSource(
-  //         currentDay?.map((it: any) => {
-  //           const isRed = it.project?.some(
-  //             (pro: any) =>
-  //               pro.pro_name?.startsWith('emergency') ||
-  //               pro.pro_name?.startsWith('stagepatch') ||
-  //               pro.pro_name?.startsWith('stage-patch'),
-  //           );
-  //           return {
-  //             ...it,
-  //             baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-  //             cls: isRed ? styles.dotLineEmergency : styles.dotLinePrimary,
-  //             bg: isRed ? initBg[1] : initBg[2],
-  //           };
-  //         }),
-  //       );
-  //       setPlanSource(
-  //         plan?.map((it: any, i: number) => ({
-  //           ...it,
-  //           baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-  //           cls: styles.dotLineGray,
-  //           bg: initBg[3],
-  //           plan_release_time: it.plan_time,
-  //           release_env: it.cluster
-  //             ? it.cluster?.map((it: any) => clusterMap[it])?.join(',') ?? ''
-  //             : '',
-  //           release_num: it.branch + i,
-  //         })),
-  //       );
-  //     },
-  //   );
-  // };
-
   const getViewData = async (clusterMap = cluster) => {
     setLoading(true);
     try {
@@ -359,13 +322,7 @@ const VisualView = () => {
     }
   };
 
-  const renderTr = (
-    arr: any[],
-    title: string,
-    showStep = true,
-    deleteIcon?: boolean,
-    showLink = true,
-  ) => {
+  const renderTr = (arr: any[], title: string, showStep = true, deleteIcon?: boolean, showLink = true,) => {
     if (isEmpty(arr)) {
       return (
         <tr>
@@ -412,7 +369,7 @@ const VisualView = () => {
     );
   };
 
-  const renderTd = (data: any, deleteIcon?: boolean, showLink = true) => {
+  const renderTd = (data: any, deleteIcon?: boolean, showLink = true, clusterMap = cluster) => {
     // 这里需要处理集群。将集群2，3，4，5，6，7集合在一起
     // 宁夏集群2-7
     const filterCluster = ['cn-northwest-2', 'cn-northwest-3', 'cn-northwest-4', 'cn-northwest-5', 'cn-northwest-6', 'cn-northwest-7'];
@@ -425,8 +382,8 @@ const VisualView = () => {
     if (cluster && cluster.length) {
       cluster.map((e: any) => {
         if (filterCluster.includes(e)) {
-          // 后面要展示的集群
-          showCluster.push(e);
+          // 后面要展示的集群(展示中文)
+          showCluster.push(clusterMap[e]);
           // 重新添加集群2-7的总id
           if (!newCluster.includes("cn-northwest-234567")) {
             newCluster.push("cn-northwest-234567");
@@ -437,7 +394,6 @@ const VisualView = () => {
         }
       });
     }
-
 
     debugger
     return (
@@ -456,6 +412,7 @@ const VisualView = () => {
                   child={
                     <div>
                       {newCluster.map((env: any, i: number) => {
+                        debugger
                         const baseIndex = dynamicColumn.findIndex(
                           (v) => data.baseline_cluster == v.name,
                         );
@@ -463,23 +420,22 @@ const VisualView = () => {
                         const alpha = envIndex - baseIndex;
                         if (envIndex < 0 || env == data.baseline_cluster) return '';
 
-                        // clusterMap
                         return (
-                          <div>
-                            <div
-                              key={env + i}
-                              className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
-                              style={{
-                                width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
-                              }}
-                            >
-                              {env === "cn-northwest-234567" ? showCluster.join(",") : ""}
-                            </div>
-
+                          <div
+                            key={env + i}
+                            className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
+                            style={{
+                              width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
+                            }}
+                          >
+                            {/* 如果2-7集群全都有的话，则，后面不再展示已成功的标签。 */}
+                            <span style={{backgroundColor: "gold", position: "relative", paddingTop: -20}}>
+                              {showCluster.length > 0 && showCluster.length < 6 ? showCluster.join(",") : ""}
+                            </span>
                           </div>
-
                         );
                       })}
+
                     </div>
                   }
                 />

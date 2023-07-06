@@ -421,6 +421,33 @@ const VisualView = () => {
   };
 
   const renderTd = (data: any, deleteIcon?: boolean, showLink = true) => {
+    // 这里需要处理集群。将集群2，3，4，5，6，7集合在一起
+    // 宁夏集群2-7
+    const filterCluster = ['cn-northwest-2', 'cn-northwest-3', 'cn-northwest-4', 'cn-northwest-5', 'cn-northwest-6', 'cn-northwest-7'];
+
+    // 集群里面是否存在2-7的集群
+    const showCluster: any = [];
+    const newCluster: any = [];
+
+    const {cluster} = data;
+    if (cluster && cluster.length) {
+      cluster.map((e: any) => {
+        if (filterCluster.includes(e)) {
+          // 后面要展示的集群
+          showCluster.push(e);
+          // 重新添加集群2-7的总id
+          if (!newCluster.includes("cn-northwest-234567")) {
+            newCluster.push("cn-northwest-234567");
+          }
+        } else {
+          //  不是集群2-7，添加到新集群数组中。
+          newCluster.push(e);
+        }
+      });
+    }
+
+
+    debugger
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
@@ -436,7 +463,7 @@ const VisualView = () => {
                   showLink={showLink}
                   child={
                     <div>
-                      {data?.cluster?.map((env: any, i: number) => {
+                      {newCluster.map((env: any, i: number) => {
                         const baseIndex = dynamicColumn.findIndex(
                           (v) => data.baseline_cluster == v.name,
                         );
@@ -444,13 +471,19 @@ const VisualView = () => {
                         const alpha = envIndex - baseIndex;
                         if (envIndex < 0 || env == data.baseline_cluster) return '';
                         return (
-                          <div
-                            key={env + i}
-                            className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
-                            style={{
-                              width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
-                            }}
-                          />
+                          <div>
+                            <div
+                              key={env + i}
+                              className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
+                              style={{
+                                width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
+                              }}
+                            >
+                              {env === "cn-northwest-234567" ? showCluster.join(",") : ""}
+                            </div>
+
+                          </div>
+
                         );
                       })}
                     </div>

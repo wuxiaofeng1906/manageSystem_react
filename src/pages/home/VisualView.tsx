@@ -426,28 +426,24 @@ const VisualView = () => {
                             className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
                             style={{
                               width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
+                              textAlign: "right"
                             }}
                           >
                             {/* 如果2-7集群全都有的话，则，后面不再展示已成功的标签。 */}
-                            <span style={{backgroundColor: "gold", position: "relative", paddingTop: -20}}>
-                              {showCluster.length > 0 && showCluster.length < 6 ? showCluster.join(",") : ""}
-                            </span>
+                            <label>
+                              {env === "cn-northwest-234567" && showCluster.length > 0 && showCluster.length < 6 ? showCluster.join(",") : ""}
+                            </label>
                           </div>
                         );
                       })}
-
                     </div>
-                  }
-                />
-              ) : (
-                ''
-              )}
+                  }/>) : ('')}
             </td>
           );
         })}
-      </Fragment>
-    );
-  };
+          </Fragment>
+          );
+        };
 
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
 

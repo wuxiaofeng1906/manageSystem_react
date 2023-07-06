@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState, Fragment} from 'react';
 import styles from './index.less';
 import cns from 'classnames';
-import {Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch} from 'antd';
+import {Collapse, Card, Modal, Spin, Switch} from 'antd';
 import {InfoCircleOutlined, RightOutlined, DownOutlined} from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
 import {isEmpty, sortBy, cloneDeep, isArray, intersection, difference, pick} from 'lodash';
@@ -204,11 +204,8 @@ const ICard = (params: {
 };
 
 const VisualView = () => {
-  const [form] = Form.useForm();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [loading, setLoading] = useState(false);
-  const [project, setProject] = useState<any[]>([]);
-  const [branch, setBranch] = useState<any[]>([]);
   const [cluster, setCluster] = useState<any>();
   const [online, setOnline] = useState<{ name: string; value: string }[]>([
     {name: '', value: ''},
@@ -230,47 +227,6 @@ const VisualView = () => {
       getViewData(clusterMap);
     });
   }, []);
-
-  const getSelectData = async () => {
-    const [projectList, branchList] = await Promise.all([
-      PreReleaseServices.project(),
-      PreReleaseServices.branch(),
-    ]);
-    setProject(
-      projectList?.map((it: any) => ({
-        label: it.project_name,
-        value: it.project_id,
-        key: it.project_id,
-      })),
-    );
-    setBranch(
-      branchList?.map((it: any) => ({
-        label: it.branch_name,
-        value: it.branch_name,
-        key: it.branch_id,
-      })),
-    );
-  };
-
-  const getPlanList = async () => {
-    const values = form.getFieldsValue();
-    const plan = await PreReleaseServices.releasePlan({
-      project_id: values.project_id?.join(',') ?? '',
-      branch: values.branch?.join(',') ?? '',
-      plan_time: values.plan_time ? dayjs(values.plan_time).format('YYYY-MM-DD') : '',
-    });
-    setPlanSource(
-      plan?.map((it: any, i: number) => ({
-        ...it,
-        baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-        cls: styles.dotLinePrimary,
-        bg: initBg[2],
-        plan_release_time: it.plan_time,
-        release_num: it.branch + i,
-        release_env: it.cluster ? it.cluster?.map((it: any) => cluster[it])?.join(',') ?? '' : '',
-      })),
-    );
-  };
 
   const computeFn = (origin: any[], clusterMap: any) => {
     if (isEmpty(origin)) return [];
@@ -540,8 +496,6 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
-  const init = useMemo(() => {
-  }, []);
   return (
     <Card
       className={styles.card}
@@ -604,42 +558,6 @@ const VisualView = () => {
               {renderBasicTd}
             </tr>
             {renderTr(currentSource, '待发布过程单')}
-            {/*搜索条件*/}
-            {/*<tr>*/}
-            {/*  <td colSpan={onlineLen + 5}>*/}
-            {/*    <Form*/}
-            {/*      form={form}*/}
-            {/*      size={'small'}*/}
-            {/*      layout={'inline'}*/}
-            {/*      className={styles.condition}*/}
-            {/*      onFieldsChange={getPlanList}*/}
-            {/*    >*/}
-            {/*      <Form.Item name={'project_id'} label={'项目名称'}>*/}
-            {/*        <Select*/}
-            {/*          style={{ width: '300px' }}*/}
-            {/*          options={project}*/}
-            {/*          placeholder={'项目名称'}*/}
-            {/*          mode={'multiple'}*/}
-            {/*          showSearch*/}
-            {/*          optionFilterProp={'label'}*/}
-            {/*        />*/}
-            {/*      </Form.Item>*/}
-            {/*      <Form.Item name={'branch'} label={'分支名称'}>*/}
-            {/*        <Select*/}
-            {/*          style={{ width: '300px' }}*/}
-            {/*          options={branch}*/}
-            {/*          placeholder={'分支名称'}*/}
-            {/*          mode={'multiple'}*/}
-            {/*          showSearch*/}
-            {/*          optionFilterProp={'label'}*/}
-            {/*        />*/}
-            {/*      </Form.Item>*/}
-            {/*      <Form.Item name={'plan_time'} label={'计划上线日期'}>*/}
-            {/*        <DatePicker style={{ width: '170px' }} />*/}
-            {/*      </Form.Item>*/}
-            {/*    </Form>*/}
-            {/*  </td>*/}
-            {/*</tr>*/}
             {renderTr(planSource, '计划上线日历', false, false, false)}
             </tbody>
           </table>

@@ -233,50 +233,86 @@ const VisualView = () => {
     return origin.map((it: any) => ({value: clusterMap[it], name: it}));
   };
 
-  const preData = (clusterMap = cluster) => {
-    Promise.all([PreReleaseServices.releaseView(), PreReleaseServices.releasePlan({})]).then(
-      (res) => {
-        const [currentDay, plan] = res;
-        setCurrentSource(
-          currentDay?.map((it: any) => {
-            const isRed = it.project?.some(
-              (pro: any) =>
-                pro.pro_name?.startsWith('emergency') ||
-                pro.pro_name?.startsWith('stagepatch') ||
-                pro.pro_name?.startsWith('stage-patch'),
-            );
-            return {
-              ...it,
-              baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-              cls: isRed ? styles.dotLineEmergency : styles.dotLinePrimary,
-              bg: isRed ? initBg[1] : initBg[2],
-            };
-          }),
+  const preData = (clusterMap = cluster, currentDay: any, plan: any) => {
+
+    setCurrentSource(
+      currentDay?.map((it: any) => {
+        const isRed = it.project?.some(
+          (pro: any) =>
+            pro.pro_name?.startsWith('emergency') ||
+            pro.pro_name?.startsWith('stagepatch') ||
+            pro.pro_name?.startsWith('stage-patch'),
         );
-        setPlanSource(
-          plan?.map((it: any, i: number) => ({
-            ...it,
-            baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-            cls: styles.dotLineGray,
-            bg: initBg[3],
-            plan_release_time: it.plan_time,
-            release_env: it.cluster
-              ? it.cluster?.map((it: any) => clusterMap[it])?.join(',') ?? ''
-              : '',
-            release_num: it.branch + i,
-          })),
-        );
-      },
+        return {
+          ...it,
+          baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+          cls: isRed ? styles.dotLineEmergency : styles.dotLinePrimary,
+          bg: isRed ? initBg[1] : initBg[2],
+        };
+      }),
+    );
+    setPlanSource(
+      plan?.map((it: any, i: number) => ({
+        ...it,
+        baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+        cls: styles.dotLineGray,
+        bg: initBg[3],
+        plan_release_time: it.plan_time,
+        release_env: it.cluster
+          ? it.cluster?.map((it: any) => clusterMap[it])?.join(',') ?? ''
+          : '',
+        release_num: it.branch + i,
+      })),
     );
   };
+
+  // const preData = (clusterMap = cluster) => {
+  //   Promise.all([PreReleaseServices.releaseView(), PreReleaseServices.releasePlan({})]).then(
+  //     (res) => {
+  //       const [currentDay, plan] = res;
+  //       setCurrentSource(
+  //         currentDay?.map((it: any) => {
+  //           const isRed = it.project?.some(
+  //             (pro: any) =>
+  //               pro.pro_name?.startsWith('emergency') ||
+  //               pro.pro_name?.startsWith('stagepatch') ||
+  //               pro.pro_name?.startsWith('stage-patch'),
+  //           );
+  //           return {
+  //             ...it,
+  //             baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+  //             cls: isRed ? styles.dotLineEmergency : styles.dotLinePrimary,
+  //             bg: isRed ? initBg[1] : initBg[2],
+  //           };
+  //         }),
+  //       );
+  //       setPlanSource(
+  //         plan?.map((it: any, i: number) => ({
+  //           ...it,
+  //           baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+  //           cls: styles.dotLineGray,
+  //           bg: initBg[3],
+  //           plan_release_time: it.plan_time,
+  //           release_env: it.cluster
+  //             ? it.cluster?.map((it: any) => clusterMap[it])?.join(',') ?? ''
+  //             : '',
+  //           release_num: it.branch + i,
+  //         })),
+  //       );
+  //     },
+  //   );
+  // };
 
   const getViewData = async (clusterMap = cluster) => {
     setLoading(true);
     try {
-      preData(clusterMap);
-      const basic = await PreReleaseServices.releaseBaseline();
+      // 获取整个视图的数据
+      const totalBasic = await PreReleaseServices.totalViewData();
+      const {version_baseline, ready_release, release_plan} = totalBasic;
+      preData(clusterMap, ready_release, release_plan);
+
       const formatBasicCluster = computeFn(
-        difference((basic.group ?? []).concat(basic.exist_clu ?? []), [
+        difference((version_baseline.group ?? []).concat(version_baseline.exist_clu ?? []), [
           'cn-northwest-01',
           'cn-northwest-10',
           ...ignore,
@@ -294,7 +330,7 @@ const VisualView = () => {
           basicGroup.push({
             name: it.name,
             children:
-              basic?.res.flatMap((re: any) => (re.cluster.includes(it.name) ? [re] : [])) ?? [],
+              version_baseline?.res.flatMap((re: any) => (re.cluster.includes(it.name) ? [re] : [])) ?? [],
           });
         });
       basicGroup.forEach((it) => {
@@ -426,6 +462,8 @@ const VisualView = () => {
                         const envIndex = dynamicColumn.findIndex((v) => v.name == env);
                         const alpha = envIndex - baseIndex;
                         if (envIndex < 0 || env == data.baseline_cluster) return '';
+
+                        // clusterMap
                         return (
                           <div>
                             <div

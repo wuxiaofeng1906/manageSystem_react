@@ -369,34 +369,23 @@ const VisualView = () => {
     );
   };
 
-  const renderTd = (data: any, deleteIcon?: boolean, showLink = true, clusterMap = cluster) => {
-    debugger
-    // 这里需要处理集群。将集群2，3，4，5，6，7集合在一起
-    // 宁夏集群2-7
-    const filterCluster = ['cn-northwest-2', 'cn-northwest-3', 'cn-northwest-4', 'cn-northwest-5', 'cn-northwest-6', 'cn-northwest-7'];
+  const renderTd = (data: any, deleteIcon?: boolean, showLink = true) => {
 
-    // 集群里面是否存在2-7的集群
+    const {arrow_info} = data;
+    // 展示的数字
     const showCluster: any = [];
-    const newCluster: any = [];
-
-    const {cluster} = data;
-    if (cluster && cluster.length) {
-      cluster.map((e: any) => {
-        if (filterCluster.includes(e)) {
-          // 后面要展示的集群(展示中文)
-          showCluster.push(clusterMap[e]);
-          // 重新添加集群2-7的总id
-          if (!newCluster.includes("cn-northwest-234567")) {
-            newCluster.push("cn-northwest-234567");
-          }
-        } else {
-          //  不是集群2-7，添加到新集群数组中。
-          newCluster.push(e);
+    if (arrow_info && arrow_info.length) {
+      arrow_info.map((e: any) => {
+        const {part_tips} = e;
+        if (part_tips && part_tips.length) {
+          part_tips.map((tip: any) => {
+            showCluster.push(tip.toString().replace("cn-northwest-", "").trim());
+          })
         }
-      });
+      })
     }
 
-    // debugger
+    debugger
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
@@ -412,30 +401,34 @@ const VisualView = () => {
                   showLink={showLink}
                   child={
                     <div>
-                      {newCluster.map((env: any, i: number) => {
+                      {arrow_info.map((env: any, i: number) => {
                         // debugger
                         const baseIndex = dynamicColumn.findIndex(
                           (v) => data.baseline_cluster == v.name,
                         );
-                        const envIndex = dynamicColumn.findIndex((v) => v.name == env);
+                        const envIndex = dynamicColumn.findIndex((v) => v.name == env.arrow_to);
                         const alpha = envIndex - baseIndex;
-                        if (envIndex < 0 || env == data.baseline_cluster) return '';
+                        if (envIndex < 0 || env.arrow_to == data.baseline_cluster) return '';
 
                         return (
                           <div
-                            key={env + i}
+                            key={env.arrow_to + i}
                             className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
                             style={{
                               width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
-                              textAlign: "right"
                             }}
                           >
                             {/* 如果2-7集群全都有的话，则，后面不再展示已成功的标签。 */}
-                            <div
-                              style={{top: -10,left:20, position: "relative",color:"gray"}}>
-                              {env === "cn-northwest-234567" && showCluster.length > 0 && showCluster.length < 6 ? "集群2、3、4、5、6" : ""}
-                              {/*{env === "cn-northwest-234567" && showCluster.length > 0 && showCluster.length < 6 ? showCluster.join(",") : ""}*/}
-                            </div>
+                            {(env.part_tips && env.part_tips.length > 0) && showCluster.length > 0 && showCluster.length < 6 ?
+                              <div style={{
+                                top: 5,
+                                position: "absolute",
+                                color: "gray",
+                                right: -85,
+                                textAlign: "left",
+                                width: 180
+                              }}>已上集群({showCluster.join("，")})</div>
+                              : ""}
                           </div>
                         );
                       })}

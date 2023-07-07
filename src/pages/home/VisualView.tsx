@@ -370,6 +370,7 @@ const VisualView = () => {
   };
 
   const renderTd = (data: any, deleteIcon?: boolean, showLink = true, clusterMap = cluster) => {
+    debugger
     // 这里需要处理集群。将集群2，3，4，5，6，7集合在一起
     // 宁夏集群2-7
     const filterCluster = ['cn-northwest-2', 'cn-northwest-3', 'cn-northwest-4', 'cn-northwest-5', 'cn-northwest-6', 'cn-northwest-7'];
@@ -395,7 +396,7 @@ const VisualView = () => {
       });
     }
 
-    debugger
+    // debugger
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
@@ -412,7 +413,7 @@ const VisualView = () => {
                   child={
                     <div>
                       {newCluster.map((env: any, i: number) => {
-                        debugger
+                        // debugger
                         const baseIndex = dynamicColumn.findIndex(
                           (v) => data.baseline_cluster == v.name,
                         );
@@ -430,9 +431,11 @@ const VisualView = () => {
                             }}
                           >
                             {/* 如果2-7集群全都有的话，则，后面不再展示已成功的标签。 */}
-                            <label>
-                              {env === "cn-northwest-234567" && showCluster.length > 0 && showCluster.length < 6 ? showCluster.join(",") : ""}
-                            </label>
+                            <div
+                              style={{top: -10,left:20, position: "relative",color:"gray"}}>
+                              {env === "cn-northwest-234567" && showCluster.length > 0 && showCluster.length < 6 ? "集群2、3、4、5、6" : ""}
+                              {/*{env === "cn-northwest-234567" && showCluster.length > 0 && showCluster.length < 6 ? showCluster.join(",") : ""}*/}
+                            </div>
                           </div>
                         );
                       })}
@@ -441,9 +444,9 @@ const VisualView = () => {
             </td>
           );
         })}
-          </Fragment>
-          );
-        };
+      </Fragment>
+    );
+  };
 
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
 

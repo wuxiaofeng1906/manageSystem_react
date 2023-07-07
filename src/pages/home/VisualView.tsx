@@ -427,7 +427,7 @@ const VisualView = () => {
                                 right: -85,
                                 textAlign: "left",
                                 width: 180
-                              }}>已上集群({showCluster.join("，")})</div>
+                              }}>集群({showCluster.join("，")})</div>
                               : ""}
                           </div>
                         );

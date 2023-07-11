@@ -87,7 +87,6 @@ const SheetInfo = (props: any, ref: any) => {
    */
   const onSave = async (flag = false, detail_cluster: any = {}) => {
 
-    debugger
     if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
     // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
     //       ...it,
@@ -140,10 +139,10 @@ const SheetInfo = (props: any, ref: any) => {
         // cluster: isString(release_app?.[0]?.cluster)
         //   ? release_app?.[0]?.cluster
         //   : release_app?.[0]?.cluster?.join(','),
-        cluster: flag ? detail_cluster.success_cluster : isString(release_app?.[0]?.cluster)
+        cluster: flag ? detail_cluster.success_cluster?.join(',') : isString(release_app?.[0]?.cluster)
           ? release_app?.[0]?.cluster
           : release_app?.[0]?.cluster?.join(','),
-        failure_cluster: flag ? detail_cluster.failed_cluster : "",
+        failure_cluster: flag ? detail_cluster.failed_cluster?.join(',') : "",
         database_version: release_app?.[0]?.database_version ?? '',
         batch: release_app?.[0]?.batch ?? '',
         sql_order:
@@ -282,7 +281,6 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const onSaveBeforeCheck = async (isAuto = false) => {
-    debugger
 
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
@@ -367,7 +365,6 @@ const SheetInfo = (props: any, ref: any) => {
 
       // 二次确认标记发布结果
       if (result == 'result') {
-        debugger
         // 集群，用于传数据到结果确认页面
         allClusters = (serverInfo?.[0]?.cluster).split(",");
         setSuccessModal(true);
@@ -403,7 +400,6 @@ const SheetInfo = (props: any, ref: any) => {
 
   // 确认发布成功
   const onSuccessConfirm = async (data: any) => {
-    debugger
 
     const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {

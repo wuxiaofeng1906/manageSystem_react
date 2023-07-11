@@ -44,138 +44,37 @@ const HistoryList = ({height}: { height: number }) => {
   };
 
   // 处理失败和成功的数据
-  const dealRows = (res: any) => {
-    const testData = [
-      {
-        "sortNo": 1,
-        "story": "",
-        "release_num": "202306280003",
-        "release_name": "202306280003灰度发布",
-        "project": [
-          {
-            "pro_name": "emergency20230625",
-            "pro_id": "2709"
+  const dealRows = (data: any) => {
+    const dealedData: any = [];
+    if (data && data.length) {
+      data.forEach((it: any, index: number) => {
+          //   需要单独处理发布成功的数据，需要判断里面有无发布失败的集群。
+          if (it.release_result === "success" && it.failure_cluster.length) {
+            const basic = {
+              ...it,
+              project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
+            }
+            // 有失败集群
+            dealedData.push({
+              ...basic,
+              sortNo: index + 1,
+              rowSpan: 2,
+            }, {
+              ...basic,
+              cluster: it.failure_cluster, // 将失败的集群赋值到cluster中用于展示
+              release_result: "failure"
+            });
+          } else {
+            dealedData.push({
+              ...it,
+              sortNo: index + 1,
+              project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
+            })
           }
-        ],
-        "branch": "emergency20230625",
-        "repair_order": null,
-        "release_type": "ready_release",
-        "release_way": "keep_server",
-        "release_env": "宁夏灰度集群0",
-        "cluster": [
-          "cn-northwest-0"
-        ],
-        "plan_release_time": "2023-06-28 10:00:00",
-        "release_index": 473,
-        "person_duty_num": null,
-        "announcement_num": null,
-        "apps": "h5,web,authapp",
-        "project_manager": "李小雷",
-        "release_result": "success",
-        "baseline_cluster": "",
-        "is_delete": false,
-        rowSpan: 2
-      },
-      {
-        "story": "",
-        "release_num": "202306280003",
-        "release_name": "202306280003灰度发布",
-        "project": [
-          {
-            "pro_name": "emergency20230625",
-            "pro_id": "2709"
-          }
-        ],
-        "branch": "emergency20230625",
-        "repair_order": null,
-        "release_type": "ready_release",
-        "release_way": "keep_server",
-        "release_env": "宁夏灰度集群1",
-        "cluster": [
-          "cn-northwest-0"
-        ],
-        "plan_release_time": "2023-06-28 10:00:00",
-        "release_index": 473,
-        "person_duty_num": null,
-        "announcement_num": null,
-        "apps": "h5,web,authapp",
-        "project_manager": "李小雷",
-        "release_result": "failure",
-        "baseline_cluster": "",
-        "is_delete": false
-      }, {
-        "sortNo": 2,
-        "story": "",
-        "release_num": "202306280003",
-        "release_name": "202306280003灰度发布",
-        "project": [
-          {
-            "pro_name": "emergency20230625",
-            "pro_id": "2709"
-          }
-        ],
-        "branch": "emergency20230625",
-        "repair_order": null,
-        "release_type": "ready_release",
-        "release_way": "keep_server",
-        "release_env": "宁夏灰度集群1",
-        "cluster": [
-          "cn-northwest-0"
-        ],
-        "plan_release_time": "2023-06-28 10:00:00",
-        "release_index": 473,
-        "person_duty_num": null,
-        "announcement_num": null,
-        "apps": "h5,web,authapp",
-        "project_manager": "李小雷",
-        "release_result": "unknown",
-        "baseline_cluster": "",
-        "is_delete": true
-      }, {
-        "sortNo": 3,
-        "story": "",
-        "release_num": "202306280003",
-        "release_name": "202306280003灰度发布",
-        "project": [
-          {
-            "pro_name": "emergency20230625",
-            "pro_id": "2709"
-          }
-        ],
-        "branch": "emergency20230625",
-        "repair_order": null,
-        "release_type": "ready_release",
-        "release_way": "keep_server",
-        "release_env": "宁夏灰度集群1",
-        "cluster": [
-          "cn-northwest-0"
-        ],
-        "plan_release_time": "2023-06-28 10:00:00",
-        "release_index": 473,
-        "person_duty_num": null,
-        "announcement_num": null,
-        "apps": "h5,web,authapp",
-        "project_manager": "李小雷",
-        "release_result": "unknown",
-        "baseline_cluster": "",
-        "is_delete": true
-      }
-    ];
-
-
-    setRowData(
-      testData.map((it: any) => ({
-        ...it,
-        project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
-      })) ?? [],
-    );
-
-    // setRowData(
-    //   res.data.map((it: any) => ({
-    //     ...it,
-    //     project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
-    //   })) ?? [],
-    // );
+        }
+      );
+    }
+    setRowData(dealedData);
   };
 
   const getTableList = async (page = 1, page_size = pages.page_size) => {
@@ -195,7 +94,7 @@ const HistoryList = ({height}: { height: number }) => {
           : moment(values.time?.[1]).endOf('d').format('YYYY-MM-DD HH:mm:ss'),
       });
 
-      dealRows(res);
+      dealRows(res?.data);
       setPages({page: res.page, total: res.total, page_size: res.page_size});
       setSpinning(false);
     } catch (e) {

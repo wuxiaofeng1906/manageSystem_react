@@ -10,7 +10,7 @@ import {
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
-import {errorMessage, infoMessage} from '@/publicMethods/showMessages';
+import {errorMessage} from '@/publicMethods/showMessages';
 import {useModel} from '@@/plugin-model/useModel';
 import {getDevOpsOrderColumn, PublishSeverColumn, PublishUpgradeColumn} from '@/pages/onlineSystem/config/column';
 import {
@@ -24,7 +24,7 @@ import AnnouncementServices from '@/services/announcement';
 import PreReleaseServices from '@/services/preRelease';
 import {OnlineSystemServices} from '@/services/onlineSystem';
 import moment from 'moment';
-import {isEmpty, omit, isString, pick, difference, isEqual, intersection} from 'lodash';
+import {isEmpty, omit, isString, pick, isEqual} from 'lodash';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {ModalSuccessCheck} from '@/pages/onlineSystem/releaseProcess/ReleaseOrder';
 import usePermission from '@/hooks/permission';
@@ -39,11 +39,11 @@ let allClusters: any = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
-  const {release_num, is_delete} = useParams() as { release_num: string, is_delete: string };
+  const {release_num} = useParams() as { release_num: string };
   const {onlineSystemPermission} = usePermission();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [envs] = useModel('env', (env) => [env.globalEnv]);
-  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft, getReleaseInfo, basic, api] =
+  const [globalState, sqlList, draft, setGlobalState, getLogInfo, setDraft] =
     useModel('onlineSystem', (online) => [online.globalState, online.sqlList,
       online.draft, online.setGlobalState, online.getLogInfo, online.setDraft, online.getReleaseInfo, online.basic, online.api]);
   const {devOpsOrderInfo, getDevOpsOrderInfo} = useModel('onlineSystem');
@@ -88,7 +88,7 @@ const SheetInfo = (props: any, ref: any) => {
   const onSave = async (flag = false, detail_cluster: any = {}) => {
     debugger
 
-    if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
+    if (isEmpty(upgradeData)) return errorMessage('工单基础信息获取异常，请刷新重试');
     // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
     //       ...it,
     //       concurrent: it.concurrent ?? 20,
@@ -172,7 +172,7 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const onDrag = async () => {
-    if (agFinished) return infoMessage('已标记发布结果不能修改工单顺序!');
+    if (agFinished) return errorMessage('已标记发布结果不能修改工单顺序!');
     if (!leaveShow) setLeaveShow(true);
   };
 
@@ -197,8 +197,6 @@ const SheetInfo = (props: any, ref: any) => {
       // 因为结果前提需要依靠这里面的数据，所以需要写在这里（获取所有的数据库版本和batch版本）
       const database = await OnlineSystemServices.databaseVersion();
       databaseVersion = database?.map((it: string) => ({label: it, value: it}));
-      const batch = await OnlineSystemServices.getBatchVersion({release_num});
-      agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
 
       // 工单信息的初始化数据(获取界面数据，被删除也要展示)
       let param: any = {release_num, include_deleted: true};
@@ -248,11 +246,18 @@ const SheetInfo = (props: any, ref: any) => {
       setFinished(agFinished);
       //--------------- res中，batch版本和数据库版本需要用来默认为获取的数据中的第一个
       const service = res.release_app;
-      // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
-      if (batch && batch.length > 0 && (isEmpty(service.batch) || service.batch === "-")) {
-        service.batch = batch[0];
+
+      // 应用里面必须包bpatch才展示默认值
+      if ((service.apps).includes('batch')) {
+        // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
+        const batch = await OnlineSystemServices.getBatchVersion({release_num});
+        agBatch = batch?.map((it: string) => ({label: it, value: it})) ?? [];
+        if (batch && batch.length > 0 && (isEmpty(service.batch) || service.batch === "-")) {
+          service.batch = batch[0];
+        }
       }
-      // 如果获取的batch数组有数据，并且表格返回的batch没有数据，则默认为数组的第一个值。
+
+      // 如果获取的database数组有数据，并且表格返回的database没有数据，则默认为数组的第一个值。
       if (database && database.length > 0 && (isEmpty(service.database_version) || service.database_version === "-")) {
         service.database_version = database[0];
       }
@@ -358,7 +363,7 @@ const SheetInfo = (props: any, ref: any) => {
     }
     if (showErrTip) {
       orderForm.setFieldsValue({release_result: null});
-      return infoMessage(showErrTip);
+      return errorMessage(showErrTip);
     }
 
     // 发布结果为空，直接保存

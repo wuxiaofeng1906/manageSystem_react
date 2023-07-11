@@ -10,6 +10,7 @@ import {isEmpty} from 'lodash';
 import moment from 'moment';
 import {history} from '@@/core/history';
 import "./index.less";
+import {useModel} from "@@/plugin-model/useModel";
 
 const HistoryList = ({height}: { height: number }) => {
   const gridRef = useRef<GridApi>();
@@ -20,7 +21,7 @@ const HistoryList = ({height}: { height: number }) => {
   const [projects, setProjects] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
-
+  const [mergeEnv] = useModel('env', (env) => [env.mergeEnv]);
   const [pages, setPages] = useState({
     page_size: 20,
     total: 0,
@@ -45,6 +46,7 @@ const HistoryList = ({height}: { height: number }) => {
 
   // 处理失败和成功的数据
   const dealRows = (data: any) => {
+    debugger
     const dealedData: any = [];
     if (data && data.length) {
       data.forEach((it: any, index: number) => {
@@ -54,15 +56,18 @@ const HistoryList = ({height}: { height: number }) => {
               ...it,
               project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
             }
+
             // 有失败集群
             dealedData.push({
               ...basic,
               sortNo: index + 1,
               rowSpan: 2,
+              release_env: (it.cluster).map((i: any) => mergeEnv[i]) // 转为中文
             }, {
               ...basic,
               cluster: it.failure_cluster, // 将失败的集群赋值到cluster中用于展示
-              release_result: "failure"
+              release_result: "failure",
+              release_env: (it.failure_cluster).map((i: any) => mergeEnv[i])
             });
           } else {
             dealedData.push({

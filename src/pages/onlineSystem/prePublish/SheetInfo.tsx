@@ -82,10 +82,11 @@ const SheetInfo = (props: any, ref: any) => {
   ]);
   /**
    * save information
-   * @param flag： release result
+   * @param flag： release result operation
    * @param detail_cluster：failed and success cluster
    */
   const onSave = async (flag = false, detail_cluster: any = {}) => {
+    debugger
 
     if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
     // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
@@ -104,6 +105,15 @@ const SheetInfo = (props: any, ref: any) => {
     const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
     const baseValues = baseForm.getFieldsValue();
     const orderValues = orderForm.getFieldsValue();
+    let releaseResult = 'unknown';
+    // 只要有一个成功集群，结果就是成功的。
+    if (flag) {
+      if (detail_cluster.success_cluster && (detail_cluster.success_cluster).length) {
+        releaseResult = "success";
+      } else if (detail_cluster.failed_cluster && (detail_cluster.failed_cluster).length) {
+        releaseResult = "failure";
+      }
+    }
     const params = {
       ready_release_num: release_num,
       user_id: user?.userid,
@@ -130,7 +140,8 @@ const SheetInfo = (props: any, ref: any) => {
         project: upgradeData?.basic_data?.project,
         announcement_num: orderValues?.announcement_num ?? '',
         person_duty_num: orderValues?.person_duty_num ?? '',
-        release_result: orderValues?.release_result ?? 'unknown',
+        // release_result: orderValues?.release_result ?? 'unknown',
+        release_result: releaseResult,
         need_auto: baseValues?.need_auto ?? '',
         auto_env: baseValues?.auto_env?.join(',') ?? '',
       },
@@ -152,6 +163,7 @@ const SheetInfo = (props: any, ref: any) => {
           })) ?? [],
       },
     };
+
     await OnlineSystemServices.updateOrderDetail(params);
     setLeaveShow(false);
     if (!flag) {

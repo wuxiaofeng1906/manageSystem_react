@@ -5,7 +5,7 @@ import React, {
 } from 'react';
 import {
   Col, DatePicker, Form, Input, Select, Spin,
-  Row, Space, Modal, InputNumber, ModalFuncProps, Cascader,
+  Row, Space, Modal, InputNumber, ModalFuncProps, Cascader, Button,
 } from 'antd';
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
@@ -771,34 +771,45 @@ const SheetInfo = (props: any, ref: any) => {
                   const color = {success: '#2BF541', failure: 'red'};
                   return (
                     <Form.Item name={'release_result'}>
-                      <Select
-                        allowClear
-                        // disabled={!hasPermission.orderPublish || draft || finished}
-                        className={styles.selectColor}
-                        onChange={() => onSaveBeforeCheck(true)}
-                        options={[
-                          // {label: '发布成功', value: 'success', key: 'success'},
-                          // {label: '发布失败', value: 'failure', key: 'failure'},
-                          {label: '发布结果', value: 'result', key: 'result'},
-                          {label: '置为草稿', value: 'draft', key: 'draft'},
-                          {label: ' ', value: 'unknown', key: 'unknown'},
-                        ]}
-                        style={{
-                          width: '100%',
-                          fontWeight: 'bold',
-                          color: color[result] ?? 'initial',
-                        }}
-                        placeholder={
-                          <span style={{color: '#00bb8f', fontWeight: 'initial'}}>
+                      {(!hasPermission.orderPublish || finished) ?
+                        <Button
+                          style={{
+                            width: '100%',
+                            // fontWeight: 'bold',
+                          }} onClick={() => setSuccessModal(true)}>
+                          结果明细
+                        </Button> :
+                        <Select
+                          allowClear
+                          disabled={!hasPermission.orderPublish || draft || finished}
+                          className={styles.selectColor}
+                          onChange={() => onSaveBeforeCheck(true)}
+                          options={[
+                            // {label: '发布成功', value: 'success', key: 'success'},
+                            // {label: '发布失败', value: 'failure', key: 'failure'},
+                            {label: '发布结果', value: 'result', key: 'result'},
+                            {label: '置为草稿', value: 'draft', key: 'draft'},
+                            {label: ' ', value: 'unknown', key: 'unknown'},
+                          ]}
+                          style={{
+                            width: '100%',
+                            fontWeight: 'bold',
+                            color: color[result] ?? 'initial',
+                          }}
+                          placeholder={
+                            <span style={{color: '#00bb8f', fontWeight: 'initial'}}>
                             标记发布结果
                           </span>
-                        }
-                      />
+                          }
+                        />}
+
+
                     </Form.Item>
                   );
                 }}
               </Form.Item>
             </Col>
+
           </Row>
         </Form>
         <h4 style={{margin: '16px 0'}}>一、工单-基础设置</h4>
@@ -1001,6 +1012,7 @@ const SheetInfo = (props: any, ref: any) => {
           visible={successModal}
           onOk={(v?: any) => onSuccessConfirm(v)}
           cluster={allClusters}
+          release_num={release_num}
         />
       </div>
     </Spin>

@@ -454,7 +454,7 @@ const ReleaseOrder = () => {
         });
       }
       setVisible(false);
-        // 清除Tab缓存
+      // 清除Tab缓存
       setTabsLocalStorage({release_num: id ?? ''}, "delete");
       history.replace('/onlineSystem/releaseProcess');
     }
@@ -966,6 +966,7 @@ const ReleaseOrder = () => {
             visible={visible}
             onOk={(v?: any) => onSuccessConfirm(v)}
             cluster={orderForm.getFieldValue('cluster')}
+            release_num={id}
           />
         </div>
       </PageContainer>
@@ -974,10 +975,11 @@ const ReleaseOrder = () => {
 };
 export default ReleaseOrder;
 
-export const ModalSuccessCheck = ({visible, onOk, cluster,}: {
-  visible: boolean; cluster: any; onOk: (v?: any) => void;
+export const ModalSuccessCheck = ({visible, cluster, onOk, release_num}: {
+  visible: boolean; cluster: any; onOk: (v?: any) => void; release_num: string
 }) => {
-
+  debugger
+  console.log(release_num)
   const [envList] = useModel('env', (env) => [env.releaseOrderEnv]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);

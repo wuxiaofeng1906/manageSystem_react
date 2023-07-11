@@ -773,7 +773,7 @@ const SheetInfo = (props: any, ref: any) => {
                     <Form.Item name={'release_result'}>
                       <Select
                         allowClear
-                        disabled={!hasPermission.orderPublish || draft || finished}
+                        // disabled={!hasPermission.orderPublish || draft || finished}
                         className={styles.selectColor}
                         onChange={() => onSaveBeforeCheck(true)}
                         options={[

@@ -80,8 +80,14 @@ const SheetInfo = (props: any, ref: any) => {
     upgradeData,
     deployments,
   ]);
+  /**
+   * save information
+   * @param flag： release result
+   * @param detail_cluster：failed and success cluster
+   */
+  const onSave = async (flag = false, detail_cluster: any = {}) => {
 
-  const onSave = async (flag = false) => {
+    debugger
     if (isEmpty(upgradeData)) return infoMessage('工单基础信息获取异常，请刷新重试');
     // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
     //       ...it,
@@ -99,8 +105,7 @@ const SheetInfo = (props: any, ref: any) => {
     const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
     const baseValues = baseForm.getFieldsValue();
     const orderValues = orderForm.getFieldsValue();
-    const sqlValues = sqlForm.getFieldsValue();
-    await OnlineSystemServices.updateOrderDetail({
+    const params = {
       ready_release_num: release_num,
       user_id: user?.userid,
       upgrade_api,
@@ -132,9 +137,13 @@ const SheetInfo = (props: any, ref: any) => {
       },
       release_app: {
         ...release_app?.[0],
-        cluster: isString(release_app?.[0]?.cluster)
+        // cluster: isString(release_app?.[0]?.cluster)
+        //   ? release_app?.[0]?.cluster
+        //   : release_app?.[0]?.cluster?.join(','),
+        cluster: flag ? detail_cluster.success_cluster : isString(release_app?.[0]?.cluster)
           ? release_app?.[0]?.cluster
           : release_app?.[0]?.cluster?.join(','),
+        failure_cluster: flag ? detail_cluster.failed_cluster : "",
         database_version: release_app?.[0]?.database_version ?? '',
         batch: release_app?.[0]?.batch ?? '',
         sql_order:
@@ -143,7 +152,8 @@ const SheetInfo = (props: any, ref: any) => {
             sql_action_time,
           })) ?? [],
       },
-    });
+    };
+    await OnlineSystemServices.updateOrderDetail(params);
     setLeaveShow(false);
     if (!flag) {
       await getDetail();
@@ -272,6 +282,7 @@ const SheetInfo = (props: any, ref: any) => {
   };
 
   const onSaveBeforeCheck = async (isAuto = false) => {
+    debugger
 
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
@@ -282,7 +293,7 @@ const SheetInfo = (props: any, ref: any) => {
     if (base.need_auto == 'no') ignore.push('auto_env');
 
     let valid = false;
-    const checkResult = !['failure', 'draft'].includes(order.release_result);
+    const checkResult = !['draft'].includes(order.release_result);
     const checkObj = omit({...order, ...base}, ignore);
     let showErrTip = '';
     const errTip = {
@@ -392,12 +403,19 @@ const SheetInfo = (props: any, ref: any) => {
 
   // 确认发布成功
   const onSuccessConfirm = async (data: any) => {
+    debugger
 
     const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});
       setSuccessModal(false);
     } else {
+
+      // func 1 -------save page data
+      await onSave(true, {failed_cluster: data.failedList, success_cluster: data.successList});
+      agFinished = true;
+      setFinished(true);
+      //func 2 -------excute automation
       let params: any[] = [];
       const ignoreCheck = data.ignoreCheck;
       Object.keys(AutoCheckType).forEach((type) => {
@@ -410,26 +428,25 @@ const SheetInfo = (props: any, ref: any) => {
           ready_release_num: release_num ?? '',
         });
       });
-      await onSave(true);
-      agFinished = true;
-      setFinished(true);
       await PreReleaseServices.automation(params);
-      // 获取集群
-      const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
-      const clusters = (release_app?.[0]?.cluster).split(",");
 
-      // 关联公告并勾选挂起公告
+
+      //func 3 -------push announcement
+      // 公告不为空和不为免，则需要传。。只传成功的集群
       if (!isEmpty(announce) && announce !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),
-          // announcement_time: 'after',
-          cluster_ids: clusters,
+          cluster_ids: data.successList ?? [],
         });
       }
-
+      //func 4 -------Release all tenant
+      // 获取全部集群
+      const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
+      const clusters = (release_app?.[0]?.cluster).split(",");
       // 发布类型为停机发布 并且 包含租户集群才调用开放租户接口  （cn-northwest-global）
       if (orderForm.getFieldValue("release_way") === "stop_server" && !isEqual(clusters, ["cn-northwest-global"])) {
+        // 里面拼接了成功和失败的所有集群
         await PreReleaseServices.releasetenants({env_name_list: clusters});
       }
 

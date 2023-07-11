@@ -423,6 +423,7 @@ const ReleaseOrder = () => {
   };
 
   const onSuccessConfirm = async (data: any) => {
+    debugger
     const announcement_num = orderForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});
@@ -457,7 +458,7 @@ const ReleaseOrder = () => {
         });
       }
       setVisible(false);
-      //   清除Tab缓存
+        // 清除Tab缓存
       setTabsLocalStorage({release_num: id ?? ''}, "delete");
       history.replace('/onlineSystem/releaseProcess');
     }
@@ -968,7 +969,7 @@ export default ReleaseOrder;
 export const ModalSuccessCheck = ({visible, onOk, cluster,}: {
   visible: boolean; cluster: any; onOk: (v?: any) => void;
 }) => {
-  debugger
+
   const [envList] = useModel('env', (env) => [env.releaseOrderEnv]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);

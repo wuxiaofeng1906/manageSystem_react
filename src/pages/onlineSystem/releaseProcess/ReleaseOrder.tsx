@@ -117,6 +117,7 @@ const ReleaseOrder = () => {
   };
 
   const getOrderDetail = async (clusterMap = clusters) => {
+    debugger
     try {
       setSpinning(true);
       const params: any = {release_num: id, include_deleted: true};
@@ -126,7 +127,7 @@ const ReleaseOrder = () => {
       } else
         orderForm.setFieldsValue({
           ...res,
-          release_result:
+          release_result: res.is_delete ? "cancel" :
             isEmpty(res.release_result) || res.release_result == 'unknown'
               ? null
               : res.release_result,
@@ -710,32 +711,43 @@ const ReleaseOrder = () => {
                 >
                   {({getFieldValue}) => {
                     const result = getFieldValue('release_result');
+
                     const color = {success: '#2BF541', failure: 'red'};
                     return (
                       <Form.Item name={'release_result'}>
-                        <Select
-                          allowClear
-                          disabled={!hasPermission?.saveResult || finished}
-                          className={styles.selectColor}
-                          onChange={() => onSaveBeforeCheck(true)}
-                          options={[
-                            // {label: '发布成功', value: 'success', key: 'success'},
-                            // {label: '发布失败', value: 'failure', key: 'failure'},
-                            {label: '发布结果', value: 'result', key: 'result'},
-                            {label: '取消发布', value: 'cancel', key: 'cancel'},
-                            {label: ' ', value: 'unknown', key: 'unknown'},
-                          ]}
-                          style={{
-                            width: '100%',
-                            fontWeight: 'bold',
-                            color: color[result] ?? 'initial',
+                        {finished && result !== "cancel" ?
+                          <Button style={{
+                            borderRadius: 4, width: '100%',
+                            backgroundColor: "transparent", borderColor: "#46a0fc",
+                            color: "#46a0fc",
                           }}
-                          placeholder={
-                            <span style={{color: '#00bb8f', fontWeight: 'initial'}}>
+                                  onClick={() => setVisible(true)}>
+                            结果明细
+                          </Button> :
+                          <Select
+                            allowClear
+                            disabled={!hasPermission?.saveResult || finished}
+                            // className={styles.selectColor}
+                            onChange={() => onSaveBeforeCheck(true)}
+                            options={[
+                              // {label: '发布成功', value: 'success', key: 'success'},
+                              // {label: '发布失败', value: 'failure', key: 'failure'},
+                              {label: '发布结果', value: 'result', key: 'result'},
+                              {label: '取消发布', value: 'cancel', key: 'cancel'},
+                              {label: ' ', value: 'unknown', key: 'unknown'},
+                            ]}
+                            style={{
+                              width: '100%',
+                              fontWeight: 'bold',
+                              color: color[result] ?? 'initial',
+                            }}
+                            placeholder={
+                              <span style={{color: '#00bb8f', fontWeight: 'initial'}}>
                               标记发布结果
                             </span>
-                          }
-                        />
+                            }
+                          />}
+
                       </Form.Item>
                     );
                   }}
@@ -1035,13 +1047,13 @@ export const ModalSuccessCheck = ({visible, onOk, pageInfo}: {
     }
 
     form.setFieldsValue({
-      successList: cluster.success,
-      failedList: cluster.failure,
+      successList: cluster?.success,
+      failedList: cluster?.failure,
       ignoreCheck: checkResult.length === 0,
       checkResult: checkResult
     });
 
-    setSelectOption(envList.filter(e => [...cluster.success, ...cluster.failure].includes(e.key)));
+    setSelectOption(envList.filter(e => [...cluster?.success, ...cluster?.failure].includes(e.key)));
   };
 
   useEffect(() => {

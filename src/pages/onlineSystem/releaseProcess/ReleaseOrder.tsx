@@ -1036,6 +1036,8 @@ export const ModalSuccessCheck = ({visible, onOk, pageInfo}: {
     }
     // if finished ,get history info
     const {cluster, automation_datas} = await PreReleaseServices.getResultRemark({release_num});
+    if (!cluster || !automation_datas) return;
+    debugger
     // get automation info
     const checkResult: any = [];
     if (automation_datas && automation_datas.length) {

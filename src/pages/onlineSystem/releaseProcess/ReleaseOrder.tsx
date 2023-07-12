@@ -362,7 +362,12 @@ const ReleaseOrder = () => {
     }
   };
 
-  const onSave = async (jump = false) => {
+  /**
+   *
+   * @param flag   save result(true)
+   * @param detail_cluster
+   */
+  const onSave = async (flag = false, detail_cluster: any = {}) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const checkObj = omit({...order, ...base}, ['release_result']);
@@ -383,13 +388,22 @@ const ReleaseOrder = () => {
     if (isEmpty(base.release_name?.trim())) return errorMessage(errTip.release_name);
 
     // 过滤掉工单-表单设置（orderData）手动添加的空行
-
     let filteredOrder: any = [];
     if (orderData && orderData.length) {
       filteredOrder = orderData.filter((e: any) => e.ready_release_name !== "" && e.repair_order_type !== "");
     }
 
-    await PreReleaseServices.saveOrder({
+    let releaseResult = 'unknown';
+    // 只要有一个成功集群，结果就是成功的。
+    if (flag) {
+      if (detail_cluster.success_cluster && (detail_cluster.success_cluster).length) {
+        releaseResult = "success";
+      } else if (detail_cluster.failed_cluster && (detail_cluster.failed_cluster).length) {
+        releaseResult = "failure";
+      }
+    }
+
+    const params = {
       release_num: id, // 发布编号
       user_id: user?.userid ?? '',
       release_name: base.release_name?.trim() ?? '',
@@ -399,11 +413,14 @@ const ReleaseOrder = () => {
       rd_repair_data: filteredOrder,
       release_way: order.release_way ?? '',
       ops_repair_data: compareData?.opsData ?? [],
-      release_result: order.release_result ?? 'unknown',
-      cluster: base.cluster?.join(',') ?? '',
+      release_result: releaseResult,
+      cluster: flag ? detail_cluster.success_cluster?.join(',') : base.cluster?.join(',') ?? '',
+      failure_cluster: flag ? detail_cluster.failed_cluster?.join(',') : "",
       ready_release_num: filteredOrder?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
       plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
-    });
+    };
+
+    await PreReleaseServices.saveOrder(params);
     setTabsLocalStorage({
       "release_num": id,
       "release_name": base.release_name?.trim() ?? '',
@@ -414,7 +431,7 @@ const ReleaseOrder = () => {
     // 修改后要刷新Tab
     await ref.current?.onTabsRefresh(true);
     // 更新详情
-    if (!jump) {
+    if (!flag) {
       getOrderDetail();
     }
   };
@@ -437,19 +454,18 @@ const ReleaseOrder = () => {
           ready_release_num: id ?? '',
         });
       });
-      await onSave(true);
+      await onSave(true, {failed_cluster: data.failedList, success_cluster: data.successList});
       agFinished = true;
       setFinished(true);
       await PreReleaseServices.automation(params);
 
-      const clusterArray = baseForm.getFieldValue('cluster');  // 获取集群
-      // 关联公告并勾选挂起公告
+      // 关联公告并勾选挂起公告(成功的集群)
       if (!isEmpty(announcement_num) && announcement_num !== '免' && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),
           // announcement_time: 'after',
-          cluster_ids: clusterArray
+          cluster_ids: data.successList ?? [],
 
         });
       }

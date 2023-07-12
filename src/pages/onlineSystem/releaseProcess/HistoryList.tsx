@@ -46,7 +46,6 @@ const HistoryList = ({height}: { height: number }) => {
 
   // 处理失败和成功的数据
   const dealRows = (data: any) => {
-    debugger
     const dealedData: any = [];
     if (data && data.length) {
       data.forEach((it: any, index: number) => {
@@ -69,12 +68,20 @@ const HistoryList = ({height}: { height: number }) => {
               release_result: "failure",
               release_env: (it.failure_cluster).map((i: any) => mergeEnv[i])
             });
+          } else if (it.release_result === "failure") {
+            dealedData.push({
+              ...it,
+              cluster: it.failure_cluster, // 将失败的集群赋值到cluster中用于展示
+              sortNo: index + 1,
+              project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
+              release_env: (it.failure_cluster).map((i: any) => mergeEnv[i])
+            });
           } else {
             dealedData.push({
               ...it,
               sortNo: index + 1,
               project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
-            })
+            });
           }
         }
       );

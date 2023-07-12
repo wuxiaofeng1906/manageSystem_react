@@ -965,8 +965,8 @@ const ReleaseOrder = () => {
           <ModalSuccessCheck
             visible={visible}
             onOk={(v?: any) => onSuccessConfirm(v)}
-            cluster={orderForm.getFieldValue('cluster')}
-            release_num={id}
+            pageInfo={{initCluster: orderForm.getFieldValue('cluster'), release_num: id, finished}}
+
           />
         </div>
       </PageContainer>
@@ -975,14 +975,15 @@ const ReleaseOrder = () => {
 };
 export default ReleaseOrder;
 
-export const ModalSuccessCheck = ({visible, cluster, onOk, release_num}: {
-  visible: boolean; cluster: any; onOk: (v?: any) => void; release_num: string
+export const ModalSuccessCheck = ({visible, onOk, pageInfo}: {
+  visible: boolean; onOk: (v?: any) => void; pageInfo: any
 }) => {
-  debugger
-  console.log(release_num)
+  const {initCluster, release_num, finished} = pageInfo;
   const [envList] = useModel('env', (env) => [env.releaseOrderEnv]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [selectOption, setSelectOption] = useState<any>([]);
+
   const onConfirm = async () => {
     setLoading(true);
     try {
@@ -994,8 +995,41 @@ export const ModalSuccessCheck = ({visible, cluster, onOk, release_num}: {
     }
   };
 
+
+  const getInitData = async () => {
+    // init value
+    if (!finished) {
+      form.setFieldsValue({
+        successList: initCluster
+      });
+      setSelectOption(envList.filter(e => initCluster.includes(e.key)));
+      return;
+    }
+    // if finished ,get history info
+    const {cluster, automation_datas} = await PreReleaseServices.getResultRemark({release_num});
+    // get automation info
+    const checkResult: any = [];
+    if (automation_datas && automation_datas.length) {
+      automation_datas.map((e: any) => {
+        if (e.check_result === "yes") {
+          checkResult.push(e.check_type)
+        }
+      });
+    }
+
+    form.setFieldsValue({
+      successList: cluster.success,
+      failedList: cluster.failure,
+      ignoreCheck: checkResult.length === 0,
+      checkResult: checkResult
+    });
+
+    setSelectOption(envList.filter(e => [...cluster.success, ...cluster.failure].includes(e.key)));
+  };
+
   useEffect(() => {
     if (!visible) form.resetFields();
+    getInitData();
   }, [visible]);
 
   return (
@@ -1008,9 +1042,9 @@ export const ModalSuccessCheck = ({visible, cluster, onOk, release_num}: {
       onCancel={() => onOk()}
       className={styles.modalSuccessCheck}
       destroyOnClose
-      okButtonProps={{disabled: loading}}
+      okButtonProps={{disabled: loading || finished}}
     >
-      <Form form={form} layout={'inline'} initialValues={{successList: cluster}}>
+      <Form form={form} layout={'inline'}>
 
         <Form.Item style={{marginTop: -20}} shouldUpdate={(old, next) => old.failedList != next.failedList}>
           {({getFieldValue}) => {
@@ -1025,10 +1059,11 @@ export const ModalSuccessCheck = ({visible, cluster, onOk, release_num}: {
                   size={"small"}
                   allowClear
                   style={{width: '350px'}}
-                  options={envList.filter(e => cluster.includes(e.key))}
+                  options={selectOption}
+                  disabled={finished}
                   onChange={() => {
                     const successCluter = getFieldValue("successList");
-                    const failedCluster = difference(cluster, successCluter);
+                    const failedCluster = difference(initCluster, successCluter);
                     form.setFieldsValue({
                       failedList: failedCluster
                     })
@@ -1052,10 +1087,11 @@ export const ModalSuccessCheck = ({visible, cluster, onOk, release_num}: {
                   size={"small"}
                   allowClear
                   style={{width: '350px'}}
-                  options={envList.filter(e => cluster.includes(e.key))}
+                  disabled={finished}
+                  options={selectOption}
                   onChange={() => {
                     const failedCluster = getFieldValue("failedList");
-                    const successCluter = difference(cluster, failedCluster);
+                    const successCluter = difference(initCluster, failedCluster);
                     form.setFieldsValue({
                       successList: successCluter
                     })
@@ -1077,7 +1113,7 @@ export const ModalSuccessCheck = ({visible, cluster, onOk, release_num}: {
               >
                 <Checkbox
                   value="yes"
-                  disabled={!isEmpty(getFieldValue('checkResult'))}
+                  disabled={!isEmpty(getFieldValue('checkResult')) || finished}
                   onChange={({target}) => form.validateFields(['checkResult'])}
                 >
                   忽略检查
@@ -1099,7 +1135,7 @@ export const ModalSuccessCheck = ({visible, cluster, onOk, release_num}: {
                 // required={true}
                 rules={[{required: afterCheck !== true, message: '请选择检查结果'}]}
               >
-                <Checkbox.Group style={{width: '100%'}} disabled={afterCheck == true}>
+                <Checkbox.Group style={{width: '100%'}} disabled={afterCheck == true || finished}>
                   <Checkbox value="ui">UI执行通过</Checkbox>
                   <Checkbox value="applet">小程序执行通过</Checkbox>
                 </Checkbox.Group>

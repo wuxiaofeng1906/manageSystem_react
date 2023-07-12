@@ -1011,8 +1011,8 @@ const SheetInfo = (props: any, ref: any) => {
         <ModalSuccessCheck
           visible={successModal}
           onOk={(v?: any) => onSuccessConfirm(v)}
-          cluster={allClusters}
-          release_num={release_num}
+          // cluster={allClusters}
+          pageInfo={{initCluster: allClusters, release_num, finished}}
         />
       </div>
     </Spin>

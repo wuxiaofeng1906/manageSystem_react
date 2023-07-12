@@ -181,6 +181,11 @@ const PreReleaseServices = {
 //   检查对应集群在运维平台的状态
   async getClusterStatus(cluster: any) {
     return axiosGet_TJ(Check_Cluster_Status, {env: cluster});
-  }
+  },
+
+// 获取发布结果数据
+  async getResultRemark(data: any) {
+    return axiosGet_TJ(`${baseUrl}/online/rd-release-result-mark`, data);
+  },
 };
 export default PreReleaseServices;

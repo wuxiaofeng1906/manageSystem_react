@@ -997,6 +997,7 @@ export const ModalSuccessCheck = ({visible, onOk, pageInfo}: {
 
 
   const getInitData = async () => {
+    if (!initCluster || !release_num) return;
     // init value
     if (!finished) {
       form.setFieldsValue({

@@ -381,44 +381,48 @@ export const logColumns: any = [
     headerName: '编号',
     field: 'id',
     minWidth: 90,
+    maxWidth: 90,
   },
   {
     headerName: '项目',
     field: 'testCaseProject',
     minWidth: 100,
   },
+  // {
+  //   headerName: '分支',
+  //   field: 'testCaseBranch',
+  //   minWidth: 100,
+  // },
   {
-    headerName: '分支',
-    field: 'testCaseBranch',
-    minWidth: 100,
+    headerName: '执行人',
+    field: 'actionUser',
+    minWidth: 85,
+    maxWidth: 85,
   },
   {
     headerName: '开始时间',
     field: 'testCaseTime',
-    minWidth: 140,
-
+    minWidth: 190,
+    maxWidth: 190
   },
   {
     headerName: '结束时间',
     field: 'testCaseEndTime',
-    minWidth: 140,
-
+    minWidth: 190,
+    maxWidth: 190
   },
   {
-    headerName: '运行状态',
+    headerName: '状态',
     field: 'testCaseStatus',
-    minWidth: 90,
+    minWidth: 65,
+    maxWidth: 65,
     cellRenderer: "runStatus"
-  },
-  {
-    headerName: '执行人',
-    field: 'actionUser',
-    minWidth: 90,
   },
   {
     headerName: '日志',
     field: 'testCaseUrl',
     minWidth: 65,
+    maxWidth: 65,
     pinned: "right",
     cellRenderer: 'logLink',
   }

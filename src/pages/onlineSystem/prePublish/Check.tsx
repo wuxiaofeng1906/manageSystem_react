@@ -291,7 +291,7 @@ const Check = (props: any, ref: any) => {
       // 后端单元测试是否通过
       if (type === 'backend_test_unit') {
         debugger
-        content = (<div style={{height: 400}}>
+        content = (<div style={{height: 500, marginLeft: -50, marginRight: -20}}>
           <AgGridReact
             className="ag-theme-alpine"
             defaultColDef={{
@@ -328,7 +328,7 @@ const Check = (props: any, ref: any) => {
                 }
 
                 return <a href={v.value} target="_blank">
-                  <LinkOutlined/>
+                  <LinkOutlined style={{cursor: "pointer"}}/>
                 </a>
               }
             }}
@@ -336,11 +336,12 @@ const Check = (props: any, ref: any) => {
         </div>);
 
         return Modal.info({
-          title: "检查日志",
+          title: <div style={{marginTop: -10}}>检查日志</div>,
           centered: true,
           maskClosable: false,
-          width: props.width || 1000,
+          width: 1000,
           content: content,
+          okText: "确定",
         });
       }
 
@@ -672,6 +673,8 @@ const Check = (props: any, ref: any) => {
           />
 
         </div>
+
+
       </Spin>
     );
   }

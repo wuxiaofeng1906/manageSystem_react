@@ -1,7 +1,7 @@
 import React, {useImperativeHandle, useState, forwardRef, useEffect, useMemo, useRef} from 'react';
 import {
   Table, Switch, Spin, Modal, Checkbox, Select,
-  Form, DatePicker, ModalFuncProps, Button, Tooltip, Input, Space
+  Form, DatePicker, ModalFuncProps, Button, Tooltip, Input
 } from 'antd';
 import {
   AutoCheckType, checkInfo, CheckStatus, CheckTechnicalSide, onLog, logColumns,
@@ -17,7 +17,6 @@ import DutyListServices from '@/services/dutyList';
 import usePermission from '@/hooks/permission';
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {RELEASE_MODULE} from "@/pages/onlineSystem/announcement/constant";
 import {LinkOutlined} from "@ant-design/icons";
 
 const {TextArea} = Input;
@@ -660,16 +659,28 @@ const Check = (props: any, ref: any) => {
                 rowData={isLogModalOpen.data}
                 frameworkComponents={{
                   runStatus: (v: any) => {
-                    const status = {success: "成功", error: "失败", skip: "跳过", running: "运行中"};
+                    const status = {
+                      success: {title: "成功", pic: "success.png"},
+                      error: {titile: "失败", pic: "error.png"},
+                      skip: {title: "跳过", pic: "skip.png"},
+                      running: {title: "运行中", pic: "running.gif"},
+                      notrun: {title: "未执行", pic: "notrun.png"},
+                      aborted: {title: "中断", pic: "aborted.png"},
+                    };
                     if (v.value) {
-                      return <Tooltip title={status[v.value]}>
-                        <img
-                          width={18}
-                          height={18}
-                          style={{marginTop: -5}}
-                          src={require(`../../../../public/${v.value}.png`)}
-                        />
-                      </Tooltip>;
+                      const values = (v.value).toLowerCase();
+                      if (status[values]) {
+                        return <Tooltip title={status[values].title}>
+                          <img
+                            width={18}
+                            height={18}
+                            style={{marginTop: -5}}
+                            src={require(`../../../../public/${status[values].pic}`)}
+                            // src={require(`../../../../public/notrun.png`)}
+                          />
+                        </Tooltip>;
+                      }
+
                     }
 
                     return v.value;

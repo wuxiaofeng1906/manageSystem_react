@@ -291,7 +291,7 @@ const Check = (props: any, ref: any) => {
       // 后端单元测试是否通过
       if (type === 'backend_test_unit') {
         debugger
-        content = (<div style={{height: 300}}>
+        content = (<div style={{height: 400}}>
           <AgGridReact
             className="ag-theme-alpine"
             defaultColDef={{
@@ -300,12 +300,27 @@ const Check = (props: any, ref: any) => {
               suppressMenu: true,
               cellStyle: {'line-height': '30px'},
             }}
-            rowHeight={28}
-            headerHeight={30}
+            rowHeight={30}
+            headerHeight={32}
             onGridReady={onGridReady}
             columnDefs={logColumns}
             rowData={v}
             frameworkComponents={{
+              runStatus: (v: any) => {
+                const status = {success: "成功", error: "失败", skip: "跳过", running: "运行中"};
+                if (v.value) {
+                  return <Tooltip title={status[v.value]}>
+                    <img
+                      width={18}
+                      height={18}
+                      style={{marginTop: -5}}
+                      src={require(`../../../../public/${v.value}.png`)}
+                    />
+                  </Tooltip>;
+                }
+
+                return v.value;
+              },
               logLink: (v: any) => {
                 // 无数据，展示灰色链接
                 if (!v.value) {

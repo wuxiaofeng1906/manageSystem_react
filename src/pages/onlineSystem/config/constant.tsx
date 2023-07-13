@@ -408,15 +408,7 @@ export const logColumns: any = [
     headerName: '运行状态',
     field: 'testCaseStatus',
     minWidth: 90,
-    cellRenderer: (v: any) => {
-
-      const status = {success: "成功", error: "失败", skip: "跳过", running: "运行中"};
-      if (v.value) {
-        return status[v.value];
-      }
-
-      return v.value;
-    }
+    cellRenderer: "runStatus"
   },
   {
     headerName: '执行人',

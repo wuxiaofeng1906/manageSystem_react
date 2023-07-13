@@ -64,11 +64,24 @@ const Check = (props: any, ref: any) => {
       data: null,
       param: null
     });
+
+    // 日志弹窗
+    const [isLogModalOpen, setIsLogModalOpen] = useState({
+      visible: false,
+      data: []
+    });
     const gridRef = useRef<GridApi>();
     const onGridReady = (params: GridReadyEvent) => {
       gridRef.current = params.api;
       params.api.sizeColumnsToFit();
     };
+    const handleCancel = () => {
+      setIsLogModalOpen({
+        ...isLogModalOpen,
+        visible: false
+      });
+    };
+
     useImperativeHandle(
       ref,
       () => ({
@@ -290,58 +303,9 @@ const Check = (props: any, ref: any) => {
 
       // 后端单元测试是否通过
       if (type === 'backend_test_unit') {
-        debugger
-        content = (<div style={{height: 500, marginLeft: -50, marginRight: -20}}>
-          <AgGridReact
-            className="ag-theme-alpine"
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              suppressMenu: true,
-              cellStyle: {'line-height': '30px'},
-            }}
-            rowHeight={30}
-            headerHeight={32}
-            onGridReady={onGridReady}
-            columnDefs={logColumns}
-            rowData={v}
-            frameworkComponents={{
-              runStatus: (v: any) => {
-                const status = {success: "成功", error: "失败", skip: "跳过", running: "运行中"};
-                if (v.value) {
-                  return <Tooltip title={status[v.value]}>
-                    <img
-                      width={18}
-                      height={18}
-                      style={{marginTop: -5}}
-                      src={require(`../../../../public/${v.value}.png`)}
-                    />
-                  </Tooltip>;
-                }
-
-                return v.value;
-              },
-              logLink: (v: any) => {
-                // 无数据，展示灰色链接
-                if (!v.value) {
-                  return <LinkOutlined/>;
-                }
-
-                return <a href={v.value} target="_blank">
-                  <LinkOutlined style={{cursor: "pointer"}}/>
-                </a>
-              }
-            }}
-          />
-        </div>);
-
-        return Modal.info({
-          title: <div style={{marginTop: -10}}>检查日志</div>,
-          centered: true,
-          maskClosable: false,
-          width: 1000,
-          content: content,
-          okText: "确定",
+        setIsLogModalOpen({
+          visible: true,
+          data: v
         });
       }
 
@@ -671,6 +635,59 @@ const Check = (props: any, ref: any) => {
                          onOk={updateStatus}
 
           />
+          {/* 后端单元测试日志 */}
+          <Modal title={<div style={{marginTop: -5, fontWeight: "bold"}}>检查日志</div>}
+                 visible={isLogModalOpen.visible}
+                 onCancel={handleCancel}
+                 maskClosable={false}
+                 width={1000}
+                 destroyOnClose={true}
+                 footer={null}>
+            {/*<div style={{height: 500, marginTop: -30, marginLeft: -10, marginRight: -10}}>*/}
+            <div style={{height: 500, margin: "-30px -15px 0px -15px"}}>
+              <AgGridReact
+                className="ag-theme-alpine"
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  suppressMenu: true,
+                  cellStyle: {'line-height': '30px'},
+                }}
+                rowHeight={30}
+                headerHeight={32}
+                onGridReady={onGridReady}
+                columnDefs={logColumns}
+                rowData={isLogModalOpen.data}
+                frameworkComponents={{
+                  runStatus: (v: any) => {
+                    const status = {success: "成功", error: "失败", skip: "跳过", running: "运行中"};
+                    if (v.value) {
+                      return <Tooltip title={status[v.value]}>
+                        <img
+                          width={18}
+                          height={18}
+                          style={{marginTop: -5}}
+                          src={require(`../../../../public/${v.value}.png`)}
+                        />
+                      </Tooltip>;
+                    }
+
+                    return v.value;
+                  },
+                  logLink: (v: any) => {
+                    // 无数据，展示灰色链接
+                    if (!v.value) {
+                      return <LinkOutlined/>;
+                    }
+
+                    return <a href={`${v.value}console`} target="_blank">
+                      <LinkOutlined style={{cursor: "pointer"}}/>
+                    </a>
+                  }
+                }}
+              />
+            </div>
+          </Modal>
 
         </div>
 

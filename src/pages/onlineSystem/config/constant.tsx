@@ -367,11 +367,77 @@ export const checkInfo = [
     desc: "remark"
   },
 ];
+
+export const logColumns: any = [
+  {
+    headerName: '序号',
+    minWidth: 65,
+    maxWidth: 65,
+    cellRenderer: (params: any) => {
+      return Number(params.node.id) + 1;
+    },
+  },
+  {
+    headerName: '编号',
+    field: 'id',
+    minWidth: 90,
+  },
+  {
+    headerName: '项目',
+    field: 'testCaseProject',
+    minWidth: 100,
+  },
+  {
+    headerName: '分支',
+    field: 'testCaseBranch',
+    minWidth: 100,
+  },
+  {
+    headerName: '开始时间',
+    field: 'testCaseTime',
+    minWidth: 140,
+
+  },
+  {
+    headerName: '结束时间',
+    field: 'testCaseEndTime',
+    minWidth: 140,
+
+  },
+  {
+    headerName: '运行状态',
+    field: 'testCaseStatus',
+    minWidth: 90,
+    cellRenderer: (v: any) => {
+
+      const status = {success: "成功", error: "失败", skip: "跳过", running: "运行中"};
+      if (v.value) {
+        return status[v.value];
+      }
+
+      return v.value;
+    }
+  },
+  {
+    headerName: '执行人',
+    field: 'actionUser',
+    minWidth: 90,
+  },
+  {
+    headerName: '日志',
+    field: 'testCaseUrl',
+    minWidth: 65,
+    pinned: "right",
+    cellRenderer: 'logLink',
+  }
+
+];
 // 日志弹窗
 export const onLog = (props: ModalFuncProps & { log: string; noData: string }) => {
   if (isEmpty(props.log)) return infoMessage(props.noData || '暂无日志！');
   Modal.info({
     centered: true,
+    maskClosable: false,
     width: props.width || 1000,
     okText: props.okText || '取消',
     title: props.title,

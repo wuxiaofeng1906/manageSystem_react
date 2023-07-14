@@ -661,7 +661,7 @@ const Check = (props: any, ref: any) => {
                   runStatus: (v: any) => {
                     const status = {
                       success: {title: "成功", pic: "success.png"},
-                      error: {titile: "失败", pic: "error.png"},
+                      error: {title: "失败", pic: "error.png"},
                       skip: {title: "跳过", pic: "skip.png"},
                       running: {title: "运行中", pic: "running.gif"},
                       notrun: {title: "未执行", pic: "notrun.png"},

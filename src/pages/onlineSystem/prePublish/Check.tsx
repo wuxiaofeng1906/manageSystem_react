@@ -667,6 +667,7 @@ const Check = (props: any, ref: any) => {
                       notrun: {title: "未执行", pic: "notrun.png"},
                       aborted: {title: "中断", pic: "aborted.png"},
                       unknown: {title: "未知", pic: "unknown.png"},
+                      cancel: {title: "取消", pic: "aborted.png"},
                     };
                     if (v.value) {
                       const values = (v.value).toLowerCase();

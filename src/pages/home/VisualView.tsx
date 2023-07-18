@@ -315,6 +315,7 @@ const VisualView = () => {
   };
 
   const getViewData = async (clusterMap = cluster) => {
+    debugger
     setLoading(true);
     try {
       preData(clusterMap);

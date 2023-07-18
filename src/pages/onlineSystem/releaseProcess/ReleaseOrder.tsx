@@ -438,6 +438,7 @@ const ReleaseOrder = () => {
   };
 
   const onSuccessConfirm = async (data: any) => {
+    debugger
     const announcement_num = orderForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});
@@ -461,7 +462,7 @@ const ReleaseOrder = () => {
       await PreReleaseServices.automation(params);
 
       // 关联公告并勾选挂起公告(成功的集群)
-      if (!isEmpty(announcement_num) && announcement_num !== '免' && data.announcement) {
+      if (!isEmpty(announcement_num) && announcement_num !== '免') {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),

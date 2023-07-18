@@ -417,6 +417,7 @@ const SheetInfo = (props: any, ref: any) => {
 
   // 确认发布成功
   const onSuccessConfirm = async (data: any) => {
+    debugger
 
     const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
@@ -446,7 +447,7 @@ const SheetInfo = (props: any, ref: any) => {
 
       //func 3 -------push announcement
       // 公告不为空和不为免，则需要传。。只传成功的集群
-      if (!isEmpty(announce) && announce !== '免' && data.announcement) {
+      if (!isEmpty(announce) && announce !== '免') {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),

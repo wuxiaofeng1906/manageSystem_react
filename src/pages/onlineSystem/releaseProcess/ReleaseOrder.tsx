@@ -133,9 +133,11 @@ const ReleaseOrder = () => {
               : res.release_result,
           plan_release_time: res.plan_release_time ? moment(res.plan_release_time) : null,
         });
+      debugger
       baseForm.setFieldsValue({
         ...res,
-        cluster: res.cluster ?? [],
+        cluster: (res.cluster).concat(res.failure_cluster) ?? [],
+        // cluster: res.cluster ?? [],
       });
       agFinished = res.is_delete ? true : res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
       setFinished(agFinished);

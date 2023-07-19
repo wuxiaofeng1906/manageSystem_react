@@ -178,7 +178,6 @@ const ReleaseOrder = () => {
     let rdOrigin: any = [];
     rdOriginDt.forEach((e: any) => {
       if (e.repair_order_type === "DeployApi" || e.repair_order_type === "SQL") {
-        debugger
         const {label, repair_order_type, ready_release_name} = e;
         if (label) {
           // 解析出 repair_order和project;
@@ -810,7 +809,6 @@ const ReleaseOrder = () => {
                   pushType: (params: CellClickedEvent) => {
                     // 只有是SQL工单、接口工单或者新增行时
                     if (params.value === "DeployApi" || params.value === "SQL" || params.data?.addID) {
-                      debugger
                       return (
                         <Select
                           style={{

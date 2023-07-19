@@ -8,6 +8,7 @@ import {isEmpty, sortBy, cloneDeep, isArray, intersection, difference, pick} fro
 import dayjs from 'dayjs';
 import {valueMap} from '@/utils/utils';
 import {history, useModel} from 'umi';
+import {objectArraySortByAsc} from "@/publicMethods/arrayMethod";
 
 let thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
@@ -301,9 +302,8 @@ const VisualView = () => {
           child.detail?.forEach((o: any) => {
             const cn = it.name.replace('cn-northwest-', '')?.split();
             const clusters = o.cluster?.join(',')?.replaceAll('cn-northwest-', '')?.split(',');
-            if (
-              clusters?.filter((num: string) => cn?.join()?.includes(num))?.length > 0 // 存在集群合并的情况
-            ) {
+            if (clusters?.filter((num: string) => cn?.join()?.includes(num))?.length > 0) {
+              // 存在集群合并的情况
               it.children[i] = {
                 ...child,
                 release_type: o.release_type,
@@ -313,7 +313,10 @@ const VisualView = () => {
             }
           });
         });
+        // 按照发布时间（release_time）进行排序
+        it.children = it.children?.sort(objectArraySortByAsc('release_time'));
       });
+
       setBasicSource(basicGroup);
       setOnline(formatOnline);
       setLoading(false);
@@ -385,7 +388,7 @@ const VisualView = () => {
       })
     }
 
-    debugger
+
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
@@ -402,7 +405,6 @@ const VisualView = () => {
                   child={
                     <div>
                       {arrow_info.map((env: any, i: number) => {
-                        // debugger
                         const baseIndex = dynamicColumn.findIndex(
                           (v) => data.baseline_cluster == v.name,
                         );

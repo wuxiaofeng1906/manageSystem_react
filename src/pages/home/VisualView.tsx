@@ -308,7 +308,7 @@ const VisualView = () => {
                 ...child,
                 release_type: o.release_type,
                 release_num: o.release_num,
-                release_time: o.plan_release_time,
+                release_time: o.release_time,
               };
             }
           });

@@ -62,6 +62,7 @@ const ReleaseOrder = () => {
   const [spinning, setSpinning] = useState(false);
   const [finished, setFinished] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [buttonState, setButtonState] = useState(true); // 标记发布结果按钮是否可点击
   const [clusters, setClusters] = useState<any>(); // 所有组合集群
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   // const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
@@ -144,6 +145,7 @@ const ReleaseOrder = () => {
       setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
+      setButtonState(false);
     } catch (e: any) {
       if (e?.code == 4001) initForm();
       else errorMessage(e?.msg ?? e?.statusText);
@@ -170,6 +172,7 @@ const ReleaseOrder = () => {
       });
       await formatCompare([], rd);
       setSpinning(false);
+      setButtonState(true);
     } catch (e) {
       setSpinning(false);
     }
@@ -433,6 +436,7 @@ const ReleaseOrder = () => {
     });
     // 修改后要刷新Tab
     await ref.current?.onTabsRefresh(true);
+    setButtonState(false);
     // 更新详情
     if (!flag) {
       getOrderDetail();
@@ -729,7 +733,7 @@ const ReleaseOrder = () => {
                           </Button> :
                           <Select
                             allowClear
-                            disabled={!hasPermission?.saveResult || finished}
+                            disabled={!hasPermission?.saveResult || finished || buttonState}
                             // className={styles.selectColor}
                             onChange={() => onSaveBeforeCheck(true)}
                             options={[

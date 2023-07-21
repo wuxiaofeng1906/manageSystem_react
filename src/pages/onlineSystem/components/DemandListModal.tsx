@@ -17,7 +17,6 @@ import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
 import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 
-const {TextArea} = Input;
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [form] = Form.useForm();
   const [baseForm] = Form.useForm();
@@ -32,10 +31,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<any[]>([]);
   const [relatedStory, setRelatedStory] = useState<any>();
-  const [branchEnv, setBranchEnv] = useState<any[]>([]);
+  const [branchEnv, setBranchEnv] = useState<any[]>([]); // 镜像环境
   const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
   const [branchs, setBranchs] = useState<any[]>();
-  const [releaseCluster, setReleaseCluster] = useState(globalEnv);
+  const [releaseCluster, setReleaseCluster] = useState(globalEnv); // 发布集群
   const {prePermission} = usePermission();
   const hasPermission = prePermission();
 
@@ -86,9 +85,17 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const res = await OnlineSystemServices.getRelatedStory({
       branch: computed?.branch,
     });
-    const branchEnv = await OnlineSystemServices.branchEnv({
+    // 20230721新需求 17469：
+    let branchEnv = await OnlineSystemServices.branchEnv({
       branch: computed?.branch,
     });
+    // 如果是超级管理员，则不用依据上线分支获取镜像环境（取所有的镜像环境）
+    if( user?.group === 'superGroup'){
+      branchEnv =  await OnlineSystemServices.branchEnv({
+        branch: computed?.branch,
+      });
+    }
+
     setBranchEnv(branchEnv?.map((it: string) => ({label: it, value: it})));
     setRelatedStory(res);
   };

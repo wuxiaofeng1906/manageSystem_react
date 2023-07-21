@@ -18,6 +18,7 @@ import usePermission from '@/hooks/permission';
 import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 import {preEnv} from "@/pages/onlineSystem/announcement/constant";
 
+let totalBranchEnv: any = [];
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [form] = Form.useForm();
   const [baseForm] = Form.useForm();
@@ -99,7 +100,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       });
       branchEnv = branch?.map((it: string) => ({label: it, value: it}));
     }
-
+    totalBranchEnv = JSON.parse(JSON.stringify(branchEnv));
     setBranchEnv(branchEnv);
     setRelatedStory(res);
   };
@@ -244,21 +245,26 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setReleaseCluster(filtered);
   };
 
-  const getBranchEnv = (v: string) => {
+  const getBranchEnv = async (v: string) => {
+    // 20230721新需求 17469：
+    // 如果是超级管理员，则不用依据上线分支获取镜像环境（取所有的镜像环境）
     // 超管则不用过滤
     if (user?.group === 'superGroup') {
       return;
     }
 
-    const _branchEnv = JSON.parse(JSON.stringify(branchEnv));
-    if(v === "tenant"){
-
-    }else if(v === "tenant"){
-
+    debugger
+    const _branchEnv = JSON.parse(JSON.stringify(totalBranchEnv));
+    if (v === "tenant") {
+      // 不展示global的数据
+      setBranchEnv(_branchEnv.filter((it: any) => !it.label.includes("-global")));
+    } else if (v === "global") {
+      // 只展示global的数据
+      setBranchEnv(_branchEnv.filter((it: any) => it.label.includes("-global")));
     }
-    setBranchEnv([]);
+
   }
-  const onChange = (v: string) => {
+  const onChange = async (v: string) => {
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
@@ -286,6 +292,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
 
     form.setFieldsValue({
+      release_env: "",
       cluster:
         v == 'global'
           ? ['cn-northwest-global']
@@ -297,7 +304,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     // 当“发布环境类型”选择“租户集群发布”时，发布集群列表要过滤掉global集群---需求：15086
     getReleseCluster(v);
     // 当“发布环境类型”选择“租户集群发布”时，镜像环境列表要过滤掉global集群，当选择global时，要过滤掉租户集群的id。-- 需求17469
-    getBranchEnv(v);
+    await getBranchEnv(v);
     setSelected(
       selectedData?.filter(
         (o) => intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0,

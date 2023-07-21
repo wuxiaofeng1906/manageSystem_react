@@ -35,7 +35,7 @@ export const preEnv = async (isNotice: boolean = true) => {
     branchEnv.map((it: any) => {
       // 展示所有测试环境镜像，不区分global
       if (it.type !== "prod") {
-        branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
+        branchs.push({label: it.envName, value: it.envName, isGlobal: it.isGlobal});
       }
     });
   }

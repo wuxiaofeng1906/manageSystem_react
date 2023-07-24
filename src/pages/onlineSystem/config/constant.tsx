@@ -387,6 +387,8 @@ export const logColumns: any = [
     headerName: '项目',
     field: 'testCaseProject',
     minWidth: 100,
+    filter: true,
+    suppressMenu: false,
   },
   // {
   //   headerName: '分支',

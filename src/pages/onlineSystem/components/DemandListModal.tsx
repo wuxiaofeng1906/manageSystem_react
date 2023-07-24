@@ -97,7 +97,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setSpin(true);
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
-
+      debugger
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
@@ -233,6 +233,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setReleaseCluster(filtered);
   };
   const onChange = (v: string) => {
+    debugger
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
@@ -248,7 +249,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     } else {
       // 默认勾选 特性项目
       list
-        .filter((it) => !['stagepatch', 'emergency'].includes(it.sprinttype)) // sprint
+        .filter((it) => !['stagepatch', 'emergency', 'performpatch'].includes(it.sprinttype)) // sprint
         .forEach((o) => {
           const nothing = isEmpty(
             selectedData?.find(
@@ -515,8 +516,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
 
   const memoColumn: any = () => {
-    const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
-
+    const isSprint = list?.every((it) => !['emergency', 'stagepatch', 'performpatch'].includes(it.sprinttype));
     return {
       isSprint,
       column: isSprint

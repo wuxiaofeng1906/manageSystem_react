@@ -1422,7 +1422,7 @@ const DutyPlan: React.FC<any> = () => {
               <div>
                 <label style={{color: 'orange'}}> 备注： </label>
                 <label>
-                  对应分支：emergency/stage-patch
+                  对应分支：emergency/stage-patch/perform-patch
                   <br/>
                   租户应用测试环境：hotfix-aws-编号
                   <br/>

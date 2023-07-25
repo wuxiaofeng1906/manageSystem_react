@@ -145,7 +145,6 @@ const ProcessDetail = (props: any, ref: any) => {
 
   useEffect(() => {
     if (isEmpty(basic?.branch) || subTab !== 'server') return;
-debugger
     showInitBranchEnv(basic?.release_env_type, basic?.branch);
 
   }, [basic, subTab]);

@@ -99,9 +99,15 @@ const Check = (props: any, ref: any) => {
           ]
           : [],
       );
+
       await Promise.all(
-        checkList.map((data) =>
-          OnlineSystemServices.checkOpts(omit(data, ['api_url']), data.api_url),
+        checkList.map((data) => {
+            if (data.api_url === "version-check") {
+              // 带码遗漏检查添加 api_identity 参数
+              data["api_identity"] = "rd";
+            }
+            OnlineSystemServices.checkOpts(omit(data, ['api_url']), data.api_url)
+          }
         ),
       );
       // infoMessage('任务正在进行中，请稍后刷新');
@@ -252,16 +258,18 @@ const Check = (props: any, ref: any) => {
       setSelected(selected.filter((it) => it != record.rowKey));
     }
 
-    await OnlineSystemServices.checkOpts(
-      {
-        user_id: user?.userid ?? '',
-        release_num,
-        is_ignore: e ? 'no' : 'yes',
-        side: record.side,
-        remark: record.desc
-      },
-      record.api_url,
-    );
+    const checkData = {
+      user_id: user?.userid ?? '',
+      release_num,
+      is_ignore: e ? 'no' : 'yes',
+      side: record.side,
+      remark: record.desc
+    }
+
+    if (record.api_url === "version-check") {
+      checkData["api_identity"] = "rd";
+    }
+    await OnlineSystemServices.checkOpts(checkData, record.api_url);
     setDescShow({visible: false, data: null, param: null})
     if (e) {
       infoMessage('任务正在执行中，请稍后刷新查看');

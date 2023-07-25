@@ -77,6 +77,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
   }, [computed?.branch]);
 
+  useEffect(() => {
+    showInitBranchEnv(props.data?.release_env_type, computed?.branch);
+  }, [computed?.branch, props.data]);
 
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();
@@ -84,26 +87,13 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const getRelatedStory = async () => {
-
     const res = await OnlineSystemServices.getRelatedStory({
       branch: computed?.branch,
     });
-    // 20230721新需求 17469：
-    // 如果是超级管理员，则不用依据上线分支获取镜像环境（取所有的镜像环境）
-    let branchEnv: any = [];
-    debugger
-    if (user?.group === 'superGroup') {
-      branchEnv = await preEnv(false);
-    } else {
-      const branch = await OnlineSystemServices.branchEnv({
-        branch: computed?.branch,
-      });
-      branchEnv = branch?.map((it: string) => ({label: it, value: it}));
-    }
-    totalBranchEnv = JSON.parse(JSON.stringify(branchEnv));
-    setBranchEnv(branchEnv);
+
     setRelatedStory(res);
   };
+
 
   const getTableList = async () => {
     setSpin(true);
@@ -245,15 +235,46 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setReleaseCluster(filtered);
   };
 
-  const getBranchEnv = async (v: string) => {
+  /**
+   * 初始化的时候加载镜像环境
+   * @param v  镜像环境
+   * @param onlineBranch 上线分支
+   */
+  const showInitBranchEnv = async (v: string, onlineBranch: string) => {
+    let branchEnv: any = [];
     // 20230721新需求 17469：
     // 如果是超级管理员，则不用依据上线分支获取镜像环境（取所有的镜像环境）
-    // 超管则不用过滤
+    if (user?.group === 'superGroup') {
+      branchEnv = await preEnv(false);
+    } else {
+      const branch = await OnlineSystemServices.branchEnv({
+        branch: onlineBranch,
+      });
+      branchEnv = branch?.map((it: string) => ({label: it, value: it}));
+    }
+
+    let _branchEnv = JSON.parse(JSON.stringify(branchEnv));
+    if (v === "tenant") {
+      // 不展示global的数据
+      _branchEnv = _branchEnv.filter((it: any) => !it.label.includes("-global"));
+    } else if (v === "global") {
+      // 只展示global的数据
+      _branchEnv = _branchEnv.filter((it: any) => it.label.includes("-global"));
+    }
+
+    totalBranchEnv = JSON.parse(JSON.stringify(_branchEnv));
+    setBranchEnv(_branchEnv);
+  };
+
+  /**
+   * 根据发布环境类型匹配不同的选项
+   * @param v 发布环境类型
+   */
+  const getBranchEnv = async (v: string) => {
     if (user?.group === 'superGroup') {
       return;
     }
 
-    debugger
     const _branchEnv = JSON.parse(JSON.stringify(totalBranchEnv));
     if (v === "tenant") {
       // 不展示global的数据
@@ -263,7 +284,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       setBranchEnv(_branchEnv.filter((it: any) => it.label.includes("-global")));
     }
 
-  }
+  };
+
   const onChange = async (v: string) => {
     const values = form.getFieldsValue();
     /*

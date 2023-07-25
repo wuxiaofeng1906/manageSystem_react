@@ -247,23 +247,19 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     if (user?.group === 'superGroup') {
       branchEnv = await preEnv(false);
     } else {
-      const branch = await OnlineSystemServices.branchEnv({
-        branch: onlineBranch,
-      });
+      const branch = await OnlineSystemServices.branchEnv({branch: onlineBranch});
       branchEnv = branch?.map((it: string) => ({label: it, value: it}));
+      if (v === "tenant") {
+        // 不展示global的数据
+        branchEnv = branchEnv.filter((it: any) => !it.label.includes("-global"));
+      } else if (v === "global") {
+        // 只展示global的数据
+        branchEnv = branchEnv.filter((it: any) => it.label.includes("-global"));
+      }
     }
 
-    let _branchEnv = JSON.parse(JSON.stringify(branchEnv));
-    if (v === "tenant") {
-      // 不展示global的数据
-      _branchEnv = _branchEnv.filter((it: any) => !it.label.includes("-global"));
-    } else if (v === "global") {
-      // 只展示global的数据
-      _branchEnv = _branchEnv.filter((it: any) => it.label.includes("-global"));
-    }
-
-    totalBranchEnv = JSON.parse(JSON.stringify(_branchEnv));
-    setBranchEnv(_branchEnv);
+    totalBranchEnv = JSON.parse(JSON.stringify(branchEnv));
+    setBranchEnv(branchEnv);
   };
 
   /**
@@ -283,7 +279,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       // 只展示global的数据
       setBranchEnv(_branchEnv.filter((it: any) => it.label.includes("-global")));
     }
-
   };
 
   const onChange = async (v: string) => {
@@ -729,12 +724,18 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       width={1200}
       title={`${memoEdit.update ? '修改' : '新增'}发布批次：选择该批次发布的项目与需求`}
       wrapClassName={styles.DemandListModal}
-      onCancel={() => props.onOk?.()}
+      onCancel={() => {
+        totalBranchEnv = [];
+        props.onOk?.()
+      }}
       footer={[
         <Button onClick={showLog} hidden={!memoEdit.update}>
           查看日志
         </Button>,
-        <Button onClick={() => props.onOk?.()}>取消</Button>,
+        <Button onClick={() => {
+          totalBranchEnv = [];
+          props.onOk?.()
+        }}>取消</Button>,
         <Button
           type={'primary'}
           disabled={(memoEdit.update ? memoEdit.global : memoEdit.update) || spin}

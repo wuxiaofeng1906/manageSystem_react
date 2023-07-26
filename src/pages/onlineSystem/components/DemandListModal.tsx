@@ -297,7 +297,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     } else {
       // 默认勾选 特性项目
       list
-        .filter((it) => !['stagepatch', 'emergency'].includes(it.sprinttype)) // sprint
+        .filter((it) => !['stagepatch', 'emergency', 'performpatch'].includes(it.sprinttype)) // sprint
         .forEach((o) => {
           const nothing = isEmpty(
             selectedData?.find(
@@ -566,8 +566,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
 
   const memoColumn: any = () => {
-    const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
-
+    const isSprint = list?.every((it) => !['emergency', 'stagepatch', 'performpatch'].includes(it.sprinttype));
     return {
       isSprint,
       column: isSprint

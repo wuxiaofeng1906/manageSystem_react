@@ -16,8 +16,9 @@ import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
 import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
+import {preEnv} from "@/pages/onlineSystem/announcement/constant";
 
-const {TextArea} = Input;
+let totalBranchEnv: any = [];
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [form] = Form.useForm();
   const [baseForm] = Form.useForm();
@@ -32,10 +33,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<any[]>([]);
   const [relatedStory, setRelatedStory] = useState<any>();
-  const [branchEnv, setBranchEnv] = useState<any[]>([]);
+  const [branchEnv, setBranchEnv] = useState<any[]>([]); // 镜像环境
   const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
   const [branchs, setBranchs] = useState<any[]>();
-  const [releaseCluster, setReleaseCluster] = useState(globalEnv);
+  const [releaseCluster, setReleaseCluster] = useState(globalEnv); // 发布集群
   const {prePermission} = usePermission();
   const hasPermission = prePermission();
 
@@ -76,6 +77,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
   }, [computed?.branch]);
 
+  useEffect(() => {
+    showInitBranchEnv(props.data?.release_env_type, computed?.branch);
+  }, [computed?.branch, props.data]);
 
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();
@@ -86,18 +90,16 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const res = await OnlineSystemServices.getRelatedStory({
       branch: computed?.branch,
     });
-    const branchEnv = await OnlineSystemServices.branchEnv({
-      branch: computed?.branch,
-    });
-    setBranchEnv(branchEnv?.map((it: string) => ({label: it, value: it})));
+
     setRelatedStory(res);
   };
+
 
   const getTableList = async () => {
     setSpin(true);
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
-      debugger
+
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
@@ -232,8 +234,54 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
     setReleaseCluster(filtered);
   };
-  const onChange = (v: string) => {
-    debugger
+
+  /**
+   * 初始化的时候加载镜像环境
+   * @param v  镜像环境
+   * @param onlineBranch 上线分支
+   */
+  const showInitBranchEnv = async (v: string, onlineBranch: string) => {
+    let branchEnv: any = [];
+    // 20230721新需求 17469：
+    // 如果是超级管理员，则不用依据上线分支获取镜像环境（取所有的镜像环境）
+    if (user?.group === 'superGroup') {
+      branchEnv = await preEnv(false);
+    } else {
+      const branch = await OnlineSystemServices.branchEnv({branch: onlineBranch});
+      branchEnv = branch?.map((it: string) => ({label: it, value: it}));
+      if (v === "tenant") {
+        // 不展示global的数据
+        branchEnv = branchEnv.filter((it: any) => !it.label.includes("-global"));
+      } else if (v === "global") {
+        // 只展示global的数据
+        branchEnv = branchEnv.filter((it: any) => it.label.includes("-global"));
+      }
+    }
+
+    totalBranchEnv = JSON.parse(JSON.stringify(branchEnv));
+    setBranchEnv(branchEnv);
+  };
+
+  /**
+   * 根据发布环境类型匹配不同的选项
+   * @param v 发布环境类型
+   */
+  const getBranchEnv = async (v: string) => {
+    if (user?.group === 'superGroup') {
+      return;
+    }
+
+    const _branchEnv = JSON.parse(JSON.stringify(totalBranchEnv));
+    if (v === "tenant") {
+      // 不展示global的数据
+      setBranchEnv(_branchEnv.filter((it: any) => !it.label.includes("-global")));
+    } else if (v === "global") {
+      // 只展示global的数据
+      setBranchEnv(_branchEnv.filter((it: any) => it.label.includes("-global")));
+    }
+  };
+
+  const onChange = async (v: string) => {
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
@@ -261,6 +309,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
 
     form.setFieldsValue({
+      release_env: "",
       cluster:
         v == 'global'
           ? ['cn-northwest-global']
@@ -271,7 +320,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
     // 当“发布环境类型”选择“租户集群发布”时，发布集群列表要过滤掉global集群---需求：15086
     getReleseCluster(v);
-
+    // 当“发布环境类型”选择“租户集群发布”时，镜像环境列表要过滤掉global集群，当选择global时，要过滤掉租户集群的id。-- 需求17469
+    await getBranchEnv(v);
     setSelected(
       selectedData?.filter(
         (o) => intersection(o.apps?.split(','), appServers?.[values?.release_env_type])?.length > 0,
@@ -673,12 +723,18 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       width={1200}
       title={`${memoEdit.update ? '修改' : '新增'}发布批次：选择该批次发布的项目与需求`}
       wrapClassName={styles.DemandListModal}
-      onCancel={() => props.onOk?.()}
+      onCancel={() => {
+        totalBranchEnv = [];
+        props.onOk?.()
+      }}
       footer={[
         <Button onClick={showLog} hidden={!memoEdit.update}>
           查看日志
         </Button>,
-        <Button onClick={() => props.onOk?.()}>取消</Button>,
+        <Button onClick={() => {
+          totalBranchEnv = [];
+          props.onOk?.()
+        }}>取消</Button>,
         <Button
           type={'primary'}
           disabled={(memoEdit.update ? memoEdit.global : memoEdit.update) || spin}

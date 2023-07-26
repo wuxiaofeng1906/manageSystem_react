@@ -11,28 +11,33 @@ export const RELEASE_MODULE = {
   "2": "弹窗"
 }
 
-// export const PRE_ENV = [
-//   {label: "正式环境", value: "https://app.77hub.com/cn-global/login"},
-//   {label: "nx-temp1-k8s", value: "https://nx-temp1-k8s.e7link.com/cn-global/login"},
-//   {label: "hotfix-aws-1", value: "https://hotfix-aws-1-global.e7link.com/cn-global/login"}
-// ]
 
-// 获取镜像环境
-export const preEnv = async () => {
+/**
+ * 获取运维系统中的镜像环境
+ * @param isNotice 是否为公告中的引用
+ */
+export const preEnv = async (isNotice: boolean = true) => {
   const branchEnv = await axiosGet(Notice_PreviewEnv);
   const branchs: any = [];
-  branchEnv.map((it: any) => {
-    // 展示不是global的选项,正式环境不展示测试预览环境
-    if (!it.isGlobal && it.type !== "prod" && !location.origin.includes("rd.q7link.com")) {
-      branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
-    }
-    //  正式环境添加集群0，正式环境不要集群0。。   envName:"cn-northwest-0"  暂时放出来以后可能会屏蔽，
-    if (it.envName === "cn-northwest-0" && location.origin.includes("rd.q7link.com")) {
-      branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
-    }
+  if (isNotice) {
+    branchEnv.map((it: any) => {
+      // 展示不是global的选项,正式环境不展示测试预览环境
+      if (!it.isGlobal && it.type !== "prod" && !location.origin.includes("rd.q7link.com")) {
+        branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
+      }
+      //  正式环境添加集群0，正式环境不要集群0。。   envName:"cn-northwest-0"  暂时放出来以后可能会屏蔽，
+      if (it.envName === "cn-northwest-0" && location.origin.includes("rd.q7link.com")) {
+        branchs.push({label: it.envName, value: it.envName, viewKey: it.globalEnv});
+      }
 
-  });
-
+    });
+  } else {
+    branchEnv.map((it: any) => {
+      // 展示所有测试环境镜像，不区分global
+      if (it.type !== "prod") {
+        branchs.push({label: it.envName, value: it.envName, isGlobal: it.isGlobal});
+      }
+    });
+  }
   return branchs;
-
 }

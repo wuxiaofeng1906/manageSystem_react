@@ -31,6 +31,7 @@ import {OnlineSystemServices} from '@/services/onlineSystem';
 import usePermission from '@/hooks/permission';
 import {display} from "html2canvas/dist/types/css/property-descriptors/display";
 import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
+import {preEnv} from "@/pages/onlineSystem/announcement/constant";
 
 const color = {yes: '#2BF541', no: '#faad14'};
 const pickKey = ['release_name', 'release_env', 'plan_release_time'];
@@ -116,13 +117,37 @@ const ProcessDetail = (props: any, ref: any) => {
     }
   }, [release_num, subTab, tab]);
 
+  /**
+   * 初始化的时候加载镜像环境
+   * @param v  镜像环境
+   * @param onlineBranch 上线分支
+   */
+  const showInitBranchEnv = async (v: string, onlineBranch: string) => {
+    let branchEnv: any = [];
+    // 20230721新需求 17469：
+    // 如果是超级管理员，则不用依据上线分支获取镜像环境（取所有的镜像环境）
+    if (user?.group === 'superGroup') {
+      branchEnv = await preEnv(false);
+    } else {
+      const branch = await OnlineSystemServices.branchEnv({branch: onlineBranch});
+      branchEnv = branch?.map((it: string) => ({label: it, value: it}));
+      if (v === "tenant") {
+        // 不展示global的数据
+        branchEnv = branchEnv.filter((it: any) => !it.label.includes("-global"));
+      } else if (v === "global") {
+        // 只展示global的数据
+        branchEnv = branchEnv.filter((it: any) => it.label.includes("-global"));
+      }
+    }
+
+    setBranchEnv(branchEnv);
+  };
+
   useEffect(() => {
     if (isEmpty(basic?.branch) || subTab !== 'server') return;
+    showInitBranchEnv(basic?.release_env_type, basic?.branch);
 
-    OnlineSystemServices.branchEnv({branch: basic?.branch}).then((res) =>
-      setBranchEnv(res?.map((it: string) => ({label: it, value: it}))),
-    );
-  }, [basic?.branch, subTab]);
+  }, [basic, subTab]);
 
   useEffect(() => {
     if (!isEmpty(basic)) {

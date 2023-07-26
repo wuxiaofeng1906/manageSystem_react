@@ -124,7 +124,7 @@ const Check = (props: any, ref: any) => {
             OnlineSystemServices.checkOpts(omit(data, ['api_url']), data.api_url),
           ),
         );
-        // infoMessage('任务正在进行中，请稍后刷新');
+        infoMessage('任务正在进行中，请稍后刷新！');
         init(true)
         setSpin(false);
       } catch (e) {

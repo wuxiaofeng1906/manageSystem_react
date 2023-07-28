@@ -65,8 +65,6 @@ export const preViewNotice = (noticeEditionId: string, targetEnv: string) => {
 
 // 获取特性列表list  startOrder:开始的顺序
 const getSpecialList = (ptyGroup: any, startOrder: number) => {
-  debugger
-
   let finalOrder = startOrder;
   if (!ptyGroup) return [];
   const specialList: any = [];

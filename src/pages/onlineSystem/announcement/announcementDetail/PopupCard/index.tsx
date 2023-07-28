@@ -637,7 +637,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                             </div>
                                             <div>
                                               <Button disabled={!eidtFlag} type="link"
-                                                      onClick={() => addSecond("", 0)}>添加二级特性
+                                                      onClick={() => addSecond({first: ""}, 0)}>添加二级特性
                                               </Button>
                                             </div>
                                           </div>
@@ -667,7 +667,7 @@ const PopupCard: React.FC<any> = (props: any) => {
                                           if (!eidtFlag) {
                                             return;
                                           }
-                                          addSecond("", second_index + 1);
+                                          addSecond({first: ""}, second_index + 1);
                                         }}/>
 
                                         {/* 删除二级特性 */}

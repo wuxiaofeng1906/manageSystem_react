@@ -422,7 +422,7 @@ const secondSpecialIsUpdate = (newCommonData: any, newPopData: any, oldPopData: 
 
 // 二级特性修改
 const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any, currentOrder: number) => {
-  debugger
+
   let lastOrder = currentOrder;
   const children: any = [];
   const newIds: any = []; // 记录旧数据的id，拿来对比新数据用作删除，如果在新数据里找不到，则删除
@@ -760,8 +760,6 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
-  debugger
-
   // 构造基础数据
   const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
   // 是否轮播

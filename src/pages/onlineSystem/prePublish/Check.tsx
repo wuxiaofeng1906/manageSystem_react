@@ -145,7 +145,7 @@ const Check = (props: any, ref: any) => {
        */
 
       if (!globalState.locked) {
-        await OnlineSystemServices.checkProcess({release_num});
+        // await OnlineSystemServices.checkProcess({release_num});   // 暂时注释掉这个检查，正式环境需要放开
         const flag = list.some(
           (it) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status),
         );

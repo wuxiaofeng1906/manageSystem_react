@@ -86,7 +86,6 @@ const SheetInfo = (props: any, ref: any) => {
    * @param detail_cluster：failed and success cluster
    */
   const onSave = async (flag = false, detail_cluster: any = {}) => {
-    debugger
 
     if (isEmpty(upgradeData)) return errorMessage('工单基础信息获取异常，请刷新重试');
     // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
@@ -417,7 +416,6 @@ const SheetInfo = (props: any, ref: any) => {
 
   // 确认发布成功
   const onSuccessConfirm = async (data: any) => {
-    debugger
 
     const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {

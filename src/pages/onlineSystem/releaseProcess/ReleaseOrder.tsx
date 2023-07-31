@@ -118,7 +118,7 @@ const ReleaseOrder = () => {
   };
 
   const getOrderDetail = async (clusterMap = clusters) => {
-    debugger
+
     try {
       setSpinning(true);
       const params: any = {release_num: id, include_deleted: true};
@@ -134,7 +134,7 @@ const ReleaseOrder = () => {
               : res.release_result,
           plan_release_time: res.plan_release_time ? moment(res.plan_release_time) : null,
         });
-      debugger
+
       baseForm.setFieldsValue({
         ...res,
         cluster: (res.cluster).concat(res.failure_cluster) ?? [],
@@ -444,7 +444,7 @@ const ReleaseOrder = () => {
   };
 
   const onSuccessConfirm = async (data: any) => {
-    debugger
+
     const announcement_num = orderForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});
@@ -1044,7 +1044,7 @@ export const ModalSuccessCheck = ({visible, onOk, pageInfo}: {
     // if finished ,get history info
     const {cluster, automation_datas} = await PreReleaseServices.getResultRemark({release_num});
     if (!cluster || !automation_datas) return;
-    debugger
+
     // get automation info
     const checkResult: any = [];
     if (automation_datas && automation_datas.length) {

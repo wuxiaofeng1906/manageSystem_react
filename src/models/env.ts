@@ -31,6 +31,7 @@ export default () => {
       });
       obj = {...obj, [it.online_environment_id]: it.online_environment_name ?? ''};
     });
+    debugger
     setReleaseOrderEnv(orderResult);
     setGlobalEnv(result);
     setMergeEnv(obj);

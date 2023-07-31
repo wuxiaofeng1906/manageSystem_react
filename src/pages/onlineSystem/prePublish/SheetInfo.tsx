@@ -5,7 +5,7 @@ import React, {
 } from 'react';
 import {
   Col, DatePicker, Form, Input, Select, Spin,
-  Row, Space, Modal, InputNumber, ModalFuncProps, Cascader,
+  Row, Space, Modal, InputNumber, ModalFuncProps, Cascader, Button,
 } from 'antd';
 import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
@@ -35,6 +35,7 @@ let agFinished = false; // 处理ag-grid
 let agSql: any[] = [];
 let agBatch: any[] = [];
 let databaseVersion: any[] = [];
+let allClusters: any = [];
 
 const SheetInfo = (props: any, ref: any) => {
   const {tab, subTab} = useLocation()?.query as { tab: string; subTab: string };
@@ -79,8 +80,14 @@ const SheetInfo = (props: any, ref: any) => {
     upgradeData,
     deployments,
   ]);
+  /**
+   * save information
+   * @param flag： release result operation
+   * @param detail_cluster：failed and success cluster
+   */
+  const onSave = async (flag = false, detail_cluster: any = {}) => {
+    debugger
 
-  const onSave = async (flag = false) => {
     if (isEmpty(upgradeData)) return errorMessage('工单基础信息获取异常，请刷新重试');
     // const upgrade_api = upgradeRef.current?.getRenderedNodes()?.map((it) => it.data)?.map((it) => ({
     //       ...it,
@@ -98,8 +105,16 @@ const SheetInfo = (props: any, ref: any) => {
     const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
     const baseValues = baseForm.getFieldsValue();
     const orderValues = orderForm.getFieldsValue();
-    const sqlValues = sqlForm.getFieldsValue();
-    await OnlineSystemServices.updateOrderDetail({
+    let releaseResult = 'unknown';
+    // 只要有一个成功集群，结果就是成功的。
+    if (flag) {
+      if (detail_cluster.success_cluster && (detail_cluster.success_cluster).length) {
+        releaseResult = "success";
+      } else if (detail_cluster.failed_cluster && (detail_cluster.failed_cluster).length) {
+        releaseResult = "failure";
+      }
+    }
+    const params = {
       ready_release_num: release_num,
       user_id: user?.userid,
       upgrade_api,
@@ -125,15 +140,20 @@ const SheetInfo = (props: any, ref: any) => {
         project: upgradeData?.basic_data?.project,
         announcement_num: orderValues?.announcement_num ?? '',
         person_duty_num: orderValues?.person_duty_num ?? '',
-        release_result: orderValues?.release_result ?? 'unknown',
+        // release_result: orderValues?.release_result ?? 'unknown',
+        release_result: releaseResult,
         need_auto: baseValues?.need_auto ?? '',
         auto_env: baseValues?.auto_env?.join(',') ?? '',
       },
       release_app: {
         ...release_app?.[0],
-        cluster: isString(release_app?.[0]?.cluster)
+        // cluster: isString(release_app?.[0]?.cluster)
+        //   ? release_app?.[0]?.cluster
+        //   : release_app?.[0]?.cluster?.join(','),
+        cluster: flag ? detail_cluster.success_cluster?.join(',') : isString(release_app?.[0]?.cluster)
           ? release_app?.[0]?.cluster
           : release_app?.[0]?.cluster?.join(','),
+        failure_cluster: flag ? detail_cluster.failed_cluster?.join(',') : "",
         database_version: release_app?.[0]?.database_version ?? '',
         batch: release_app?.[0]?.batch ?? '',
         sql_order:
@@ -142,7 +162,9 @@ const SheetInfo = (props: any, ref: any) => {
             sql_action_time,
           })) ?? [],
       },
-    });
+    };
+
+    await OnlineSystemServices.updateOrderDetail(params);
     setLeaveShow(false);
     if (!flag) {
       await getDetail();
@@ -286,7 +308,7 @@ const SheetInfo = (props: any, ref: any) => {
     if (base.need_auto == 'no') ignore.push('auto_env');
 
     let valid = false;
-    const checkResult = !['failure', 'draft'].includes(order.release_result);
+    const checkResult = !['draft'].includes(order.release_result);
     const checkObj = omit({...order, ...base}, ignore);
     let showErrTip = '';
     const errTip = {
@@ -359,39 +381,27 @@ const SheetInfo = (props: any, ref: any) => {
       }
 
       // 二次确认标记发布结果
-      const tips = {
-        draft: {
-          title: '置为草稿提醒',
-          content: '置为草稿将还原到初始生成工单信息,请确认是否置为草稿?',
-        },
-        success: {title: '发布成功提醒', content: '请确认是否标记发布成功?'},
-        failure: {title: '发布失败提醒', content: '请确认是否标记发布失败?'},
-      };
-      if (result == 'success') {
+      if (result == 'result') {
+        // 集群，用于传数据到结果确认页面
+        allClusters = (serverInfo?.[0]?.cluster).split(",");
         setSuccessModal(true);
-      } else {
+
+      } else if (result == 'draft') {
         setLeaveShow(false);
         Modal.confirm({
           okText: '确认',
           cancelText: '取消',
           centered: true,
-          title: tips[result].title,
-          content: tips[result].content,
+          title: "置为草稿提醒",
+          content: '置为草稿将还原到初始生成工单信息,请确认是否置为草稿?',
           icon: <InfoCircleOutlined style={{color: result == 'cancel' ? 'red' : '#1585ff'}}/>,
           okButtonProps: {disabled: confirmDisabled},
           onOk: async () => {
             setConfirmDisabled(true);
             try {
-              if (result == 'draft') {
-                await OnlineSystemServices.removeOrder({release_num, user_id: user?.userid});
-                await getDetail();
-              } else {
-                await onSave(true);// 发布失败
-                //   清除Tab缓存（置为草稿不需要清缓存）
-                setTabsLocalStorage({release_num}, "delete");
-              }
+              await OnlineSystemServices.removeOrder({release_num, user_id: user?.userid});
+              await getDetail();
               setConfirmDisabled(false);
-
             } catch (e) {
               setConfirmDisabled(false);
             }
@@ -407,12 +417,19 @@ const SheetInfo = (props: any, ref: any) => {
 
   // 确认发布成功
   const onSuccessConfirm = async (data: any) => {
+    debugger
 
     const announce = baseForm.getFieldValue('announcement_num');
     if (isEmpty(data)) {
       orderForm.setFieldsValue({release_result: null});
       setSuccessModal(false);
     } else {
+
+      // func 1 -------save page data
+      await onSave(true, {failed_cluster: data.failedList, success_cluster: data.successList});
+      agFinished = true;
+      setFinished(true);
+      //func 2 -------excute automation
       let params: any[] = [];
       const ignoreCheck = data.ignoreCheck;
       Object.keys(AutoCheckType).forEach((type) => {
@@ -425,26 +442,25 @@ const SheetInfo = (props: any, ref: any) => {
           ready_release_num: release_num ?? '',
         });
       });
-      await onSave(true);
-      agFinished = true;
-      setFinished(true);
       await PreReleaseServices.automation(params);
-      // 获取集群
-      const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
-      const clusters = (release_app?.[0]?.cluster).split(",");
 
-      // 关联公告并勾选挂起公告
-      if (!isEmpty(announce) && announce !== '免' && data.announcement) {
+
+      //func 3 -------push announcement
+      // 公告不为空和不为免，则需要传。。只传成功的集群
+      if (!isEmpty(announce) && announce !== '免') {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),
-          // announcement_time: 'after',
-          cluster_ids: clusters,
+          cluster_ids: data.successList ?? [],
         });
       }
-
+      //func 4 -------Release all tenant
+      // 获取全部集群
+      const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
+      const clusters = (release_app?.[0]?.cluster).split(",");
       // 发布类型为停机发布 并且 包含租户集群才调用开放租户接口  （cn-northwest-global）
       if (orderForm.getFieldValue("release_way") === "stop_server" && !isEqual(clusters, ["cn-northwest-global"])) {
+        // 里面拼接了成功和失败的所有集群
         await PreReleaseServices.releasetenants({env_name_list: clusters});
       }
 
@@ -756,33 +772,45 @@ const SheetInfo = (props: any, ref: any) => {
                   const color = {success: '#2BF541', failure: 'red'};
                   return (
                     <Form.Item name={'release_result'}>
-                      <Select
-                        allowClear
-                        disabled={!hasPermission.orderPublish || draft || finished}
-                        className={styles.selectColor}
-                        onChange={() => onSaveBeforeCheck(true)}
-                        options={[
-                          {label: '发布成功', value: 'success', key: 'success'},
-                          {label: '发布失败', value: 'failure', key: 'failure'},
-                          {label: '置为草稿', value: 'draft', key: 'draft'},
-                          {label: ' ', value: 'unknown', key: 'unknown'},
-                        ]}
-                        style={{
-                          width: '100%',
-                          fontWeight: 'bold',
-                          color: color[result] ?? 'initial',
-                        }}
-                        placeholder={
-                          <span style={{color: '#00bb8f', fontWeight: 'initial'}}>
+                      {(!hasPermission.orderPublish || finished) ?
+                        <Button
+                          style={{
+                            width: '100%',
+                            // fontWeight: 'bold',
+                          }} onClick={() => setSuccessModal(true)}>
+                          结果明细
+                        </Button> :
+                        <Select
+                          allowClear
+                          disabled={!hasPermission.orderPublish || draft || finished}
+                          className={styles.selectColor}
+                          onChange={() => onSaveBeforeCheck(true)}
+                          options={[
+                            // {label: '发布成功', value: 'success', key: 'success'},
+                            // {label: '发布失败', value: 'failure', key: 'failure'},
+                            {label: '发布结果', value: 'result', key: 'result'},
+                            {label: '置为草稿', value: 'draft', key: 'draft'},
+                            {label: ' ', value: 'unknown', key: 'unknown'},
+                          ]}
+                          style={{
+                            width: '100%',
+                            fontWeight: 'bold',
+                            color: color[result] ?? 'initial',
+                          }}
+                          placeholder={
+                            <span style={{color: '#00bb8f', fontWeight: 'initial'}}>
                             标记发布结果
                           </span>
-                        }
-                      />
+                          }
+                        />}
+
+
                     </Form.Item>
                   );
                 }}
               </Form.Item>
             </Col>
+
           </Row>
         </Form>
         <h4 style={{margin: '16px 0'}}>一、工单-基础设置</h4>
@@ -984,7 +1012,8 @@ const SheetInfo = (props: any, ref: any) => {
         <ModalSuccessCheck
           visible={successModal}
           onOk={(v?: any) => onSuccessConfirm(v)}
-          announce={orderForm.getFieldValue('announcement_num')}
+          // cluster={allClusters}
+          pageInfo={{initCluster: allClusters, release_num, finished}}
         />
       </div>
     </Spin>

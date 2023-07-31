@@ -431,16 +431,17 @@ const secondSpecialDataUpdate = (newSecondArray: any, oldSecondArray: any, curre
     newSecondArray.forEach((v1: any) => {
       if (v1) {
         if (v1.id) {
+          // 有id，则是修改的内容
           newIds.push(v1.id);
           children.push({
             id: v1.id,
-            speciality: v1.first,
+            speciality: v1.first ?? "",
             specialityOrdinal: lastOrder
           });
-        } else if (v1.first && !isEmpty((v1.first).trim())) {
+        } else {
           // 没有ID的话就是新增的特性，同时也要判断是值是否为空
           children.push({
-            speciality: v1.first,
+            speciality: v1.first ?? "",
             editFlag: "add",
             specialityOrdinal: lastOrder
           })
@@ -576,13 +577,13 @@ const firstSpecialDataUpdate = (newCommonData: any, modifyPopData: any, oldCommo
           // 二级特性数据
 
           (m.seconds).map((p: any) => {
-            if (p.first) {
-              firstSpecial.children.push({
-                speciality: p.first,
-                editFlag: "add",
-                specialityOrdinal: currentOrder,
-              });
-            }
+
+            firstSpecial.children.push({
+              speciality: p.first ?? "",
+              editFlag: "add",
+              specialityOrdinal: currentOrder,
+            });
+
             currentOrder = currentOrder + 1;
           });
           if (m.first) {
@@ -759,7 +760,6 @@ const otherInfoUpdate = (newCommonData: any, newPopData: any, oldCommonData: any
 
 // 修改发布公告
 export const updateAnnouncement = async (releaseID: string, newCommonData: any, newPopData: any) => {
-
   // 构造基础数据
   const {oldCommonData, oldPopData} = await getOldNoticeDetails(releaseID);
   // 是否轮播

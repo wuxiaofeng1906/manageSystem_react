@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input} from 'antd';
+import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input, Tooltip} from 'antd';
 import dayjs from 'dayjs';
 import {useModel} from 'umi';
 import {isEmpty, difference, isEqual, intersection, uniq} from 'lodash';
@@ -520,10 +520,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
             title: '应用服务',
             dataIndex: 'apps',
             width: 110,
-            ellipsis: {showTitle: false},
-            render: (v: string) => (
-              <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
+            render: (value: any) => {
+              return (<Tooltip title={"提示信息"}
+                               color={'#108ee9'} placement="bottomLeft">
+                <div>{value}</div>
+              </Tooltip>);
+            }
           },
           {
             title: '是否涉及数据update',

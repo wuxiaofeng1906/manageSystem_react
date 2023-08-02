@@ -523,12 +523,38 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
             render: (value: any, data: any) => {
               debugger
               const {task_apps, apply_apps} = data;
-              // 当前值和apply_apps值做对比。apply_apps中是emergency申请的数据。
+              // 展示所有服务（emergency申请+禅道）
+              let allServer = value.split(",");
+              if (apply_apps && apply_apps.length) {
+                allServer = uniq(allServer.concat(apply_apps));
+              }
 
-              // 对比和展示颜色
-              return <Tooltip title={"提示信息"} color={'#108ee9'} placement="bottomLeft">
-                <div>{value}</div>
-              </Tooltip>;
+              // 当前值和apply_apps值做对比。apply_apps中是emergency申请的数据。
+              const spanArray: any = [];
+              let showTitle = false;
+              allServer.forEach((server: string) => {
+                // 同时存在
+                if (value.includes(server) && apply_apps.includes(server)) {
+                  spanArray.push(<span>{server}</span>);
+                } else if (!value.includes(server) && apply_apps.includes(server)) { // 禅道不存在，emergency存在
+                  showTitle = true;
+                  spanArray.push(<span style={{color: "gray"}}>{server}</span>);
+                } else if (value.includes(server) && !apply_apps.includes(server)) {  // 禅道存在，emergency不存在
+                  showTitle = true;
+                  spanArray.push(<span style={{color: "orange"}}>{server}</span>);
+                }
+              });
+
+              if (showTitle) {
+                return <Tooltip title={"提示信息"} color={'#108ee9'} placement="bottomLeft">
+                  <div>
+                    {spanArray}
+                  </div>
+                </Tooltip>;
+              }
+
+
+              return <div>{spanArray}</div>;
             }
           },
           {

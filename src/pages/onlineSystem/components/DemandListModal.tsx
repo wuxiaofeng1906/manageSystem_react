@@ -99,7 +99,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setSpin(true);
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
-
+      debugger
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
@@ -520,11 +520,15 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
             title: '应用服务',
             dataIndex: 'apps',
             width: 110,
-            render: (value: any) => {
-              return (<Tooltip title={"提示信息"}
-                               color={'#108ee9'} placement="bottomLeft">
+            render: (value: any, data: any) => {
+              debugger
+              const {task_apps, apply_apps} = data;
+              // 当前值和apply_apps值做对比。apply_apps中是emergency申请的数据。
+
+              // 对比和展示颜色
+              return <Tooltip title={"提示信息"} color={'#108ee9'} placement="bottomLeft">
                 <div>{value}</div>
-              </Tooltip>);
+              </Tooltip>;
             }
           },
           {

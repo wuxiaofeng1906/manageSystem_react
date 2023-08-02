@@ -2,9 +2,10 @@ import request from './request';
 import {GqlClient} from '@/hooks';
 
 const baseUrl = '/api/verify';
+
+//   | 'icon-check' // 图标一致性 暂时屏蔽掉图标一致性检查
 export type ICheckType =
   | 'test-unit' // 单元测试
-  | 'icon-check' // 图标一致性
   | 'version-check' // 代码遗漏检查
   | 'hot-update-check' // 热更检查
   | 'create-libray' // 构建时间比较

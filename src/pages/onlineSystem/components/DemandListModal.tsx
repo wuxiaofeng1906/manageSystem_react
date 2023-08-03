@@ -445,6 +445,76 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     [globalState, props.data],
   );
 
+  // 应用服务渲染
+  const appsRender = (value: any, data: any) => {
+    const {task_apps, apply_apps, story, title} = data;
+    // 保存界面展示的列的数据
+    const columnValue: any = [];
+    // 是否展示tooltip内容
+    let showTooltip = false;
+    // 保存toolTip 中服务的数据
+    const titleServer: any = [];
+
+    // 展示所有服务（emergency申请+禅道）
+    let allServer = value.split(",");
+    if (apply_apps && apply_apps.length) {
+      allServer = uniq(allServer.concat(apply_apps));
+    }
+
+    // 当前值和apply_apps值做对比。apply_apps中是emergency申请的数据。
+    allServer.forEach((server: string) => {
+      // 同时存在
+      if (value.includes(server) && apply_apps.includes(server)) {
+        columnValue.push(<span>{server}</span>);
+        titleServer.push(<span>{server}</span>);
+      } else if (!value.includes(server) && apply_apps.includes(server)) { // 禅道不存在，emergency存在(服务移除)
+        showTooltip = true;
+        if (columnValue.length) {
+          columnValue.push(<span style={{color: "gray"}}>,{server}</span>);
+          titleServer.push(<span style={{color: "gray"}}>,{server}(服务移除)</span>);
+        } else {
+          columnValue.push(<span style={{color: "gray"}}>{server}</span>);
+          titleServer.push(<span style={{color: "gray"}}>{server}(服务移除)</span>);
+        }
+
+      } else if (value.includes(server) && !apply_apps.includes(server)) {  // 禅道存在，emergency不存在（服务添加）
+        showTooltip = true;
+        if (columnValue.length) {
+          columnValue.push(<span style={{color: "orange"}}>,{server}</span>);
+          titleServer.push(<span style={{color: "orange"}}>,{server}(服务增添)</span>);
+        } else {
+          columnValue.push(<span style={{color: "orange"}}>{server}</span>);
+          titleServer.push(<span style={{color: "orange"}}>{server}(服务增添)</span>);
+        }
+
+      }
+    });
+
+    if (showTooltip) {
+      const taskArray: any = [];
+      if (task_apps && task_apps.length) {
+        task_apps.map((task: any) => {
+          taskArray.push(<p style={{marginTop: -10}}>=&gt;task-
+            <a target={"_blank"}
+               href={`http://zentao.77hub.com/zentao/task-view-${task.task_id}.html`}>{task.task_id}</a>:{task.apps}
+          </p>)
+        });
+      }
+
+      const _title = <div style={{color: "black", width: 400}}>
+        <p>=&gt;story-
+          <a target={"_blank"} href={`http://zentao.77hub.com/zentao/story-view-${story}.html`}>{story}</a>
+          ：{title}</p>
+        <p style={{marginTop: -10}}>=&gt;服务：{titleServer}</p>
+        {taskArray}
+      </div>;
+      return <Tooltip overlayClassName={styles.ToolTipStyle} title={_title} color={"white"} placement="bottomLeft">
+        <div>{columnValue}</div>
+      </Tooltip>;
+    }
+
+    return <div>{columnValue}</div>;
+  }
 
   const memoColumn: any = () => {
     const isSprint = list?.every((it) => !['emergency', 'stagepatch', 'performpatch'].includes(it.sprinttype));
@@ -519,68 +589,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           {
             title: '应用服务',
             dataIndex: 'apps',
-            width: 110,
-            render: (value: any, data: any) => {
-              debugger
-              const {task_apps, apply_apps, story, title} = data;
-              // 展示所有服务（emergency申请+禅道）
-              let allServer = value.split(",");
-              if (apply_apps && apply_apps.length) {
-                allServer = uniq(allServer.concat(apply_apps));
-              }
-
-              // 保存界面展示的列的数据
-              const columnValue: any = [];
-              // 是否展示tooltip内容
-              let showTooltip = false;
-              // 保存toolTip 中服务的数据
-              const titleServer: any = [];
-
-              // 当前值和apply_apps值做对比。apply_apps中是emergency申请的数据。
-              allServer.forEach((server: string) => {
-                // 同时存在
-                if (value.includes(server) && apply_apps.includes(server)) {
-                  columnValue.push(<span>{server},</span>);
-                  titleServer.push(<span>{server},</span>);
-                } else if (!value.includes(server) && apply_apps.includes(server)) { // 禅道不存在，emergency存在(服务移除)
-                  showTooltip = true;
-                  columnValue.push(<span style={{color: "gray"}}>{server},</span>);
-                  titleServer.push(<span style={{color: "gray"}}>{server}(服务移除),</span>);
-                } else if (value.includes(server) && !apply_apps.includes(server)) {  // 禅道存在，emergency不存在（服务添加）
-                  showTooltip = true;
-                  columnValue.push(<span style={{color: "orange"}}>{server},</span>);
-                  titleServer.push(<span style={{color: "orange"}}>{server}(服务增添),</span>);
-                }
-              });
-
-              if (showTooltip) {
-                const taskArray: any = [];
-                if (task_apps && task_apps.length) {
-                  task_apps.map((task: any) => {
-                    taskArray.push(<p>task-
-                      <a target={"_blank"}
-                         href={`http://zentao.77hub.com/zentao/task-view-${task.task_id}.html`}>{task.task_id}</a>:{task.apps}
-                    </p>)
-                  });
-                }
-
-                const _title = <div style={{color: "black"}}>
-                  <p>story-
-                    <a target={"_blank"}
-                       href={`http://zentao.77hub.com/zentao/story-view-${story}.html`}>{story}</a>：{title}</p>
-                  <p style={{paddingTop:-5}}>服务：{titleServer}</p>
-                  {taskArray}
-                </div>;
-
-                return <Tooltip title={_title} color={"white"} placement="bottomLeft">
-                  <div>
-                    {columnValue.join(",")}
-                  </div>
-                </Tooltip>;
-              }
-
-              return <div>{columnValue}</div>;
-            }
+            render: appsRender
           },
           {
             title: '是否涉及数据update',

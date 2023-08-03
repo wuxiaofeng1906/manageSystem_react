@@ -503,7 +503,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         });
       }
 
-      const _title = <div style={{color: "black", width: 400}}>
+      const _title = <div style={{color: "black", width: 380}}>
         <p>=&gt;story-
           <a target={"_blank"} href={`http://zentao.77hub.com/zentao/story-view-${story}.html`}>{story}</a>
           ：{title}</p>

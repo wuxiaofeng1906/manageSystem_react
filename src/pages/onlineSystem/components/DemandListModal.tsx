@@ -462,31 +462,33 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
 
     // 当前值和apply_apps值做对比。apply_apps中是emergency申请的数据。
-    allServer.forEach((server: string) => {
+    allServer.forEach((server: string, index: number) => {
+      let showCharFlag: boolean;
+      if (allServer.length - 1 === index) {
+        showCharFlag = false;
+      } else {
+        showCharFlag = true;
+      }
+
       // 同时存在
       if (value.includes(server) && apply_apps.includes(server)) {
         columnValue.push(<span>{server}</span>);
         titleServer.push(<span>{server}</span>);
+
       } else if (!value.includes(server) && apply_apps.includes(server)) { // 禅道不存在，emergency存在(服务移除)
         showTooltip = true;
-        if (columnValue.length) {
-          columnValue.push(<span style={{color: "gray"}}>,{server}</span>);
-          titleServer.push(<span style={{color: "gray"}}>,{server}(服务移除)</span>);
-        } else {
-          columnValue.push(<span style={{color: "gray"}}>{server}</span>);
-          titleServer.push(<span style={{color: "gray"}}>{server}(服务移除)</span>);
-        }
-
+        columnValue.push(<span><span style={{color: "gray"}}>{server}</span></span>);
+        titleServer.push(<span><span style={{color: "gray"}}>{server}(服务移除)</span></span>);
       } else if (value.includes(server) && !apply_apps.includes(server)) {  // 禅道存在，emergency不存在（服务添加）
         showTooltip = true;
-        if (columnValue.length) {
-          columnValue.push(<span style={{color: "orange"}}>,{server}</span>);
-          titleServer.push(<span style={{color: "orange"}}>,{server}(服务增添)</span>);
-        } else {
-          columnValue.push(<span style={{color: "orange"}}>{server}</span>);
-          titleServer.push(<span style={{color: "orange"}}>{server}(服务增添)</span>);
-        }
+        columnValue.push(<span><span style={{color: "orange"}}>{server}</span></span>);
+        titleServer.push(<span><span style={{color: "orange"}}>{server}(服务增添)</span></span>);
+      }
 
+      // 添加逗号
+      if (showCharFlag) {
+        columnValue.push(<span>,</span>);
+        titleServer.push(<span>,</span>);
       }
     });
 

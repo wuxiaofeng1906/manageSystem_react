@@ -492,31 +492,30 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       }
     });
 
-    if (showTooltip) {
-      const taskArray: any = [];
-      if (task_apps && task_apps.length) {
-        task_apps.map((task: any) => {
-          taskArray.push(<p style={{marginTop: -10}}>=&gt;task-
-            <a target={"_blank"}
-               href={`http://zentao.77hub.com/zentao/task-view-${task.task_id}.html`}>{task.task_id}</a>:{task.apps}
-          </p>)
-        });
-      }
-
-      const _title = <div style={{color: "black", width: 380}}>
-        <p>=&gt;story-
-          <a target={"_blank"} href={`http://zentao.77hub.com/zentao/story-view-${story}.html`}>{story}</a>
-          ：{title}</p>
-        <p style={{marginTop: -10}}>=&gt;服务：{titleServer}</p>
-        {taskArray}
-      </div>;
-      return <Tooltip overlayClassName={styles.ToolTipStyle} title={_title} color={"white"} placement="bottomLeft">
-        <div>{columnValue}</div>
-      </Tooltip>;
+    if (!showTooltip) {
+      return <div>{columnValue}</div>;
+    }
+    const taskArray: any = [];
+    if (task_apps && task_apps.length) {
+      task_apps.map((task: any) => {
+        taskArray.push(<p style={{marginTop: -10}}>=&gt;task-
+          <a target={"_blank"}
+             href={`http://zentao.77hub.com/zentao/task-view-${task.task_id}.html`}>{task.task_id}</a>:{task.apps}
+        </p>)
+      });
     }
 
-    return <div>{columnValue}</div>;
-  }
+    const _title = <div style={{color: "black", width: 380}}>
+      <p>=&gt;story-
+        <a target={"_blank"} href={`http://zentao.77hub.com/zentao/story-view-${story}.html`}>{story}</a>
+        ：{title}</p>
+      <p style={{marginTop: -10}}>=&gt;服务：{titleServer}</p>
+      {taskArray}
+    </div>;
+    return <Tooltip overlayClassName={styles.ToolTipStyle} title={_title} color={"white"} placement="bottomLeft">
+      <div>{columnValue}</div>
+    </Tooltip>;
+  };
 
   const memoColumn: any = () => {
     const isSprint = list?.every((it) => !['emergency', 'stagepatch', 'performpatch'].includes(it.sprinttype));

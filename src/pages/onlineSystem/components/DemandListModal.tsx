@@ -477,8 +477,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
       } else if (!value.includes(server) && apply_apps.includes(server)) { // 禅道不存在，emergency存在(服务移除)
         showTooltip = true;
-        columnValue.push(<span><span style={{color: "gray"}}>{server}</span></span>);
-        titleServer.push(<span><span style={{color: "gray"}}>{server}(服务移除)</span></span>);
+        columnValue.push(<span><span style={{color: "#8190C1"}}>{server}</span></span>);
+        titleServer.push(<span><span style={{color: "#8190C1"}}>{server}(服务移除)</span></span>);
       } else if (value.includes(server) && !apply_apps.includes(server)) {  // 禅道存在，emergency不存在（服务添加）
         showTooltip = true;
         columnValue.push(<span><span style={{color: "orange"}}>{server}</span></span>);

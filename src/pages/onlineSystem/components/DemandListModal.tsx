@@ -447,7 +447,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   // 应用服务渲染
   const appsRender = (value: any, data: any) => {
     const {task_apps, apply_apps, story, title} = data;
-    debugger
     // 保存界面展示的列的数据
     const columnValue: any = [];
     // 是否展示tooltip内容

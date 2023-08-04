@@ -99,7 +99,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setSpin(true);
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
-      debugger
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
@@ -448,6 +447,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   // 应用服务渲染
   const appsRender = (value: any, data: any) => {
     const {task_apps, apply_apps, story, title} = data;
+    debugger
     // 保存界面展示的列的数据
     const columnValue: any = [];
     // 是否展示tooltip内容
@@ -456,7 +456,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const titleServer: any = [];
 
     // 展示所有服务（emergency申请+禅道）
-    let allServer = value.split(",");
+    let allServer = isEmpty(value) ? [] : value.split(",");
     if (apply_apps && apply_apps.length) {
       allServer = uniq(allServer.concat(apply_apps));
     }

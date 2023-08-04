@@ -493,7 +493,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     });
 
     if (!showTooltip) {
-      return <div>{columnValue}</div>;
+      return <Ellipsis title={columnValue} width={'100%'} placement={'bottomLeft'} color={'white'}/>
+      // return <div>{columnValue}</div>;
     }
     const taskArray: any = [];
     if (task_apps && task_apps.length) {
@@ -590,7 +591,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
           {
             title: '应用服务',
             dataIndex: 'apps',
+            width: 110,
+            ellipsis: {showTitle: false},
             render: appsRender
+            // render: (v: string) => (
+            //   <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            // ),
           },
           {
             title: '是否涉及数据update',

@@ -4,7 +4,7 @@ import {
   Form, DatePicker, ModalFuncProps, Button, Tooltip, Input
 } from 'antd';
 import {
-  AutoCheckType, checkInfo, CheckStatus, CheckTechnicalSide, onLog, logColumns,
+  AutoCheckType, checkInfo, CheckStatus, CheckTechnicalSide, onLog, logColumns, StoryStatus,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
 import {isEmpty, omit, delay, isString, uniq} from 'lodash';
@@ -373,24 +373,26 @@ const Check = (props: any, ref: any) => {
         );
       } else if (type === "story_data") {
         debugger
-        // content = (
-        //   <div>
-        //     {v?.map((it: any) => (
-        //       <div key={it.name_path}>
-        //         <span>{`【${it.name_path}】`}</span>【
-        //         <span style={{color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14'}}>
-        //         {it.sealing_version == 'yes' ? '已封版' : '未封版'}
-        //       </span>
-        //         】
-        //         <span>{`封版时间：${
-        //           it.sealing_version_time
-        //             ? dayjs(it.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
-        //             : ''
-        //         }`}</span>
-        //       </div>
-        //     ))}
-        //   </div>
-        // );
+        content = (
+          <div>
+            {v?.map((it: any, index: number) => {
+              let id = it?.story_num;
+              let type = "story";
+              if (it.obj_type) {
+                id = it.id;
+                type = it.obj_type;
+              }
+
+              return (<div key={id.toString()}>
+                <span>{index+1}. story-</span>
+                <a href={`http://zentao.77hub.com/zentao/${type}-view-${id}.html`}
+                   target={"_blank"}>{id} </a>
+                <span>=&gt;  {it.title}。</span>
+                <span>  未达到已完成（{StoryStatus[it.status]}）</span>
+              </div>);
+            })}
+          </div>
+        );
       }
 
       return onLog({

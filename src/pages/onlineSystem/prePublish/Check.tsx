@@ -334,8 +334,7 @@ const Check = (props: any, ref: any) => {
             </div>
           </div>
         );
-      }
-      if (type == 'hot_data') {
+      } else if (type == 'hot_data') {
         width = 1000;
         content = (
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
@@ -353,8 +352,7 @@ const Check = (props: any, ref: any) => {
             </div>
           </div>
         );
-      }
-      if (type.includes('seal_data') && !isString(v)) {
+      } else if (type.includes('seal_data') && !isString(v)) {
         content = (
           <div>
             {v?.map((it: any) => (
@@ -373,6 +371,26 @@ const Check = (props: any, ref: any) => {
             ))}
           </div>
         );
+      } else if (type === "story_data") {
+        debugger
+        // content = (
+        //   <div>
+        //     {v?.map((it: any) => (
+        //       <div key={it.name_path}>
+        //         <span>{`【${it.name_path}】`}</span>【
+        //         <span style={{color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14'}}>
+        //         {it.sealing_version == 'yes' ? '已封版' : '未封版'}
+        //       </span>
+        //         】
+        //         <span>{`封版时间：${
+        //           it.sealing_version_time
+        //             ? dayjs(it.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
+        //             : ''
+        //         }`}</span>
+        //       </div>
+        //     ))}
+        //   </div>
+        // );
       }
 
       return onLog({

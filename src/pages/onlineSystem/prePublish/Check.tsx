@@ -372,7 +372,7 @@ const Check = (props: any, ref: any) => {
           </div>
         );
       } else if (type === "story_data") {
-        debugger
+        width = 1000;
         content = (
           <div>
             {v?.map((it: any, index: number) => {
@@ -384,11 +384,11 @@ const Check = (props: any, ref: any) => {
               }
 
               return (<div key={id.toString()}>
-                <span>{index+1}. story-</span>
+                <span>{index + 1}. {type}-</span>
                 <a href={`http://zentao.77hub.com/zentao/${type}-view-${id}.html`}
                    target={"_blank"}>{id} </a>
-                <span>=&gt;  {it.title}。</span>
-                <span>  未达到已完成（{StoryStatus[it.status]}）</span>
+                <span>=&gt;  {it.title}。  未达到已完成</span>
+                <span style={{color: "#8190C1"}}>（{StoryStatus[it.status]}）</span>
               </div>);
             })}
           </div>

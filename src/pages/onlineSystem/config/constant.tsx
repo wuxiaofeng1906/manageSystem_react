@@ -75,6 +75,7 @@ export const StoryStatus = {
   verified: '已验收',
   released: '已发布',
   closed: '已关闭',
+  doing:'进行中' // 这个是任务的状态，也需要用到
 };
 export const AutoCheckType = {ui: 'ui执行通过', api: '接口执行通过', applet: '小程序执行通过'};
 export const checkInfo = [

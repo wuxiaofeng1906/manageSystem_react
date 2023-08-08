@@ -151,9 +151,11 @@ const Check = (props: any, ref: any) => {
         // 当有后端或者global的时候，并且是否可热更为是的时候，则要判断检查项目中的检查项是否符合条件
         const serverConfirmCount = serverConfirm.filter((e: any) => (e.confirm_type === "backend" || e.confirm_type === "global") && e.is_hot_update === "yes");
         const passItem = ['yes', 'skip'];
+        let title = "通过、忽略";
         if (serverConfirmCount && serverConfirmCount.length) {
           // 如果有数据，则要判断【后端是否可以热更新】是否为【可热更】或者为【忽略】
-          passItem.push("hot")
+          passItem.push("hot");
+          title = "通过、可热更、忽略";
         }
         // const flag = list.some(
         //   (it) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status),
@@ -161,7 +163,7 @@ const Check = (props: any, ref: any) => {
 
         const flag = list.some((it: any) => !passItem.includes(it.status));
         debugger
-        if (flag) return infoMessage('各项检查状态未达到『 通过、忽略 』，不能进行封版锁定');
+        if (flag) return infoMessage(`各项检查状态未达到『 ${title} 』，不能进行封版锁定`);
       }
 
       await OnlineSystemServices.checkSealingLock({

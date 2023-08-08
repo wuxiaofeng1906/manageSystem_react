@@ -4,7 +4,7 @@ import React, {
 } from 'react';
 import {
   Form, Select, Checkbox, Table, Row, Col,
-  Input, DatePicker, Button, Modal, Spin,
+  Input, DatePicker, Button, Modal, Spin, Space,
 } from 'antd';
 import {
   preServerColumn, repairColumn, getDevOpsOrderColumn, serverConfirmColumn, upgradeServicesColumn,
@@ -32,6 +32,8 @@ import usePermission from '@/hooks/permission';
 import {display} from "html2canvas/dist/types/css/property-descriptors/display";
 import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 import {preEnv} from "@/pages/onlineSystem/announcement/constant";
+import DragIcon from "@/components/DragIcon";
+import {EditModal} from "@/pages/onlineSystem/prePublish/SheetInfo";
 
 const color = {yes: '#2BF541', no: '#faad14'};
 const pickKey = ['release_name', 'release_env', 'plan_release_time'];
@@ -61,6 +63,11 @@ const ProcessDetail = (props: any, ref: any) => {
   }); // 需求列表
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
 
+  // 并发数弹窗
+  const [concurrent, setConcurrent] = useState<{ visible: boolean; data: any }>({
+    visible: false,
+    data: null,
+  });
   const confirmRef = useRef<GridApi>();
   const interfaceRef = useRef<GridApi>();
   const repairRef = useRef<GridApi>();
@@ -683,6 +690,27 @@ const ProcessDetail = (props: any, ref: any) => {
             columnDefs={upgradeServicesColumn}
             rowData={api ?? []}
             {...initGridTable({ref: interfaceRef, height: 30})}
+            frameworkComponents={{
+              operations: (p: CellClickedEvent) => (
+                <Space size={8}>
+                  <img
+                    title={'编辑'}
+                    src={require('../../../../public/edit.png')}
+                    style={{
+                      width: 18,
+                      height: 18,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      setConcurrent({
+                        visible: true,
+                        data: {...p.data, rowIndex: String(p.rowIndex)}
+                      });
+                    }}
+                  />
+                </Space>
+              ),
+            }}
           />
         </div>
 
@@ -785,6 +813,22 @@ const ProcessDetail = (props: any, ref: any) => {
               reset();
               getReleaseInfo({release_num});
             }
+          }}
+        />
+
+        <EditModal
+          visible={concurrent.visible}
+          data={concurrent.data}
+          onOk={(v: any) => {
+            debugger
+            if (v) {
+              const rowNode = interfaceRef.current?.getRowNode(concurrent.data?.rowIndex);
+              rowNode?.setData({...concurrent.data, concurrent: v.concurrent});
+            }
+            setConcurrent({
+              visible: false,
+              data: null
+            });
           }}
         />
       </div>

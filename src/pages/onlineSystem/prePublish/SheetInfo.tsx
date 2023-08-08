@@ -1019,7 +1019,7 @@ const SheetInfo = (props: any, ref: any) => {
 };
 export default forwardRef(SheetInfo);
 
-const EditModal = (props: ModalFuncProps & { data: any }) => {
+export const EditModal = (props: ModalFuncProps & { data: any }) => {
   const [form] = Form.useForm();
   const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
 

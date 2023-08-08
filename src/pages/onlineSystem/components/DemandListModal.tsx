@@ -1,22 +1,22 @@
-import React, {useState, useEffect, useMemo} from 'react';
-import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input} from 'antd';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input } from 'antd';
 import dayjs from 'dayjs';
-import {useModel} from 'umi';
-import {isEmpty, difference, isEqual, intersection, uniq} from 'lodash';
+import { useModel } from 'umi';
+import { isEmpty, difference, isEqual, intersection, uniq } from 'lodash';
 import styles from './DemandListModal.less';
-import {OnlineSystemServices} from '@/services/onlineSystem';
+import { OnlineSystemServices } from '@/services/onlineSystem';
 import {
   ClusterType,
   StoryStatus,
   WhetherOrNot,
   onLog,
 } from '@/pages/onlineSystem/config/constant';
-import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
-import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
-import {preEnv} from "@/pages/onlineSystem/announcement/constant";
+import { setTabsLocalStorage } from '@/pages/onlineSystem/commonFunction';
+import { preEnv } from '@/pages/onlineSystem/announcement/constant';
 
 let totalBranchEnv: any = [];
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
@@ -37,7 +37,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [appServers, setAppServers] = useState<Record<'tenant' | 'global', string[]>>();
   const [branchs, setBranchs] = useState<any[]>();
   const [releaseCluster, setReleaseCluster] = useState(globalEnv); // 发布集群
-  const {prePermission} = usePermission();
+  const { prePermission } = usePermission();
   const hasPermission = prePermission();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       return;
     }
     OnlineSystemServices.getBranch().then((res) => {
-      setBranchs(res?.map((it: any) => ({label: it.branch_name, value: it.branch_name})));
+      setBranchs(res?.map((it: any) => ({ label: it.branch_name, value: it.branch_name })));
     });
     if (!isEmpty(props.data)) {
       const branch = props.data?.branch;
@@ -59,7 +59,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         release_env: props.data.release_env,
       });
       if (branch) {
-        const result = {branch, type: '1'};
+        const result = { branch, type: '1' };
         baseForm.setFieldsValue(result);
         setComputed(result);
       }
@@ -94,18 +94,20 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setRelatedStory(res);
   };
 
-
   const getTableList = async () => {
     setSpin(true);
     try {
-      const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
+      const res = await OnlineSystemServices.getStoryList({
+        branch: computed?.branch,
+        onlyappr: true,
+      });
 
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
         setSelected(
-          res?.flatMap((it: any) =>
-            ['stagepatch', 'emergency'].includes(it.sprinttype) ? [] : [it], // sprint
+          res?.flatMap(
+            (it: any) => (['stagepatch', 'emergency'].includes(it.sprinttype) ? [] : [it]), // sprint
           ),
         );
       } else {
@@ -132,13 +134,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     // 如果选择的集群只为：灰度集群0；灰度集群1；灰度集群0、1三种情况默认加“灰度发布”；否则默认加“正式发布”
     let allCluster: any = [];
     clusterArray.map((v: any) => {
-      const vs = v.split(",");
+      const vs = v.split(',');
       allCluster = [...allCluster, ...vs];
     });
 
-    const name = difference(allCluster, ['cn-northwest-0', 'cn-northwest-1'])?.length > 0
-      ? '正式发布'
-      : '灰度发布';
+    const name =
+      difference(allCluster, ['cn-northwest-0', 'cn-northwest-1'])?.length > 0
+        ? '正式发布'
+        : '灰度发布';
 
     return name;
   };
@@ -158,7 +161,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
     // 灰度发布
     if (!isPreRelease) {
-
       setSpin(false);
       // 这里不能加入灰度推生产的缓存，只有在点击保存后才有本张单据的缓存。
       // setTabsLocalStorage({
@@ -166,15 +168,16 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       //   "release_name": release_num + "灰度推生产",
       //   "newAdd": true
       // });
-      props.onOk?.({...baseData, release_num});
+      props.onOk?.({ ...baseData, release_num });
       return;
     }
 
-    let time = (isEqual(values.cluster, ['cn-northwest-0'])
+    let time = (
+      isEqual(values.cluster, ['cn-northwest-0'])
         ? dayjs().startOf('d').hour(10)
         : isEqual(values.cluster, ['cn-northwest-1'])
-          ? dayjs().startOf('d').hour(22)
-          : dayjs().startOf('d')
+        ? dayjs().startOf('d').hour(22)
+        : dayjs().startOf('d')
     ).format('YYYY-MM-DD HH:mm:ss');
     let name = `${release_num}${getReleaseName(values.cluster)}`;
     // 如果是修改的情况，则发布时间为获取的数据中的时间，创建的时候才为初始时间
@@ -208,12 +211,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
       setTabsLocalStorage({
-        "release_num": release_num,
-        "release_name": name,
-        "newAdd": true
+        release_num: release_num,
+        release_name: name,
+        newAdd: true,
       });
 
-      props.onOk?.({...baseData, release_num});
+      props.onOk?.({ ...baseData, release_num });
     } catch (e) {
       errorMessage('接口异常');
       setSpin(false);
@@ -223,8 +226,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const getReleseCluster = (v: string) => {
     const filtered: any = [];
     [...globalEnv].forEach((cluster: any) => {
-      if (v === "tenant") {
-        if (cluster.key !== "cn-northwest-global") {
+      if (v === 'tenant') {
+        if (cluster.key !== 'cn-northwest-global') {
           filtered.push(cluster);
         }
       } else {
@@ -247,14 +250,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     if (user?.group === 'superGroup') {
       branchEnv = await preEnv(false);
     } else {
-      const branch = await OnlineSystemServices.branchEnv({branch: onlineBranch});
-      branchEnv = branch?.map((it: string) => ({label: it, value: it}));
-      if (v === "tenant") {
+      const branch = await OnlineSystemServices.branchEnv({ branch: onlineBranch });
+      branchEnv = branch?.map((it: string) => ({ label: it, value: it }));
+      if (v === 'tenant') {
         // 不展示global的数据
-        branchEnv = branchEnv.filter((it: any) => !it.label.includes("-global"));
-      } else if (v === "global") {
+        branchEnv = branchEnv.filter((it: any) => !it.label.includes('-global'));
+      } else if (v === 'global') {
         // 只展示global的数据
-        branchEnv = branchEnv.filter((it: any) => it.label.includes("-global"));
+        branchEnv = branchEnv.filter((it: any) => it.label.includes('-global'));
       }
     }
 
@@ -272,12 +275,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
 
     const _branchEnv = JSON.parse(JSON.stringify(totalBranchEnv));
-    if (v === "tenant") {
+    if (v === 'tenant') {
       // 不展示global的数据
-      setBranchEnv(_branchEnv.filter((it: any) => !it.label.includes("-global")));
-    } else if (v === "global") {
+      setBranchEnv(_branchEnv.filter((it: any) => !it.label.includes('-global')));
+    } else if (v === 'global') {
       // 只展示global的数据
-      setBranchEnv(_branchEnv.filter((it: any) => it.label.includes("-global")));
+      setBranchEnv(_branchEnv.filter((it: any) => it.label.includes('-global')));
     }
   };
 
@@ -309,12 +312,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     }
 
     form.setFieldsValue({
-      release_env: "",
+      release_env: '',
       cluster:
-        v == 'global'
-          ? ['cn-northwest-global']
-          : memoColumn().isSprint
-          ? ['cn-northwest-0'] : []
+        v == 'global' ? ['cn-northwest-global'] : memoColumn().isSprint ? ['cn-northwest-0'] : [],
       // : uniq(selectedData?.flatMap((it) => (it.cluster ? [it.cluster] : []))),
     });
 
@@ -337,32 +337,42 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     );
   };
 
-
   const updateStatus = (column: string, data: any, status: string, index: number) => {
-
-    const columnTitle = column === "db_update" ? "是否涉及数据update" : "是否可热更";
-    let inputValue = column === "db_update" ? data.data_update_note : data.hot_update_note;
+    const columnTitle = column === 'db_update' ? '是否涉及数据update' : '是否可热更';
+    let inputValue = column === 'db_update' ? data.data_update_note : data.hot_update_note;
     let confirm = Modal.confirm({
       centered: true,
       title: `修改${columnTitle}提醒`,
       width: 500,
-      content: <div>
-        <div>请确认是否将『执行名称：{data.pro_name ?? ''} 需求编号：{data.story ?? ''
-        }』的{columnTitle} 状态调整为 {WhetherOrNot[status] ?? "-"}</div>
+      content: (
         <div>
-          {/*<label>修改说明</label>*/}
-          <Input addonBefore={<div><span>修改说明</span><span style={{color: "red", marginLeft: 5}}>*</span></div>}
-                 defaultValue={inputValue}
-                 onChange={(e: any) => {
-                   inputValue = e.target.value;
-                 }}/>
+          <div>
+            请确认是否将『执行名称：{data.pro_name ?? ''} 需求编号：{data.story ?? ''}』的
+            {columnTitle} 状态调整为 {WhetherOrNot[status] ?? '-'}
+          </div>
+          <div>
+            {/*<label>修改说明</label>*/}
+            <Input
+              addonBefore={
+                <div>
+                  <span>修改说明</span>
+                  <span style={{ color: 'red', marginLeft: 5 }}>*</span>
+                </div>
+              }
+              defaultValue={inputValue}
+              onChange={(e: any) => {
+                inputValue = e.target.value;
+              }}
+            />
+          </div>
         </div>
-      </div>,
+      ),
 
-      onOk: async (e) => {   // 如果需要点击ok后，不满足条件不关闭的话，就必须写这个参数
+      onOk: async (e) => {
+        // 如果需要点击ok后，不满足条件不关闭的话，就必须写这个参数
 
         if (isEmpty(inputValue)) {
-          errorMessage("修改说明不能为空!", 2);
+          errorMessage('修改说明不能为空!', 2);
           return;
         }
 
@@ -370,24 +380,26 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         // 先更新后端，后端更新成功再更新这个界面上的值
         const updateResult = await OnlineSystemServices.updateListColumn({
           // "release_num": "202305250008", 可以不传
-          "execu_no": _list.pro_id,
-          "story_no": _list.story,
-          "user_id": user?.userid ?? '',
-          "datas": [
+          execu_no: _list.pro_id,
+          story_no: _list.story,
+          user_id: user?.userid ?? '',
+          datas: [
             {
-              "label_en": column === "db_update" ? "is_data_update" : "is_hot_update",
-              "old_value": column === "db_update" ? _list.db_update : _list.is_update,
-              "new_value": status,
-              "note": inputValue
-            }
-          ]
+              label_en: column === 'db_update' ? 'is_data_update' : 'is_hot_update',
+              old_value: column === 'db_update' ? _list.db_update : _list.is_update,
+              new_value: status,
+              note: inputValue,
+            },
+          ],
         });
         if (updateResult.code === 200) {
-          sucMessage(`${column === "db_update" ? "是否涉及数据update" : "是否可热更"}状态修改成功！`);
+          sucMessage(
+            `${column === 'db_update' ? '是否涉及数据update' : '是否可热更'}状态修改成功！`,
+          );
           // 更新是否值（是否数据update，是否热更）
           _list[column] = status;
           // 更新说明值
-          const descColumn = column === "db_update" ? "data_update_note" : "hot_update_note";
+          const descColumn = column === 'db_update' ? 'data_update_note' : 'hot_update_note';
           _list[descColumn] = inputValue;
 
           // 重新设置数据源
@@ -435,7 +447,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       ),
     });
   };
-
 
   const memoEdit = useMemo(
     () => ({
@@ -564,154 +575,164 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   //   };
   // }, [JSON.stringify(list), user?.group]);
 
-
   const memoColumn: any = () => {
-    const isSprint = list?.every((it) => !['emergency', 'stagepatch', 'performpatch'].includes(it.sprinttype));
+    const isSprint = list?.every(
+      (it) => !['emergency', 'stagepatch', 'performpatch'].includes(it.sprinttype),
+    );
     return {
       isSprint,
       column: isSprint
         ? [
-          {
-            title: '序号',
-            width: 70,
-            render: (_: any, r: any, i: number) => i + 1,
-            fixed: 'left',
-          },
-          {
-            title: '禅道执行名称',
-            dataIndex: 'pro_name',
-            ellipsis: {showTitle: false},
-            width: 500,
-            fixed: 'left',
-            render: (v: string) => (
-              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
-          },
-          {
-            title: '应用服务',
-            dataIndex: 'apps',
-            width: 400,
-            ellipsis: {showTitle: false},
-            render: (v: string) => (
-              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
-          },
-        ]
-        : [
-          {
-            title: '序号',
-            width: 70,
-            render: (_: any, r: any, i: number) => i + 1,
-            fixed: 'left',
-          },
-          {
-            title: '禅道执行名称',
-            dataIndex: 'pro_name',
-            ellipsis: {showTitle: false},
-            width: 200,
-            fixed: 'left',
-            render: (v: string) => (
-              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
-          },
-          {
-            title: '需求编号',
-            dataIndex: 'story',
-            width: 90,
-          },
-          {
-            title: '需求标题',
-            dataIndex: 'title',
-            width: 150,
-            ellipsis: {showTitle: false},
-            render: (v: string) => (
-              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
-          },
-          {
-            title: '需求阶段',
-            dataIndex: 'status',
-            width: 90,
-            ellipsis: {showTitle: false},
-            render: (v: string) => StoryStatus[v] ?? '',
-          },
-          {
-            title: '应用服务',
-            dataIndex: 'apps',
-            width: 110,
-            ellipsis: {showTitle: false},
-            render: (v: string) => (
-              <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
-          },
-          {
-            title: '是否涉及数据update',
-            dataIndex: 'db_update',
-            // width: 150,
-            // render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-            render: (v: string, row: any, i: number) => v == '-' ? (v) : (
-              <Select
-                disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update) || !hasPermission.dbUpdate}
-                value={v}
-                style={{width: '100%'}}
-                options={Object.keys(WhetherOrNot)?.map((k) => ({
-                  value: k,
-                  label: WhetherOrNot[k],
-                }))}
-                onChange={(e) => updateStatus("db_update", row, e, i)}
-              />
-            ),
-
-          },
-          // {
-          //   title: '是否涉及数据Recovery',
-          //   dataIndex: 'is_recovery',
-          //   render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-          // },
-          {
-            title: '是否可热更',
-            dataIndex: 'is_update',
-            width: 90,
-            render: (v: string, row: any, i: number) =>
-              v == '-' ? (
-                v
-              ) : (
-                <Select
-                  disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update) || !hasPermission.hotUpdate}
-                  value={v}
-                  style={{width: '100%'}}
-                  options={Object.keys(WhetherOrNot)?.map((k) => ({
-                    value: k,
-                    label: WhetherOrNot[k],
-                  }))}
-                  onChange={(e) => updateStatus("is_update", row, e, i)}
-                />
+            {
+              title: '序号',
+              width: 70,
+              render: (_: any, r: any, i: number) => i + 1,
+              fixed: 'left',
+            },
+            {
+              title: '禅道执行名称',
+              dataIndex: 'pro_name',
+              ellipsis: { showTitle: false },
+              width: 500,
+              fixed: 'left',
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
               ),
-          },
-          {title: '需求创建人', dataIndex: 'opened_by', width: 100},
-          {title: '需求指派人', dataIndex: 'ass_to', width: 100},
-          {
-            title: '数据update修改说明',
-            dataIndex: 'data_update_note',
-            width: 150,
-            ellipsis: {showTitle: false},
-            render: (v: string) => (
-              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
-          },
-          {
-            title: '是否可热更修改说明',
-            dataIndex: 'hot_update_note',
-            width: 150,
-            ellipsis: {showTitle: false},
-            render: (v: string) => (
-              <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
-          },
-        ],
+            },
+            {
+              title: '应用服务',
+              dataIndex: 'apps',
+              width: 400,
+              ellipsis: { showTitle: false },
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+          ]
+        : [
+            {
+              title: '序号',
+              width: 70,
+              render: (_: any, r: any, i: number) => i + 1,
+              fixed: 'left',
+            },
+            {
+              title: '禅道执行名称',
+              dataIndex: 'pro_name',
+              ellipsis: { showTitle: false },
+              width: 200,
+              fixed: 'left',
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '需求编号',
+              dataIndex: 'story',
+              width: 90,
+            },
+            {
+              title: '需求标题',
+              dataIndex: 'title',
+              width: 150,
+              ellipsis: { showTitle: false },
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '需求阶段',
+              dataIndex: 'status',
+              width: 90,
+              ellipsis: { showTitle: false },
+              render: (v: string) => StoryStatus[v] ?? '',
+            },
+            {
+              title: '应用服务',
+              dataIndex: 'apps',
+              width: 110,
+              ellipsis: { showTitle: false },
+              render: (v: string) => (
+                <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '是否涉及数据update',
+              dataIndex: 'db_update',
+              // width: 150,
+              // render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+              render: (v: string, row: any, i: number) =>
+                v == '-' ? (
+                  v
+                ) : (
+                  <Select
+                    disabled={
+                      user?.group !== 'superGroup' ||
+                      (memoEdit.update ? memoEdit.global : memoEdit.update) ||
+                      !hasPermission.dbUpdate
+                    }
+                    value={v}
+                    style={{ width: '100%' }}
+                    options={Object.keys(WhetherOrNot)?.map((k) => ({
+                      value: k,
+                      label: WhetherOrNot[k],
+                    }))}
+                    onChange={(e) => updateStatus('db_update', row, e, i)}
+                  />
+                ),
+            },
+            // {
+            //   title: '是否涉及数据Recovery',
+            //   dataIndex: 'is_recovery',
+            //   render: (v: string) => WhetherOrNot[v] ?? (v || ''),
+            // },
+            {
+              title: '是否可热更',
+              dataIndex: 'is_update',
+              width: 90,
+              render: (v: string, row: any, i: number) =>
+                v == '-' ? (
+                  v
+                ) : (
+                  <Select
+                    disabled={
+                      user?.group !== 'superGroup' ||
+                      (memoEdit.update ? memoEdit.global : memoEdit.update) ||
+                      !hasPermission.hotUpdate
+                    }
+                    value={v}
+                    style={{ width: '100%' }}
+                    options={Object.keys(WhetherOrNot)?.map((k) => ({
+                      value: k,
+                      label: WhetherOrNot[k],
+                    }))}
+                    onChange={(e) => updateStatus('is_update', row, e, i)}
+                  />
+                ),
+            },
+            { title: '需求创建人', dataIndex: 'opened_by', width: 100 },
+            { title: '需求指派人', dataIndex: 'ass_to', width: 100 },
+            {
+              title: '数据update修改说明',
+              dataIndex: 'data_update_note',
+              width: 150,
+              ellipsis: { showTitle: false },
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '是否可热更修改说明',
+              dataIndex: 'hot_update_note',
+              width: 150,
+              ellipsis: { showTitle: false },
+              render: (v: string) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+          ],
     };
-  }
-
+  };
 
   return (
     <Modal
@@ -725,16 +746,20 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       wrapClassName={styles.DemandListModal}
       onCancel={() => {
         totalBranchEnv = [];
-        props.onOk?.()
+        props.onOk?.();
       }}
       footer={[
         <Button onClick={showLog} hidden={!memoEdit.update}>
           查看日志
         </Button>,
-        <Button onClick={() => {
-          totalBranchEnv = [];
-          props.onOk?.()
-        }}>取消</Button>,
+        <Button
+          onClick={() => {
+            totalBranchEnv = [];
+            props.onOk?.();
+          }}
+        >
+          取消
+        </Button>,
         <Button
           type={'primary'}
           disabled={(memoEdit.update ? memoEdit.global : memoEdit.update) || spin}
@@ -752,13 +777,13 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                 <Form.Item
                   label={'类型选择'}
                   name={'type'}
-                  rules={[{required: true, message: '请选择发布类型！'}]}
+                  rules={[{ required: true, message: '请选择发布类型！' }]}
                 >
                   <Select
                     disabled={memoEdit.update}
                     options={[
-                      {label: '非积压发布', value: '1'},
-                      {label: '灰度推线上', value: '2'},
+                      { label: '非积压发布', value: '1' },
+                      { label: '灰度推线上', value: '2' },
                     ]}
                   />
                 </Form.Item>
@@ -768,7 +793,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   <Form.Item
                     label={'上线分支'}
                     name={'branch'}
-                    rules={[{required: true, message: '请选择发布类型！'}]}
+                    rules={[{ required: true, message: '请选择发布类型！' }]}
                   >
                     <Select
                       options={branchs}
@@ -791,7 +816,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     <Form.Item
                       name={'release_env_type'}
                       label={'发布环境类型'}
-                      rules={[{required: true, message: '请选择发布环境'}]}
+                      rules={[{ required: true, message: '请选择发布环境' }]}
                     >
                       <Select
                         placeholder={'发布环境类型'}
@@ -809,20 +834,22 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                       noStyle
                       shouldUpdate={(old, next) => old.release_env_type !== next.release_env_type}
                     >
-                      {({getFieldValue}) => {
+                      {({ getFieldValue }) => {
                         const env = getFieldValue('release_env_type');
                         return (
                           <Form.Item
                             name={'cluster'}
                             label={'发布集群'}
-                            rules={[{required: true, message: '请选择发布集群'}]}
+                            rules={[{ required: true, message: '请选择发布集群' }]}
                           >
                             <Select
                               mode={'multiple'}
                               options={releaseCluster}
                               placeholder={'发布集群'}
                               disabled={
-                                (memoEdit.update ? memoEdit.global : memoEdit.update) || env == 'global' || (memoColumn()?.isSprint && env == 'tenant')
+                                (memoEdit.update ? memoEdit.global : memoEdit.update) ||
+                                env == 'global' ||
+                                (memoColumn()?.isSprint && env == 'tenant')
                               }
                               //{
                               // global 、班车，特性项目 不可编辑
@@ -838,7 +865,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     <Form.Item
                       name={'release_env'}
                       label={'镜像环境绑定'}
-                      rules={[{required: true, message: '请选择镜像环境绑定'}]}
+                      rules={[{ required: true, message: '请选择镜像环境绑定' }]}
                     >
                       <Select
                         // defaultValue={"nx-temp-test"} // 测试环境测试时使用
@@ -854,7 +881,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               <div className={styles.onlineTable}>
                 <Table
                   size={'small'}
-                  scroll={{y: 400, x: 500}}
+                  scroll={{ y: 400, x: 500 }}
                   pagination={false}
                   columns={memoColumn().column}
                   rowKey={(p) => `${p.story}&${p.pro_id}`}
@@ -875,7 +902,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   }}
                 />
               </div>
-              <p style={{marginTop: 8}}>
+              <p style={{ marginTop: 8 }}>
                 提示：如本次发布不涉及的需求，请将对应需求前勾选的复选框去掉
               </p>
             </>

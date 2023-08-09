@@ -164,13 +164,13 @@ const Check = (props: any, ref: any) => {
               title.push(<br/>);
               title.push(<span>2. </span>);
             }
-            title.push(<span style={{textIndent: "2em"}}>后端是否可以热更新服务确认中为『 是』，当前检查为『不可热更』，请进行核对或进行忽略。</span>);
+            title.push(<span style={{textIndent: "2em"}}>【后端是否可以热更新】服务确认中为『 是』，当前检查为『不可热更』，请进行核对或进行忽略。</span>);
           }
         }
 
         if (title.length) {
-          Modal.error({
-            title: '封版锁定失败',
+          Modal.warn({
+            title: '提示',
             centered: true,
             width: 550,
             content: <div>{title} </div>

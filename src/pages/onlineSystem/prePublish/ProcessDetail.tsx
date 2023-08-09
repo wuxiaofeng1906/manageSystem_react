@@ -15,7 +15,7 @@ import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import styles from '@/pages/onlineSystem/config/common.less';
-import {infoMessage} from '@/publicMethods/showMessages';
+import {infoMessage, warnMessage} from '@/publicMethods/showMessages';
 import {InfoCircleOutlined, WarningOutlined} from '@ant-design/icons';
 import {history, useLocation, useModel, useParams} from 'umi';
 import IPagination from '@/components/IPagination';
@@ -702,6 +702,12 @@ const ProcessDetail = (props: any, ref: any) => {
                       cursor: 'pointer',
                     }}
                     onClick={() => {
+                      debugger
+                      // 封版锁定后不能修改
+                      if (globalState.locked) {
+                        warnMessage("服务已封版，不能修改！");
+                        return;
+                      }
                       setConcurrent({
                         visible: true,
                         data: {...p.data, rowIndex: String(p.rowIndex)}

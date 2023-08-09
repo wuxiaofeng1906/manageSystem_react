@@ -144,10 +144,9 @@ const Check = (props: any, ref: any) => {
        * 1.检查是否封版，是否已确认
        * 2. 检查状态是否通过、忽略
        */
-      debugger
 
       if (!globalState.locked) {
-        // await OnlineSystemServices.checkProcess({release_num});
+        await OnlineSystemServices.checkProcess({release_num}); // 正式使用需要放开
         // 当有后端或者global的时候，并且是否可热更为是的时候，则要判断检查项目中的检查项是否符合条件
         const serverConfirmCount = serverConfirm.filter((e: any) => (e.confirm_type === "backend" || e.confirm_type === "global") && e.is_hot_update === "yes");
         const passItem = ['yes', 'skip'];
@@ -157,12 +156,9 @@ const Check = (props: any, ref: any) => {
           passItem.push("hot");
           title = "通过、可热更、忽略";
         }
-        // const flag = list.some(
-        //   (it) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status),
-        // );
 
         const flag = list.some((it: any) => !passItem.includes(it.status));
-        debugger
+
         if (flag) return infoMessage(`各项检查状态未达到『 ${title} 』，不能进行封版锁定`);
       }
 

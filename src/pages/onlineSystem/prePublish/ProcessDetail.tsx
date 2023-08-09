@@ -819,11 +819,16 @@ const ProcessDetail = (props: any, ref: any) => {
         <EditModal
           visible={concurrent.visible}
           data={concurrent.data}
-          onOk={(v: any) => {
-            debugger
+          onOk={async (v: any) => {
             if (v) {
-              const rowNode = interfaceRef.current?.getRowNode(concurrent.data?.rowIndex);
-              rowNode?.setData({...concurrent.data, concurrent: v.concurrent});
+              const {data} = concurrent;
+              await OnlineSystemServices.updateConcurrent({
+                ready_release_num: data.ready_release_num,
+                id: data._id,
+                concurrent: (v.concurrent).toString()
+              });
+              const rowNode = interfaceRef.current?.getRowNode(data?.rowIndex);
+              rowNode?.setData({...data, concurrent: v.concurrent});
             }
             setConcurrent({
               visible: false,

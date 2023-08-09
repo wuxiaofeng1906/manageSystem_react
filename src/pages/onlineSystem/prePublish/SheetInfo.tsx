@@ -99,6 +99,7 @@ const SheetInfo = (props: any, ref: any) => {
         ...it.data,
         concurrent: it.data.concurrent ?? 20,
         api_header: it.data.api_header ?? '',
+        id: it.data._id
       })
     });
     const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];

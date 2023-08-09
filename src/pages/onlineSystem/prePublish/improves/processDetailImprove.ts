@@ -14,12 +14,13 @@ export const modifyCheckboxOnTableSelectedChange = (
     uniqueApps.push(_app);
   }
   if (setFuncsRecord.setSelectedProjApps) setFuncsRecord.setSelectedProjApps(uniqueApps);
-  // if (setFuncsRecord.setCheckedList) setFuncsRecord.setCheckedList(uniqueApps);
+  if (setFuncsRecord.setCheckedList) setFuncsRecord.setCheckedList(uniqueApps);
   form.setFieldsValue({ app_services: uniqueApps });
 };
 
 /* checkbox变化时,更新table中的选中项 */
 export const modifyTableSelectedOnCheckboxChange = (
+  form: FormInstance<any>,
   checkedValues: any[],
   dataList: any[],
   setFuncsRecord: Partial<Record<'setCheckedList' | 'setSelected', Function>>,
@@ -35,6 +36,8 @@ export const modifyTableSelectedOnCheckboxChange = (
       }
   }
   //
+  form.setFieldsValue({ app_services: checkedValues });
   if (setFuncsRecord.setCheckedList) setFuncsRecord.setCheckedList(checkedValues);
   if (setFuncsRecord.setSelected) setFuncsRecord.setSelected(selectedList);
+  if (checkedValues.length === 0) form.validateFields(['app_services']); // 规避"setFieldsValue"操作后,验证失效的问题
 };

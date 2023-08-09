@@ -57,9 +57,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const { prePermission } = usePermission();
   const hasPermission = prePermission();
   //
-  const [selectedProjApps, setSelectedProjApps] = useState<string[]>();
-  const [checkedList, setCheckedList] = useState<string[]>();
-  const [releaseEnvType, setReleaseEnvType] = useState<any>();
+  const [selectedProjApps, setSelectedProjApps] = useState<string[]>(); // 当前env类型所有可以被选择到的服务列表
+  const [checkedList, setCheckedList] = useState<string[]>(); // 当前选中的服务列表
+  const [releaseEnvType, setReleaseEnvType] = useState<any>(); // 当前"发布环境类型"
 
   useEffect(() => {
     if (!props.visible) {
@@ -365,7 +365,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
     // checkbox关联修改
     modifyCheckboxOnTableSelectedChange(form, appServers?.[v] ?? [], selectedApps, {
-      // setCheckedList: setCheckedList,
+      setCheckedList: setCheckedList,
       setSelectedProjApps: setSelectedProjApps,
     });
   };
@@ -777,7 +777,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     const selectedApps: string[] = [];
     for (const item of selectedRows) selectedApps.push(...item.apps.split(','));
     modifyCheckboxOnTableSelectedChange(form, appServers?.[releaseEnvType] ?? [], selectedApps, {
-      // setCheckedList,
+      setCheckedList,
     });
   };
 
@@ -788,7 +788,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       checkedValues.length > (checkedList ?? []).length
         ? list // 增加时
         : selected; // 减少时
-    modifyTableSelectedOnCheckboxChange(checkedValues, dataList, { setCheckedList, setSelected });
+    modifyTableSelectedOnCheckboxChange(form, checkedValues, dataList, {
+      setCheckedList,
+      setSelected,
+    });
   };
 
   return (
@@ -941,11 +944,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                         name={'app_services'}
                         label={'应用服务'}
                         rules={[{ required: true }]}
-                        initialValue={checkedList}
+                        initialValue={selectedProjApps}
                       >
                         <Checkbox.Group
                           options={selectedProjApps}
-                          value={checkedList}
                           onChange={onFormCheckboxChange}
                         />
                       </Form.Item>

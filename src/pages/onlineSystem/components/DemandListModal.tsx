@@ -67,6 +67,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       baseForm.resetFields();
       setComputed(null);
       setSelected([]);
+      //
+      setSelectedProjApps(undefined);
+      setCheckedList(undefined);
+      setReleaseEnvType(undefined);
       return;
     }
     OnlineSystemServices.getBranch().then((res) => {

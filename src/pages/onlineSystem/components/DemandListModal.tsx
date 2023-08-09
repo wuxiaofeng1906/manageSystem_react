@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input } from 'antd';
+import {
+  Modal,
+  ModalFuncProps,
+  Table,
+  Select,
+  Form,
+  Col,
+  Row,
+  Spin,
+  Button,
+  Input,
+  Checkbox,
+} from 'antd';
 import dayjs from 'dayjs';
 import { useModel } from 'umi';
 import { isEmpty, difference, isEqual, intersection, uniq } from 'lodash';
@@ -17,6 +29,11 @@ import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
 import { setTabsLocalStorage } from '@/pages/onlineSystem/commonFunction';
 import { preEnv } from '@/pages/onlineSystem/announcement/constant';
+import {
+  modifyCheckboxOnTableSelectedChange,
+  modifyTableSelectedOnCheckboxChange,
+} from '../prePublish/improves/processDetailImprove';
+import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 
 let totalBranchEnv: any = [];
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
@@ -39,6 +56,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [releaseCluster, setReleaseCluster] = useState(globalEnv); // 发布集群
   const { prePermission } = usePermission();
   const hasPermission = prePermission();
+  //
+  const [selectedProjApps, setSelectedProjApps] = useState<string[]>();
+  const [checkedList, setCheckedList] = useState<string[]>();
+  const [releaseEnvType, setReleaseEnvType] = useState<any>();
 
   useEffect(() => {
     if (!props.visible) {
@@ -285,6 +306,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const onChange = async (v: string) => {
+    setReleaseEnvType(v);
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
@@ -329,12 +351,23 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     );
 
     if (isEmpty(appServers?.[v])) return;
+    const selectedApps: string[] = [];
     setList(
-      list?.map((it: any) => ({
-        ...it,
-        disabled: intersection(it.apps?.split(','), appServers?.[v])?.length == 0,
-      })),
+      list?.map((it: any) => {
+        const apps: string[] = it.apps?.split(',');
+        selectedApps.push(...apps);
+        return {
+          ...it,
+          disabled: intersection(apps, appServers?.[v])?.length == 0,
+        };
+      }),
     );
+
+    // checkbox关联修改
+    modifyCheckboxOnTableSelectedChange(form, appServers?.[v] ?? [], selectedApps, {
+      // setCheckedList: setCheckedList,
+      setSelectedProjApps: setSelectedProjApps,
+    });
   };
 
   const updateStatus = (column: string, data: any, status: string, index: number) => {
@@ -734,6 +767,30 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     };
   };
 
+  /* table选中项改变时 */
+  const onTableCheckboxChange = (selectedRows) => {
+    // 更新选中项
+    setSelected(selectedRows);
+
+    // checkbox关联修改
+    if (!releaseEnvType) return;
+    const selectedApps: string[] = [];
+    for (const item of selectedRows) selectedApps.push(...item.apps.split(','));
+    modifyCheckboxOnTableSelectedChange(form, appServers?.[releaseEnvType] ?? [], selectedApps, {
+      // setCheckedList,
+    });
+  };
+
+  /* checkboxGroup选中项改变时 */
+  const onFormCheckboxChange = (checkedValues: CheckboxValueType[]) => {
+    console.log(checkedValues, checkedList);
+    const dataList: any[] =
+      checkedValues.length > (checkedList ?? []).length
+        ? list // 增加时
+        : selected; // 减少时
+    modifyTableSelectedOnCheckboxChange(checkedValues, dataList, { setCheckedList, setSelected });
+  };
+
   return (
     <Modal
       {...props}
@@ -877,6 +934,26 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     </Form.Item>
                   </Col>
                 </Row>
+                {selectedProjApps !== undefined ? (
+                  <Row justify={'space-between'} gutter={8}>
+                    <Col span={24}>
+                      <Form.Item
+                        name={'app_services'}
+                        label={'应用服务'}
+                        rules={[{ required: true }]}
+                        initialValue={checkedList}
+                      >
+                        <Checkbox.Group
+                          options={selectedProjApps}
+                          value={checkedList}
+                          onChange={onFormCheckboxChange}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : (
+                  ''
+                )}
               </Form>
               <div className={styles.onlineTable}>
                 <Table
@@ -888,7 +965,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   dataSource={list}
                   rowSelection={{
                     selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
-                    onChange: (_, selectedRows) => setSelected(selectedRows),
+                    onChange: (_, selectedRows) => onTableCheckboxChange(selectedRows),
                     getCheckboxProps: (record) => ({
                       disabled:
                         (memoEdit.update ? globalState.finished : false) ||

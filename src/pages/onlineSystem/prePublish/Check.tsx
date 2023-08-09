@@ -146,7 +146,7 @@ const Check = (props: any, ref: any) => {
        */
 
       if (!globalState.locked) {
-        // await OnlineSystemServices.checkProcess({release_num}); // 正式使用需要放开
+        // await OnlineSystemServices.checkProcess({release_num});
         let title = [];
         const otherFlag = list.some((it: any) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status));
         if (otherFlag) {

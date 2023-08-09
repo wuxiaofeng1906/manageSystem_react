@@ -146,20 +146,37 @@ const Check = (props: any, ref: any) => {
        */
 
       if (!globalState.locked) {
-        await OnlineSystemServices.checkProcess({release_num}); // 正式使用需要放开
-        // 当有后端或者global的时候，并且是否可热更为是的时候，则要判断检查项目中的检查项是否符合条件
-        const serverConfirmCount = serverConfirm.filter((e: any) => (e.confirm_type === "backend" || e.confirm_type === "global") && e.is_hot_update === "yes");
-        const passItem = ['yes', 'skip'];
-        let title = "通过、忽略";
-        if (serverConfirmCount && serverConfirmCount.length) {
-          // 如果有数据，则要判断【后端是否可以热更新】是否为【可热更】或者为【忽略】
-          passItem.push("hot");
-          title = "通过、可热更、忽略";
+        // await OnlineSystemServices.checkProcess({release_num}); // 正式使用需要放开
+        let title = [];
+        const otherFlag = list.some((it: any) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status));
+        if (otherFlag) {
+          title.push(<span style={{textIndent: "2em"}}>各项检查状态未达到『 通过、忽略 』，不能进行封版锁定。</span>)
         }
 
-        const flag = list.some((it: any) => !passItem.includes(it.status));
+        // 当有后端或者global的时候，并且是否可热更为是的时候，则要判断检查项目中的检查项是否符合条件
+        const serverConfirmCount = serverConfirm.filter((e: any) => (e.confirm_type === "backend" || e.confirm_type === "global") && e.is_hot_update === "yes");
+        if (serverConfirmCount && serverConfirmCount.length) {
+          // 如果有数据，则要判断【后端是否可以热更新】是否为【可热更】或者为【忽略】
+          const hotFlag = list.some((it: any) => it.rowKey === 'hot_data' && !['hot', 'skip'].includes(it.status));
+          if (hotFlag) {
+            if (title.length) {
+              title.unshift(<span>1. </span>);
+              title.push(<br/>);
+              title.push(<span>2. </span>);
+            }
+            title.push(<span style={{textIndent: "2em"}}>后端是否可以热更新服务确认中为『 是』，当前检查为『不可热更』，请进行核对或进行忽略。</span>);
+          }
+        }
 
-        if (flag) return infoMessage(`各项检查状态未达到『 ${title} 』，不能进行封版锁定`);
+        if (title.length) {
+          Modal.error({
+            title: '封版锁定失败',
+            centered: true,
+            width: 550,
+            content: <div>{title} </div>
+          });
+          return;
+        }
       }
 
       await OnlineSystemServices.checkSealingLock({

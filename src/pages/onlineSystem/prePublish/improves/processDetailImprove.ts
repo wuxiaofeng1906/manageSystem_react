@@ -3,19 +3,21 @@ import { FormInstance } from 'antd';
 /* table选中项变化时,更新checkbox */
 export const modifyCheckboxOnTableSelectedChange = (
   form: FormInstance<any>,
-  envAppServers: string[],
+  envAppServices: string[],
   selectedApps: string[],
   setFuncsRecord: Partial<Record<'setCheckedList' | 'setSelectedProjApps', Function>>,
+  checkedAppServices?: string[],
 ) => {
   const uniqueApps: string[] = [];
   for (const _app of selectedApps) {
     if (uniqueApps.includes(_app)) continue;
-    if (!envAppServers.includes(_app)) continue;
+    if (!envAppServices.includes(_app)) continue;
     uniqueApps.push(_app);
   }
   if (setFuncsRecord.setSelectedProjApps) setFuncsRecord.setSelectedProjApps(uniqueApps);
-  if (setFuncsRecord.setCheckedList) setFuncsRecord.setCheckedList(uniqueApps);
-  form.setFieldsValue({ app_services: uniqueApps });
+  if (setFuncsRecord.setCheckedList)
+    setFuncsRecord.setCheckedList(checkedAppServices ?? uniqueApps);
+  form.setFieldsValue({ app_services: checkedAppServices ?? uniqueApps });
 };
 
 /* checkbox变化时,更新table中的选中项 */

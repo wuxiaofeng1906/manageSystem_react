@@ -59,7 +59,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   //
   const [selectedProjApps, setSelectedProjApps] = useState<string[]>(); // 当前env类型所有可以被选择到的服务列表
   const [checkedList, setCheckedList] = useState<string[]>(); // 当前选中的服务列表
-  const [releaseEnvType, setReleaseEnvType] = useState<any>(); // 当前"发布环境类型"
 
   useEffect(() => {
     if (!props.visible) {
@@ -70,7 +69,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       //
       setSelectedProjApps(undefined);
       setCheckedList(undefined);
-      setReleaseEnvType(undefined);
       return;
     }
     OnlineSystemServices.getBranch().then((res) => {
@@ -105,6 +103,27 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   useEffect(() => {
     showInitBranchEnv(props.data?.release_env_type, computed?.branch);
   }, [computed?.branch, props.data]);
+
+  useEffect(() => {
+    if (memoEdit.update && !selectedProjApps) {
+      //
+      const uniqueCheckList: Set<string> = new Set(props.data.server?.map((item) => item.apps)); // init checkList
+      const envAppServices: string[] = appServers?.[props.data.release_env_type] ?? []; // init selectedProjApps
+      const uniqueListAppServices: string[] = [];
+      for (const item of list) uniqueListAppServices.push(...item.apps.split(','));
+      //
+      modifyCheckboxOnTableSelectedChange(
+        form,
+        envAppServices,
+        Array.from(new Set(uniqueListAppServices)),
+        {
+          setCheckedList,
+          setSelectedProjApps,
+        },
+        Array.from(uniqueCheckList),
+      );
+    }
+  }, [list]);
 
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();
@@ -225,7 +244,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         hot_update_note: o.hot_update_note,
         is_data_update: o.db_update,
         data_update_note: o.data_update_note,
-        apps: o.apps,
+        apps: checkedList?.join(',') ?? '',
       })),
       release_num: release_num ?? '',
       release_name: name,
@@ -310,7 +329,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const onChange = async (v: string) => {
-    setReleaseEnvType(v);
     const values = form.getFieldsValue();
     /*
       1.stage-patch、emergency 默认勾选未关联项，和集群 取 story
@@ -369,8 +387,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
 
     // checkbox关联修改
     modifyCheckboxOnTableSelectedChange(form, appServers?.[v] ?? [], selectedApps, {
-      setCheckedList: setCheckedList,
-      setSelectedProjApps: setSelectedProjApps,
+      setCheckedList,
+      setSelectedProjApps,
     });
   };
 
@@ -485,13 +503,15 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     });
   };
 
-  const memoEdit = useMemo(
-    () => ({
+  const memoEdit = useMemo(() => {
+    if (props.data) {
+      console.log('此处获取checklist数据！', appServers, selected);
+    }
+    return {
       global: globalState.locked || globalState.finished,
       update: !isEmpty(props.data?.release_num), // 新增、修改
-    }),
-    [globalState, props.data],
-  );
+    };
+  }, [globalState, props.data]);
 
   // const memoColumn = useMemo(() => {
   //   const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
@@ -777,6 +797,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setSelected(selectedRows);
 
     // checkbox关联修改
+    const releaseEnvType = form.getFieldValue('release_env_type');
     if (!releaseEnvType) return;
     const selectedApps: string[] = [];
     for (const item of selectedRows) selectedApps.push(...item.apps.split(','));

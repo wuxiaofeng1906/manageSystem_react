@@ -38,6 +38,7 @@ import {EditModal} from "@/pages/onlineSystem/prePublish/SheetInfo";
 const color = {yes: '#2BF541', no: '#faad14'};
 const pickKey = ['release_name', 'release_env', 'plan_release_time'];
 let agEdit = '';
+let agDisabled = false;
 const ProcessDetail = (props: any, ref: any) => {
   const {release_num, branch} = useParams() as { release_num: string; branch: string };
   const {subTab, tab} = useLocation()?.query as { tab: string; subTab: string };
@@ -460,6 +461,10 @@ const ProcessDetail = (props: any, ref: any) => {
   }, [errorTips]);
 
   const changeServerConfirm = async (v: string, param: CellClickedEvent) => {
+    if (agDisabled) {
+      warnMessage("服务已封版，不能修改！");
+      return;
+    }
     Modal.confirm({
       width: 500,
       maskClosable: false,
@@ -503,6 +508,8 @@ const ProcessDetail = (props: any, ref: any) => {
   const serverColumn = useMemo(() => preServerColumn(server), [server]);
 
   const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
+  console.log("22222222222222", (!hasPermission.baseInfo || hasEdit));
+  agDisabled = !hasPermission.baseInfo || hasEdit;
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
       <div className={styles.processDetail}>
@@ -702,9 +709,8 @@ const ProcessDetail = (props: any, ref: any) => {
                       cursor: 'pointer',
                     }}
                     onClick={() => {
-                      debugger
                       // 封版锁定后不能修改
-                      if (globalState.locked) {
+                      if (agDisabled) {
                         warnMessage("服务已封版，不能修改！");
                         return;
                       }

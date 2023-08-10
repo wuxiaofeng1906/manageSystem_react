@@ -106,7 +106,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   }, [computed?.branch, props.data]);
 
   useEffect(() => {
-    if (memoEdit.update && !selectedProjApps) {
+    if (appServers && list.length && memoEdit.update && !selectedProjApps) {
       //
       const uniqueCheckList: Set<string> = new Set(props.data.server?.map((item) => item.apps)); // init checkList
       const envAppServices: string[] = appServers?.[props.data.release_env_type] ?? []; // init selectedProjApps
@@ -124,7 +124,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         Array.from(uniqueCheckList),
       );
     }
-  }, [list]);
+  }, [list, appServers]);
 
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();

@@ -14,10 +14,11 @@ export const modifyCheckboxOnTableSelectedChange = (
     if (!envAppServices.includes(_app)) continue;
     uniqueApps.push(_app);
   }
+  form.setFieldsValue({ app_services: checkedAppServices ?? uniqueApps });
   if (setFuncsRecord.setSelectedProjApps) setFuncsRecord.setSelectedProjApps(uniqueApps);
   if (setFuncsRecord.setCheckedList)
     setFuncsRecord.setCheckedList(checkedAppServices ?? uniqueApps);
-  form.setFieldsValue({ app_services: checkedAppServices ?? uniqueApps });
+  if (uniqueApps.length === 0) form.validateFields(['app_services']); // 规避"setFieldsValue"操作后,验证失效的问题
 };
 
 /* checkbox变化时,更新table中的选中项 */
@@ -42,4 +43,36 @@ export const modifyTableSelectedOnCheckboxChange = (
   if (setFuncsRecord.setCheckedList) setFuncsRecord.setCheckedList(checkedValues);
   if (setFuncsRecord.setSelected) setFuncsRecord.setSelected(selectedList);
   if (checkedValues.length === 0) form.validateFields(['app_services']); // 规避"setFieldsValue"操作后,验证失效的问题
+};
+
+/* table选中项改变时 */
+export const onTableCheckboxChange = (props: any) => {
+  // 更新选中项
+  props.setSelected(props.selectedRows);
+
+  // checkbox关联修改
+  const releaseEnvType = props.form.getFieldValue('release_env_type');
+  if (!releaseEnvType) return;
+  const selectedApps: string[] = [];
+  for (const item of props.selectedRows) selectedApps.push(...item.apps.split(','));
+  modifyCheckboxOnTableSelectedChange(
+    props.form,
+    props.appServers?.[releaseEnvType] ?? [],
+    selectedApps,
+    {
+      setCheckedList: props.setCheckedList,
+    },
+  );
+};
+
+/* checkboxGroup选中项改变时 */
+export const onFormCheckboxChange = (props: any) => {
+  const dataList: any[] =
+    props.checkedValues.length > (props.checkedList ?? []).length
+      ? props.list // 增加时
+      : props.selected; // 减少时
+  modifyTableSelectedOnCheckboxChange(props.form, props.checkedValues, dataList, {
+    setCheckedList: props.setCheckedList,
+    setSelected: props.setSelected,
+  });
 };

@@ -32,6 +32,8 @@ import { preEnv } from '@/pages/onlineSystem/announcement/constant';
 import {
   modifyCheckboxOnTableSelectedChange,
   modifyTableSelectedOnCheckboxChange,
+  onFormCheckboxChange,
+  onTableCheckboxChange,
 } from '../prePublish/improves/processDetailImprove';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 
@@ -791,34 +793,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     };
   };
 
-  /* table选中项改变时 */
-  const onTableCheckboxChange = (selectedRows) => {
-    // 更新选中项
-    setSelected(selectedRows);
-
-    // checkbox关联修改
-    const releaseEnvType = form.getFieldValue('release_env_type');
-    if (!releaseEnvType) return;
-    const selectedApps: string[] = [];
-    for (const item of selectedRows) selectedApps.push(...item.apps.split(','));
-    modifyCheckboxOnTableSelectedChange(form, appServers?.[releaseEnvType] ?? [], selectedApps, {
-      setCheckedList,
-    });
-  };
-
-  /* checkboxGroup选中项改变时 */
-  const onFormCheckboxChange = (checkedValues: CheckboxValueType[]) => {
-    console.log(checkedValues, checkedList);
-    const dataList: any[] =
-      checkedValues.length > (checkedList ?? []).length
-        ? list // 增加时
-        : selected; // 减少时
-    modifyTableSelectedOnCheckboxChange(form, checkedValues, dataList, {
-      setCheckedList,
-      setSelected,
-    });
-  };
-
   return (
     <Modal
       {...props}
@@ -973,7 +947,17 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                       >
                         <Checkbox.Group
                           options={selectedProjApps}
-                          onChange={onFormCheckboxChange}
+                          onChange={(checkedValues: CheckboxValueType[]) =>
+                            onFormCheckboxChange({
+                              form,
+                              list,
+                              selected,
+                              setSelected,
+                              checkedList,
+                              checkedValues,
+                              setCheckedList,
+                            })
+                          }
                         />
                       </Form.Item>
                     </Col>
@@ -992,7 +976,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   dataSource={list}
                   rowSelection={{
                     selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
-                    onChange: (_, selectedRows) => onTableCheckboxChange(selectedRows),
+                    onChange: (_, selectedRows) =>
+                      onTableCheckboxChange({
+                        form,
+                        appServers,
+                        setSelected,
+                        selectedRows,
+                        setCheckedList,
+                      }),
                     getCheckboxProps: (record) => ({
                       disabled:
                         (memoEdit.update ? globalState.finished : false) ||

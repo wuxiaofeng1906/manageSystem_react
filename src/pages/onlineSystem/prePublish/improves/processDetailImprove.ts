@@ -14,6 +14,7 @@ export const modifyCheckboxOnTableSelectedChange = (
     if (!envAppServices.includes(_app)) continue;
     uniqueApps.push(_app);
   }
+  //
   form.setFieldsValue({ app_services: checkedAppServices ?? uniqueApps });
   if (setFuncsRecord.setSelectedProjApps) setFuncsRecord.setSelectedProjApps(uniqueApps);
   if (setFuncsRecord.setCheckedList)
@@ -45,23 +46,94 @@ export const modifyTableSelectedOnCheckboxChange = (
   if (checkedValues.length === 0) form.validateFields(['app_services']); // 规避"setFieldsValue"操作后,验证失效的问题
 };
 
+/* table移除选中的数据 */
+const getRemoveDataOfTableSelected = <T extends { apps: string }>(
+  prevSelectedRows: T[],
+  currSelectedRows: T[],
+  envAppServices: string[],
+  prevCheckList: string[],
+) => {
+  // list to map
+  const prevSelectedMap: Map<string, T> = new Map(
+    prevSelectedRows.map((item: any) => [`${item.story}${item.pro_id}`, item]),
+  );
+  const currSelectedMap: Map<string, T> = new Map(
+    currSelectedRows.map((item: any) => [`${item.story}${item.pro_id}`, item]),
+  );
+  // find diff
+  const removedApps: string[] = [];
+  const alreadyExistApps: string[] = [];
+  for (const [k, item] of prevSelectedMap.entries()) {
+    if (!currSelectedMap.get(k)) {
+      removedApps.push(...item.apps.split(',')?.filter((app) => envAppServices.includes(app)));
+      continue;
+    }
+    alreadyExistApps.push(...item.apps.split(',')?.filter((app) => envAppServices.includes(app)));
+  }
+  // generate new checklist apps
+  const newCheckedApps: string[] = [];
+  for (const prevCheckedApp of prevCheckList) {
+    if (removedApps.includes(prevCheckedApp) && !alreadyExistApps.includes(prevCheckedApp))
+      continue;
+    newCheckedApps.push(prevCheckedApp);
+  }
+
+  return Array.from(new Set(newCheckedApps));
+};
+
+/* table新增选中的数据 */
+const getAddDataOfTableSelected = <T extends { apps: string }>(
+  prevSelectedRows: T[],
+  currSelectedRows: T[],
+  envAppServices: string[],
+  prevCheckList: string[],
+) => {
+  // list to map
+  const prevSelectedMap: Map<string, T> = new Map(
+    prevSelectedRows.map((item: any) => [`${item.story}${item.pro_id}`, item]),
+  );
+  const currSelectedMap: Map<string, T> = new Map(
+    currSelectedRows.map((item: any) => [`${item.story}${item.pro_id}`, item]),
+  );
+  // find diff
+  const addedApps: string[] = [];
+  for (const [k, item] of currSelectedMap.entries()) {
+    if (prevSelectedMap.get(k)) continue;
+    addedApps.push(
+      ...item.apps
+        .split(',')
+        ?.filter((app) => envAppServices.includes(app) && !prevCheckList.includes(app)),
+    );
+  }
+
+  return Array.from(new Set([...prevCheckList, ...addedApps]));
+};
+
 /* table选中项改变时 */
 export const onTableCheckboxChange = (props: any) => {
+  const prevSelectedRows = [...props.selected];
+  const isRemoveAction = prevSelectedRows.length > props.selectedRows.length;
   // 更新选中项
   props.setSelected(props.selectedRows);
-
-  // checkbox关联修改
+  //
   const releaseEnvType = props.form.getFieldValue('release_env_type');
   if (!releaseEnvType) return;
+  const envAppServices = props.appServers?.[releaseEnvType] ?? [];
   const selectedApps: string[] = [];
   for (const item of props.selectedRows) selectedApps.push(...item.apps.split(','));
+  // 获取table选中前后的差异项
+  const newCheckedApps = (
+    isRemoveAction ? getRemoveDataOfTableSelected : getAddDataOfTableSelected
+  )(prevSelectedRows, props.selectedRows, envAppServices, props.checkedList);
+  // checkbox关联修改
   modifyCheckboxOnTableSelectedChange(
     props.form,
-    props.appServers?.[releaseEnvType] ?? [],
+    envAppServices,
     selectedApps,
     {
       setCheckedList: props.setCheckedList,
     },
+    Array.from(newCheckedApps),
   );
 };
 

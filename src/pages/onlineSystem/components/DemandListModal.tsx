@@ -31,7 +31,6 @@ import { setTabsLocalStorage } from '@/pages/onlineSystem/commonFunction';
 import { preEnv } from '@/pages/onlineSystem/announcement/constant';
 import {
   modifyCheckboxOnTableSelectedChange,
-  modifyTableSelectedOnCheckboxChange,
   onFormCheckboxChange,
   onTableCheckboxChange,
 } from '../prePublish/improves/processDetailImprove';
@@ -979,7 +978,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     onChange: (_, selectedRows) =>
                       onTableCheckboxChange({
                         form,
+                        selected,
                         appServers,
+                        checkedList,
                         setSelected,
                         selectedRows,
                         setCheckedList,

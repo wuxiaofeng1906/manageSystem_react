@@ -71,6 +71,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       //
       setSelectedProjApps(undefined);
       setCheckedList(undefined);
+      form.setFieldsValue({ app_services: [] });
       return;
     }
     OnlineSystemServices.getBranch().then((res) => {
@@ -506,9 +507,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   };
 
   const memoEdit = useMemo(() => {
-    if (props.data) {
-      console.log('此处获取checklist数据！', appServers, selected);
-    }
     return {
       global: globalState.locked || globalState.finished,
       update: !isEmpty(props.data?.release_num), // 新增、修改

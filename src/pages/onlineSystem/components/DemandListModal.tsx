@@ -59,7 +59,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const { prePermission } = usePermission();
   const hasPermission = prePermission();
   //
-  const [selectedProjApps, setSelectedProjApps] = useState<string[]>(); // 当前env类型所有可以被选择到的服务列表
+  const [selectedProjApps, setSelectedProjApps] = useState<string[]>([]); // 当前env类型所有可以被选择到的服务列表
   const [checkedList, setCheckedList] = useState<string[]>(); // 当前选中的服务列表
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       setComputed(null);
       setSelected([]);
       //
-      setSelectedProjApps(undefined);
+      setSelectedProjApps([]);
       setCheckedList(undefined);
       form.setFieldsValue({ app_services: [] });
       return;
@@ -108,10 +108,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   }, [computed?.branch, props.data]);
 
   useEffect(() => {
-    if (appServers && list.length && memoEdit.update && !selectedProjApps) {
+    if (appServers && list.length && memoEdit.update && selectedProjApps.length === 0) {
       //
       const uniqueCheckList: Set<string> = new Set(props.data.server?.map((item) => item.apps)); // init checkList
-      const envAppServices: string[] = appServers?.[props.data.release_env_type] ?? []; // init selectedProjApps
+      const envAppServices: string[] = appServers?.[props.data.release_env_type] ?? []; // init env app service
       const uniqueListAppServices: string[] = [];
       for (const item of list) uniqueListAppServices.push(...item.apps.split(','));
       //
@@ -862,7 +862,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                       placeholder={'上线分支'}
                       showSearch
                       allowClear
-                      onChange={() => form.resetFields()}
+                      onChange={() => {
+                        setSelectedProjApps([]);
+                        form.resetFields();
+                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -938,14 +941,14 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     </Form.Item>
                   </Col>
                 </Row>
-                {selectedProjApps !== undefined ? (
+                {selectedProjApps.length !== 0 ? (
                   <Row justify={'space-between'} gutter={8}>
                     <Col span={24}>
                       <Form.Item
                         name={'app_services'}
                         label={'应用服务'}
                         rules={[{ required: true }]}
-                        initialValue={selectedProjApps}
+                        // initialValue={selectedProjApps}
                       >
                         <Checkbox.Group
                           options={selectedProjApps}

@@ -240,15 +240,18 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       // release_env: 'nx-temp-test', // 测试环境测试时可以使用一个固定值
       release_env_type: values.release_env_type,
       branch: computed.branch,
-      pro_data: selected.map((o) => ({
-        pro_id: o.pro_id,
-        story_num: o.story,
-        is_hot_update: o.is_update,
-        hot_update_note: o.hot_update_note,
-        is_data_update: o.db_update,
-        data_update_note: o.data_update_note,
-        apps: checkedList?.join(',') ?? '',
-      })),
+      pro_data: selected.map((o) => {
+        const _apps = o.apps.split(',').filter((app) => checkedList?.includes(app));
+        return {
+          pro_id: o.pro_id,
+          story_num: o.story,
+          is_hot_update: o.is_update,
+          hot_update_note: o.hot_update_note,
+          is_data_update: o.db_update,
+          data_update_note: o.data_update_note,
+          apps: _apps?.join(',') ?? '',
+        };
+      }),
       release_num: release_num ?? '',
       release_name: name,
       plan_release_time: time,

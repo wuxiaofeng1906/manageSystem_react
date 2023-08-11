@@ -23,22 +23,12 @@ export const modifyCheckboxOnTableSelectedChange = (
 };
 
 /* checkbox变化时,更新table中的选中项 */
-export const modifyTableSelectedOnCheckboxChange = (
+const modifyTableSelectedOnCheckboxChange = (
   form: FormInstance<any>,
   checkedValues: any[],
-  dataList: any[],
+  selectedList: any[],
   setFuncsRecord: Partial<Record<'setCheckedList' | 'setSelected', Function>>,
 ) => {
-  const selectedList: any[] = [];
-  for (const da of dataList) {
-    if (da.disabled) continue;
-    const app_services = da.apps.split(',');
-    for (const checkedVal of checkedValues)
-      if (app_services.includes(checkedVal)) {
-        selectedList.push(da);
-        break;
-      }
-  }
   //
   form.setFieldsValue({ app_services: checkedValues });
   if (setFuncsRecord.setCheckedList) setFuncsRecord.setCheckedList(checkedValues);
@@ -46,6 +36,7 @@ export const modifyTableSelectedOnCheckboxChange = (
   if (checkedValues.length === 0) form.validateFields(['app_services']); // 规避"setFieldsValue"操作后,验证失效的问题
 };
 
+// ===============================================================
 /* table移除选中的数据 */
 const getRemoveDataOfTableSelected = <T extends { apps: string }>(
   prevSelectedRows: T[],
@@ -136,18 +127,58 @@ export const onTableCheckboxChange = (props: any) => {
     Array.from(newCheckedApps),
   );
 };
+// ===============================================================
+
+// ---------------------------------------------------------------
+/* "移除"选中时的数据处理 */
+const removeCheckedOfCheckboxGroup = (props: any) => {
+  const selectedList: any[] = [];
+  for (const da of props.selected) {
+    const apps: string[] = da.apps.split(',');
+    for (const app of apps)
+      if (props.checkedValues.includes(app)) {
+        selectedList.push(da);
+        break;
+      }
+  }
+
+  return selectedList;
+};
+
+/* "新增"选中时的数据处理 */
+const addCheckedOfCheckboxGroup = (props: any) => {
+  const { checkedValues, checkedList: prevCheckedList = [] } = props;
+  let addedCheckedApp: string = '';
+  for (const checkedApp of checkedValues)
+    if (!prevCheckedList.includes(checkedApp)) {
+      addedCheckedApp = checkedApp;
+      break;
+    }
+  //
+  const selectedList: any[] = [...props.selected];
+  const alreadySelectedSet = new Set(props.selected?.map((item) => `${item.story}${item.pro_id}`));
+  for (const da of props.list) {
+    if (alreadySelectedSet.has(`${da.story}${da.pro_id}`)) continue;
+    const apps: string[] = da.apps.split(',');
+    if (apps.includes(addedCheckedApp)) selectedList.push(da);
+  }
+
+  return selectedList;
+};
 
 /* checkboxGroup选中项改变时 */
 export const onFormCheckboxChange = (props: any) => {
-  const dataList: any[] =
+  const selectedList = (
     props.checkedValues.length > (props.checkedList ?? []).length
-      ? props.list // 增加时
-      : props.selected; // 减少时
-  modifyTableSelectedOnCheckboxChange(props.form, props.checkedValues, dataList, {
+      ? addCheckedOfCheckboxGroup
+      : removeCheckedOfCheckboxGroup
+  )(props);
+  modifyTableSelectedOnCheckboxChange(props.form, props.checkedValues, selectedList, {
     setCheckedList: props.setCheckedList,
     setSelected: props.setSelected,
   });
 };
+// ---------------------------------------------------------------
 
 /* 修改页 - table打开时, 默认勾选的选项判定 */
 export const setSelectedRowsOnUpdateTableInitOpen = (

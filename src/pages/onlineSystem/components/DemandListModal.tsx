@@ -506,12 +506,13 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     });
   };
 
-  const memoEdit = useMemo(() => {
-    return {
+  const memoEdit = useMemo(
+    () => ({
       global: globalState.locked || globalState.finished,
       update: !isEmpty(props.data?.release_num), // 新增、修改
-    };
-  }, [globalState, props.data]);
+    }),
+    [globalState, props.data],
+  );
 
   // const memoColumn = useMemo(() => {
   //   const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));

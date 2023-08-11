@@ -148,3 +148,25 @@ export const onFormCheckboxChange = (props: any) => {
     setSelected: props.setSelected,
   });
 };
+
+/* 修改页 - table打开时, 默认勾选的选项判定 */
+export const setSelectedRowsOnUpdateTableInitOpen = (
+  sourceDatas: any[],
+  checkList: string[] = [],
+) => {
+  if (!sourceDatas || sourceDatas.length === 0) return [];
+  //
+  const selectedList: string[] = [];
+  for (const da of sourceDatas) {
+    const apps = da.apps.split(',');
+    let isNeedToBeSelected = false;
+    for (const app of apps)
+      if (checkList.includes(app)) {
+        isNeedToBeSelected = true;
+        break;
+      }
+    if (isNeedToBeSelected) selectedList.push(`${da.story}&${da.pro_id}`);
+  }
+
+  return selectedList;
+};

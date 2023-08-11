@@ -33,6 +33,7 @@ import {
   modifyCheckboxOnTableSelectedChange,
   onFormCheckboxChange,
   onTableCheckboxChange,
+  setSelectedRowsOnUpdateTableInitOpen,
 } from '../prePublish/improves/processDetailImprove';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 
@@ -974,7 +975,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   rowKey={(p) => `${p.story}&${p.pro_id}`}
                   dataSource={list}
                   rowSelection={{
-                    selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
+                    selectedRowKeys: setSelectedRowsOnUpdateTableInitOpen(selected, checkedList),
                     onChange: (_, selectedRows) =>
                       onTableCheckboxChange({
                         form,

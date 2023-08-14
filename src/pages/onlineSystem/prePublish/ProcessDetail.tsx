@@ -508,7 +508,6 @@ const ProcessDetail = (props: any, ref: any) => {
   const serverColumn = useMemo(() => preServerColumn(server), [server]);
 
   const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
-  console.log("22222222222222", (!hasPermission.baseInfo || hasEdit));
   agDisabled = !hasPermission.baseInfo || hasEdit;
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>

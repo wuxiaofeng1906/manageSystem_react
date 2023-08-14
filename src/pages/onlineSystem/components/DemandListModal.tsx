@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input, Tooltip} from 'antd';
+import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input, Tooltip,Checkbox} from 'antd';
 import dayjs from 'dayjs';
 import {useModel} from 'umi';
 import {isEmpty, difference, isEqual, intersection, uniq} from 'lodash';
@@ -15,8 +15,15 @@ import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessage
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
-import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
-import {preEnv} from "@/pages/onlineSystem/announcement/constant";
+import { setTabsLocalStorage } from '@/pages/onlineSystem/commonFunction';
+import { preEnv } from '@/pages/onlineSystem/announcement/constant';
+import {
+  modifyCheckboxOnTableSelectedChange,
+  onFormCheckboxChange,
+  onTableCheckboxChange,
+  setSelectedRowsOnUpdateTableInitOpen,
+} from '../prePublish/improves/processDetailImprove';
+import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 
 let totalBranchEnv: any = [];
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
@@ -39,6 +46,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [releaseCluster, setReleaseCluster] = useState(globalEnv); // 发布集群
   const {prePermission} = usePermission();
   const hasPermission = prePermission();
+  //
+  const [selectedProjApps, setSelectedProjApps] = useState<string[]>([]); // 当前env类型所有可以被选择到的服务列表
+  const [checkedList, setCheckedList] = useState<string[]>(); // 当前选中的服务列表
 
   useEffect(() => {
     if (!props.visible) {
@@ -46,6 +56,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       baseForm.resetFields();
       setComputed(null);
       setSelected([]);
+      //
+      setSelectedProjApps([]);
+      setCheckedList(undefined);
+      form.setFieldsValue({ app_services: [] });
       return;
     }
     OnlineSystemServices.getBranch().then((res) => {
@@ -80,6 +94,27 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   useEffect(() => {
     showInitBranchEnv(props.data?.release_env_type, computed?.branch);
   }, [computed?.branch, props.data]);
+
+  useEffect(() => {
+    if (appServers && list.length && memoEdit.update && selectedProjApps.length === 0) {
+      //
+      const uniqueCheckList: Set<string> = new Set(props.data.server?.map((item) => item.apps)); // init checkList
+      const envAppServices: string[] = appServers?.[props.data.release_env_type] ?? []; // init env app service
+      const uniqueListAppServices: string[] = [];
+      for (const item of list) uniqueListAppServices.push(...item.apps.split(','));
+      //
+      modifyCheckboxOnTableSelectedChange(
+        form,
+        envAppServices,
+        Array.from(new Set(uniqueListAppServices)),
+        {
+          setCheckedList,
+          setSelectedProjApps,
+        },
+        Array.from(uniqueCheckList),
+      );
+    }
+  }, [list, appServers]);
 
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();
@@ -189,15 +224,18 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       // release_env: 'nx-temp-test', // 测试环境测试时可以使用一个固定值
       release_env_type: values.release_env_type,
       branch: computed.branch,
-      pro_data: selected.map((o) => ({
-        pro_id: o.pro_id,
-        story_num: o.story,
-        is_hot_update: o.is_update,
-        hot_update_note: o.hot_update_note,
-        is_data_update: o.db_update,
-        data_update_note: o.data_update_note,
-        apps: o.apps,
-      })),
+      pro_data: selected.map((o) => {
+        const _apps = o.apps.split(',').filter((app) => checkedList?.includes(app));
+        return {
+          pro_id: o.pro_id,
+          story_num: o.story,
+          is_hot_update: o.is_update,
+          hot_update_note: o.hot_update_note,
+          is_data_update: o.db_update,
+          data_update_note: o.data_update_note,
+          apps: _apps?.join(',') ?? '',
+        };
+      }),
       release_num: release_num ?? '',
       release_name: name,
       plan_release_time: time,
@@ -207,12 +245,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
       setTabsLocalStorage({
-        "release_num": release_num,
-        "release_name": name,
-        "newAdd": true
+        release_num: release_num,
+        release_name: name,
+        newAdd: true,
       });
 
-      props.onOk?.({...baseData, release_num});
+      props.onOk?.({ ...baseData, release_num });
     } catch (e) {
       errorMessage('接口异常');
       setSpin(false);
@@ -222,8 +260,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const getReleseCluster = (v: string) => {
     const filtered: any = [];
     [...globalEnv].forEach((cluster: any) => {
-      if (v === "tenant") {
-        if (cluster.key !== "cn-northwest-global") {
+      if (v === 'tenant') {
+        if (cluster.key !== 'cn-northwest-global') {
           filtered.push(cluster);
         }
       } else {
@@ -328,14 +366,24 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     );
 
     if (isEmpty(appServers?.[v])) return;
+    const selectedApps: string[] = [];
     setList(
-      list?.map((it: any) => ({
-        ...it,
-        disabled: intersection(it.apps?.split(','), appServers?.[v])?.length == 0,
-      })),
+      list?.map((it: any) => {
+        const apps: string[] = it.apps?.split(',');
+        selectedApps.push(...apps);
+        return {
+          ...it,
+          disabled: intersection(apps, appServers?.[v])?.length == 0,
+        };
+      }),
     );
-  };
 
+    // checkbox关联修改
+    modifyCheckboxOnTableSelectedChange(form, appServers?.[v] ?? [], selectedApps, {
+      setCheckedList,
+      setSelectedProjApps,
+    });
+  };
 
   const updateStatus = (column: string, data: any, status: string, index: number) => {
 
@@ -369,17 +417,17 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         // 先更新后端，后端更新成功再更新这个界面上的值
         const updateResult = await OnlineSystemServices.updateListColumn({
           // "release_num": "202305250008", 可以不传
-          "execu_no": _list.pro_id,
-          "story_no": _list.story,
-          "user_id": user?.userid ?? '',
-          "datas": [
+          execu_no: _list.pro_id,
+          story_no: _list.story,
+          user_id: user?.userid ?? '',
+          datas: [
             {
-              "label_en": column === "db_update" ? "is_data_update" : "is_hot_update",
-              "old_value": column === "db_update" ? _list.db_update : _list.is_update,
-              "new_value": status,
-              "note": inputValue
-            }
-          ]
+              label_en: column === 'db_update' ? 'is_data_update' : 'is_hot_update',
+              old_value: column === 'db_update' ? _list.db_update : _list.is_update,
+              new_value: status,
+              note: inputValue,
+            },
+          ],
         });
         if (updateResult.code === 200) {
           sucMessage(`${column === "db_update" ? "是否涉及数据update" : "是否可热更"}状态修改成功！`);
@@ -729,7 +777,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                       placeholder={'上线分支'}
                       showSearch
                       allowClear
-                      onChange={() => form.resetFields()}
+                      onChange={() => {
+                        setSelectedProjApps([]);
+                        form.resetFields();
+                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -803,6 +854,35 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     </Form.Item>
                   </Col>
                 </Row>
+                {selectedProjApps.length !== 0 ? (
+                  <Row justify={'space-between'} gutter={8}>
+                    <Col span={24}>
+                      <Form.Item
+                        name={'app_services'}
+                        label={'应用服务'}
+                        rules={[{ required: true }]}
+                        // initialValue={selectedProjApps}
+                      >
+                        <Checkbox.Group
+                          options={selectedProjApps}
+                          onChange={(checkedValues: CheckboxValueType[]) =>
+                            onFormCheckboxChange({
+                              form,
+                              list,
+                              selected,
+                              setSelected,
+                              checkedList,
+                              checkedValues,
+                              setCheckedList,
+                            })
+                          }
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : (
+                  ''
+                )}
               </Form>
               <div className={styles.onlineTable}>
                 <Table
@@ -813,8 +893,17 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   rowKey={(p) => `${p.story}&${p.pro_id}`}
                   dataSource={list}
                   rowSelection={{
-                    selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
-                    onChange: (_, selectedRows) => setSelected(selectedRows),
+                    selectedRowKeys: setSelectedRowsOnUpdateTableInitOpen(selected, checkedList),
+                    onChange: (_, selectedRows) =>
+                      onTableCheckboxChange({
+                        form,
+                        selected,
+                        appServers,
+                        checkedList,
+                        setSelected,
+                        selectedRows,
+                        setCheckedList,
+                      }),
                     getCheckboxProps: (record) => ({
                       disabled:
                         (memoEdit.update ? globalState.finished : false) ||

@@ -1292,6 +1292,7 @@ const SprintList: React.FC<any> = () => {
     '阶段',
     '测试',
     '测试确认',
+    '来源bug编号',
     '标题内容',
     '创建时间',
     '解决时间',
@@ -3244,6 +3245,9 @@ const SprintList: React.FC<any> = () => {
                 </Col>
                 <Col span={4}>
                   <Checkbox value="测试确认">测试确认</Checkbox>
+                </Col>
+                <Col span={4}>
+                  <Checkbox value="来源bug编号">来源bug编号</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="标题内容">标题内容</Checkbox>

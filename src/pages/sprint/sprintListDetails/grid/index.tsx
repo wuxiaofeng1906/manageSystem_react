@@ -26,7 +26,7 @@ import {
   isDelayTextDecorateRender,
 } from './columnRenderer';
 
-import { history } from '@@/core/history';
+import {history} from '@@/core/history';
 // 定义列名
 const getColums = (prjNames: any, show = true) => {
   // 获取缓存的字段
@@ -81,7 +81,7 @@ const getColums = (prjNames: any, show = true) => {
         '是否需要测试验证：自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色',
       tooltipValueGetter: testConfirmTooltipValueGetter,
       cellRenderer: testConfirmedRenderer,
-      filterParams: { cellRenderer: testVertifyFilter },
+      filterParams: {cellRenderer: testVertifyFilter},
     },
     {
       headerName: '类型',
@@ -98,6 +98,15 @@ const getColums = (prjNames: any, show = true) => {
       minWidth: 80,
       // suppressMenu: true,
       cellRenderer: linkToZentaoPage,
+    },
+    {
+      headerName: '来源bug编号',
+      field: 'fromBug',
+      pinned: 'left',
+      minWidth: 80,
+      cellRenderer: (param: any) => {
+        linkToZentaoPage(param, 'bug')
+      },
     },
     {
       headerName: '标题内容',
@@ -162,7 +171,7 @@ const getColums = (prjNames: any, show = true) => {
       field: 'clearCache',
       minWidth: 120,
       cellRenderer: clearCacheRenderer,
-      filterParams: { cellRenderer: testVertifyFilter },
+      filterParams: {cellRenderer: testVertifyFilter},
     },
     {
       headerName: '是否有数据升级',
@@ -412,21 +421,21 @@ const getColums = (prjNames: any, show = true) => {
 
 // 设置行的颜色
 const setRowColor = (params: any) => {
-  let style: any = { background: 'white' };
+  let style: any = {background: 'white'};
   // ztUnlinkedAt: null 禅道需求未移除
   const isDelete = params.data.ztUnlinkedAt != null;
   // 超范围 + 禅道需求移除
   if (params.data.baseline == '0' && isDelete) {
-    style = { background: '#e1e4ea80', color: isDelete ? 'red' : 'initial' };
+    style = {background: '#e1e4ea80', color: isDelete ? 'red' : 'initial'};
   } else if (params.data.baseline === '0') {
     // 如果基线为0，则整行都渲染颜色
-    style = { background: '#FFF6F6' };
+    style = {background: '#FFF6F6'};
   }
   // 禅道需求移除 灰色背景
   else if (isDelete) {
-    style = { background: '#e1e4ea80' };
+    style = {background: '#e1e4ea80'};
   }
   return style;
 };
 
-export { getColums, setRowColor };
+export {getColums, setRowColor};

@@ -61,6 +61,10 @@ export const OnlineSystemServices = {
   async removeServerApp(data: any) {
     return request(`${baseUrl}/online/project-app`, {data, method: 'delete', msg: '移除成功'});
   },
+  // 修改升级接口并发数
+  async updateConcurrent(data: any) {
+    return request(`${baseUrl}/online/update-api`, {data, method: 'post'});
+  },
   // 封版、解除封版
   async updateServerApp(data: any) {
     return request(`${baseUrl}/online/sealing-version`, {

@@ -99,6 +99,7 @@ const SheetInfo = (props: any, ref: any) => {
         ...it.data,
         concurrent: it.data.concurrent ?? 20,
         api_header: it.data.api_header ?? '',
+        id: it.data._id
       })
     });
     const release_app = serverRef.current?.getRenderedNodes()?.map((it) => it.data) || [];
@@ -1019,7 +1020,7 @@ const SheetInfo = (props: any, ref: any) => {
 };
 export default forwardRef(SheetInfo);
 
-const EditModal = (props: ModalFuncProps & { data: any }) => {
+export const EditModal = (props: ModalFuncProps & { data: any }) => {
   const [form] = Form.useForm();
   const [globalState] = useModel('onlineSystem', (online) => [online.globalState]);
 

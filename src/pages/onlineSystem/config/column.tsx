@@ -284,6 +284,15 @@ export const upgradeServicesColumn: (ColDef | ColGroupDef)[] = [
   {headerName: 'Header', field: 'api_header', minWidth: 110, tooltipField: 'api_header'},
   {headerName: '租户ID', field: 'tenant', minWidth: 100, maxWidth: 100},
   {headerName: '提交人', field: 'author', minWidth: 100, maxWidth: 100},
+  {
+    headerName: '并发数',
+    field: 'concurrent',
+    minWidth: 100,
+    width: 100,
+    headerClass: 'ag-required',
+    valueFormatter: (p) => p.value ?? 20,
+  },
+  {headerName: '操作', minWidth: 90, width: 90, cellRenderer: 'operations'},
 ];
 
 // 运维工单

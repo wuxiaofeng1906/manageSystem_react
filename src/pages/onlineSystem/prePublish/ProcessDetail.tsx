@@ -4,7 +4,7 @@ import React, {
 } from 'react';
 import {
   Form, Select, Checkbox, Table, Row, Col,
-  Input, DatePicker, Button, Modal, Spin,
+  Input, DatePicker, Button, Modal, Spin, Space,
 } from 'antd';
 import {
   preServerColumn, repairColumn, getDevOpsOrderColumn, serverConfirmColumn, upgradeServicesColumn,
@@ -15,7 +15,7 @@ import {AgGridReact} from 'ag-grid-react';
 import {CellClickedEvent, GridApi} from 'ag-grid-community';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import styles from '@/pages/onlineSystem/config/common.less';
-import {infoMessage} from '@/publicMethods/showMessages';
+import {infoMessage, warnMessage} from '@/publicMethods/showMessages';
 import {InfoCircleOutlined, WarningOutlined} from '@ant-design/icons';
 import {history, useLocation, useModel, useParams} from 'umi';
 import IPagination from '@/components/IPagination';
@@ -32,10 +32,13 @@ import usePermission from '@/hooks/permission';
 import {display} from "html2canvas/dist/types/css/property-descriptors/display";
 import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
 import {preEnv} from "@/pages/onlineSystem/announcement/constant";
+import DragIcon from "@/components/DragIcon";
+import {EditModal} from "@/pages/onlineSystem/prePublish/SheetInfo";
 
 const color = {yes: '#2BF541', no: '#faad14'};
 const pickKey = ['release_name', 'release_env', 'plan_release_time'];
 let agEdit = '';
+let agDisabled = false;
 const ProcessDetail = (props: any, ref: any) => {
   const {release_num, branch} = useParams() as { release_num: string; branch: string };
   const {subTab, tab} = useLocation()?.query as { tab: string; subTab: string };
@@ -61,6 +64,11 @@ const ProcessDetail = (props: any, ref: any) => {
   }); // 需求列表
   const [branchEnv, setBranchEnv] = useState<any[]>([]);
 
+  // 并发数弹窗
+  const [concurrent, setConcurrent] = useState<{ visible: boolean; data: any }>({
+    visible: false,
+    data: null,
+  });
   const confirmRef = useRef<GridApi>();
   const interfaceRef = useRef<GridApi>();
   const repairRef = useRef<GridApi>();
@@ -453,6 +461,10 @@ const ProcessDetail = (props: any, ref: any) => {
   }, [errorTips]);
 
   const changeServerConfirm = async (v: string, param: CellClickedEvent) => {
+    if (agDisabled) {
+      warnMessage("服务已封版，不能修改！");
+      return;
+    }
     Modal.confirm({
       width: 500,
       maskClosable: false,
@@ -496,6 +508,8 @@ const ProcessDetail = (props: any, ref: any) => {
   const serverColumn = useMemo(() => preServerColumn(server), [server]);
 
   const hasPermission = useMemo(onlineSystemPermission, [user?.group]);
+  console.log("22222222222222", (!hasPermission.baseInfo || hasEdit));
+  agDisabled = !hasPermission.baseInfo || hasEdit;
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
       <div className={styles.processDetail}>
@@ -683,6 +697,32 @@ const ProcessDetail = (props: any, ref: any) => {
             columnDefs={upgradeServicesColumn}
             rowData={api ?? []}
             {...initGridTable({ref: interfaceRef, height: 30})}
+            frameworkComponents={{
+              operations: (p: CellClickedEvent) => (
+                <Space size={8}>
+                  <img
+                    title={'编辑'}
+                    src={require('../../../../public/edit.png')}
+                    style={{
+                      width: 18,
+                      height: 18,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      // 封版锁定后不能修改
+                      if (agDisabled) {
+                        warnMessage("服务已封版，不能修改！");
+                        return;
+                      }
+                      setConcurrent({
+                        visible: true,
+                        data: {...p.data, rowIndex: String(p.rowIndex)}
+                      });
+                    }}
+                  />
+                </Space>
+              ),
+            }}
           />
         </div>
 
@@ -785,6 +825,27 @@ const ProcessDetail = (props: any, ref: any) => {
               reset();
               getReleaseInfo({release_num});
             }
+          }}
+        />
+
+        <EditModal
+          visible={concurrent.visible}
+          data={concurrent.data}
+          onOk={async (v: any) => {
+            if (v) {
+              const {data} = concurrent;
+              await OnlineSystemServices.updateConcurrent({
+                ready_release_num: data.ready_release_num,
+                id: data._id,
+                concurrent: (v.concurrent).toString()
+              });
+              const rowNode = interfaceRef.current?.getRowNode(data?.rowIndex);
+              rowNode?.setData({...data, concurrent: v.concurrent});
+            }
+            setConcurrent({
+              visible: false,
+              data: null
+            });
           }}
         />
       </div>

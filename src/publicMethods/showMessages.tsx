@@ -55,7 +55,7 @@ const errorMessage = (errMsg: string = "错误", dutationTime: number = 1.5, pos
 };
 
 // 提示信息
-const infoMessage = (infoMsg: string, dutationTime: number = 1.5) => {
+const infoMessage = (infoMsg: any, dutationTime: number = 1.5) => {
   message.info({
     content: infoMsg,
     duration: dutationTime,

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input} from 'antd';
+import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input, Tooltip} from 'antd';
 import dayjs from 'dayjs';
 import {useModel} from 'umi';
 import {isEmpty, difference, isEqual, intersection, uniq} from 'lodash';
@@ -99,7 +99,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setSpin(true);
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
-
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
@@ -445,125 +444,78 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     [globalState, props.data],
   );
 
-  // const memoColumn = useMemo(() => {
-  //   const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
-  //   const disableValue = user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update);
-  //   console.log("user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update", disableValue);
-  //
-  //   return {
-  //     isSprint,
-  //     column: isSprint
-  //       ? [
-  //         {
-  //           title: '序号',
-  //           width: 70,
-  //           render: (_: any, r: any, i: number) => i + 1,
-  //           fixed: 'left',
-  //         },
-  //         {
-  //           title: '禅道执行名称',
-  //           dataIndex: 'pro_name',
-  //           ellipsis: {showTitle: false},
-  //           width: 500,
-  //           fixed: 'left',
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //         {
-  //           title: '应用服务',
-  //           dataIndex: 'apps',
-  //           width: 400,
-  //           ellipsis: {showTitle: false},
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //       ]
-  //       : [
-  //         {
-  //           title: '序号',
-  //           width: 70,
-  //           render: (_: any, r: any, i: number) => i + 1,
-  //           fixed: 'left',
-  //         },
-  //         {
-  //           title: '禅道执行名称',
-  //           dataIndex: 'pro_name',
-  //           ellipsis: {showTitle: false},
-  //           width: 200,
-  //           fixed: 'left',
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //         {
-  //           title: '需求编号',
-  //           dataIndex: 'story',
-  //           width: 90,
-  //         },
-  //         {
-  //           title: '需求标题',
-  //           dataIndex: 'title',
-  //           width: 150,
-  //           ellipsis: {showTitle: false},
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //         {
-  //           title: '需求阶段',
-  //           dataIndex: 'status',
-  //           width: 90,
-  //           ellipsis: {showTitle: false},
-  //           render: (v: string) => StoryStatus[v] ?? '',
-  //         },
-  //         {
-  //           title: '应用服务',
-  //           dataIndex: 'apps',
-  //           width: 110,
-  //           ellipsis: {showTitle: false},
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //         {
-  //           title: '是否涉及数据update',
-  //           dataIndex: 'db_update',
-  //           // width: 150,
-  //           render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-  //         },
-  //         {
-  //           title: '是否涉及数据Recovery',
-  //           dataIndex: 'is_recovery',
-  //           render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-  //         },
-  //         {
-  //           title: '是否可热更',
-  //           dataIndex: 'is_update',
-  //           width: 90,
-  //           render: (v: string, row: any, i: number) =>
-  //             v == '-' ? (
-  //               v
-  //             ) : (
-  //               <Select
-  //                 disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update)}
-  //                 value={v}
-  //                 style={{width: '100%'}}
-  //                 options={Object.keys(WhetherOrNot)?.map((k) => ({
-  //                   value: k,
-  //                   label: WhetherOrNot[k],
-  //                 }))}
-  //                 onChange={(e) => updateStatus(row, e, i)}
-  //               />
-  //             ),
-  //         },
-  //         {title: '需求创建人', dataIndex: 'opened_by', width: 100},
-  //         {title: '需求指派人', dataIndex: 'ass_to', width: 100},
-  //       ],
-  //   };
-  // }, [JSON.stringify(list), user?.group]);
+  // 应用服务渲染
+  const appsRender = (value: any, data: any) => {
+    const {task_apps, apply_apps, story, title} = data;
+    // 保存界面展示的列的数据
+    const columnValue: any = [];
+    // 是否展示tooltip内容
+    let showTooltip = false;
+    // 保存toolTip 中服务的数据
+    const titleServer: any = [];
 
+    // 展示所有服务（emergency申请+禅道）
+    let allServer = isEmpty(value) ? [] : value.split(",");
+    if (apply_apps && apply_apps.length) {
+      allServer = uniq(allServer.concat(apply_apps));
+    }
+
+    // 当前值和apply_apps值做对比。apply_apps中是emergency申请的数据。
+    allServer.forEach((server: string, index: number) => {
+      let showCharFlag: boolean;
+      if (allServer.length - 1 === index) {
+        showCharFlag = false;
+      } else {
+        showCharFlag = true;
+      }
+
+      // 同时存在
+      if (value.includes(server) && apply_apps.includes(server)) {
+        columnValue.push(<span>{server}</span>);
+        titleServer.push(<span>{server}</span>);
+
+      } else if (!value.includes(server) && apply_apps.includes(server)) { // 禅道不存在，emergency存在(服务移除)
+        showTooltip = true;
+        columnValue.push(<span><span style={{color: "#8190C1"}}>{server}</span></span>);
+        titleServer.push(<span><span style={{color: "#8190C1"}}>{server}(服务移除)</span></span>);
+      } else if (value.includes(server) && !apply_apps.includes(server)) {  // 禅道存在，emergency不存在（服务添加）
+        showTooltip = true;
+        columnValue.push(<span><span style={{color: "orange"}}>{server}</span></span>);
+        titleServer.push(<span><span style={{color: "orange"}}>{server}(服务增添)</span></span>);
+      }
+
+      // 添加逗号
+      if (showCharFlag) {
+        columnValue.push(<span>,</span>);
+        titleServer.push(<span>,</span>);
+      }
+    });
+
+    if (!showTooltip) {
+      return <Ellipsis title={columnValue} width={'100%'} placement={'bottomLeft'} color={'white'}/>
+      // return <div>{columnValue}</div>;
+    }
+    const taskArray: any = [];
+    if (task_apps && task_apps.length) {
+      task_apps.map((task: any) => {
+        taskArray.push(<p style={{marginTop: -10}}>=&gt;task-
+          <a target={"_blank"}
+             href={`http://zentao.77hub.com/zentao/task-view-${task.task_id}.html`}>{task.task_id}</a>:{task.apps}
+        </p>)
+      });
+    }
+
+    const _title = <div style={{color: "black", width: 380}}>
+      <p>=&gt;story-
+        <a target={"_blank"} href={`http://zentao.77hub.com/zentao/story-view-${story}.html`}>{story}</a>
+        ：{title}</p>
+      <p style={{marginTop: -10}}>=&gt;服务：{titleServer}</p>
+      {taskArray}
+    </div>;
+    return <Tooltip overlayClassName={styles.ToolTipStyle} title={_title} color={"white"} placement="bottomLeft">
+      <div>{columnValue}</div>
+    </Tooltip>;
+  };
 
   const memoColumn: any = () => {
     const isSprint = list?.every((it) => !['emergency', 'stagepatch', 'performpatch'].includes(it.sprinttype));
@@ -640,9 +592,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
             dataIndex: 'apps',
             width: 110,
             ellipsis: {showTitle: false},
-            render: (v: string) => (
-              <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
+            render: appsRender
+            // render: (v: string) => (
+            //   <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            // ),
           },
           {
             title: '是否涉及数据update',

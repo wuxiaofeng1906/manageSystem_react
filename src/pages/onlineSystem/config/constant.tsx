@@ -75,6 +75,7 @@ export const StoryStatus = {
   verified: '已验收',
   released: '已发布',
   closed: '已关闭',
+  doing:'进行中' // 这个是任务的状态，也需要用到
 };
 export const AutoCheckType = {ui: 'ui执行通过', api: '接口执行通过', applet: '小程序执行通过'};
 export const checkInfo = [
@@ -295,7 +296,8 @@ export const checkInfo = [
     desc: "remark"
   },
   {
-    check_type: '需求阶段是否满足条件（需要测试需达到测试完毕/无需测试需要开发完毕）',
+    // check_type: '需求阶段是否满足条件（需要测试需达到测试完毕/无需测试需要开发完毕）',
+    check_type: '需求下任务是否达到已完成',
     side: 'public',
     status: 'check_result',
     start: 'check_start_time',

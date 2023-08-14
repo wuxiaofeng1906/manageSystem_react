@@ -4,7 +4,7 @@ import {
   Form, DatePicker, ModalFuncProps, Button, Tooltip, Input
 } from 'antd';
 import {
-  AutoCheckType, checkInfo, CheckStatus, CheckTechnicalSide, onLog, logColumns,
+  AutoCheckType, checkInfo, CheckStatus, CheckTechnicalSide, onLog, logColumns, StoryStatus,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
 import {isEmpty, omit, delay, isString, uniq} from 'lodash';
@@ -317,62 +317,97 @@ const Check = (props: any, ref: any) => {
         return;
       }
 
-      if (type == 'libray_data') {
-        content = (
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <div>
-              <strong>线上：</strong>
-              {Object.entries(v?.before ?? {})?.map(([k, v]) => (
-                <div>{`${k}: ${v}`}</div>
-              ))}
+      switch (type) {
+        case 'libray_data': {
+          content = (
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <div>
+                <strong>线上：</strong>
+                {Object.entries(v?.before ?? {})?.map(([k, v]) => (
+                  <div>{`${k}: ${v}`}</div>
+                ))}
+              </div>
+              <div>
+                <strong>线下：</strong>
+                {Object.entries(v?.after ?? {})?.map(([k, v]) => (
+                  <div>{`${k}: ${v}`}</div>
+                ))}
+              </div>
             </div>
-            <div>
-              <strong>线下：</strong>
-              {Object.entries(v?.after ?? {})?.map(([k, v]) => (
-                <div>{`${k}: ${v}`}</div>
-              ))}
+          );
+        }
+          break;
+        case 'hot_data': {
+          width = 1000;
+          content = (
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <div>
+                <strong>收集数据当前环境数据:</strong>
+                <div>{v?.present_env}</div>
+              </div>
+              <div>
+                <strong>收集数据线上环境数据:</strong>
+                <div>{v?.online_env}</div>
+              </div>
+              <div>
+                <strong>集群服务状态版本检查:</strong>
+                <div>{v?.servers_check}</div>
+              </div>
             </div>
-          </div>
-        );
-      }
-      if (type == 'hot_data') {
-        width = 1000;
-        content = (
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <div>
-              <strong>收集数据当前环境数据:</strong>
-              <div>{v?.present_env}</div>
-            </div>
-            <div>
-              <strong>收集数据线上环境数据:</strong>
-              <div>{v?.online_env}</div>
-            </div>
-            <div>
-              <strong>集群服务状态版本检查:</strong>
-              <div>{v?.servers_check}</div>
-            </div>
-          </div>
-        );
-      }
-      if (type.includes('seal_data') && !isString(v)) {
-        content = (
-          <div>
-            {v?.map((it: any) => (
-              <div key={it.name_path}>
-                <span>{`【${it.name_path}】`}</span>【
-                <span style={{color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14'}}>
+          );
+        }
+          break;
+        case 'front_seal_data':
+        case 'backend_seal_data': {
+          if (!isString(v)) {
+            content = (
+              <div>
+                {v?.map((it: any) => (
+                  <div key={it.name_path}>
+                    <span>{`【${it.name_path}】`}</span>【
+                    <span style={{color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14'}}>
                 {it.sealing_version == 'yes' ? '已封版' : '未封版'}
               </span>
-                】
-                <span>{`封版时间：${
-                  it.sealing_version_time
-                    ? dayjs(it.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
-                    : ''
-                }`}</span>
+                    】
+                    <span>{`封版时间：${
+                      it.sealing_version_time
+                        ? dayjs(it.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
+                        : ''
+                    }`}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        );
+            );
+          }
+        }
+
+          break;
+        case "story_data": {
+          width = 1000;
+          content = (
+            <div>
+              {v?.map((it: any, index: number) => {
+                let id = it?.story_num;
+                let type = "story";
+                if (it.obj_type) {
+                  id = it.id;
+                  type = it.obj_type;
+                }
+
+                return (<div key={id.toString()}>
+                  <span>{index + 1}. {type}-</span>
+                  <a href={`http://zentao.77hub.com/zentao/${type}-view-${id}.html`}
+                     target={"_blank"}>{id} </a>
+                  <span>=&gt;  {it.title}。  未达到已完成</span>
+                  <span style={{color: "#8190C1"}}>（{StoryStatus[it.status]}）</span>
+                </div>);
+              })}
+            </div>
+          );
+        }
+          break;
+        default:
+          break;
       }
 
       return onLog({

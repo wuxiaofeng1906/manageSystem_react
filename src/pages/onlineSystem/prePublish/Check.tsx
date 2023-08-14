@@ -4,7 +4,7 @@ import {
   Form, DatePicker, ModalFuncProps, Button, Tooltip, Input
 } from 'antd';
 import {
-  AutoCheckType, checkInfo, CheckStatus, CheckTechnicalSide, onLog, logColumns,
+  AutoCheckType, checkInfo, CheckStatus, CheckTechnicalSide, onLog, logColumns, StoryStatus,
 } from '@/pages/onlineSystem/config/constant';
 import styles from '../config/common.less';
 import {isEmpty, omit, delay, isString, uniq} from 'lodash';
@@ -26,10 +26,11 @@ const Check = (props: any, ref: any) => {
     const {release_num} = useParams() as { release_num: string };
     const {onlineSystemPermission} = usePermission();
     const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
-    const [globalState, setGlobalState, basic] = useModel('onlineSystem', (online) => [
+    const [globalState, setGlobalState, basic, serverConfirm] = useModel('onlineSystem', (online) => [
       online.globalState,
       online.setGlobalState,
       online.basic,
+      online.serverConfirm
     ]);
 
     const [spin, setSpin] = useState(false);
@@ -141,15 +142,41 @@ const Check = (props: any, ref: any) => {
     const onLock = async () => {
       /*
        * 1.检查是否封版，是否已确认
-       * 2. 检查状态是否通过、忽略[除后端是否可以热更新]
+       * 2. 检查状态是否通过、忽略
        */
 
       if (!globalState.locked) {
-        await OnlineSystemServices.checkProcess({release_num});   // 暂时注释掉这个检查，正式环境需要放开
-        const flag = list.some(
-          (it) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status),
-        );
-        if (flag) return infoMessage('各项检查状态未达到『 通过、忽略 』，不能进行封版锁定');
+        await OnlineSystemServices.checkProcess({release_num});
+        let title = [];
+        const otherFlag = list.some((it: any) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status));
+        if (otherFlag) {
+          title.push(<span style={{textIndent: "2em"}}>各项检查状态未达到『 通过、忽略 』，不能进行封版锁定。</span>)
+        }
+
+        // 当有后端或者global的时候，并且是否可热更为是的时候，则要判断检查项目中的检查项是否符合条件
+        const serverConfirmCount = serverConfirm.filter((e: any) => (e.confirm_type === "backend" || e.confirm_type === "global") && e.is_hot_update === "yes");
+        if (serverConfirmCount && serverConfirmCount.length) {
+          // 如果有数据，则要判断【后端是否可以热更新】是否为【可热更】或者为【忽略】
+          const hotFlag = list.some((it: any) => it.rowKey === 'hot_data' && !['hot', 'skip'].includes(it.status));
+          if (hotFlag) {
+            if (title.length) {
+              title.unshift(<span>1. </span>);
+              title.push(<br/>);
+              title.push(<span>2. </span>);
+            }
+            title.push(<span style={{textIndent: "2em"}}>【后端是否可以热更新】服务确认中为『 是』，当前检查为『不可热更』，请进行核对或进行忽略。</span>);
+          }
+        }
+
+        if (title.length) {
+          Modal.warn({
+            title: '提示',
+            centered: true,
+            width: 550,
+            content: <div>{title} </div>
+          });
+          return;
+        }
       }
 
       await OnlineSystemServices.checkSealingLock({
@@ -317,62 +344,97 @@ const Check = (props: any, ref: any) => {
         return;
       }
 
-      if (type == 'libray_data') {
-        content = (
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <div>
-              <strong>线上：</strong>
-              {Object.entries(v?.before ?? {})?.map(([k, v]) => (
-                <div>{`${k}: ${v}`}</div>
-              ))}
+      switch (type) {
+        case 'libray_data': {
+          content = (
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <div>
+                <strong>线上：</strong>
+                {Object.entries(v?.before ?? {})?.map(([k, v]) => (
+                  <div>{`${k}: ${v}`}</div>
+                ))}
+              </div>
+              <div>
+                <strong>线下：</strong>
+                {Object.entries(v?.after ?? {})?.map(([k, v]) => (
+                  <div>{`${k}: ${v}`}</div>
+                ))}
+              </div>
             </div>
-            <div>
-              <strong>线下：</strong>
-              {Object.entries(v?.after ?? {})?.map(([k, v]) => (
-                <div>{`${k}: ${v}`}</div>
-              ))}
+          );
+        }
+          break;
+        case 'hot_data': {
+          width = 1000;
+          content = (
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <div>
+                <strong>收集数据当前环境数据:</strong>
+                <div>{v?.present_env}</div>
+              </div>
+              <div>
+                <strong>收集数据线上环境数据:</strong>
+                <div>{v?.online_env}</div>
+              </div>
+              <div>
+                <strong>集群服务状态版本检查:</strong>
+                <div>{v?.servers_check}</div>
+              </div>
             </div>
-          </div>
-        );
-      }
-      if (type == 'hot_data') {
-        width = 1000;
-        content = (
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <div>
-              <strong>收集数据当前环境数据:</strong>
-              <div>{v?.present_env}</div>
-            </div>
-            <div>
-              <strong>收集数据线上环境数据:</strong>
-              <div>{v?.online_env}</div>
-            </div>
-            <div>
-              <strong>集群服务状态版本检查:</strong>
-              <div>{v?.servers_check}</div>
-            </div>
-          </div>
-        );
-      }
-      if (type.includes('seal_data') && !isString(v)) {
-        content = (
-          <div>
-            {v?.map((it: any) => (
-              <div key={it.name_path}>
-                <span>{`【${it.name_path}】`}</span>【
-                <span style={{color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14'}}>
+          );
+        }
+          break;
+        case 'front_seal_data':
+        case 'backend_seal_data': {
+          if (!isString(v)) {
+            content = (
+              <div>
+                {v?.map((it: any) => (
+                  <div key={it.name_path}>
+                    <span>{`【${it.name_path}】`}</span>【
+                    <span style={{color: it.sealing_version == 'yes' ? '#52c41a' : '#faad14'}}>
                 {it.sealing_version == 'yes' ? '已封版' : '未封版'}
               </span>
-                】
-                <span>{`封版时间：${
-                  it.sealing_version_time
-                    ? dayjs(it.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
-                    : ''
-                }`}</span>
+                    】
+                    <span>{`封版时间：${
+                      it.sealing_version_time
+                        ? dayjs(it.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
+                        : ''
+                    }`}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        );
+            );
+          }
+        }
+
+          break;
+        case "story_data": {
+          width = 1000;
+          content = (
+            <div>
+              {v?.map((it: any, index: number) => {
+                let id = it?.story_num;
+                let type = "story";
+                if (it.obj_type) {
+                  id = it.id;
+                  type = it.obj_type;
+                }
+
+                return (<div key={id.toString()}>
+                  <span>{index + 1}. {type}-</span>
+                  <a href={`http://zentao.77hub.com/zentao/${type}-view-${id}.html`}
+                     target={"_blank"}>{id} </a>
+                  <span>=&gt;  {it.title}。  未达到已完成</span>
+                  <span style={{color: "#8190C1"}}>（{StoryStatus[it.status]}）</span>
+                </div>);
+              })}
+            </div>
+          );
+        }
+          break;
+        default:
+          break;
       }
 
       return onLog({

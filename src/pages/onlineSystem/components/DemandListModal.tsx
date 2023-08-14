@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input} from 'antd';
+import {Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Button, Input, Tooltip,Checkbox} from 'antd';
 import dayjs from 'dayjs';
 import {useModel} from 'umi';
 import {isEmpty, difference, isEqual, intersection, uniq} from 'lodash';
@@ -15,8 +15,15 @@ import {errorMessage, infoMessage, sucMessage} from '@/publicMethods/showMessage
 import DutyListServices from '@/services/dutyList';
 import Ellipsis from '@/components/Elipsis';
 import usePermission from '@/hooks/permission';
-import {setTabsLocalStorage} from "@/pages/onlineSystem/commonFunction";
-import {preEnv} from "@/pages/onlineSystem/announcement/constant";
+import { setTabsLocalStorage } from '@/pages/onlineSystem/commonFunction';
+import { preEnv } from '@/pages/onlineSystem/announcement/constant';
+import {
+  modifyCheckboxOnTableSelectedChange,
+  onFormCheckboxChange,
+  onTableCheckboxChange,
+  setSelectedRowsOnUpdateTableInitOpen,
+} from '../prePublish/improves/processDetailImprove';
+import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 
 let totalBranchEnv: any = [];
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
@@ -39,6 +46,9 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const [releaseCluster, setReleaseCluster] = useState(globalEnv); // 发布集群
   const {prePermission} = usePermission();
   const hasPermission = prePermission();
+  //
+  const [selectedProjApps, setSelectedProjApps] = useState<string[]>([]); // 当前env类型所有可以被选择到的服务列表
+  const [checkedList, setCheckedList] = useState<string[]>(); // 当前选中的服务列表
 
   useEffect(() => {
     if (!props.visible) {
@@ -46,6 +56,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       baseForm.resetFields();
       setComputed(null);
       setSelected([]);
+      //
+      setSelectedProjApps([]);
+      setCheckedList(undefined);
+      form.setFieldsValue({ app_services: [] });
       return;
     }
     OnlineSystemServices.getBranch().then((res) => {
@@ -81,6 +95,27 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     showInitBranchEnv(props.data?.release_env_type, computed?.branch);
   }, [computed?.branch, props.data]);
 
+  useEffect(() => {
+    if (appServers && list.length && memoEdit.update && selectedProjApps.length === 0) {
+      //
+      const uniqueCheckList: Set<string> = new Set(props.data.server?.map((item) => item.apps)); // init checkList
+      const envAppServices: string[] = appServers?.[props.data.release_env_type] ?? []; // init env app service
+      const uniqueListAppServices: string[] = [];
+      for (const item of list) uniqueListAppServices.push(...item.apps.split(','));
+      //
+      modifyCheckboxOnTableSelectedChange(
+        form,
+        envAppServices,
+        Array.from(new Set(uniqueListAppServices)),
+        {
+          setCheckedList,
+          setSelectedProjApps,
+        },
+        Array.from(uniqueCheckList),
+      );
+    }
+  }, [list, appServers]);
+
   const getTenantGlobalApps = async () => {
     const res = await OnlineSystemServices.getTenantGlobalApps();
     setAppServers(res);
@@ -99,7 +134,6 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     setSpin(true);
     try {
       const res = await OnlineSystemServices.getStoryList({branch: computed?.branch, onlyappr: true});
-
       setList(res);
       // 新增 -默认勾选特性项目和sprint分支项目
       if (!props.data?.release_num) {
@@ -190,15 +224,18 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       // release_env: 'nx-temp-test', // 测试环境测试时可以使用一个固定值
       release_env_type: values.release_env_type,
       branch: computed.branch,
-      pro_data: selected.map((o) => ({
-        pro_id: o.pro_id,
-        story_num: o.story,
-        is_hot_update: o.is_update,
-        hot_update_note: o.hot_update_note,
-        is_data_update: o.db_update,
-        data_update_note: o.data_update_note,
-        apps: o.apps,
-      })),
+      pro_data: selected.map((o) => {
+        const _apps = o.apps.split(',').filter((app) => checkedList?.includes(app));
+        return {
+          pro_id: o.pro_id,
+          story_num: o.story,
+          is_hot_update: o.is_update,
+          hot_update_note: o.hot_update_note,
+          is_data_update: o.db_update,
+          data_update_note: o.data_update_note,
+          apps: _apps?.join(',') ?? '',
+        };
+      }),
       release_num: release_num ?? '',
       release_name: name,
       plan_release_time: time,
@@ -208,12 +245,12 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
       await OnlineSystemServices.addRelease(data);
       setSpin(false);
       setTabsLocalStorage({
-        "release_num": release_num,
-        "release_name": name,
-        "newAdd": true
+        release_num: release_num,
+        release_name: name,
+        newAdd: true,
       });
 
-      props.onOk?.({...baseData, release_num});
+      props.onOk?.({ ...baseData, release_num });
     } catch (e) {
       errorMessage('接口异常');
       setSpin(false);
@@ -223,8 +260,8 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
   const getReleseCluster = (v: string) => {
     const filtered: any = [];
     [...globalEnv].forEach((cluster: any) => {
-      if (v === "tenant") {
-        if (cluster.key !== "cn-northwest-global") {
+      if (v === 'tenant') {
+        if (cluster.key !== 'cn-northwest-global') {
           filtered.push(cluster);
         }
       } else {
@@ -329,14 +366,24 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     );
 
     if (isEmpty(appServers?.[v])) return;
+    const selectedApps: string[] = [];
     setList(
-      list?.map((it: any) => ({
-        ...it,
-        disabled: intersection(it.apps?.split(','), appServers?.[v])?.length == 0,
-      })),
+      list?.map((it: any) => {
+        const apps: string[] = it.apps?.split(',');
+        selectedApps.push(...apps);
+        return {
+          ...it,
+          disabled: intersection(apps, appServers?.[v])?.length == 0,
+        };
+      }),
     );
-  };
 
+    // checkbox关联修改
+    modifyCheckboxOnTableSelectedChange(form, appServers?.[v] ?? [], selectedApps, {
+      setCheckedList,
+      setSelectedProjApps,
+    });
+  };
 
   const updateStatus = (column: string, data: any, status: string, index: number) => {
 
@@ -370,17 +417,17 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
         // 先更新后端，后端更新成功再更新这个界面上的值
         const updateResult = await OnlineSystemServices.updateListColumn({
           // "release_num": "202305250008", 可以不传
-          "execu_no": _list.pro_id,
-          "story_no": _list.story,
-          "user_id": user?.userid ?? '',
-          "datas": [
+          execu_no: _list.pro_id,
+          story_no: _list.story,
+          user_id: user?.userid ?? '',
+          datas: [
             {
-              "label_en": column === "db_update" ? "is_data_update" : "is_hot_update",
-              "old_value": column === "db_update" ? _list.db_update : _list.is_update,
-              "new_value": status,
-              "note": inputValue
-            }
-          ]
+              label_en: column === 'db_update' ? 'is_data_update' : 'is_hot_update',
+              old_value: column === 'db_update' ? _list.db_update : _list.is_update,
+              new_value: status,
+              note: inputValue,
+            },
+          ],
         });
         if (updateResult.code === 200) {
           sucMessage(`${column === "db_update" ? "是否涉及数据update" : "是否可热更"}状态修改成功！`);
@@ -445,125 +492,78 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
     [globalState, props.data],
   );
 
-  // const memoColumn = useMemo(() => {
-  //   const isSprint = list?.every((it) => !['emergency', 'stagepatch'].includes(it.sprinttype));
-  //   const disableValue = user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update);
-  //   console.log("user?.group !== 'superGroup' && (memoEdit.update ? memoEdit.global : memoEdit.update", disableValue);
-  //
-  //   return {
-  //     isSprint,
-  //     column: isSprint
-  //       ? [
-  //         {
-  //           title: '序号',
-  //           width: 70,
-  //           render: (_: any, r: any, i: number) => i + 1,
-  //           fixed: 'left',
-  //         },
-  //         {
-  //           title: '禅道执行名称',
-  //           dataIndex: 'pro_name',
-  //           ellipsis: {showTitle: false},
-  //           width: 500,
-  //           fixed: 'left',
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //         {
-  //           title: '应用服务',
-  //           dataIndex: 'apps',
-  //           width: 400,
-  //           ellipsis: {showTitle: false},
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //       ]
-  //       : [
-  //         {
-  //           title: '序号',
-  //           width: 70,
-  //           render: (_: any, r: any, i: number) => i + 1,
-  //           fixed: 'left',
-  //         },
-  //         {
-  //           title: '禅道执行名称',
-  //           dataIndex: 'pro_name',
-  //           ellipsis: {showTitle: false},
-  //           width: 200,
-  //           fixed: 'left',
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //         {
-  //           title: '需求编号',
-  //           dataIndex: 'story',
-  //           width: 90,
-  //         },
-  //         {
-  //           title: '需求标题',
-  //           dataIndex: 'title',
-  //           width: 150,
-  //           ellipsis: {showTitle: false},
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //         {
-  //           title: '需求阶段',
-  //           dataIndex: 'status',
-  //           width: 90,
-  //           ellipsis: {showTitle: false},
-  //           render: (v: string) => StoryStatus[v] ?? '',
-  //         },
-  //         {
-  //           title: '应用服务',
-  //           dataIndex: 'apps',
-  //           width: 110,
-  //           ellipsis: {showTitle: false},
-  //           render: (v: string) => (
-  //             <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'}/>
-  //           ),
-  //         },
-  //         {
-  //           title: '是否涉及数据update',
-  //           dataIndex: 'db_update',
-  //           // width: 150,
-  //           render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-  //         },
-  //         {
-  //           title: '是否涉及数据Recovery',
-  //           dataIndex: 'is_recovery',
-  //           render: (v: string) => WhetherOrNot[v] ?? (v || ''),
-  //         },
-  //         {
-  //           title: '是否可热更',
-  //           dataIndex: 'is_update',
-  //           width: 90,
-  //           render: (v: string, row: any, i: number) =>
-  //             v == '-' ? (
-  //               v
-  //             ) : (
-  //               <Select
-  //                 disabled={user?.group !== 'superGroup' || (memoEdit.update ? memoEdit.global : memoEdit.update)}
-  //                 value={v}
-  //                 style={{width: '100%'}}
-  //                 options={Object.keys(WhetherOrNot)?.map((k) => ({
-  //                   value: k,
-  //                   label: WhetherOrNot[k],
-  //                 }))}
-  //                 onChange={(e) => updateStatus(row, e, i)}
-  //               />
-  //             ),
-  //         },
-  //         {title: '需求创建人', dataIndex: 'opened_by', width: 100},
-  //         {title: '需求指派人', dataIndex: 'ass_to', width: 100},
-  //       ],
-  //   };
-  // }, [JSON.stringify(list), user?.group]);
+  // 应用服务渲染
+  const appsRender = (value: any, data: any) => {
+    const {task_apps, apply_apps, story, title} = data;
+    // 保存界面展示的列的数据
+    const columnValue: any = [];
+    // 是否展示tooltip内容
+    let showTooltip = false;
+    // 保存toolTip 中服务的数据
+    const titleServer: any = [];
 
+    // 展示所有服务（emergency申请+禅道）
+    let allServer = isEmpty(value) ? [] : value.split(",");
+    if (apply_apps && apply_apps.length) {
+      allServer = uniq(allServer.concat(apply_apps));
+    }
+
+    // 当前值和apply_apps值做对比。apply_apps中是emergency申请的数据。
+    allServer.forEach((server: string, index: number) => {
+      let showCharFlag: boolean;
+      if (allServer.length - 1 === index) {
+        showCharFlag = false;
+      } else {
+        showCharFlag = true;
+      }
+
+      // 同时存在
+      if (value.includes(server) && apply_apps.includes(server)) {
+        columnValue.push(<span>{server}</span>);
+        titleServer.push(<span>{server}</span>);
+
+      } else if (!value.includes(server) && apply_apps.includes(server)) { // 禅道不存在，emergency存在(服务移除)
+        showTooltip = true;
+        columnValue.push(<span><span style={{color: "#8190C1"}}>{server}</span></span>);
+        titleServer.push(<span><span style={{color: "#8190C1"}}>{server}(服务移除)</span></span>);
+      } else if (value.includes(server) && !apply_apps.includes(server)) {  // 禅道存在，emergency不存在（服务添加）
+        showTooltip = true;
+        columnValue.push(<span><span style={{color: "orange"}}>{server}</span></span>);
+        titleServer.push(<span><span style={{color: "orange"}}>{server}(服务增添)</span></span>);
+      }
+
+      // 添加逗号
+      if (showCharFlag) {
+        columnValue.push(<span>,</span>);
+        titleServer.push(<span>,</span>);
+      }
+    });
+
+    if (!showTooltip) {
+      return <Ellipsis title={columnValue} width={'100%'} placement={'bottomLeft'} color={'white'}/>
+      // return <div>{columnValue}</div>;
+    }
+    const taskArray: any = [];
+    if (task_apps && task_apps.length) {
+      task_apps.map((task: any) => {
+        taskArray.push(<p style={{marginTop: -10}}>=&gt;task-
+          <a target={"_blank"}
+             href={`http://zentao.77hub.com/zentao/task-view-${task.task_id}.html`}>{task.task_id}</a>:{task.apps}
+        </p>)
+      });
+    }
+
+    const _title = <div style={{color: "black", width: 380}}>
+      <p>=&gt;story-
+        <a target={"_blank"} href={`http://zentao.77hub.com/zentao/story-view-${story}.html`}>{story}</a>
+        ：{title}</p>
+      <p style={{marginTop: -10}}>=&gt;服务：{titleServer}</p>
+      {taskArray}
+    </div>;
+    return <Tooltip overlayClassName={styles.ToolTipStyle} title={_title} color={"white"} placement="bottomLeft">
+      <div>{columnValue}</div>
+    </Tooltip>;
+  };
 
   const memoColumn: any = () => {
     const isSprint = list?.every((it) => !['emergency', 'stagepatch', 'performpatch'].includes(it.sprinttype));
@@ -640,9 +640,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
             dataIndex: 'apps',
             width: 110,
             ellipsis: {showTitle: false},
-            render: (v: string) => (
-              <Ellipsis title={v} width={110} placement={'bottomLeft'} color={'#108ee9'}/>
-            ),
+            render: appsRender
+            // render: (v: string) => (
+            //   <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'}/>
+            // ),
           },
           {
             title: '是否涉及数据update',
@@ -776,7 +777,10 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                       placeholder={'上线分支'}
                       showSearch
                       allowClear
-                      onChange={() => form.resetFields()}
+                      onChange={() => {
+                        setSelectedProjApps([]);
+                        form.resetFields();
+                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -850,6 +854,35 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                     </Form.Item>
                   </Col>
                 </Row>
+                {selectedProjApps.length !== 0 ? (
+                  <Row justify={'space-between'} gutter={8}>
+                    <Col span={24}>
+                      <Form.Item
+                        name={'app_services'}
+                        label={'应用服务'}
+                        rules={[{ required: true }]}
+                        // initialValue={selectedProjApps}
+                      >
+                        <Checkbox.Group
+                          options={selectedProjApps}
+                          onChange={(checkedValues: CheckboxValueType[]) =>
+                            onFormCheckboxChange({
+                              form,
+                              list,
+                              selected,
+                              setSelected,
+                              checkedList,
+                              checkedValues,
+                              setCheckedList,
+                            })
+                          }
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : (
+                  ''
+                )}
               </Form>
               <div className={styles.onlineTable}>
                 <Table
@@ -860,8 +893,17 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                   rowKey={(p) => `${p.story}&${p.pro_id}`}
                   dataSource={list}
                   rowSelection={{
-                    selectedRowKeys: selected?.map((p) => `${p.story}&${p.pro_id}`),
-                    onChange: (_, selectedRows) => setSelected(selectedRows),
+                    selectedRowKeys: setSelectedRowsOnUpdateTableInitOpen(selected, checkedList),
+                    onChange: (_, selectedRows) =>
+                      onTableCheckboxChange({
+                        form,
+                        selected,
+                        appServers,
+                        checkedList,
+                        setSelected,
+                        selectedRows,
+                        setCheckedList,
+                      }),
                     getCheckboxProps: (record) => ({
                       disabled:
                         (memoEdit.update ? globalState.finished : false) ||

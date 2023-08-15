@@ -96,16 +96,26 @@ const getColums = (prjNames: any, show = true) => {
       field: 'ztNo',
       pinned: 'left',
       minWidth: 80,
-      // suppressMenu: true,
+      suppressMenu: true,
       cellRenderer: linkToZentaoPage,
     },
     {
       headerName: '来源bug编号',
       field: 'fromBug',
       pinned: 'left',
-      minWidth: 80,
+      minWidth: 100,
+      suppressMenu: true,
       cellRenderer: (param: any) => {
-        linkToZentaoPage(param, 'bug')
+        const {data, value} = param;
+        if (data.category !== "-3") {
+          return "";
+        }
+
+        if (data.stage === 8 || data.stage === 9 || data.stage === 10) {
+          return `<a target="_blank" style="color:blue;text-decoration: line-through" href='http://zentao.77hub.com/zentao/bug-view-${value}.html'>${value}</a>`;
+        }
+        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/bug-view-${value}.html'>${value}</a>`;
+
       },
     },
     {

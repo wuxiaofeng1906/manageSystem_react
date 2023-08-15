@@ -106,8 +106,8 @@ const catagoryValueGetter = (params: any) => {
   return typeValue[type];
 };
 // 渲染禅道编号跳转到禅道
-const linkToZentaoPage = (params: any,type:string='bug') => {
-  let ztCategory = type;
+const linkToZentaoPage = (params: any) => {
+  let ztCategory = 'bug';
   switch (params.data.category) {
     case '1':
       ztCategory = 'bug';

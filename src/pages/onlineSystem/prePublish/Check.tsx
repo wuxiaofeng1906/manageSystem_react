@@ -214,6 +214,23 @@ const Check = (props: any, ref: any) => {
               : [],
           );
         }
+
+        // 判断原始数据前后端单元测试运行是否通过是否为执行中，是的话需要调用执行接口
+        if (!showLoading && list && list.length) {
+          //
+          const backendStatus = list.some((e: any) => e.rowKey === "backend_test_unit" && e.status === "running");
+          if (backendStatus) {
+            const data = {user_id: user?.userid ?? '', release_num, is_ignore: "no", side: "backend"};
+            OnlineSystemServices.checkOpts(omit(data, ['api_url']), "test-unit");
+          }
+          // 前端单元测试覆盖率没有使用
+          // const frontStatus = list.some((e: any) => e.rowKey === "front_test_unit" && e.status === "running");
+          // if (frontStatus) {
+          //   data["side"] = "front";
+          //   OnlineSystemServices.checkOpts(omit(data, ['api_url']), "test-unit");
+          // }
+        }
+
         Promise.all(
           uniq(autoCheck).map((type) => {
             }

@@ -146,7 +146,8 @@ const Check = (props: any, ref: any) => {
        */
 
       if (!globalState.locked) {
-        await OnlineSystemServices.checkProcess({release_num});
+        debugger
+        // await OnlineSystemServices.checkProcess({release_num});
         let title = [];
         const otherFlag = list.some((it: any) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status));
         if (otherFlag) {
@@ -157,7 +158,7 @@ const Check = (props: any, ref: any) => {
         const serverConfirmCount = serverConfirm.filter((e: any) => (e.confirm_type === "backend" || e.confirm_type === "global") && e.is_hot_update === "yes");
         if (serverConfirmCount && serverConfirmCount.length) {
           // 如果有数据，则要判断【后端是否可以热更新】是否为【可热更】或者为【忽略】
-          const hotFlag = list.some((it: any) => it.rowKey === 'hot_data' && !['hot', 'skip'].includes(it.status));
+          const hotFlag = list.some((it: any) => it.rowKey === 'hot_data' && !['hot', 'yes', 'skip'].includes(it.status));
           if (hotFlag) {
             if (title.length) {
               title.unshift(<span>1. </span>);

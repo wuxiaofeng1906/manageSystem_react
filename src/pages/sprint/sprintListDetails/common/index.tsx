@@ -1,5 +1,5 @@
-import { history } from '@@/core/history';
-import { zentaoTypeRenderToNumber } from '@/publicMethods/cellRenderer';
+import {history} from '@@/core/history';
+import {zentaoTypeRenderToNumber} from '@/publicMethods/cellRenderer';
 
 // 获取界面跳转过来的参数
 const getProjectInfo = () => {
@@ -26,7 +26,7 @@ const getProjectInfo = () => {
     }
   }
 
-  return { prjId, prjNames, prjType, showTestConfirmFlag, ztId };
+  return {prjId, prjNames, prjType, showTestConfirmFlag, ztId};
 };
 
 const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
@@ -56,13 +56,26 @@ const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
     publishEnv: pubEnv,
   };
   // 如果修改了是否需要测试验证，就要改为负值。
-  if (curRow[0].testCheck !== oradata.managertesterVerifi) {
-    datas['testCheck'] =
-      oradata.managertesterVerifi === '' ? '' : `-${oradata.managertesterVerifi}`; //  为手动修改的数据
+  if (rowDatas.testCheck !== oradata.managertesterVerifi) {
+    datas['testCheck'] = oradata.managertesterVerifi === '' ? '' : `-${oradata.managertesterVerifi}`; //  为手动修改的数据
+
+    // 对于需求 任务- 128858
+    if ((oradata.managerChandaoType).toLowerCase() === "story") {
+      if (oradata.managertesterVerifi === "0") { //  当测试验证为否
+        //并且测试确认为否，则 testConfirmed= ’2‘（免）
+        if (rowDatas.testConfirmed !== "1" && rowDatas.testConfirmed !== "2") {
+          datas['testConfirmed'] = '2';
+        }
+      } else if (oradata.managertesterVerifi === "1" && rowDatas.testConfirmed === "2") {
+        //  当测试验证为是,1.测试确认为免，则testConfirmed=null，否则原本是什么就是什么。）
+        datas['testConfirmed'] = null;
+      }
+    }
+
   }
 
   // 如果修改了是否清缓存，就要改为负值。
-  if (curRow[0].clearCache !== oradata.managerClearCache) {
+  if (rowDatas.clearCache !== oradata.managerClearCache) {
     datas['clearCache'] = oradata.managerClearCache === '' ? '' : `-${oradata.managerClearCache}`; //  为手动修改的数据
   }
 
@@ -137,6 +150,6 @@ const getRelatedPersonName = (oraData: any) => {
     }
   });
 
-  return { tester, assigned, solvedBy };
+  return {tester, assigned, solvedBy};
 };
-export { getProjectInfo, alayManagerData, defaultSelectParams, getRelatedPersonName };
+export {getProjectInfo, alayManagerData, defaultSelectParams, getRelatedPersonName};

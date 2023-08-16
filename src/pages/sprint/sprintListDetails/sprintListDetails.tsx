@@ -639,7 +639,6 @@ const SprintList: React.FC<any> = () => {
 
     /* #endregion */
 
-    debugger
     const datas = {
       project: prjId,
       stage:
@@ -690,7 +689,7 @@ const SprintList: React.FC<any> = () => {
       addCommitDetails(datas);
     } else {
       const curRow: any = getFinalGridData(); // 获取选中的行
-      debugger
+
       datas['id'] = curRow[0].id;
       // 判断是否被修改过 禅道id 对应测试、对应UED、创建人,是否需要测试验证
       if (curRow[0].ztNo !== oradata.adminChandaoId) {
@@ -929,7 +928,7 @@ const SprintList: React.FC<any> = () => {
       currentUserGroup =
         initialState.currentUser === undefined ? '' : initialState.currentUser.group;
     }
-    // currentUserGroup = 'devGroup';
+    // currentUserGroup = 'devManageGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':

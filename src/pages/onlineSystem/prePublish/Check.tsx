@@ -146,8 +146,9 @@ const Check = (props: any, ref: any) => {
        */
 
       if (!globalState.locked) {
+
         await OnlineSystemServices.checkProcess({release_num});
-        let title = [];
+        let title: any = [];
         const otherFlag = list.some((it: any) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status));
         if (otherFlag) {
           title.push(<span style={{textIndent: "2em"}}>各项检查状态未达到『 通过、忽略 』，不能进行封版锁定。</span>)
@@ -157,7 +158,7 @@ const Check = (props: any, ref: any) => {
         const serverConfirmCount = serverConfirm.filter((e: any) => (e.confirm_type === "backend" || e.confirm_type === "global") && e.is_hot_update === "yes");
         if (serverConfirmCount && serverConfirmCount.length) {
           // 如果有数据，则要判断【后端是否可以热更新】是否为【可热更】或者为【忽略】
-          const hotFlag = list.some((it: any) => it.rowKey === 'hot_data' && !['hot', 'skip'].includes(it.status));
+          const hotFlag = list.some((it: any) => it.rowKey === 'hot_data' && !['hot', 'yes', 'skip'].includes(it.status));
           if (hotFlag) {
             if (title.length) {
               title.unshift(<span>1. </span>);
@@ -213,6 +214,23 @@ const Check = (props: any, ref: any) => {
               : [],
           );
         }
+
+        // 判断原始数据前后端单元测试运行是否通过是否为执行中，是的话需要调用执行接口
+        if (!showLoading && list && list.length) {
+          //
+          const backendStatus = list.some((e: any) => e.rowKey === "backend_test_unit" && e.status === "running");
+          if (backendStatus) {
+            const data = {user_id: user?.userid ?? '', release_num, is_ignore: "no", side: "backend"};
+            OnlineSystemServices.checkOpts(omit(data, ['api_url']), "test-unit");
+          }
+          // 前端单元测试覆盖率没有使用
+          // const frontStatus = list.some((e: any) => e.rowKey === "front_test_unit" && e.status === "running");
+          // if (frontStatus) {
+          //   data["side"] = "front";
+          //   OnlineSystemServices.checkOpts(omit(data, ['api_url']), "test-unit");
+          // }
+        }
+
         Promise.all(
           uniq(autoCheck).map((type) => {
             }

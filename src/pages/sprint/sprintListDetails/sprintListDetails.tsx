@@ -708,20 +708,18 @@ const SprintList: React.FC<any> = () => {
       if (curRow[0].testCheck !== oradata.adminAddtesterVerifi) {
         datas['testCheck'] = oradata.adminAddtesterVerifi === '' ? '' : `-${oradata.adminAddtesterVerifi}`; //  为手动修改的数据
 
-        if (oradata.adminAddtesterVerifi !== "1") { // 为否
-          // 当测试验证为否，并且测试确认为否，则 testConfirmed= ’2‘（免）
-          if (curRow[0].testConfirmed === "2") {
-            datas['testConfirmed'] = '2';
-          }
-        } else { // 为是
-          // 当测试验证修改为是，（1.测试确认为免，则testConfirmed=null，2，否则是什么就是什么。）
-          if (curRow[0].testConfirmed === "2") {
+        // 对于需求 任务- 128858
+        if (oradata.adminChandaoType === "3") {
+          if (oradata.adminAddtesterVerifi === "0") { //  当测试验证为否
+            //并且测试确认为否，则 testConfirmed= ’2‘（免）
+            if (curRow[0].testConfirmed !== "1" && curRow[0].testConfirmed !== "2") {
+              datas['testConfirmed'] = '2';
+            }
+          } else if (oradata.adminAddtesterVerifi === "1" && curRow[0].testConfirmed === "2") {
+            //  当测试验证为是,1.测试确认为免，则testConfirmed=null，否则原本是什么就是什么。）
             datas['testConfirmed'] = null;
-          } else {
-            datas['testConfirmed'] = curRow[0].testConfirmed;
           }
         }
-
       }
 
       // 如果修改了是否清缓存，就要改为负值。

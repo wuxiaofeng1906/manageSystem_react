@@ -146,9 +146,9 @@ const Check = (props: any, ref: any) => {
        */
 
       if (!globalState.locked) {
-        debugger
-        // await OnlineSystemServices.checkProcess({release_num});
-        let title = [];
+
+        await OnlineSystemServices.checkProcess({release_num});
+        let title: any = [];
         const otherFlag = list.some((it: any) => it.rowKey != 'hot_data' && !['yes', 'skip'].includes(it.status));
         if (otherFlag) {
           title.push(<span style={{textIndent: "2em"}}>各项检查状态未达到『 通过、忽略 』，不能进行封版锁定。</span>)

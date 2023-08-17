@@ -206,11 +206,9 @@ const SheetInfo = (props: any, ref: any) => {
       let res = await OnlineSystemServices.getOrderDetail(param);
       const basicInfo = res?.basic_data;
       // 新需求 -18098  针对stage-patch/perform-patch/emergency上线分支“升级公告”默认为“免”
-      const {branch, announcement_num} = basicInfo;
-      let announcement_name = announcement_num;
-      if (branch.includes("stage-patch") || branch.includes("perform-patch") || branch.includes("emergency")) {
-        announcement_name = '免'
-      }
+      const announcement_name = ["stage-patch", "perform-patch", "emergency"]
+        .some((e) => (basicInfo.branch).includes(e)) ? '免' : basicInfo.announcement_num;
+
       orderForm.setFieldsValue({
         ...basicInfo,
         plan_release_time: basicInfo?.plan_release_time

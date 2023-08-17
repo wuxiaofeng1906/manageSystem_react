@@ -205,6 +205,10 @@ const SheetInfo = (props: any, ref: any) => {
       // }
       let res = await OnlineSystemServices.getOrderDetail(param);
       const basicInfo = res?.basic_data;
+      // 新需求 -18098  针对stage-patch/perform-patch/emergency上线分支“升级公告”默认为“免”
+      const announcement_name = ["stage-patch", "perform-patch", "emergency"]
+        .some((e) => (basicInfo.branch).includes(e)) ? '免' : basicInfo.announcement_num;
+
       orderForm.setFieldsValue({
         ...basicInfo,
         plan_release_time: basicInfo?.plan_release_time
@@ -214,7 +218,7 @@ const SheetInfo = (props: any, ref: any) => {
           basicInfo?.release_result == 'unknown'
             ? undefined
             : basicInfo?.release_result?.trim() || undefined,
-        announcement_num: basicInfo?.announcement_num || undefined,
+        announcement_num: announcement_name || undefined,
         person_duty_num: basicInfo?.person_duty_num ?? '免',
       });
       baseForm.setFieldsValue({

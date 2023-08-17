@@ -95,6 +95,7 @@ export const checkInfo = [
     source: '运维平台',
     contact: '前端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   // {
@@ -131,6 +132,7 @@ export const checkInfo = [
     source: '研发管理平台',
     contact: '前端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -149,6 +151,7 @@ export const checkInfo = [
     source: '研发管理平台',
     contact: '前端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -167,6 +170,7 @@ export const checkInfo = [
     source: '运维平台',
     contact: '后端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -185,6 +189,7 @@ export const checkInfo = [
     source: '研发管理平台',
     contact: '后端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -203,6 +208,7 @@ export const checkInfo = [
     source: '运维平台',
     contact: '运维',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -221,6 +227,7 @@ export const checkInfo = [
     source: '后端平台',
     contact: '后端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -239,6 +246,7 @@ export const checkInfo = [
     source: '后端平台',
     contact: '后端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -257,6 +265,7 @@ export const checkInfo = [
     source: '研发管理平台',
     contact: '后端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -275,6 +284,7 @@ export const checkInfo = [
     source: '值班助手',
     contact: '后端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -293,6 +303,7 @@ export const checkInfo = [
     source: '研发管理平台',
     contact: '后端',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -311,6 +322,7 @@ export const checkInfo = [
     source: '研发管理平台',
     contact: '测试',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -329,6 +341,7 @@ export const checkInfo = [
     source: '运维平台',
     contact: '测试',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -348,6 +361,7 @@ export const checkInfo = [
     source: '运维平台',
     contact: '测试',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
   {
@@ -366,6 +380,7 @@ export const checkInfo = [
     source: '研发管理平台',
     contact: '测试',
     check_person: 'check_user',
+    check_person_id: 'check_user_wxid',
     desc: "remark"
   },
 ];

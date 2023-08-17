@@ -49,6 +49,7 @@ const Check = (props: any, ref: any) => {
         log: '',
         contact: '',
         check_person: '',
+        check_person_id: '',
         desc: ""
       })),
     );
@@ -217,18 +218,11 @@ const Check = (props: any, ref: any) => {
 
         // 判断原始数据前后端单元测试运行是否通过是否为执行中，是的话需要调用执行接口
         if (!showLoading && list && list.length) {
-          //
-          const backendStatus = list.some((e: any) => e.rowKey === "backend_test_unit" && e.status === "running");
-          if (backendStatus) {
-            const data = {user_id: user?.userid ?? '', release_num, is_ignore: "no", side: "backend"};
+          const backendList = list.filter((e: any) => e.rowKey === "backend_test_unit" && e.status === "running");
+          if (backendList && backendList.length) {
+            const data = {user_id: backendList[0].check_person_id ?? '', release_num, is_ignore: "no", side: "backend"};
             OnlineSystemServices.checkOpts(omit(data, ['api_url']), "test-unit");
           }
-          // 前端单元测试覆盖率没有使用
-          // const frontStatus = list.some((e: any) => e.rowKey === "front_test_unit" && e.status === "running");
-          // if (frontStatus) {
-          //   data["side"] = "front";
-          //   OnlineSystemServices.checkOpts(omit(data, ['api_url']), "test-unit");
-          // }
         }
 
         Promise.all(
@@ -284,6 +278,7 @@ const Check = (props: any, ref: any) => {
               source: currentKey?.data_from || it.source,
               // contact: orignDuty?.[it.contact] || '',
               check_person: flag ? currentKey[0][it.check_person] : currentKey?.[it.check_person] || '',
+              check_person_id: flag ? currentKey[0][it.check_person_id] : currentKey?.[it.check_person_id] || '',
               desc: flag ? currentKey[0][it.desc] : currentKey?.[it.desc] || '',
             };
 

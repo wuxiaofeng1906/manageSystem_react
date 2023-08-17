@@ -324,7 +324,7 @@ const ProcessDetail = (props: any, ref: any) => {
       cancelText: '取消',
       icon: <InfoCircleOutlined style={{color: 'red'}}/>,
       content: `请确认是否要移除 ${
-        type == 'server' ? gridSelected?.map((it) => it.apps)?.join(',') + '服务' : ''
+        type == 'server' ? uniq(gridSelected?.map((it) => it.apps))?.join(',') + '服务' : ''
       }?`,
       okButtonProps: {disabled: confirmDisabled},
       onOk: async () => {

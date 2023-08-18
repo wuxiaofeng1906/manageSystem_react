@@ -56,7 +56,7 @@ const PreReleaseServices = {
   },
   // 发布集群
   async environment() {
-    return request(`${baseUrl}/release/environment`);
+    return request(`${baseUrl}/release/environment?order_by=asc`);
   },
   // 发布项目
   async project() {

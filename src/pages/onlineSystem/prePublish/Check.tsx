@@ -220,7 +220,13 @@ const Check = (props: any, ref: any) => {
         if (!showLoading && list && list.length) {
           const backendList = list.filter((e: any) => e.rowKey === "backend_test_unit" && e.status === "running");
           if (backendList && backendList.length) {
-            const data = {user_id: backendList[0].check_person_id ?? '', release_num, is_ignore: "no", side: "backend"};
+            const data = {
+              user_id: backendList[0].check_person_id ?? '',
+              release_num,
+              is_ignore: "no",
+              side: "backend",
+              is_extra: true // 只有在自动刷新的时候才加这个参数
+            };
             OnlineSystemServices.checkOpts(omit(data, ['api_url']), "test-unit");
           }
         }

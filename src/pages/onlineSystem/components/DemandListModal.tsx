@@ -35,8 +35,9 @@ import {
   onFormCheckboxChange,
   onTableCheckboxChange,
   setSelectedRowsOnUpdateTableInitOpen,
-} from '../prePublish/improves/processDetailImprove';
+} from '../improves/funcs/demandListModalImprove';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
+import AssociatedListPopover from '../improves/components/AssociatedListPopover';
 
 let totalBranchEnv: any = [];
 const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
@@ -648,7 +649,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               title: '禅道执行名称',
               dataIndex: 'pro_name',
               ellipsis: { showTitle: false },
-              width: 500,
+              width: 450,
               fixed: 'left',
               render: (v: string) => (
                 <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
@@ -661,6 +662,15 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               ellipsis: { showTitle: false },
               render: (v: string) => (
                 <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: <span title="关联发布单次数">关联次数</span>,
+              align: 'center',
+              width: 80,
+              dataIndex: 'associated_count_result',
+              render: (item: any[]) => (
+                <AssociatedListPopover item={item} placement="left" trigger="hover" />
               ),
             },
           ]
@@ -696,12 +706,20 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
               ),
             },
             {
-              title: '需求阶段',
-              dataIndex: 'status',
-              width: 90,
-              ellipsis: { showTitle: false },
-              render: (v: string) => StoryStatus[v] ?? '',
+              title: <span title="关联发布单次数">关联次数</span>,
+              width: 80,
+              dataIndex: 'associated_count_result',
+              render: (item: any[]) => (
+                <AssociatedListPopover item={item} placement="right" trigger="hover" />
+              ),
             },
+            // {
+            //   title: '需求阶段',
+            //   dataIndex: 'status',
+            //   width: 90,
+            //   ellipsis: { showTitle: false },
+            //   render: (v: string) => StoryStatus[v] ?? '',
+            // },
             {
               title: '应用服务',
               dataIndex: 'apps',

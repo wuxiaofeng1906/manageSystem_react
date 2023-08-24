@@ -964,6 +964,7 @@ const DemandListModal = (props: ModalFuncProps & { data?: any }) => {
                         // initialValue={selectedProjApps}
                       >
                         <Checkbox.Group
+                          disabled={memoEdit.update ? globalState.locked : false}
                           options={selectedProjApps}
                           onChange={(checkedValues: CheckboxValueType[]) =>
                             onFormCheckboxChange({

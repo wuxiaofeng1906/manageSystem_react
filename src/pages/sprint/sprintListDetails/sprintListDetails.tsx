@@ -1503,9 +1503,9 @@ const SprintList: React.FC<any> = () => {
           <Option key={'0'} value={'0'}>
             否
           </Option>,
-          <Option key={'2'} value={'2'}>
-            免
-          </Option>,
+          // <Option key={'2'} value={'2'}>
+          //   免
+          // </Option>,
         ]}
       </Select>
     );

@@ -3,7 +3,7 @@
  * @ReferLink: http://zentao.77hub.com/zentao/story-view-18304.html?tid=vhxba2yy
  * @Author: jieTan
  * @Date: 2023-08-23 14:20:10
- * @LastEditTime: 2023-08-23 18:04:52
+ * @LastEditTime: 2023-08-24 10:20:01
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -45,9 +45,11 @@ export default (props: propsInput) => {
     setContent(<ContentList {...props} />);
   }, []);
 
-  return (
+  return props.item ? (
     <Popover content={content} placement={props.placement} trigger={props.trigger}>
-      <span>{props.item ? props.item.length : 0}</span>
+      <span>{props.item.length}</span>
     </Popover>
+  ) : (
+    <span>0</span>
   );
 };

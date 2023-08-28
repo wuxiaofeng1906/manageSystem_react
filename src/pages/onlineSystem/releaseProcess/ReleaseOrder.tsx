@@ -118,7 +118,6 @@ const ReleaseOrder = () => {
   };
 
   const getOrderDetail = async (clusterMap = clusters) => {
-
     try {
       setSpinning(true);
       const params: any = {release_num: id, include_deleted: true};

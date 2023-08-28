@@ -96,18 +96,24 @@ const PreReleaseServices = {
   async orderNumbers() {
     return request(`${baseUrl}/latest-release/order`);
   },
+  // 修改后的视图数据接口（三个合并成一个）
+  async totalViewData() {
+    return request(`${baseUrl}/latest-release/calendar-baseline-ready-plan`);
+  },
+
   // 发布视图数据（版本基准）
-  async releaseBaseline() {
-    return request(`${baseUrl}/latest-release/views-version-baseline`);
-  },
+  // async releaseBaseline() {
+  //   return request(`${baseUrl}/latest-release/views-version-baseline`);
+  // },
   // 发布视图数据（当天待发版）
-  async releaseView() {
-    return request(`${baseUrl}/latest-release/views-ready-release`);
-  },
+  // async releaseView() {
+  //   return request(`${baseUrl}/latest-release/views-ready-release`);
+  // },
   // 发布视图数据（发版计划）
-  async releasePlan(params: any) {
-    return request(`${baseUrl}/latest-release/release-plan`, {params});
-  },
+  // async releasePlan(params: any) {
+  //   return request(`${baseUrl}/latest-release/release-plan`, {params});
+  // },
+
   // 删除发布列表（视图）
   async removeRelease(data: any, showMsg = true) {
     return request(`${baseUrl}/latest-release/list`, {

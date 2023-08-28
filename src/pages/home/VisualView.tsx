@@ -1,13 +1,14 @@
 import React, {useEffect, useMemo, useState, Fragment} from 'react';
 import styles from './index.less';
 import cns from 'classnames';
-import {Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch} from 'antd';
+import {Collapse, Card, Modal, Spin, Switch} from 'antd';
 import {InfoCircleOutlined, RightOutlined, DownOutlined} from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
 import {isEmpty, sortBy, cloneDeep, isArray, intersection, difference, pick} from 'lodash';
 import dayjs from 'dayjs';
 import {valueMap} from '@/utils/utils';
 import {history, useModel} from 'umi';
+import {objectArraySortByAsc} from "@/publicMethods/arrayMethod";
 
 let thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
@@ -204,11 +205,8 @@ const ICard = (params: {
 };
 
 const VisualView = () => {
-  const [form] = Form.useForm();
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [loading, setLoading] = useState(false);
-  const [project, setProject] = useState<any[]>([]);
-  const [branch, setBranch] = useState<any[]>([]);
   const [cluster, setCluster] = useState<any>();
   const [online, setOnline] = useState<{ name: string; value: string }[]>([
     {name: '', value: ''},
@@ -231,86 +229,41 @@ const VisualView = () => {
     });
   }, []);
 
-  const getSelectData = async () => {
-    const [projectList, branchList] = await Promise.all([
-      PreReleaseServices.project(),
-      PreReleaseServices.branch(),
-    ]);
-    setProject(
-      projectList?.map((it: any) => ({
-        label: it.project_name,
-        value: it.project_id,
-        key: it.project_id,
-      })),
-    );
-    setBranch(
-      branchList?.map((it: any) => ({
-        label: it.branch_name,
-        value: it.branch_name,
-        key: it.branch_id,
-      })),
-    );
-  };
-
-  const getPlanList = async () => {
-    const values = form.getFieldsValue();
-    const plan = await PreReleaseServices.releasePlan({
-      project_id: values.project_id?.join(',') ?? '',
-      branch: values.branch?.join(',') ?? '',
-      plan_time: values.plan_time ? dayjs(values.plan_time).format('YYYY-MM-DD') : '',
-    });
-    setPlanSource(
-      plan?.map((it: any, i: number) => ({
-        ...it,
-        baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-        cls: styles.dotLinePrimary,
-        bg: initBg[2],
-        plan_release_time: it.plan_time,
-        release_num: it.branch + i,
-        release_env: it.cluster ? it.cluster?.map((it: any) => cluster[it])?.join(',') ?? '' : '',
-      })),
-    );
-  };
-
   const computeFn = (origin: any[], clusterMap: any) => {
     if (isEmpty(origin)) return [];
     return origin.map((it: any) => ({value: clusterMap[it], name: it}));
   };
 
-  const preData = (clusterMap = cluster) => {
-    Promise.all([PreReleaseServices.releaseView(), PreReleaseServices.releasePlan({})]).then(
-      (res) => {
-        const [currentDay, plan] = res;
-        setCurrentSource(
-          currentDay?.map((it: any) => {
-            const isRed = it.project?.some(
-              (pro: any) =>
-                pro.pro_name?.startsWith('emergency') ||
-                pro.pro_name?.startsWith('stagepatch') ||
-                pro.pro_name?.startsWith('stage-patch'),
-            );
-            return {
-              ...it,
-              baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-              cls: isRed ? styles.dotLineEmergency : styles.dotLinePrimary,
-              bg: isRed ? initBg[1] : initBg[2],
-            };
-          }),
+  const preData = (clusterMap = cluster, currentDay: any, plan: any) => {
+
+    setCurrentSource(
+      currentDay?.map((it: any) => {
+        const isRed = it.project?.some(
+          (pro: any) =>
+            pro.pro_name?.startsWith('emergency') ||
+            pro.pro_name?.startsWith('stagepatch') ||
+            pro.pro_name?.startsWith('stage-patch'),
         );
-        setPlanSource(
-          plan?.map((it: any, i: number) => ({
-            ...it,
-            baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-            cls: styles.dotLineGray,
-            bg: initBg[3],
-            plan_release_time: it.plan_time,
-            release_env: it.cluster
-              ? it.cluster?.map((it: any) => clusterMap[it])?.join(',') ?? ''
-              : '',
-            release_num: it.branch + i,
-          })),
-        );
-      },
+        return {
+          ...it,
+          baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+          cls: isRed ? styles.dotLineEmergency : styles.dotLinePrimary,
+          bg: isRed ? initBg[1] : initBg[2],
+        };
+      }),
+    );
+    setPlanSource(
+      plan?.map((it: any, i: number) => ({
+        ...it,
+        baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+        cls: styles.dotLineGray,
+        bg: initBg[3],
+        plan_release_time: it.plan_time,
+        release_env: it.cluster
+          ? it.cluster?.map((it: any) => clusterMap[it])?.join(',') ?? ''
+          : '',
+        release_num: it.branch + i,
+      })),
     );
   };
 
@@ -318,10 +271,13 @@ const VisualView = () => {
 
     setLoading(true);
     try {
-      preData(clusterMap);
-      const basic = await PreReleaseServices.releaseBaseline();
+      // 获取整个视图的数据
+      const totalBasic = await PreReleaseServices.totalViewData();
+      const {version_baseline, ready_release, release_plan} = totalBasic;
+      preData(clusterMap, ready_release, release_plan);
+
       const formatBasicCluster = computeFn(
-        difference((basic.group ?? []).concat(basic.exist_clu ?? []), [
+        difference((version_baseline.group ?? []).concat(version_baseline.exist_clu ?? []), [
           'cn-northwest-01',
           'cn-northwest-10',
           ...ignore,
@@ -339,7 +295,7 @@ const VisualView = () => {
           basicGroup.push({
             name: it.name,
             children:
-              basic?.res.flatMap((re: any) => (re.cluster.includes(it.name) ? [re] : [])) ?? [],
+              version_baseline?.res.flatMap((re: any) => (re.cluster.includes(it.name) ? [re] : [])) ?? [],
           });
         });
       basicGroup.forEach((it) => {
@@ -347,19 +303,21 @@ const VisualView = () => {
           child.detail?.forEach((o: any) => {
             const cn = it.name.replace('cn-northwest-', '')?.split();
             const clusters = o.cluster?.join(',')?.replaceAll('cn-northwest-', '')?.split(',');
-            if (
-              clusters?.filter((num: string) => cn?.join()?.includes(num))?.length > 0 // 存在集群合并的情况
-            ) {
+            if (clusters?.filter((num: string) => cn?.join()?.includes(num))?.length > 0) {
+              // 存在集群合并的情况
               it.children[i] = {
                 ...child,
                 release_type: o.release_type,
                 release_num: o.release_num,
-                release_time: o.plan_release_time,
+                release_time: o.release_time,
               };
             }
           });
         });
+        // 按照发布时间（release_time）进行排序
+        it.children = it.children?.sort(objectArraySortByAsc('release_time'));
       });
+
       setBasicSource(basicGroup);
       setOnline(formatOnline);
       setLoading(false);
@@ -368,13 +326,7 @@ const VisualView = () => {
     }
   };
 
-  const renderTr = (
-    arr: any[],
-    title: string,
-    showStep = true,
-    deleteIcon?: boolean,
-    showLink = true,
-  ) => {
+  const renderTr = (arr: any[], title: string, showStep = true, deleteIcon?: boolean, showLink = true,) => {
     if (isEmpty(arr)) {
       return (
         <tr>
@@ -422,6 +374,22 @@ const VisualView = () => {
   };
 
   const renderTd = (data: any, deleteIcon?: boolean, showLink = true) => {
+
+    const {arrow_info} = data;
+    // 展示的数字
+    const showCluster: any = [];
+    if (arrow_info && arrow_info.length) {
+      arrow_info.map((e: any) => {
+        const {part_tips} = e;
+        if (part_tips && part_tips.length) {
+          part_tips.map((tip: any) => {
+            showCluster.push(tip.toString().replace("cn-northwest-", "").trim());
+          })
+        }
+      })
+    }
+
+
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
@@ -437,29 +405,38 @@ const VisualView = () => {
                   showLink={showLink}
                   child={
                     <div>
-                      {data?.cluster?.map((env: any, i: number) => {
+                      {arrow_info.map((env: any, i: number) => {
                         const baseIndex = dynamicColumn.findIndex(
                           (v) => data.baseline_cluster == v.name,
                         );
-                        const envIndex = dynamicColumn.findIndex((v) => v.name == env);
+                        const envIndex = dynamicColumn.findIndex((v) => v.name == env.arrow_to);
                         const alpha = envIndex - baseIndex;
-                        if (envIndex < 0 || env == data.baseline_cluster) return '';
+                        if (envIndex < 0 || env.arrow_to == data.baseline_cluster) return '';
+
                         return (
                           <div
-                            key={env + i}
+                            key={env.arrow_to + i}
                             className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
                             style={{
                               width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
                             }}
-                          />
+                          >
+                            {/* 如果2-7集群全都有的话，则，后面不再展示已成功的标签。 */}
+                            {(env.part_tips && env.part_tips.length > 0) && showCluster.length > 0 && showCluster.length < 6 ?
+                              <div style={{
+                                top: 5,
+                                position: "absolute",
+                                color: "gray",
+                                right: -85,
+                                textAlign: "left",
+                                width: 180
+                              }}>集群({showCluster.join("，")})</div>
+                              : ""}
+                          </div>
                         );
                       })}
                     </div>
-                  }
-                />
-              ) : (
-                ''
-              )}
+                  }/>) : ('')}
             </td>
           );
         })}
@@ -508,8 +485,6 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
-  const init = useMemo(() => {
-  }, []);
   return (
     <Card
       className={styles.card}
@@ -572,42 +547,6 @@ const VisualView = () => {
               {renderBasicTd}
             </tr>
             {renderTr(currentSource, '待发布过程单')}
-            {/*搜索条件*/}
-            {/*<tr>*/}
-            {/*  <td colSpan={onlineLen + 5}>*/}
-            {/*    <Form*/}
-            {/*      form={form}*/}
-            {/*      size={'small'}*/}
-            {/*      layout={'inline'}*/}
-            {/*      className={styles.condition}*/}
-            {/*      onFieldsChange={getPlanList}*/}
-            {/*    >*/}
-            {/*      <Form.Item name={'project_id'} label={'项目名称'}>*/}
-            {/*        <Select*/}
-            {/*          style={{ width: '300px' }}*/}
-            {/*          options={project}*/}
-            {/*          placeholder={'项目名称'}*/}
-            {/*          mode={'multiple'}*/}
-            {/*          showSearch*/}
-            {/*          optionFilterProp={'label'}*/}
-            {/*        />*/}
-            {/*      </Form.Item>*/}
-            {/*      <Form.Item name={'branch'} label={'分支名称'}>*/}
-            {/*        <Select*/}
-            {/*          style={{ width: '300px' }}*/}
-            {/*          options={branch}*/}
-            {/*          placeholder={'分支名称'}*/}
-            {/*          mode={'multiple'}*/}
-            {/*          showSearch*/}
-            {/*          optionFilterProp={'label'}*/}
-            {/*        />*/}
-            {/*      </Form.Item>*/}
-            {/*      <Form.Item name={'plan_time'} label={'计划上线日期'}>*/}
-            {/*        <DatePicker style={{ width: '170px' }} />*/}
-            {/*      </Form.Item>*/}
-            {/*    </Form>*/}
-            {/*  </td>*/}
-            {/*</tr>*/}
             {renderTr(planSource, '计划上线日历', false, false, false)}
             </tbody>
           </table>

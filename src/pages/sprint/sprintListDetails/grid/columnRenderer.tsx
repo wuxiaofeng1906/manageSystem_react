@@ -87,6 +87,9 @@ const testConfirmValueGetter = (params: any) => {
   if (testConfirme === '0' || testConfirme === null || testConfirme === undefined) {
     return '否';
   }
+  if (testConfirme === '2') {
+    return '免';
+  }
   return '是';
 };
 

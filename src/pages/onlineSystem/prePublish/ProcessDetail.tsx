@@ -159,10 +159,13 @@ const ProcessDetail = (props: any, ref: any) => {
 
   useEffect(() => {
     if (!isEmpty(basic)) {
+      // 获取到的集群
+      const cluster = basic?.cluster?.split(',') ?? [];
+
       form.setFieldsValue({
         ...basic,
         plan_release_time: basic?.plan_release_time ? moment(basic?.plan_release_time) : null,
-        cluster: basic?.cluster?.split(',') ?? [],
+        cluster: globalEnv.filter((e) => cluster.includes(e.value)),    // 这里要根据_cluster中的顺序来
       });
     }
     if (!isEmpty(repair)) {

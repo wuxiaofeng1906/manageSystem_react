@@ -683,11 +683,13 @@ const SprintList: React.FC<any> = () => {
       datas['feedback'] = oradata.adminAddFeedbacker;
       datas['testCheck'] =
         oradata.adminAddtesterVerifi === '' ? '' : `-${oradata.adminAddtesterVerifi}`; // 新增的行都是为手动修改的数据
+      // datas['testConfirmed'] =adminAddtesterVerifi
       datas['clearCache'] = oradata.adminClearCache === '' ? '' : `-${oradata.adminClearCache}`; // 手动修改是否清缓存
 
       addCommitDetails(datas);
     } else {
       const curRow: any = getFinalGridData(); // 获取选中的行
+
       datas['id'] = curRow[0].id;
       // 判断是否被修改过 禅道id 对应测试、对应UED、创建人,是否需要测试验证
       if (curRow[0].ztNo !== oradata.adminChandaoId) {
@@ -703,8 +705,20 @@ const SprintList: React.FC<any> = () => {
 
       // 如果修改了是否需要测试验证，就要改为负值。
       if (curRow[0].testCheck !== oradata.adminAddtesterVerifi) {
-        datas['testCheck'] =
-          oradata.adminAddtesterVerifi === '' ? '' : `-${oradata.adminAddtesterVerifi}`; //  为手动修改的数据
+        datas['testCheck'] = oradata.adminAddtesterVerifi === '' ? '' : `-${oradata.adminAddtesterVerifi}`; //  为手动修改的数据
+
+        // 对于需求 任务- 128858
+        if (oradata.adminChandaoType === "3") {
+          if (oradata.adminAddtesterVerifi === "0") { //  当测试验证为否
+            //并且测试确认为否，则 testConfirmed= ’2‘（免）
+            if (curRow[0].testConfirmed !== "1" && curRow[0].testConfirmed !== "2") {
+              datas['testConfirmed'] = '2';
+            }
+          } else if (oradata.adminAddtesterVerifi === "1" && curRow[0].testConfirmed === "2") {
+            //  当测试验证为是,1.测试确认为免，则testConfirmed=null，否则原本是什么就是什么。）
+            datas['testConfirmed'] = null;
+          }
+        }
       }
 
       // 如果修改了是否清缓存，就要改为负值。
@@ -914,7 +928,7 @@ const SprintList: React.FC<any> = () => {
       currentUserGroup =
         initialState.currentUser === undefined ? '' : initialState.currentUser.group;
     }
-    // currentUserGroup = 'devGroup';
+    // currentUserGroup = 'devManageGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':
@@ -1490,6 +1504,9 @@ const SprintList: React.FC<any> = () => {
           <Option key={'0'} value={'0'}>
             否
           </Option>,
+          // <Option key={'2'} value={'2'}>
+          //   免
+          // </Option>,
         ]}
       </Select>
     );

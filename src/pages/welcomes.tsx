@@ -11,7 +11,7 @@ export default (): React.ReactNode => {
         <Alert
           message={intl.formatMessage({
             id: 'firstPages',
-            defaultMessage: '欢迎使用企企研发管理平台',
+            defaultMessage: '欢迎使用管理系统',
           })}
           type="success"
           showIcon

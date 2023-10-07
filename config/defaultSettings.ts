@@ -1,9 +1,6 @@
 import {Settings as LayoutSettings} from '@ant-design/pro-layout';
 
-const Settings: LayoutSettings & {
-  pwa?: boolean;
-  logo?: string;
-} = {
+const Settings: LayoutSettings & { pwa?: boolean; logo?: string; } = {
   navTheme: 'light',
   primaryColor: '#1890ff',
   layout: 'mix',
@@ -11,9 +8,9 @@ const Settings: LayoutSettings & {
   fixedHeader: true,
   fixSiderbar: true,
   colorWeak: false,
-  title: '企企研发管理平台',
+  title: '管理系统',
   pwa: false,
-  logo: '/77Logo.png',
+  logo: '/icons/flag.png',
   iconfontUrl: '',
   menu: {
     locale: false,

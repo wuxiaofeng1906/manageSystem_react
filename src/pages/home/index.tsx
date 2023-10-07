@@ -1,105 +1,86 @@
-import React, {useEffect, useRef, useState} from 'react';
-import styles from './index.less';
-import {Card} from 'antd';
-import {AgGridReact} from 'ag-grid-react';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {dutyColumn} from '@/pages/home/column';
-import * as dayjs from 'dayjs';
-import DutyListServices from '@/services/dutyList';
-import VisualView from '@/pages/home/VisualView';
-import { isEmpty, omit } from 'lodash';
-import usePermission from '@/hooks/permission';
-import { useLocation, history, useModel } from 'umi';
-import { useUser } from '@/hooks/user';
+import React, {useEffect} from 'react';
+import * as echarts from 'echarts'; // 引入 ECharts 主模块
+import 'echarts/lib/chart/bar'; // 引入柱状图
+import 'echarts/lib/component/tooltip'; // 引入提示框和标题组件
+import 'echarts/lib/component/title';
+import type {CountdownProps} from 'antd';
+import {Col, Row, Statistic} from 'antd';
+
+const {Countdown} = Statistic;
 
 const Home = () => {
-  const { setUser } = useUser();
-  const [initialState, setInitialState] = useModel('@@initialState', (user) => [
-    user?.initialState,
-    user.setInitialState,
-  ]);
-  const urlParams = useLocation()?.query as { auth?: string; userId: string; userName: string };
-  const gridRef = useRef<GridApi>();
-  const [dutyPerson, setDutyPerson] = useState<any[]>([]);
-  const {prePermission} = usePermission();
-  const hasPermission = prePermission();
-  const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
-  const to = from.endOf('w');
 
-  const range = {
-    start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
-    end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
-  };
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-  // 获取第一值班人
-  const getFirstDuty = async () => {
-    const firstDuty = await DutyListServices.getFirstDutyPerson(range);
-    const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
-    let obj = {};
-    duty?.forEach((it: any) => {
-      obj[it.user_tech] = it.user_name;
-    });
-    setDutyPerson(isEmpty(obj) ? [] : [obj]);
-  };
-  useEffect(() => {
-    getFirstDuty();
-  }, []);
-
-  useEffect(() => {
-    if (urlParams?.auth) {
-      localStorage.setItem('accessId', urlParams?.auth);
-      setUser({
-        ...initialState,
-        currentUser: {
-          ...initialState?.currentUser,
-          userid: urlParams?.userId,
-          name: urlParams?.userName,
-          avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+  const showChart = () => {
+    const bom = document.getElementById('totalPieChart');
+    if (bom) {
+      // 基于准备好的dom，初始化echarts实例
+      const pieChart = echarts.init(bom);
+      // 绘制图表
+      pieChart.setOption({
+        tooltip: {
+          trigger: 'item',
         },
+        legend: {
+          x: '70%',
+          orient: 'Vertical',
+        },
+        series: [
+          {
+            radius: '95%', // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
+            type: 'pie',
+            center: ['40%', '50%'], // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
+            label: {
+              // 饼图标签相关
+              normal: {
+                show: true,
+                position: 'inner', // 标签的位置
+                textStyle: {
+                  // fontWeight: 100,
+                  fontSize: 13, // 文字的字体大小
+                  color: 'black', // 文字颜色
+                },
+                formatter: '{d}%',
+              },
+            },
+            data: [
+              {
+                value: 50,
+                name: '开发人数',
+              },
+              {
+                value: 5,
+                name: '架构师人数',
+              },
+              {
+                value: 10,
+                name: '技术管理人数',
+              },
+            ],
+          },
+        ],
       });
-      history.replace({
-        pathname: location.pathname,
-        query: omit(urlParams, ['auth', 'userName', 'userId']),
-      });
+      // 窗口缩放后重新调整图标尺寸
+      window.onresize = function () {
+        pieChart.resize();
+      };
     }
-  }, [urlParams?.auth]);
+  }
+
+  useEffect(() => {
+    showChart();
+  }, [])
 
   return (
-    <div className={styles.homePage}>
-      <Card
-        className={styles.card}
-        title={
-          <span>
-            值班信息：{dayjs(range.start_time).format('YYYY-MM-DD')}~
-            {dayjs(range.end_time).format('YYYY-MM-DD')}
-          </span>
-        }
-      >
-        <div className="ag-theme-alpine" style={{height: 80, width: '100%'}}>
-          <AgGridReact
-            columnDefs={dutyColumn}
-            rowData={dutyPerson}
-            defaultColDef={{
-              resizable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-              cellStyle: {'line-height': '28px'},
-              minWidth: 100,
-            }}
-            rowHeight={28}
-            headerHeight={30}
-            onGridSizeChanged={onGridReady}
-            onGridReady={onGridReady}
-          />
-        </div>
-      </Card>
-      {/* 有权限的话显示待发布视图 */}
-      {hasPermission?.preView ? <VisualView/> : <div/>}
+    <div>
+      首页可以做一些统计数据展示
+      <div id="totalPieChart"
+           style={{height: 250, backgroundColor: 'white'}}
+      ></div>
+      <div style={{marginTop:30}}>
+        <Countdown title="距离2024年倒计时" value={'2023-12-31 23:59:59'} format="D 天 H 时 m 分 s 秒"/>
+      </div>
+
+
     </div>
   );
 };

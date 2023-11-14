@@ -23,7 +23,29 @@ export default [
     name: '首页',
     icon: 'HomeOutlined',
     component: './home',
-  }, {
+  },
+  {
+    path: '/redux',
+    name: 'redux学习',
+    // icon: 'HomeOutlined',
+    component: './redux',
+  },  {
+    path: '/reactRedux',
+    name: 'redux-reduct学习',
+    // icon: 'HomeOutlined',
+    component: './reactRedux',
+  },
+  {
+    name: '学习',
+    path: '/study',
+    routes: [{
+      name: 'hooksApi',
+      path: 'hooksApi',
+      component: './study/hooksApi',
+    }]
+  },
+
+  {
     name: '管理',
     icon: 'CarOutlined',
     path: '/manage',

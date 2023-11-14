@@ -39,7 +39,7 @@ const Login: React.FC<{}> = () => {
     };
 
     if (userInfo) {
-      debugger
+
       setInitialState({...initialState, currentUser: userInfo});
       goto();
     }

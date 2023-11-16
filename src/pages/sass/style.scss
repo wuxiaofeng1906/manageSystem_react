@@ -1,0 +1,52 @@
+@import "testStyle";
+
+$blue: red;
+.divStyle {
+  @if 1 + 1 == 2 {
+    color: $blue;
+  } @else {
+    color: red;
+  }
+
+}
+
+// 自定义函数
+@function double($n) {
+  @return $n*2;
+}
+
+$side: left;
+.buttonStyle {
+  margin-#{$side}: double(50px); // 运算
+}
+
+.buttonStyle2 {
+  @extend .buttonStyle; // 继承
+  &:Hover {
+    color: red;
+  }
+}
+
+//// 定义一个mixin
+//@mixin color {
+//  background-color: red;
+//}
+//
+//// 使用mixin
+//.buttonStyle3 {
+//  @include color
+//}
+
+
+// 定义一个mixin,并指定参数和默认值
+@mixin color($value:red) {
+  background-color: $value;
+}
+
+// 使用mixin
+.buttonStyle3 {
+  @include color(blue)
+}
+
+
+

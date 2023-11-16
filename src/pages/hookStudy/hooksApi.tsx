@@ -1,13 +1,13 @@
 import React from 'react';
 import {Divider} from "antd";
-import StateExample from "@/pages/study/useState";
-import ContextExample from "@/pages/study/useContext";
-import EffectExample from "@/pages/study/useEffect";
-import RefExample from "@/pages/study/useRef";
-import ImperativeHandleExample from "@/pages/study/useImperativeHandle";
-import MemoExample from "@/pages/study/useMemo";
-import CallbackExample from "@/pages/study/useCallback";
-import ReducerExample from "@/pages/study/useReducer";
+import StateExample from "@/pages/hookStudy/useState";
+import ContextExample from "@/pages/hookStudy/useContext";
+import EffectExample from "@/pages/hookStudy/useEffect";
+import RefExample from "@/pages/hookStudy/useRef";
+import ImperativeHandleExample from "@/pages/hookStudy/useImperativeHandle";
+import MemoExample from "@/pages/hookStudy/useMemo";
+import CallbackExample from "@/pages/hookStudy/useCallback";
+import ReducerExample from "@/pages/hookStudy/useReducer";
 
 function TotalExample() {
 

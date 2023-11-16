@@ -1,0 +1,16 @@
+.buttonStyle4 {
+  background-color: orange; }
+
+.divStyle {
+  color: red; }
+
+.buttonStyle, .buttonStyle2 {
+  margin-left: 100px; }
+
+.buttonStyle2:Hover {
+  color: red; }
+
+.buttonStyle3 {
+  background-color: blue; }
+
+/*# sourceMappingURL=style.css.map */

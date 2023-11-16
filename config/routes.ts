@@ -27,21 +27,25 @@ export default [
   {
     path: '/redux',
     name: 'redux学习',
-    // icon: 'HomeOutlined',
     component: './redux',
-  },  {
+  },
+  {
     path: '/reactRedux',
-    name: 'redux-reduct学习',
-    // icon: 'HomeOutlined',
+    name: 'react-redux学习',
     component: './reactRedux',
   },
   {
-    name: '学习',
-    path: '/study',
+    path: '/sass',
+    name: 'sass学习',
+    component: './sass',
+  },
+  {
+    name: 'reactHooks学习',
+    path: '/hookStudy',
     routes: [{
       name: 'hooksApi',
       path: 'hooksApi',
-      component: './study/hooksApi',
+      component: './hookStudy/hooksApi',
     }]
   },
 
